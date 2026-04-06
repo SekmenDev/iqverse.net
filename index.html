@@ -1,177 +1,312 @@
-  <!-- https://egotype.design/work/web/html/kounter/index-waterpipe-cd.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-
-  <!-- Title of Website -->
-  <title>IQ Verse &ndash; Coming Soon</title>
-
-  <meta name="description"
-        content="Coming Soon"/>
-  <meta name="keywords"
-        content="IQ Verse, html theme, Coming Soon, Coming Soon template, html, one page, responsive"/>
-  <meta name="author" content="Egotype">
-
-  <!-- Favicon -->
-  <link rel="icon" href="favicon.png" type="image/png">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-
-  <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="css/plugins/bootstrap.min.css">
-
-  <!-- Font Icons -->
-  <link rel="stylesheet"
-        href="css/icons/font-awesome.css">
-  <link rel="stylesheet"
-        href="css/icons/linea.css">
-
-  <!-- Google Fonts -->
-  <link rel="stylesheet" type="text/css"
-        href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700">
-
-  <!-- Plugins CSS -->
-  <link rel="stylesheet" href="css/plugins/loaders.min.css">
-
-
-  <!-- Custom CSS -->
-  <link rel="stylesheet" href="css/style.css">
-
-  <!-- Responsive CSS -->
-  <link href="css/responsive.css" rel="stylesheet">
-
-  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-  <!--[if lt IE 9]>
-  <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-  <![endif]-->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IQVerse Tools | Free. Open. Powerful.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body data-spy="scroll" data-target=".scrollspy" class="bg-dark">
+<body>
 
-<!-- Preloader  -->
-<div class="loader bg-dark">
-  <div class="loader-inner ball-scale-ripple-multiple ball-scale-ripple-multiple-color">
-    <div></div>
-    <div></div>
-    <div></div>
-  </div>
-</div>
-<!-- /End Preloader  -->
+  <!-- Background grid -->
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow--1"></div>
+  <div class="bg-glow bg-glow--2"></div>
 
-
-<div id="page">
-
-  <!-- ============================
-       BG & Overlays
-  ================================= -->
-
-  <!-- Waterpipe BG -->
-  <div id="waterpipe" class="section-overlay">
-    <canvas></canvas>
-  </div>
-  <!-- /End Waterpipe BG -->
-
-  <!-- Overlay BG -->
-  <div class="section-overlay bg-black overlay-opacity"></div>
-  <!-- /End Overlay BG -->
-
-
-  <!-- Modal -->
-  <div id="modal-notify" class="modal fade modal-scale" tabindex="-1" role="dialog"
-       aria-labelledby="meinModalLabel">
-
-    <!-- .modal-dialog -->
-    <div class="modal-dialog" role="document">
-      <div>
-
-        <!-- .modal-content -->
-        <div class="modal-content text-center bg-dark text-light">
-          <button class="button-close" data-dismiss="modal" aria-label="Close"><i
-              class="icon icon-lg icon-arrows-remove"></i></button>
-
-
-          <!-- Headline -->
-          <div class="wrap-line border-dark">
-            <h3><span class="font-weight-200">Stay</span> Tuned</h3>
-          </div>
-          <!-- /End Headline -->
-
-          <!-- Description -->
-          <div class="p-t-b-15">
-            <p>We launch our new website soon.<br>
-              Please stay updated and follow.</p>
-          </div>
-          <!-- /End Description -->
-
-          </div>
-        </div>
-
-      </div>
-      <!-- /End .modal-content -->
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav__logo">
+      <span class="nav__logo-bracket">[</span>
+      IQVerse
+      <span class="nav__logo-bracket">]</span>
     </div>
-    <!-- /End .modal-dialog -->
-  </div>
-  <!-- /End Modal -->
+    <ul class="nav__links">
+      <li><a href="#tools">Tools</a></li>
+      <li><a href="#ideas">Ideas</a></li>
+      <li><a href="#cta" class="nav__cta">GitHub ↗</a></li>
+    </ul>
+  </nav>
 
-  <!-- ============================
-       Header Navigation
-  ================================= -->
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero__eyebrow">
+      <span class="pill">Open Source</span>
+      <span class="pill">Free Forever</span>
+      <span class="pill">Browser-Based</span>
+    </div>
+    <h1 class="hero__title">
+      Tools built by<br />
+      <em>developers</em><br />
+      for developers.
+    </h1>
+    <p class="hero__sub">No logins. No paywalls. No telemetry. Just tools that work, right in your browser.</p>
+    <div class="hero__scroll-hint">scroll to explore ↓</div>
+  </section>
 
-  <div class="container-fluid">
-    <div class="row">
+  <!-- TOOLS -->
+  <section class="tools" id="tools">
+    <div class="section-label">// tools</div>
 
-      <!-- ============================
-           Info
-      ================================= -->
-
-      <div id="info" class="col-md-12 text-white text-center page-info col-transform">
-        <div class="vert-middle">
-          <div class="reveal scale-out">
-
-            <!-- Count Down -->
-            <div class="count-down p-t-b-15" data-end-date="Jan 01, 2026 00:00:00">
-            </div>
-            <!-- /End Count Down -->
-
-            <!-- Logo 
-            <div class="p-t-b-15">
-              <img src="images/logo.png" height="60" width="49" alt="">
-            </div>
-             /End Logo -->
-
-            <div class="p-t-b-15">
-              <!-- Headline & Description -->
-              <h2><span class="font-weight-200">Before launching our</span><br>new Website</h2>
-
-              <p>We're coming soon!<br>We're working hard to give you the best experience!<br>
-              </p>
-              <!-- /End Headline & Description -->
-            </div>
+    <!-- QR Forge -->
+    <article class="tool-card" data-index="01">
+      <div class="tool-card__meta">
+        <span class="tool-card__number">01</span>
+        <span class="tool-card__tag">Open Source</span>
+        <span class="tool-card__tag tool-card__tag--live">Live</span>
+      </div>
+      <div class="tool-card__content">
+        <div class="tool-card__icon">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="2.5"/>
+            <rect x="8" y="8" width="8" height="8" fill="currentColor"/>
+            <rect x="28" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="2.5"/>
+            <rect x="32" y="8" width="8" height="8" fill="currentColor"/>
+            <rect x="4" y="28" width="16" height="16" rx="2" stroke="currentColor" stroke-width="2.5"/>
+            <rect x="8" y="32" width="8" height="8" fill="currentColor"/>
+            <rect x="28" y="28" width="4" height="4" fill="currentColor"/>
+            <rect x="36" y="28" width="4" height="4" fill="currentColor"/>
+            <rect x="28" y="36" width="4" height="4" fill="currentColor"/>
+            <rect x="36" y="36" width="8" height="8" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="tool-card__body">
+          <h2 class="tool-card__title">QR Forge</h2>
+          <p class="tool-card__desc">
+            Generate QR codes instantly in your browser without any data collection. Supports URLs, plain text, Wi-Fi credentials, vCards and more. Export as SVG or PNG at any resolution.
+          </p>
+          <ul class="tool-card__features">
+            <li>100% client-side generation</li>
+            <li>SVG & PNG export</li>
+            <li>Custom colors & logos</li>
+            <li>Multiple data types</li>
+          </ul>
+          <div class="tool-card__links">
+            <a href="https://qrforge.iqverse.net/" target="_blank" class="btn btn--primary">Launch Tool ↗</a>
+            <a href="https://github.com/SekmenDev/qr-forge" target="_blank" class="btn btn--ghost">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              Source Code
+            </a>
           </div>
         </div>
       </div>
+      <div class="tool-card__glow"></div>
+    </article>
+
+    <!-- Link Radar -->
+    <article class="tool-card" data-index="02">
+      <div class="tool-card__meta">
+        <span class="tool-card__number">02</span>
+        <span class="tool-card__tag">Open Source</span>
+        <span class="tool-card__tag tool-card__tag--live">Live</span>
+      </div>
+      <div class="tool-card__content">
+        <div class="tool-card__icon">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="24" cy="24" r="18" stroke="currentColor" stroke-width="2.5"/>
+            <circle cx="24" cy="24" r="10" stroke="currentColor" stroke-width="2.5" stroke-dasharray="3 3"/>
+            <circle cx="24" cy="24" r="3" fill="currentColor"/>
+            <path d="M36 12L28 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M36 8L40 4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="40" cy="8" r="3" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="tool-card__body">
+          <h2 class="tool-card__title">Link Radar</h2>
+          <p class="tool-card__desc">
+            Scan any webpage and detect broken links in seconds. Paste a URL or raw HTML and Link Radar will crawl all anchors and report 404s, timeouts and redirect chains. So you can fix them before users hit them.
+          </p>
+          <ul class="tool-card__features">
+            <li>Bulk link scanning</li>
+            <li>HTTP status detection</li>
+            <li>Redirect chain analysis</li>
+            <li>Exportable reports</li>
+          </ul>
+          <div class="tool-card__links">
+            <a href="https://linkradar.iqverse.net/" target="_blank" class="btn btn--primary">Launch Tool ↗</a>
+            <a href="https://github.com/SekmenDev/link-radar" target="_blank" class="btn btn--ghost">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              Source Code
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="tool-card__glow"></div>
+    </article>
+
+    <!-- School Management -->
+    <article class="tool-card tool-card--saas" data-index="03">
+      <div class="tool-card__meta">
+        <span class="tool-card__number">03</span>
+        <span class="tool-card__tag tool-card__tag--saas">SaaS</span>
+        <span class="tool-card__tag tool-card__tag--live">Live</span>
+      </div>
+      <div class="tool-card__content">
+        <div class="tool-card__icon">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="16" width="40" height="28" rx="3" stroke="currentColor" stroke-width="2.5"/>
+            <path d="M14 16V10a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v6" stroke="currentColor" stroke-width="2.5"/>
+            <path d="M4 24h40" stroke="currentColor" stroke-width="2.5"/>
+            <circle cx="16" cy="34" r="3" fill="currentColor"/>
+            <circle cx="32" cy="34" r="3" fill="currentColor"/>
+            <path d="M19 34h10" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="tool-card__body">
+          <h2 class="tool-card__title">School Management <span class="badge">SaaS</span></h2>
+          <p class="tool-card__desc">
+            A full-featured school management platform covering student records, attendance, grades, timetables, parent communication and staff management. Built for real educational institutions with privacy-first design.
+          </p>
+          <ul class="tool-card__features">
+            <li>Student & staff management</li>
+            <li>Attendance tracking</li>
+            <li>Grade & report cards</li>
+            <li>Parent portal</li>
+          </ul>
+          <div class="tool-card__links">
+            <a href="https://goo.iqverse.net/" target="_blank" class="btn btn--primary">Visit App ↗</a>
+            <span class="tool-note">* Closed source, proprietary SaaS</span>
+          </div>
+        </div>
+      </div>
+      <div class="tool-card__glow"></div>
+    </article>
+
+    <!-- Favicon Generator (Coming Soon) -->
+    <article class="tool-card tool-card--wip" data-index="04">
+      <div class="tool-card__meta">
+        <span class="tool-card__number">04</span>
+        <span class="tool-card__tag">Open Source</span>
+        <span class="tool-card__tag tool-card__tag--wip">In Development</span>
+      </div>
+      <div class="tool-card__content">
+        <div class="tool-card__icon">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="6" y="6" width="36" height="36" rx="8" stroke="currentColor" stroke-width="2.5"/>
+            <path d="M16 24h16M24 16v16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="24" cy="24" r="6" stroke="currentColor" stroke-width="2" stroke-dasharray="2 2"/>
+          </svg>
+        </div>
+        <div class="tool-card__body">
+          <h2 class="tool-card__title">Favicon Generator <span class="badge badge--wip">Soon</span></h2>
+          <p class="tool-card__desc">
+            Upload any image or design a favicon from scratch. Automatically exports all sizes needed for modern browsers: 16×16, 32×32, 180×180 Apple touch and the full <code>manifest.json</code>. No Photoshop required.
+          </p>
+          <ul class="tool-card__features">
+            <li>All favicon sizes in one click</li>
+            <li>SVG favicon support</li>
+            <li>Web manifest generation</li>
+            <li>Browser preview</li>
+          </ul>
+          <div class="tool-card__links">
+            <span class="btn btn--disabled">Coming Soon</span>
+          </div>
+        </div>
+      </div>
+      <div class="tool-card__glow"></div>
+    </article>
+
+  </section>
+
+  <!-- IDEAS SECTION -->
+  <section class="ideas" id="ideas">
+    <div class="section-label">// what's next?</div>
+    <h2 class="ideas__title">More tools on the horizon</h2>
+    <p class="ideas__sub">Here are some ideas that fit perfectly into the IQVerse ecosystem: browser-based, open source, developer-friendly.</p>
+
+    <div class="ideas__grid">
+
+      <div class="idea-card">
+        <div class="idea-card__icon">⚡</div>
+        <h3>JSON Formatter & Validator</h3>
+        <p>Paste raw JSON to instantly beautify, minify, validate and diff it. Supports JSONPath querying and schema validation.</p>
+        <div class="idea-card__tags"><span>Utility</span><span>Dev Tool</span></div>
+      </div>
+
+      <div class="idea-card">
+        <div class="idea-card__icon">🎨</div>
+        <h3>Color Palette Generator</h3>
+        <p>Generate accessible, harmonious color palettes from a seed color. Export as CSS variables, Tailwind config or Figma tokens.</p>
+        <div class="idea-card__tags"><span>Design</span><span>CSS</span></div>
+      </div>
+
+      <div class="idea-card">
+        <div class="idea-card__icon">📐</div>
+        <h3>CSS Units Converter</h3>
+        <p>Instantly convert between px, rem, em, vw, vh and more with a live browser context input to get accurate rem values.</p>
+        <div class="idea-card__tags"><span>CSS</span><span>Utility</span></div>
+      </div>
+
+      <div class="idea-card">
+        <div class="idea-card__icon">🔐</div>
+        <h3>Password & Secret Generator</h3>
+        <p>Generate cryptographically secure passwords, API keys, UUIDs and random tokens. 100% client-side, nothing ever leaves the browser.</p>
+        <div class="idea-card__tags"><span>Security</span><span>Privacy</span></div>
+      </div>
+
+      <div class="idea-card">
+        <div class="idea-card__icon">🖼️</div>
+        <h3>Image Optimizer</h3>
+        <p>Compress PNG, JPEG and WebP images in-browser using WebAssembly. No upload to any server, your files stay private.</p>
+        <div class="idea-card__tags"><span>Images</span><span>Performance</span></div>
+      </div>
+
+      <div class="idea-card">
+        <div class="idea-card__icon">📝</div>
+        <h3>Regex Tester & Explainer</h3>
+        <p>Write and test regular expressions with live match highlighting and a plain-English explanation of what each part does.</p>
+        <div class="idea-card__tags"><span>Utility</span><span>Dev Tool</span></div>
+      </div>
+
+      <div class="idea-card">
+        <div class="idea-card__icon">🗜️</div>
+        <h3>Base64 / URL Encoder</h3>
+        <p>Encode and decode Base64, URL encoding, HTML entities and JWT tokens with a single clean interface.</p>
+        <div class="idea-card__tags"><span>Encoding</span><span>Security</span></div>
+      </div>
+
+      <div class="idea-card">
+        <div class="idea-card__icon">🌐</div>
+        <h3>DNS Lookup Tool</h3>
+        <p>Query A, AAAA, MX, TXT, CNAME and NS records for any domain right from your browser. Great for debugging deployments.</p>
+        <div class="idea-card__tags"><span>Networking</span><span>DevOps</span></div>
+      </div>
+
+      <div class="idea-card">
+        <div class="idea-card__icon">📊</div>
+        <h3>CSV Viewer & Converter</h3>
+        <p>Drop a CSV to view it as a sortable table, then convert to JSON, Markdown table or SQL INSERT statements instantly.</p>
+        <div class="idea-card__tags"><span>Data</span><span>Utility</span></div>
+      </div>
 
     </div>
-  </div>
+  </section>
 
-</div>
+  <!-- CTA -->
+  <section class="cta" id="cta">
+    <div class="cta__inner">
+      <p class="cta__eyebrow">// open source</p>
+      <h2 class="cta__title">Want to contribute?</h2>
+      <p class="cta__body">All tools are MIT licensed and hosted on GitHub. Fork, star, open issues or submit a pull request. New tool ideas are always welcome.</p>
+      <a href="https://github.com/SekmenDev" target="_blank" class="btn btn--large">View on GitHub ↗</a>
+    </div>
+  </section>
 
-<!-- Scripts -->
-<script src="js/plugins/jquery1.11.2.min.js"></script>
-<script src="js/plugins/bootstrap.min.js"></script>
-<script src="js/plugins/scrollreveal.min.js"></script>
-<script src="js/plugins/jquery.ajaxchimp.min.js"></script>
-<script src="js/plugins/jquery.countdown.min.js"></script>
-<script src="js/plugins/waterpipe.js"></script>
-<script src="js/plugins/prefixfree.min.js"></script>
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer__logo">
+      <span class="nav__logo-bracket">[</span>IQVerse<span class="nav__logo-bracket">]</span>
+    </div>
+    <p class="footer__copy">Free. Open. Reliable. Built with care for the developer community.</p>
+    <div class="footer__links">
+      <a href="https://qrforge.iqverse.net/">QR Forge</a>
+      <a href="https://linkradar.iqverse.net/">Link Radar</a>
+      <a href="https://goo.iqverse.net/">GOO</a>
+      <a href="https://sekmen.dev/">Sekmen.Dev</a>
+    </div>
+  </footer>
 
-<!-- Custom Script -->
-<script src="js/custom.js"></script>
-
+  <script src="script.js"></script>
 </body>
 </html>
