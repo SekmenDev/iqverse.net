@@ -84,14 +84,14 @@ More tools coming soon that fit perfectly into the IQVerse ecosystem:
 | Tool                        | Description                                                                     | Category    |
 | --------------------------- | ------------------------------------------------------------------------------- | ----------- |
 | **JSON Formatter**          | Beautify, minify, validate and diff JSON with JSONPath querying                 | Utility     |
-| **Color Palette Generator** | Generate accessible color palettes and export as CSS, Tailwind or Figma tokens | Design      |
+| **Color Palette Generator** | Generate accessible color palettes and export as CSS, Tailwind or Figma tokens  | Design      |
 | **CSS Units Converter**     | Convert between px, rem, em, vw, vh with live browser context                   | CSS         |
 | **Password Generator**      | Cryptographically secure passwords, API keys, UUIDs (100% client-side)          | Security    |
 | **Image Optimizer**         | Compress PNG, JPEG, WebP using WebAssembly (no uploads)                         | Performance |
 | **Regex Tester**            | Write and test regex with live matching and plain-English explanations          | Dev Tools   |
-| **Base64 Encoder**          | Encode/decode Base64, URL, HTML entities and JWT tokens                        | Encoding    |
+| **Base64 Encoder**          | Encode/decode Base64, URL, HTML entities and JWT tokens                         | Encoding    |
 | **DNS Lookup**              | Query A, AAAA, MX, TXT records for debugging deployments                        | DevOps      |
-| **CSV Converter**           | View as table, convert to JSON, Markdown or SQL                                | Data        |
+| **CSV Converter**           | View as table, convert to JSON, Markdown or SQL                                 | Data        |
 
 ---
 
