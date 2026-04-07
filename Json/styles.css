@@ -62,8 +62,7 @@ body {
 	inset: 0;
 	pointer-events: none;
 	z-index: 0;
-	background-image: linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-		linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+	background-image: linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
 	background-size: 48px 48px;
 	mask-image: radial-gradient(ellipse 80% 80% at 50% 0%, black 40%, transparent 100%);
 }
@@ -134,11 +133,11 @@ body {
 }
 
 .nav-tag {
-    font-size: 13px;
-    color: var(--text-muted);
-    text-decoration: none;
-    font-family: var(--font-mono);
-    letter-spacing: 0.02em;
+	font-size: 13px;
+	color: var(--text-muted);
+	text-decoration: none;
+	font-family: var(--font-mono);
+	letter-spacing: 0.02em;
 }
 .nav__logo-bracket {
 	color: var(--accent);
@@ -683,4 +682,20 @@ input[type="color"] {
 }
 .footer__logo a:hover {
 	text-decoration: underline;
+}
+
+/* ---- Cursor Glow Effect ---- */
+
+.cursor-glow {
+	position: fixed;
+	width: 200px;
+	height: 200px;
+	border-radius: 50%;
+	background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+	pointer-events: none;
+	z-index: 0;
+	filter: blur(60px);
+	opacity: 0;
+	transform: translate(-50%, -50%);
+	transition: opacity 0.2s ease-out;
 }

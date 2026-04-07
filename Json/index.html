@@ -90,7 +90,140 @@
 
 		<!-- Page -->
 		<main class="page">
+			<!-- Page Header -->
+			<div class="page-header">
+				<div class="page-header__eyebrow">
+					<span class="pill">JSON TOOLS</span>
+				</div>
+				<h1 class="page-header__title">JSON <em>Formatter & Validator</em></h1>
+				<p class="page-header__sub">Validate, format, minify, and transform your JSON data. No servers, no tracking, all in your browser.</p>
+			</div>
 
+			<!-- Input Section -->
+			<section>
+				<div class="section-label">Input</div>
+				<div class="card">
+					<div class="field">
+						<label>JSON Input</label>
+						<textarea id="jsonInput" placeholder='{"name": "John", "age": 30, "city": "New York"}'></textarea>
+					</div>
+					<div class="divider"></div>
+					<div class="field">
+						<label>File Upload (Optional)</label>
+						<div class="drop-zone" id="dropZone">
+							<p>Drag & drop a JSON file here or click to select</p>
+							<p>Supported: .json, .txt, .js</p>
+							<input type="file" id="fileInput" accept=".json,.txt,.js" style="display: none" />
+						</div>
+					</div>
+					<div class="divider"></div>
+					<div style="display: flex; gap: 0.8rem; flex-wrap: wrap">
+						<button class="btn btn-primary" id="validateBtn">Validate</button>
+						<button class="btn btn-ghost" id="formatBtn">Format (Pretty Print)</button>
+						<button class="btn btn-ghost" id="minifyBtn">Minify</button>
+						<button class="btn btn-ghost" id="sortBtn">Sort Keys</button>
+						<button class="btn btn-ghost" id="statisticsBtn">Statistics</button>
+						<button class="btn btn-ghost" id="clearBtn">Clear</button>
+					</div>
+				</div>
+			</section>
+
+			<!-- Output Section -->
+			<section id="outputSection" style="display: none;margin-top: 2rem">
+				<div class="section-label">Output</div>
+				<div class="card">
+					<div class="output-header">
+						<div style="flex: 1">
+							<h3 style="margin: 0; margin-bottom: 0.5rem; font-size: 1rem">Result</h3>
+							<div id="statusMessage" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem"></div>
+						</div>
+						<div class="output-actions">
+							<button class="btn btn-sm" id="copyBtn">Copy</button>
+							<button class="btn btn-sm" id="downloadBtn">Download</button>
+						</div>
+					</div>
+					<textarea id="outputArea" readonly style="max-height: 500px; font-family: var(--font-mono); font-size: 0.85rem"></textarea>
+					<div id="outputNote" class="output-note"></div>
+				</div>
+			</section>
+
+			<!-- Error Section -->
+			<section id="errorSection" style="display: none;margin-top: 2rem">
+				<div class="section-label">Error Details</div>
+				<div class="card" style="border-color: rgba(255, 100, 100, 0.3); background: rgba(255, 100, 100, 0.05)">
+					<div id="errorMessage" style="color: #ff6464; font-family: var(--font-mono); font-size: 0.9rem; line-height: 1.6"></div>
+				</div>
+			</section>
+
+			<!-- Additional Tools Section -->
+			<section style="margin-top: 2rem">
+				<div class="section-label">Advanced Tools</div>
+				<div class="card">
+					<div style="display: flex; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 1rem">
+						<button class="btn btn-ghost" id="convertToCSVBtn">Convert to CSV</button>
+						<button class="btn btn-ghost" id="flattenBtn">Flatten JSON</button>
+						<button class="btn btn-ghost" id="findDuplicateKeysBtn">Find Duplicate Keys</button>
+						<button class="btn btn-ghost" id="validateSchemaBtn">Compare Two JSONs</button>
+						<button class="btn btn-ghost" id="escapeBtn">Escape String</button>
+						<button class="btn btn-ghost" id="unescapeBtn">Unescape String</button>
+					</div>
+				</div>
+			</section>
+
+			<!-- Statistics Section -->
+			<section id="statisticsSection" style="display: none;margin-top: 2rem">
+				<div class="section-label">Statistics</div>
+				<div class="card">
+					<div class="grid3" style="gap: 1.5rem">
+						<div>
+							<div
+								style="
+									font-family: var(--font-mono);
+									font-size: 0.7rem;
+									color: var(--text-muted);
+									text-transform: uppercase;
+									letter-spacing: 0.1em;
+									margin-bottom: 0.5rem;
+								"
+							>
+								File Size
+							</div>
+							<div id="statFileSize" style="font-size: 1.3rem; font-weight: 600; color: var(--accent)"></div>
+						</div>
+						<div>
+							<div
+								style="
+									font-family: var(--font-mono);
+									font-size: 0.7rem;
+									color: var(--text-muted);
+									text-transform: uppercase;
+									letter-spacing: 0.1em;
+									margin-bottom: 0.5rem;
+								"
+							>
+								Lines
+							</div>
+							<div id="statLines" style="font-size: 1.3rem; font-weight: 600; color: var(--accent2)"></div>
+						</div>
+						<div>
+							<div
+								style="
+									font-family: var(--font-mono);
+									font-size: 0.7rem;
+									color: var(--text-muted);
+									text-transform: uppercase;
+									letter-spacing: 0.1em;
+									margin-bottom: 0.5rem;
+								"
+							>
+								Key Count
+							</div>
+							<div id="statKeys" style="font-size: 1.3rem; font-weight: 600; color: var(--saas)"></div>
+						</div>
+					</div>
+					<div id="additionalStats" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border)"></div>
+				</div>
+			</section>
 		</main>
 
 		<footer class="footer">
