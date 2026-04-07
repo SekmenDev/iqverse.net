@@ -26,6 +26,9 @@
 	--font-body: "DM Sans", sans-serif;
 	--font-mono: "DM Mono", monospace;
 	--panel-w: 380px;
+	--green: var(--accent);
+	--green-dim: var(--accent-dim);
+	--green-faint: var(--accent-faint);
 }
 
 html {
@@ -127,23 +130,21 @@ body::after {
 	color: var(--text);
 }
 
-.logo svg {
-	color: var(--accent);
-	flex-shrink: 0;
-}
-
 .header-nav {
 	display: flex;
 	align-items: center;
 	gap: 14px;
 }
-
-.nav-tag {
-	font-size: 13px;
-	color: var(--text-muted);
+.header-nav a {
 	text-decoration: none;
-	font-family: var(--font-mono);
-	letter-spacing: 0.02em;
+	margin-left: 15px;
+}
+.nav-tag {
+    font-size: 13px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    letter-spacing: 0.02em;
 }
 .nav__logo-bracket {
 	color: var(--accent);
