@@ -1,0 +1,713 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>LinkRadar, Broken Link Scanner</title>
+
+		<!-- SEO Meta Tags -->
+		<meta
+			name="description"
+			content="Hunt down every broken link on your site from your browser. LinkRadar is a zero-install, zero-backend link scanner that crawls any website and reports every URL's HTTP status. 100% client-side, no data leaves your machine."
+		/>
+		<meta name="keywords" content="broken link checker, link scanner, broken link detector, website crawler, link validation, SEO audit, link checker tool" />
+		<meta name="author" content="Sekmen.Dev" />
+		<meta name="robots" content="index, follow" />
+		<meta name="language" content="English" />
+
+		<!-- Open Graph Tags (Social Media) -->
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content="LinkRadar, Broken Link Scanner" />
+		<meta
+			property="og:description"
+			content="Hunt down every broken link on your site from your browser. Zero-install, zero-backend, 100% client-side link scanner with no data leaves your machine."
+		/>
+		<meta property="og:url" content="https://linkradar.iqverse.net/" />
+		<meta property="og:site_name" content="LinkRadar" />
+		<meta property="og:image" content="https://linkradar.iqverse.net/og-image-1200x630.png" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+
+		<!-- Twitter Card Tags -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="LinkRadar, Broken Link Scanner" />
+		<meta
+			name="twitter:description"
+			content="Hunt down every broken link on your site. 100% client-side, zero-backend link scanner. No data leaves your machine."
+		/>
+		<meta name="twitter:image" content="https://linkradar.iqverse.net/og-image-1200x630.png" />
+
+		<!-- Canonical URL -->
+		<link rel="canonical" href="https://linkradar.iqverse.net/" />
+
+		<!-- Stylesheets and Fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link
+			href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="styles.css" />
+
+		<!-- Favicon and Touch Icons -->
+		<link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png" />
+		<link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png" />
+		<link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png" />
+		<link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png" />
+		<link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png" />
+		<link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png" />
+		<link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png" />
+		<link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png" />
+		<link rel="icon" type="image/png" sizes="192x192" href="/android-icon-192x192.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+		<link rel="manifest" href="/manifest.json" />
+		<meta name="msapplication-TileColor" content="#ffffff" />
+		<meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
+		<meta name="theme-color" content="#ffffff" />
+	</head>
+	<body>
+		<!-- ── PROGRESS BAR ────────────────────────────────────────── -->
+		<div id="progress-bar-wrap"><div id="progress-bar"></div></div>
+
+		<!-- ── NAV ────────────────────────────────────────────────── -->
+		<nav>
+			<div class="nav-inner">
+				<a href="#" class="logo">
+					<div class="logo-icon">
+						<svg viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<circle cx="15" cy="15" r="14" stroke="#00ff87" stroke-width="1.5" stroke-dasharray="3 2" />
+							<circle cx="15" cy="15" r="6" stroke="#00ff87" stroke-width="1.5" />
+							<circle cx="15" cy="15" r="2" fill="#00ff87" />
+							<line x1="15" y1="1" x2="15" y2="9" stroke="#00ff87" stroke-width="1.5" />
+							<line x1="15" y1="21" x2="15" y2="29" stroke="#00ff87" stroke-width="1.5" />
+							<line x1="1" y1="15" x2="9" y2="15" stroke="#00ff87" stroke-width="1.5" />
+							<line x1="21" y1="15" x2="29" y2="15" stroke="#00ff87" stroke-width="1.5" />
+						</svg>
+					</div>
+					Link<span>Radar</span>
+				</a>
+				<div class="nav-links">
+					<a href="#how-it-works">How it works</a>
+					<a href="#why">Why</a>
+					<a href="https://github.com/SekmenDev/link-radar" target="_blank">
+						<span class="badge-oss">Open Source</span>
+					</a>
+				</div>
+			</div>
+		</nav>
+
+		<!-- ── HERO ───────────────────────────────────────────────── -->
+		<section class="hero">
+			<div class="hero-glow"></div>
+			<div class="wrap">
+				<div class="hero-eyebrow fade-up">
+					<span class="dot"></span>
+					Client-Side · No Server Required · Free Forever
+				</div>
+				<h1 class="fade-up fade-up-d1">Hunt down every<br /><em>broken link</em> on your site</h1>
+				<p class="hero-sub fade-up fade-up-d2">
+					LinkRadar crawls your website from your browser, no backend, no tracking, no installs. Get a full report of every URL, redirect and dead link in
+					seconds.
+				</p>
+				<div class="hero-meta fade-up fade-up-d3">
+					<span>
+						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<polyline points="16 18 22 12 16 6" />
+							<polyline points="8 6 2 12 8 18" />
+						</svg>
+						100% Client-Side
+					</span>
+					<span>
+						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+						</svg>
+						No Data Leaves Your Browser
+					</span>
+					<span>
+						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<path
+								d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
+							/>
+						</svg>
+						MIT Licensed
+					</span>
+				</div>
+			</div>
+		</section>
+
+		<!-- ── SCAN SECTION ───────────────────────────────────────── -->
+		<section class="scan-section">
+			<div class="wrap">
+				<div class="scan-card">
+					<div class="scan-card-header">
+						<div class="window-dot wd-r"></div>
+						<div class="window-dot wd-y"></div>
+						<div class="window-dot wd-g"></div>
+						<span>linkradar &mdash; scan terminal</span>
+					</div>
+					<div class="scan-body">
+						<div class="input-row">
+							<div class="url-input-wrap">
+								<span class="url-prefix">$</span>
+								<input id="url-input" type="url" placeholder="https://example.com" autocomplete="off" spellcheck="false" />
+							</div>
+							<button id="scan-btn" onclick="handleScanToggle()">
+								<svg id="scan-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+									<circle cx="11" cy="11" r="8" />
+									<path d="m21 21-4.35-4.35" />
+								</svg>
+								<span id="scan-label">Scan</span>
+							</button>
+						</div>
+						<div class="scan-options">
+							<label class="option-toggle">
+								<input type="checkbox" id="opt-external" checked />
+								<span class="toggle-box">
+									<svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#0a0c10" stroke-width="2.5">
+										<polyline points="1.5 6 5 9.5 10.5 2.5" />
+									</svg>
+								</span>
+								Check external links
+							</label>
+							<label class="option-toggle">
+								<input type="checkbox" id="opt-img" checked />
+								<span class="toggle-box">
+									<svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#0a0c10" stroke-width="2.5">
+										<polyline points="1.5 6 5 9.5 10.5 2.5" />
+									</svg>
+								</span>
+								Check images &amp; assets
+							</label>
+							<label class="option-toggle">
+								<input type="checkbox" id="opt-crawl" checked />
+								<span class="toggle-box">
+									<svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#0a0c10" stroke-width="2.5">
+										<polyline points="1.5 6 5 9.5 10.5 2.5" />
+									</svg>
+								</span>
+								Crawl sub-pages
+							</label>
+							<div id="depth-row">
+								<span>Max depth:</span>
+								<input id="depth-input" type="number" value="3" min="1" max="10" />
+							</div>
+						</div>
+						<div id="no-proxy-note">
+							<strong>⚠ CORS Note:</strong> Because LinkRadar runs entirely in your browser, cross-origin requests may be blocked by the target server's CORS
+							policy. Same-origin and many public sites work fine. For restricted sites, consider running LinkRadar from a local dev server on the same domain,
+							or use a CORS proxy. No data ever leaves your machine.
+						</div>
+					</div>
+				</div>
+
+				<!-- Console log -->
+				<div id="console-wrap">
+					<div class="console-header">
+						<span class="blink"></span>
+						<span>live output</span>
+						<span id="console-counter" style="margin-left: auto; color: var(--text-dim)">0 urls checked</span>
+					</div>
+					<div id="console-log"></div>
+				</div>
+
+				<!-- Stats -->
+				<div id="stats-row">
+					<div class="stat-card stat-total">
+						<div class="stat-num" id="stat-total">0</div>
+						<div class="stat-label">Total URLs</div>
+					</div>
+					<div class="stat-card stat-ok">
+						<div class="stat-num" id="stat-ok">0</div>
+						<div class="stat-label">OK (2xx)</div>
+					</div>
+					<div class="stat-card stat-warn">
+						<div class="stat-num" id="stat-warn">0</div>
+						<div class="stat-label">Redirects</div>
+					</div>
+					<div class="stat-card stat-err">
+						<div class="stat-num" id="stat-err">0</div>
+						<div class="stat-label">Broken</div>
+					</div>
+					<div class="stat-card stat-skip">
+						<div class="stat-num" id="stat-skip">0</div>
+						<div class="stat-label">Skipped</div>
+					</div>
+				</div>
+
+				<!-- Report -->
+				<div id="report-section">
+					<div class="report-toolbar">
+						<div class="filter-group">
+							<button class="filter-btn all active" onclick="setFilter('all')">All</button>
+							<button class="filter-btn ok" onclick="setFilter('ok')">2xx OK</button>
+							<button class="filter-btn redir" onclick="setFilter('redir')">3xx Redirects</button>
+							<button class="filter-btn broken" onclick="setFilter('broken')">4xx/5xx Broken</button>
+							<button class="filter-btn other" onclick="setFilter('other')">Other</button>
+						</div>
+						<div class="ml-auto" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap">
+							<input class="search-box" type="text" id="search-input" placeholder="Search URLs..." oninput="renderTable()" />
+							<button class="export-btn" onclick="exportCSV()">
+								<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+									<polyline points="7 10 12 15 17 10" />
+									<line x1="12" y1="15" x2="12" y2="3" />
+								</svg>
+								CSV
+							</button>
+							<button class="export-btn" onclick="exportJSON()">
+								<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+									<polyline points="7 10 12 15 17 10" />
+									<line x1="12" y1="15" x2="12" y2="3" />
+								</svg>
+								JSON
+							</button>
+						</div>
+					</div>
+					<div class="report-table-wrap">
+						<table>
+							<thead>
+								<tr>
+									<th class="td-status" onclick="sortBy('status')">Status <span class="sort-icon">↕</span></th>
+									<th class="td-url" onclick="sortBy('url')">URL <span class="sort-icon">↕</span></th>
+									<th class="td-src">Source</th>
+									<th class="td-time" onclick="sortBy('time')">Time <span class="sort-icon">↕</span></th>
+									<th class="td-depth" onclick="sortBy('depth')">Depth <span class="sort-icon">↕</span></th>
+								</tr>
+							</thead>
+							<tbody id="result-tbody"></tbody>
+						</table>
+						<div id="empty-state" class="empty-state" style="display: none">
+							<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+								<circle cx="11" cy="11" r="8" />
+								<path d="m21 21-4.35-4.35" />
+							</svg>
+							<p>No results match your filters.</p>
+						</div>
+					</div>
+					<div id="pagination" style="margin-top: 12px; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-dim)">
+						<button class="export-btn" id="prev-page" onclick="changePage(-1)">← Prev</button>
+						<span id="page-info"></span>
+						<button class="export-btn" id="next-page" onclick="changePage(1)">Next →</button>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- ── FEATURES ────────────────────────────────────────────── -->
+		<section class="features" id="features">
+			<div class="wrap">
+				<div class="section-label">Features</div>
+				<div class="section-title">Everything a dev needs. Nothing they don't.</div>
+				<div class="features-grid">
+					<div class="feature-card">
+						<div class="feature-icon">
+							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+							</svg>
+						</div>
+						<div class="feature-name">100% Client-Side</div>
+						<div class="feature-desc">
+							Runs entirely in your browser using the Fetch API. No backend, no proxy, no account required. Your scanned URLs stay on your machine.
+						</div>
+					</div>
+					<div class="feature-card">
+						<div class="feature-icon">
+							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+							</svg>
+						</div>
+						<div class="feature-name">Real-Time Progress</div>
+						<div class="feature-desc">
+							A high-contrast top progress bar and a live console log let you watch every URL get checked as it happens, so you know the scanner is alive.
+						</div>
+					</div>
+					<div class="feature-card">
+						<div class="feature-icon">
+							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+								<line x1="8" y1="21" x2="16" y2="21" />
+								<line x1="12" y1="17" x2="12" y2="21" />
+							</svg>
+						</div>
+						<div class="feature-name">Source Context ("Fix-it")</div>
+						<div class="feature-desc">
+							Every broken link shows exactly which page it was found on, the HTML element type and the anchor text, so you can fix it without hunting.
+						</div>
+					</div>
+					<div class="feature-card">
+						<div class="feature-icon">
+							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<circle cx="12" cy="12" r="10" />
+								<line x1="12" y1="8" x2="12" y2="12" />
+								<line x1="12" y1="16" x2="12.01" y2="16" />
+							</svg>
+						</div>
+						<div class="feature-name">Status Badges</div>
+						<div class="feature-desc">
+							Color-coded rounded badges for every HTTP status class: green for 2xx, orange for 3xx redirects, red for 4xx/5xx broken, grey for failures.
+						</div>
+					</div>
+					<div class="feature-card">
+						<div class="feature-icon">
+							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<line x1="8" y1="6" x2="21" y2="6" />
+								<line x1="8" y1="12" x2="21" y2="12" />
+								<line x1="8" y1="18" x2="21" y2="18" />
+								<line x1="3" y1="6" x2="3.01" y2="6" />
+								<line x1="3" y1="12" x2="3.01" y2="12" />
+								<line x1="3" y1="18" x2="3.01" y2="18" />
+							</svg>
+						</div>
+						<div class="feature-name">Filter &amp; Search</div>
+						<div class="feature-desc">
+							Instantly filter by status class and search by URL text. Sort any column ascending or descending. Paginated for large sites.
+						</div>
+					</div>
+					<div class="feature-card">
+						<div class="feature-icon">
+							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+								<polyline points="7 10 12 15 17 10" />
+								<line x1="12" y1="15" x2="12" y2="3" />
+							</svg>
+						</div>
+						<div class="feature-name">Export CSV &amp; JSON</div>
+						<div class="feature-desc">
+							Download the full report or the current filtered view as CSV for spreadsheets or JSON for pipelines, CI integrations or further tooling.
+						</div>
+					</div>
+					<div class="feature-card">
+						<div class="feature-icon">
+							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" />
+								<path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
+							</svg>
+						</div>
+						<div class="feature-name">Configurable Depth</div>
+						<div class="feature-desc">
+							Control how deep the crawler follows internal links, from a quick top-level audit to a full recursive multi-level crawl of your entire site.
+						</div>
+					</div>
+					<div class="feature-card">
+						<div class="feature-icon">
+							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<rect x="3" y="3" width="18" height="18" rx="2" />
+								<path d="M3 9h18M9 21V9" />
+							</svg>
+						</div>
+						<div class="feature-name">Images &amp; Assets</div>
+						<div class="feature-desc">
+							Optionally scan <code>&lt;img&gt;</code>, <code>&lt;script&gt;</code> and <code>&lt;link&gt;</code> tags in addition to anchors, catching broken
+							images and missing stylesheets too.
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- ── HOW IT WORKS ────────────────────────────────────────── -->
+		<section class="how-it-works" id="how-it-works">
+			<div class="wrap">
+				<div class="section-label">Mechanism</div>
+				<div class="section-title">How LinkRadar works under the hood</div>
+
+				<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; margin-bottom: 48px">
+					<div class="steps">
+						<div class="step">
+							<div class="step-left">
+								<div class="step-num">1</div>
+								<div class="step-line"></div>
+							</div>
+							<div class="step-body">
+								<div class="step-title">Fetch &amp; Parse Entry Point</div>
+								<div class="step-desc">
+									LinkRadar fetches the provided URL via the browser's native <code>fetch()</code> API with <code>mode: 'cors'</code>. The HTML response is
+									parsed with <code>DOMParser</code> to extract all anchor, image, script and link elements.
+								</div>
+								<div class="step-code">fetch(url, { method: 'HEAD', mode: 'cors', redirect: 'follow' })</div>
+							</div>
+						</div>
+						<div class="step">
+							<div class="step-left">
+								<div class="step-num">2</div>
+								<div class="step-line"></div>
+							</div>
+							<div class="step-body">
+								<div class="step-title">BFS Queue with Deduplication</div>
+								<div class="step-desc">
+									URLs are processed using a breadth-first queue with a <code>Set</code>-based visited registry. Already-seen URLs are never re-fetched,
+									preventing infinite loops and duplicate reports.
+								</div>
+							</div>
+						</div>
+						<div class="step">
+							<div class="step-left">
+								<div class="step-num">3</div>
+								<div class="step-line"></div>
+							</div>
+							<div class="step-body">
+								<div class="step-title">Concurrent HEAD Requests</div>
+								<div class="step-desc">
+									Outbound links are checked with <code>HEAD</code> requests in configurable concurrency batches. Only same-origin pages are crawled for
+									sub-links; external URLs are checked for status only.
+								</div>
+							</div>
+						</div>
+						<div class="step">
+							<div class="step-left">
+								<div class="step-num">4</div>
+								<div class="step-line"></div>
+							</div>
+							<div class="step-body">
+								<div class="step-title">Source Attribution</div>
+								<div class="step-desc">
+									Every URL is tagged with its parent page, HTML element type (<code>&lt;a&gt;</code>, <code>&lt;img&gt;</code>, etc.), anchor text and crawl
+									depth, forming the "fix-it" context shown in the report.
+								</div>
+							</div>
+						</div>
+						<div class="step">
+							<div class="step-left">
+								<div class="step-num">5</div>
+								<div class="step-line"></div>
+							</div>
+							<div class="step-body">
+								<div class="step-title">Live Reporting</div>
+								<div class="step-desc">
+									Results are streamed into the DOM in real time. The progress bar updates per batch. The final table is built once scanning is complete and
+									supports client-side filtering, sorting and export.
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="mechanism">
+						<div class="mechanism-header">
+							<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<polyline points="16 18 22 12 16 6" />
+								<polyline points="8 6 2 12 8 18" />
+							</svg>
+							scanner.js, pseudocode
+						</div>
+						<div class="mechanism-body">
+							<pre style="font-size: 11px; color: var(--text-mid); line-height: 1.8; overflow-x: auto"><span style="color:var(--text-dim)">// Entry point</span>
+<span style="color:var(--cyan)">async function</span> <span style="color:var(--green)">scan</span>(rootUrl, opts) {
+  <span style="color:var(--text-dim)">// Breadth-first queue</span>
+  <span style="color:var(--cyan)">const</span> queue = [{ url: rootUrl, depth: 0 }]
+  <span style="color:var(--cyan)">const</span> visited = <span style="color:var(--cyan)">new</span> Set()
+  <span style="color:var(--cyan)">const</span> results = []
+
+  <span style="color:var(--cyan)">while</span> (queue.length > 0) {
+    <span style="color:var(--text-dim)">// Process in concurrency batches</span>
+    <span style="color:var(--cyan)">const</span> batch = queue.splice(0, CONCURRENCY)
+    <span style="color:var(--cyan)">await</span> Promise.all(batch.map(<span style="color:var(--cyan)">async</span> item => {
+      <span style="color:var(--cyan)">if</span> (visited.has(item.url)) <span style="color:var(--cyan)">return</span>
+      visited.add(item.url)
+
+      <span style="color:var(--cyan)">const</span> result = <span style="color:var(--cyan)">await</span> <span style="color:var(--green)">checkUrl</span>(item.url)
+      results.push(result)
+
+      <span style="color:var(--text-dim)">// Only crawl same-origin pages</span>
+      <span style="color:var(--cyan)">if</span> (isSameOrigin(item.url) &&
+          item.depth < opts.maxDepth) {
+        <span style="color:var(--cyan)">const</span> links = <span style="color:var(--cyan)">await</span> <span style="color:var(--green)">extractLinks</span>(item.url)
+        queue.push(...links.map(l => ({
+          url: l.href,
+          depth: item.depth + 1,
+          source: item.url,
+          tag: l.tagName,
+          text: l.innerText
+        })))
+      }
+      <span style="color:var(--green)">updateUI</span>(results)
+    }))
+  }
+  <span style="color:var(--cyan)">return</span> results
+}</pre>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- ── WHY WE BUILT THIS ───────────────────────────────────── -->
+		<section class="why-section" id="why">
+			<div class="wrap">
+				<div class="section-label">Why</div>
+				<div class="section-title">Built by devs, for devs, for free</div>
+				<div class="why-grid">
+					<div class="why-list">
+						<div class="why-item">
+							<div class="why-item-icon">
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<circle cx="12" cy="12" r="10" />
+									<line x1="12" y1="8" x2="12" y2="16" />
+									<line x1="8" y1="12" x2="16" y2="12" />
+								</svg>
+							</div>
+							<div>
+								<div class="why-item-title">The problem we solved</div>
+								<div class="why-item-desc">
+									Every broken link tool we tried was either a paid SaaS, required a Chrome extension install, sent your URLs to a third-party server, or was
+									just a clunky CLI. We wanted a zero-friction, zero-trust solution.
+								</div>
+							</div>
+						</div>
+						<div class="why-item">
+							<div class="why-item-icon">
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+								</svg>
+							</div>
+							<div>
+								<div class="why-item-title">Privacy is not a feature, it's the default</div>
+								<div class="why-item-desc">
+									Your site's URL structure, internal architecture and broken pages can be sensitive. By running fully in the browser, LinkRadar ensures zero
+									data exfiltration by design, not policy.
+								</div>
+							</div>
+						</div>
+						<div class="why-item">
+							<div class="why-item-icon">
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<polyline points="16 18 22 12 16 6" />
+									<polyline points="8 6 2 12 8 18" />
+								</svg>
+							</div>
+							<div>
+								<div class="why-item-title">Open source forever</div>
+								<div class="why-item-desc">
+									Single-file HTML with vanilla JS. Fork it, vendor it in your CI pipeline, self-host it, customize it. No node_modules, no build step, no
+									lock-in. If you can read HTML, you can audit every line.
+								</div>
+							</div>
+						</div>
+						<div class="why-item">
+							<div class="why-item-icon">
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<rect x="2" y="3" width="20" height="14" rx="2" />
+									<line x1="8" y1="21" x2="16" y2="21" />
+									<line x1="12" y1="17" x2="12" y2="21" />
+								</svg>
+							</div>
+							<div>
+								<div class="why-item-title">The "fix-it" context was missing everywhere</div>
+								<div class="why-item-desc">
+									Other tools tell you a URL is broken but not which page or which element contains it. That last mile of information is what lets you actually
+									fix it without spending 10 minutes hunting the source.
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="why-visual">
+						<div class="why-visual-glow"></div>
+						<div class="why-visual-inner">
+							<div style="font-size: 11px; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 20px">
+								Typical scan output
+							</div>
+							<div style="display: flex; flex-direction: column; gap: 10px">
+								<div
+									style="
+										background: var(--bg);
+										border: 1px solid var(--border);
+										border-radius: 8px;
+										padding: 12px 14px;
+										display: flex;
+										align-items: flex-start;
+										gap: 12px;
+									"
+								>
+									<span class="badge s4xx"><span class="badge-dot"></span>404 Not Found</span>
+									<div>
+										<div style="font-size: 11px; color: var(--white); margin-bottom: 3px">/blog/post-about-launch</div>
+										<div style="font-size: 10px; color: var(--text-dim)">
+											Found on: /index.html · <span style="color: var(--cyan)">&lt;a&gt;</span> · "Read our launch post"
+										</div>
+									</div>
+								</div>
+								<div
+									style="
+										background: var(--bg);
+										border: 1px solid var(--border);
+										border-radius: 8px;
+										padding: 12px 14px;
+										display: flex;
+										align-items: flex-start;
+										gap: 12px;
+									"
+								>
+									<span class="badge s3xx"><span class="badge-dot"></span>301 Moved</span>
+									<div>
+										<div style="font-size: 11px; color: var(--white); margin-bottom: 3px">https://old-cdn.example.com/logo.png</div>
+										<div style="font-size: 10px; color: var(--text-dim)">
+											Found on: /about · <span style="color: var(--cyan)">&lt;img&gt;</span> · alt="Company Logo"
+										</div>
+									</div>
+								</div>
+								<div
+									style="
+										background: var(--bg);
+										border: 1px solid var(--border);
+										border-radius: 8px;
+										padding: 12px 14px;
+										display: flex;
+										align-items: flex-start;
+										gap: 12px;
+									"
+								>
+									<span class="badge s2xx"><span class="badge-dot"></span>200 OK</span>
+									<div>
+										<div style="font-size: 11px; color: var(--white); margin-bottom: 3px">https://docs.example.com/api</div>
+										<div style="font-size: 10px; color: var(--text-dim)">
+											Found on: /docs · <span style="color: var(--cyan)">&lt;a&gt;</span> · "API Reference" · 142ms
+										</div>
+									</div>
+								</div>
+								<div
+									style="
+										background: var(--bg);
+										border: 1px solid var(--border);
+										border-radius: 8px;
+										padding: 12px 14px;
+										display: flex;
+										align-items: flex-start;
+										gap: 12px;
+									"
+								>
+									<span class="badge s5xx"><span class="badge-dot"></span>503 Unavailable</span>
+									<div>
+										<div style="font-size: 11px; color: var(--white); margin-bottom: 3px">https://api.external-service.io/v2</div>
+										<div style="font-size: 10px; color: var(--text-dim)">
+											Found on: /integrations · <span style="color: var(--cyan)">&lt;a&gt;</span> · "Connect"
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- ── FOOTER ──────────────────────────────────────────────── -->
+		<footer>
+			<div class="footer-inner">
+				<div class="footer-left">
+					<strong>LinkRadar</strong>, Open source broken link scanner. MIT License.<br />
+					<span style="font-size: 11px">Built with ❤ for developers, by developers. No servers. No tracking. No cost.</span>
+				</div>
+				<div class="footer-links">
+					<a href="https://sekmen.dev/" target="_blank">Sekmen.Dev</a>
+					<a href="https://qrforge.iqverse.net/" target="_blank">Qr Forge</a>
+					<a href="https://linkradar.iqverse.net/" target="_blank">Link Radar</a>
+					<a href="https://iqverse.net/" target="_blank">All Tools</a>
+				</div>
+			</div>
+		</footer>
+
+		<script src="script.js"></script>
+	</body>
+</html>
