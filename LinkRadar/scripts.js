@@ -339,6 +339,8 @@ function changePage(d) {
 	const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
 	currentPage = Math.min(totalPages, Math.max(1, currentPage + d));
 	renderTable();
+	// Scroll to top of table on page change
+	document.getElementById("stats-row").scrollIntoView({ behavior: "smooth" });
 }
 
 // ── Scan toggle ───────────────────────────────────────────────────

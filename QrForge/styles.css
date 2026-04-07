@@ -145,6 +145,9 @@ body::after {
 	font-family: var(--font-mono);
 	letter-spacing: 0.02em;
 }
+.nav__logo-bracket {
+	color: var(--accent);
+}
 
 .btn-header {
 	background: var(--accent);
@@ -991,3 +994,18 @@ input[type="range"]::-moz-range-thumb {
 .footer-inner a:hover {
 	text-decoration: underline;
 }
+.footer__logo {
+	font-family: var(--font-mono);
+	font-size: 1rem;
+	color: var(--text);
+	margin-bottom: 0.75rem;
+}
+.footer__logo a {
+	color: var(--text);
+	text-decoration: none;
+	cursor: pointer;
+}
+.footer__logo a:hover {
+	text-decoration: underline;
+}
+
