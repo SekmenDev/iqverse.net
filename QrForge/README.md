@@ -4,6 +4,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Open Source](https://img.shields.io/badge/Open%20Source-%E2%9D%A4-brightgreen)](https://github.com) [![Built for Developers](https://img.shields.io/badge/Built%20for-Developers-blue)](https://github.com)
 
+📍 [Launch Tool](https://qrfroge.iqverse.net/)
+
 ---
 
 ## 🎯 Why QR Forge?
@@ -91,68 +93,6 @@ All processing happens locally on your device. Your data never leaves your machi
 
 ---
 
-## 💻 Getting Started
-
-### Quick Start
-
-1. Open `index.html` in your browser
-2. Choose your content type (URL, Text, Email, Wi-Fi, vCard)
-3. Customize the appearance (style, colors, logo)
-4. Download in your preferred format
-
-No setup required. No build steps. No dependencies.
-
-### File Structure
-
-```text
-QrForge/
-├── index.html       # Main interface
-├── style.css        # Modern styling
-├── app.js           # Client-side logic
-└── README.md        # This file
-```
-
----
-
-## 🛠️ Technical Stack
-
-- **No frameworks** => Vanilla JavaScript
-- **No backend** => 100% runs in-browser
-- **No build tools** => Drop-in ready to use
-- **QR Library** => [qr-code-styling](https://www.npmjs.com/package/qr-code-styling)
-- **Fonts** => Google Fonts (DM Mono, Syne, DM Sans)
-
----
-
-## 🤝 Contributing
-
-QR Forge is **open source and free**. Built by developers, for developers. We welcome contributions!
-
-Have ideas? Found a bug? Want to add a feature?
-
-1. Fork the repository
-2. Create your feature branch
-3. Submit a pull request
-
----
-
-## 📄 License
-
-This project is licensed under the **MIT License** => use it freely in your projects, personal or commercial.
-
----
-
-## 🙏 Credits
-
-Made with ❤️ by the developer community.
-
-**Special thanks to:**
-
-- [qr-code-styling](https://www.npmjs.com/package/qr-code-styling) => The QR generation library
-- [Google Fonts](https://fonts.google.com) => Beautiful typography
-
----
-
 ## 💡 Tips & Tricks
 
 - **Adding a logo?** Use _Error Correction Level H_ to ensure scannability
@@ -163,3 +103,20 @@ Made with ❤️ by the developer community.
 ---
 
 **Start creating stunning QR codes today. No account. No limits. No compromises.**
+
+---
+
+## 📄 License
+
+All tools are released under the **MIT License**. See individual repositories for license details.
+
+---
+
+## 🔗 Links
+
+- **IQVerse:** [iqverse.net](https://iqverse.net)
+- **Sekmen.Dev** [Sekmen.Dev](https://sekmen.dev)
+
+---
+
+**Built with ❤️ by developers, for the developer community.**
