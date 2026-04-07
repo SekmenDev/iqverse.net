@@ -29,7 +29,7 @@ Generate QR codes instantly in your browser. Fast, powerful and zero data collec
 - Export as SVG or PNG at any resolution
 - Custom colors and logo support
 
-📍 [Launch Tool](https://qrforge.iqverse.net/) · [Source Code](https://github.com/SekmenDev/qr-forge)
+📍 [Launch Tool](https://qrforge.iqverse.net/) · [Source Code](https://github.com/SekmenDev/iqverse.net/tree/main/QrForge)
 
 ---
 
@@ -44,7 +44,7 @@ Scan any webpage and detect broken links in seconds. Crawl all anchors and ident
 - Exportable reports
 - Real-time feedback
 
-📍 [Launch Tool](https://linkradar.iqverse.net/) · [Source Code](https://github.com/SekmenDev/link-radar)
+📍 [Launch Tool](https://linkradar.iqverse.net/) · [Source Code](https://github.com/SekmenDev/iqverse.net/tree/main/LinkRadar)
 
 ---
 
@@ -133,7 +133,6 @@ All tools are released under the **MIT License**. See individual repositories fo
 ## 🔗 Links
 
 - **Website:** [iqverse.net](https://iqverse.net)
-- **GitHub:** [SekmenDev](https://github.com/SekmenDev)
 - **QR Forge:** [qrforge.iqverse.net](https://qrforge.iqverse.net)
 - **Link Radar:** [linkradar.iqverse.net](https://linkradar.iqverse.net)
 - **School App:** [goo.iqverse.net](https://goo.iqverse.net)
