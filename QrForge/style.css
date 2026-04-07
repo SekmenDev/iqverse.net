@@ -103,6 +103,7 @@ body::after {
 	backdrop-filter: blur(16px);
 	-webkit-backdrop-filter: blur(16px);
 	border-bottom: 1px solid var(--border);
+	z-index: 10;
 }
 
 .header-inner {
@@ -186,6 +187,7 @@ body::after {
 	padding: 24px;
 	position: sticky;
 	top: 82px;
+	z-index: 10;
 }
 
 /* STEPS */
@@ -854,6 +856,7 @@ input[type="range"]::-moz-range-thumb {
 	padding-top: 16px;
 	position: sticky;
 	top: 82px;
+	z-index: 10;
 }
 
 .preview-label {
@@ -970,6 +973,7 @@ input[type="range"]::-moz-range-thumb {
 	border-top: 1px solid var(--border);
 	padding: 20px 16px;
 	text-align: center;
+	z-index: 10;
 }
 
 .footer-inner {
