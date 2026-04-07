@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Favicon & Meta Generator — IQVerse Tools</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link
+		href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&family=JetBrains+Mono:wght@400;500&display=swap"
+		rel="stylesheet"
+	/>
+	<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+	<!-- Background effects -->
+	<div class="bg-grid"></div>
+	<div class="bg-glow bg-glow--1"></div>
+	<div class="bg-glow bg-glow--2"></div>
+
+	<!-- Nav -->
+	<nav class="nav">
+		<a class="nav__logo" href="https://iqverse.net">
+			<span class="nav__logo-bracket">[</span>IQVerse<span class="nav__logo-bracket">]</span>
+		</a>
+		<ul class="nav__links">
+			<li><a href="https://iqverse.net/#tools">Tools</a></li>
+			<li><a href="https://iqverse.net/#ideas">Ideas</a></li>
+			<li><a href="https://iqverse.net/#contact" class="nav__cta">Contact →</a></li>
+		</ul>
+	</nav>
+
+	<!-- Page -->
+	<main class="page">
+
+		<!-- Page header -->
+		<header class="page-header">
+			<div class="page-header__eyebrow">
+				<span class="pill">Free tool</span>
+				<span class="pill" style="border-color: rgba(79,142,247,0.25); color: var(--accent2); background: var(--accent2-dim);">No upload required</span>
+			</div>
+			<h1 class="page-header__title">Favicon &amp; <em>Meta Generator</em></h1>
+			<p class="page-header__sub">Drop your logo, fill in the details, and get production-ready <code>&lt;head&gt;</code> HTML with favicons — all in the browser.</p>
+		</header>
+
+		<!-- Tool -->
+		<div class="root">
+
+			<!-- Image upload -->
+			<div class="card">
+				<p class="section-label">Image / logo</p>
+				<div class="drop-zone" id="dropZone" onclick="document.getElementById('imgInput').click()">
+					<div id="dropContent">
+						<p>Drop your logo or icon here</p>
+						<p>PNG, SVG, JPG — square image works best</p>
+					</div>
+					<div id="previewContent" style="display: none">
+						<div class="preview-row">
+							<div class="preview-sizes">
+								<div class="preview-item">
+									<canvas id="prev16" width="16" height="16" style="display: block; image-rendering: pixelated"></canvas>
+									<span>16</span>
+								</div>
+								<div class="preview-item">
+									<canvas id="prev32" width="32" height="32" style="display: block"></canvas>
+									<span>32</span>
+								</div>
+								<div class="preview-item">
+									<canvas id="prev64" width="64" height="64" style="display: block"></canvas>
+									<span>64</span>
+								</div>
+								<div class="preview-item">
+									<canvas id="prev180" width="60" height="60" style="display: block"></canvas>
+									<span>180</span>
+								</div>
+								<div class="preview-item">
+									<canvas id="prev192" width="48" height="48" style="display: block"></canvas>
+									<span>192</span>
+								</div>
+							</div>
+							<div style="flex: 1; padding-left: 1rem; text-align: left">
+								<p id="imgName"></p>
+								<p id="imgDims"></p>
+								<button class="btn btn-sm" style="margin-top: 10px" onclick="clearImage(event)">Change image</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<input type="file" id="imgInput" accept="image/*" style="display: none" onchange="handleFile(this.files[0])" />
+			</div>
+
+			<!-- Site info -->
+			<div class="card">
+				<p class="section-label">Site info</p>
+				<div class="grid2" style="margin-bottom: 1rem">
+					<div class="field">
+						<label>Site name</label>
+						<input type="text" id="siteName" placeholder="My Awesome Site" />
+					</div>
+					<div class="field">
+						<label>Site URL</label>
+						<input type="text" id="siteUrl" placeholder="https://example.com" />
+					</div>
+				</div>
+				<div class="field" style="margin-bottom: 1rem">
+					<label>Short description (meta description)</label>
+					<textarea id="siteDesc" placeholder="What does your website do? 1–2 sentences."></textarea>
+				</div>
+				<div class="grid3" style="margin-bottom: 1rem">
+					<div class="field">
+						<label>Theme color</label>
+						<div class="color-row">
+							<input
+								type="color"
+								id="themeColor"
+								value="#1a1a1a"
+							/>
+							<input type="text" id="themeColorHex" value="#1a1a1a" oninput="syncColorFromText()" />
+						</div>
+					</div>
+					<div class="field">
+						<label>Content type</label>
+						<select id="ogType">
+							<option value="website">website</option>
+							<option value="article">article</option>
+							<option value="product">product</option>
+							<option value="profile">profile</option>
+						</select>
+					</div>
+					<div class="field">
+						<label>Language</label>
+						<select id="htmlLang">
+							<option value="en">English (en)</option>
+							<option value="tr">Turkish (tr)</option>
+							<option value="de">German (de)</option>
+							<option value="fr">French (fr)</option>
+							<option value="es">Spanish (es)</option>
+							<option value="pt">Portuguese (pt)</option>
+							<option value="ja">Japanese (ja)</option>
+							<option value="zh">Chinese (zh)</option>
+							<option value="ar">Arabic (ar)</option>
+						</select>
+					</div>
+				</div>
+				<div class="field" style="margin-bottom: 1.5rem">
+					<label>Keywords (comma-separated)</label>
+					<input type="text" id="keywords" placeholder="e.g. portfolio, design, creative studio" />
+				</div>
+				<button class="btn btn-primary" onclick="generateAll()">Generate &lt;head&gt; code →</button>
+			</div>
+
+			<!-- Output -->
+			<div id="outputSection" style="display: none">
+				<div class="card">
+					<div class="output-header">
+						<div>
+							<p class="section-label" style="margin-bottom: 0.6rem">Generated &lt;head&gt; code</p>
+							<div class="tag-row" id="outputBadges"></div>
+						</div>
+						<div class="output-actions">
+							<button class="btn btn-ghost" onclick="copyCode()">Copy code</button>
+							<button class="btn btn-primary" onclick="downloadZip()">Download favicons</button>
+						</div>
+					</div>
+					<div class="code-block" id="outputCode"></div>
+					<p class="output-note">
+						Favicons are embedded as base64 data URIs — no external files needed for testing.
+						Use "Download favicons" to get the actual .png/.ico files for production.
+					</p>
+				</div>
+			</div>
+
+		</div>
+	</main>
+
+	<canvas id="workCanvas" style="display: none"></canvas>
+	<script src="scripts.js"></script>
+</body>
+</html>
