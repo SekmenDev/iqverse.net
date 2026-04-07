@@ -684,20 +684,3 @@ input[type="color"] {
 .footer__logo a:hover {
 	text-decoration: underline;
 }
-
-.cursor-glow {
-	position: fixed;
-	left: 0;
-	top: 0;
-	width: 260px;
-	height: 260px;
-	pointer-events: none;
-	border-radius: 50%;
-	background: radial-gradient(circle, rgba(0, 200, 150, 0.22) 0%, transparent 60%);
-	filter: blur(18px);
-	opacity: 0;
-	transform: translate(-50%, -50%);
-	transition: opacity 0.24s ease;
-	mix-blend-mode: screen;
-	z-index: 9999;
-}
