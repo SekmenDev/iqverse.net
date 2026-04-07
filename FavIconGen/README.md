@@ -1,7 +1,7 @@
 # Favicon & Meta Generator
 
 > **Generate production-ready favicons and meta tags instantly.**  
-> Drop your logo, fill in the details, and get complete `<head>` HTML — all in your browser.
+> Drop your logo, fill in the details and get complete `<head>` HTML — all in your browser.
 
 ![License](https://img.shields.io/badge/license-MIT-green) ![Open Source](https://img.shields.io/badge/open-source-blue) ![Browser](https://img.shields.io/badge/browser-based-9cf)
 
@@ -20,7 +20,7 @@ Favicon & Meta Generator is a modern, browser-based tool for creating complete f
 
 ## ✨ Features
 
-- Generate favicons from PNG, SVG, or JPG images
+- Generate favicons from PNG, SVG or JPG images
 - Automatic resizing to standard sizes (16x16, 32x32, 180x180, 192x192, 512x512)
 - Complete HTML `<head>` code with meta tags
 - Open Graph and Twitter Card support
