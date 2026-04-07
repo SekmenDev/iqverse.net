@@ -57,25 +57,23 @@ document.querySelectorAll('a[href^="#"]').forEach((link) => {
 
 // ── Subtle cursor glow follow on tool cards ───────────────────────────────
 
-document.querySelectorAll(".tool-card").forEach((card) => {
-	card.addEventListener("mousemove", (e) => {
-		const rect = card.getBoundingClientRect();
-		const x = e.clientX - rect.left;
-		const y = e.clientY - rect.top;
-		const glow = card.querySelector(".tool-card__glow");
-		if (glow) {
-			glow.style.left = `${x - 150}px`;
-			glow.style.top = `${y - 150}px`;
-			glow.style.transform = "none";
-		}
+function initCursorGlow() {
+	const glow = document.createElement("div");
+	glow.className = "cursor-glow";
+	document.body.appendChild(glow);
+	let fadeTimeout;
+	document.addEventListener("mousemove", (event) => {
+		glow.style.left = `${event.clientX}px`;
+		glow.style.top = `${event.clientY}px`;
+		glow.style.opacity = "1";
+		glow.style.zIndex = "0";
+		clearTimeout(fadeTimeout);
+		fadeTimeout = setTimeout(() => {
+			glow.style.opacity = "0";
+		}, 900);
 	});
-
-	card.addEventListener("mouseleave", () => {
-		const glow = card.querySelector(".tool-card__glow");
-		if (glow) {
-			glow.style.left = "";
-			glow.style.top = "";
-			glow.style.transform = "translate(50%, -50%)";
-		}
+	document.addEventListener("mouseleave", () => {
+		glow.style.opacity = "0";
 	});
-});
+}
+initCursorGlow();

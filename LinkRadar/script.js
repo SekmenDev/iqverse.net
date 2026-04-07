@@ -475,8 +475,6 @@ function loadDemo() {
 	renderTable();
 }
 
-loadDemo();
-
 function initCursorGlow() {
 	const glow = document.createElement("div");
 	glow.className = "cursor-glow";
@@ -496,5 +494,9 @@ function initCursorGlow() {
 		glow.style.opacity = "0";
 	});
 }
+
+// ─── Init ──────────────────────────────────────────────────────────────────
+
+loadDemo();
 
 initCursorGlow();

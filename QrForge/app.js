@@ -414,10 +414,6 @@ document.getElementById("copyBtn").addEventListener("click", async () => {
 	}
 });
 
-// ─── Init ──────────────────────────────────────────────────────────────────
-
-updateQR();
-
 function initCursorGlow() {
 	const glow = document.createElement("div");
 	glow.className = "cursor-glow";
@@ -437,5 +433,9 @@ function initCursorGlow() {
 		glow.style.opacity = "0";
 	});
 }
+
+// ─── Init ──────────────────────────────────────────────────────────────────
+
+updateQR();
 
 initCursorGlow();
