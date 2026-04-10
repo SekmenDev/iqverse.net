@@ -278,6 +278,10 @@ body {
 	gap: 1.5rem 1.75rem;
 }
 
+.saas {
+	grid-template-columns: 1fr !important;
+}
+
 .section-label {
 	grid-column: 1 / -1;
 }
