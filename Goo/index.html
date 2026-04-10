@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>GOO | School Management System by Sekmen.Dev</title>
+		<title>GOO | Modular School Management System</title>
 
 		<!-- SEO Meta Tags -->
 		<meta
@@ -42,11 +42,7 @@
 
 		<!-- Stylesheets and Fonts -->
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&family=JetBrains+Mono:wght@400;500&display=swap"
-			rel="stylesheet"
-		/>
+		<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 		<link rel="stylesheet" href="styles.css" />
 
 		<!-- Favicon and Touch Icons -->
@@ -69,424 +65,476 @@
 		<meta name="theme-color" content="#ffffff" />
 	</head>
 	<body>
-		<!-- Header -->
-		<header class="header">
-			<div class="header-inner">
-				<div class="logo">
-					<img src="logo.png" alt="GOO Logo" class="logo-icon" />
-					<span>GOO</span>
-				</div>
-				<nav class="header-nav">
-					<a href="#features" class="nav-link">Features</a>
-					<a href="#pricing" class="nav-link">Pricing</a>
-					<a href="#security" class="nav-link">Security & Compliance</a>
-					<a href="#contact" class="nav-link">Contact</a>
-				</nav>
-				<button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle mobile menu">
-					<span></span>
-					<span></span>
-					<span></span>
-				</button>
+		<!-- NAV -->
+		<nav>
+			<a class="nav-brand" href="#">
+				<img src="logo.png" alt="GOO Logo" class="logo-icon" />
+				GOO
+			</a>
+			<ul class="nav-links">
+				<li><a href="#features">Features</a></li>
+				<li><a href="#personas">Who It's For</a></li>
+				<li><a href="#pricing">Pricing</a></li>
+				<li><a href="#security">Security</a></li>
+				<li><a href="#contact">Contact</a></li>
+			</ul>
+			<div class="nav-cta">
+				<a class="btn btn-ghost" href="#">Sign In</a>
+				<a class="btn btn-primary" href="#">Get Started</a>
 			</div>
-			<!-- Mobile Menu -->
-			<nav class="mobile-menu" id="mobileMenu">
-				<a href="#features" class="mobile-nav-link">Features</a>
-				<a href="#pricing" class="mobile-nav-link">Pricing</a>
-				<a href="#security" class="mobile-nav-link">Security & Compliance</a>
-				<a href="#contact" class="mobile-nav-link">Contact</a>
-			</nav>
-		</header>
+		</nav>
 
-		<div class="home-container">
-			<!-- Hero Section -->
-			<section class="hero-section">
-				<div class="container">
-					<div class="row align-items-center g-4">
-						<div class="col-12 col-lg-6">
-							<h1 class="hero-title">Simplify Campus Life with the Next-Gen Modular School Management System</h1>
-							<p class="hero-subtitle">
-								Automate operations, streamline communication and get real-time insights. GOO brings everything your school needs into one unified
-								platform, trusted by educators worldwide.
-							</p>
-							<div class="hero-actions gap-3">
-								<button class="btn btn-primary btn-lg">Book a Demo</button>
-								<button class="btn btn-outline-light btn-lg">Start Free Trial</button>
-							</div>
+		<!-- HERO -->
+		<section class="hero">
+			<div class="hero-glow"></div>
+			<div class="hero-inner">
+				<div>
+					<div class="hero-badge"><span></span> School Management Platform</div>
+					<h1>Run Your School with <em>One Unified</em> Platform</h1>
+					<p class="hero-sub">
+						Automate operations, streamline communication and get real-time insights. GOO brings everything your institution needs into a single, modular
+						platform trusted by educators worldwide.
+					</p>
+					<div class="hero-actions">
+						<a class="btn btn-primary btn-lg" href="#">Book a Demo →</a>
+						<a class="btn btn-outline btn-lg" href="#">Start Free Trial</a>
+					</div>
+					<div class="hero-trust">
+						<div class="trust-item"><span class="check">✓</span> No setup required</div>
+						<div class="trust-item"><span class="check">✓</span> GDPR Compliant</div>
+						<div class="trust-item"><span class="check">✓</span> Free to start</div>
+					</div>
+				</div>
+				<div>
+					<div class="dashboard-mock">
+						<div class="mock-topbar">
+							<div class="mock-dot" style="background: #f43f5e"></div>
+							<div class="mock-dot" style="background: #f59e0b"></div>
+							<div class="mock-dot" style="background: #10b981"></div>
+							<div class="mock-topbar-title">goo.iqverse.net — Admin Dashboard</div>
 						</div>
-						<div class="col-12 col-lg-6">
-							<div class="hero-visual">
-								<img src="https://placehold.co/500x400?text=Dashboard+Screenshot" alt="GOO Dashboard" class="img-fluid rounded-3" />
-								<div class="video-overlay">
-									<button class="btn-play" aria-label="Play demo video">
-										<i class="fa fa-play"></i>
-									</button>
+						<div class="mock-body">
+							<div class="mock-stat">
+								<div class="label">Students</div>
+								<div class="value" style="color: var(--accent2)">1,248</div>
+								<div class="trend">↑ 4.2% this term</div>
+							</div>
+							<div class="mock-stat">
+								<div class="label">Staff</div>
+								<div class="value" style="color: var(--green)">86</div>
+								<div class="trend">↑ 2 new hires</div>
+							</div>
+							<div class="mock-stat">
+								<div class="label">Attendance</div>
+								<div class="value" style="color: var(--amber)">94%</div>
+								<div class="trend">↑ 1.3% vs last week</div>
+							</div>
+							<div class="mock-chart">
+								<div class="mock-list-title">Fee Collection — This Month</div>
+								<div class="chart-bars">
+									<div class="bar" style="height: 40%"></div>
+									<div class="bar" style="height: 65%"></div>
+									<div class="bar" style="height: 55%"></div>
+									<div class="bar" style="height: 80%"></div>
+									<div class="bar" style="height: 70%"></div>
+									<div class="bar" style="height: 90%; opacity: 1"></div>
+									<div class="bar" style="height: 75%"></div>
+								</div>
+							</div>
+							<div class="mock-list">
+								<div class="mock-list-title">Recent Activity</div>
+								<div class="mock-row">
+									<span class="mock-row-name">📋 Grade 10A — Math Results Published</span>
+									<span class="mock-row-badge badge-green">Done</span>
+								</div>
+								<div class="mock-row">
+									<span class="mock-row-name">🔔 Parent Alerts Sent (78)</span>
+									<span class="mock-row-badge badge-blue">Sent</span>
+								</div>
+								<div class="mock-row">
+									<span class="mock-row-name">💳 Fee Invoice Batch — Term 2</span>
+									<span class="mock-row-badge badge-amber">Pending</span>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-			</section>
+			</div>
+		</section>
 
-			<!-- Trust Bar / Social Proof -->
-			<section class="trust-section">
-				<div class="container">
-					<p class="trust-headline">Trusted by leading educational institutions</p>
-					<div class="trust-logos">
-						<div class="trust-logo">
-							<img src="https://placehold.co/150x50?text=Verde Valley Academy" alt="Verde Valley Academy" />
-						</div>
-						<div class="trust-logo">
-							<img src="https://placehold.co/150x50?text=Westside International School" alt="Westside International School" />
-						</div>
-						<div class="trust-logo">
-							<img src="https://placehold.co/150x50?text=Sunrise Educational Centre" alt="Sunrise Educational Centre" />
-						</div>
-					</div>
-					<div class="certifications">
-						<span class="cert-badge"><i class="fa fa-shield-alt"></i> GDPR Compliant</span>
-						<span class="cert-badge"><i class="fa fa-check-circle"></i> ISO 27001 Certified</span>
-						<span class="cert-badge"><i class="fa fa-lock"></i> End-to-End Encrypted</span>
-					</div>
+		<!-- TRUST LOGOS -->
+		<div class="logos-section">
+			<div class="logos-inner">
+				<span class="logos-label">Trusted by leading institutions</span>
+				<div class="logos-list">
+					<span class="logo-name">Sunrise Academy</span>
+					<span class="logo-name">Westside Int'l School</span>
+					<span class="logo-name">Verde Valley Edu</span>
+					<span class="logo-name">NorthBridge College</span>
+					<span class="logo-name">Maple Leaf Institute</span>
 				</div>
-			</section>
-
-			<!-- Pain Points & Solution -->
-			<section class="pain-points-section">
-				<div class="container">
-					<h2 class="section-title text-center mb-5">The Challenge Schools Face</h2>
-					<div class="row g-4 mb-5">
-						<div class="col-12 col-md-6 col-lg-4">
-							<div class="pain-point-card">
-								<div class="pain-icon">
-									<i class="fa fa-file-alt"></i>
-								</div>
-								<h5>Paperwork Overload</h5>
-								<p>Manual records, duplicate data entry and disconnected systems waste hours every week</p>
-							</div>
-						</div>
-						<div class="col-12 col-md-6 col-lg-4">
-							<div class="pain-point-card">
-								<div class="pain-icon">
-									<i class="fa fa-random"></i>
-								</div>
-								<h5>Fragmented Data</h5>
-								<p>Information scattered across spreadsheets, emails and disconnected tools creates confusion</p>
-							</div>
-						</div>
-						<div class="col-12 col-md-6 col-lg-4">
-							<div class="pain-point-card">
-								<div class="pain-icon">
-									<i class="fa fa-comments"></i>
-								</div>
-								<h5>Poor Communication</h5>
-								<p>Parents kept in the dark, teachers lack timely updates and coordination becomes difficult</p>
-							</div>
-						</div>
-					</div>
-
-					<div class="solution-banner">
-						<div class="row align-items-center g-4">
-							<div class="col-12 col-lg-6">
-								<img src="https://placehold.co/450x350?text=Unified+Dashboard" alt="Unified Solution" class="img-fluid rounded-3" />
-							</div>
-							<div class="col-12 col-lg-6">
-								<h3>The GOO Solution</h3>
-								<p class="lead">We've built a modular, scalable platform that centralizes everything:</p>
-								<ul class="solution-list">
-									<li><strong>One Source of Truth:</strong> All data synchronized in real-time</li>
-									<li><strong>Instant Insights:</strong> Dashboards designed for every role</li>
-									<li><strong>Seamless Communication:</strong> Parent portals, SMS alerts and notifications</li>
-									<li><strong>Security by Design:</strong> Encryption, role-based access and compliance built-in</li>
-								</ul>
-							</div>
-						</div>
-					</div>
-				</div>
-			</section>
-
-			<!-- Core Feature Modules (Big Four) -->
-			<section class="core-modules-section">
-				<div class="container">
-					<h2 class="section-title text-center mb-5">Built for Your Entire School</h2>
-					<div class="row g-4">
-						<!-- Academic Management -->
-						<div class="col-6 col-md-6 col-lg-6">
-							<div class="core-module-card">
-								<div class="module-icon academic-bg">
-									<i class="fa fa-book"></i>
-								</div>
-								<h5>Academic Management</h5>
-								<p>Attendance tracking, grade management, scheduling and automated report cards</p>
-								<a href="#" class="learn-more">Learn More &rarr;</a>
-							</div>
-						</div>
-						<!-- Financial Suite -->
-						<div class="col-6 col-md-6 col-lg-6">
-							<div class="core-module-card">
-								<div class="module-icon financial-bg">
-									<i class="fa fa-wallet"></i>
-								</div>
-								<h5>Financial Suite</h5>
-								<p>Fee collection, invoice generation, payroll management and financial reports</p>
-								<a href="#" class="learn-more">Learn More &rarr;</a>
-							</div>
-						</div>
-						<!-- Communication Hub -->
-						<div class="col-6 col-md-6 col-lg-6">
-							<div class="core-module-card">
-								<div class="module-icon communication-bg">
-									<i class="fa fa-comments"></i>
-								</div>
-								<h5>Communication Hub</h5>
-								<p>Parent alerts, SMS notifications, email campaigns and parent-teacher portals</p>
-								<a href="#" class="learn-more">Learn More &rarr;</a>
-							</div>
-						</div>
-						<!-- Administration -->
-						<div class="col-6 col-md-6 col-lg-6">
-							<div class="core-module-card">
-								<div class="module-icon admin-bg">
-									<i class="fa fa-cog"></i>
-								</div>
-								<h5>Administration</h5>
-								<p>Admission automation, staff management, compliance tracking and audit logs</p>
-								<a href="#" class="learn-more">Learn More &rarr;</a>
-							</div>
-						</div>
-					</div>
-				</div>
-			</section>
-
-			<!-- Role-Based Benefits -->
-			<section class="personas-section">
-				<div class="container">
-					<h2 class="section-title text-center mb-5">Built for Admin, Teachers and Parents</h2>
-					<div class="row g-4">
-						<!-- Administrators -->
-						<div class="col-12 col-md-6 col-lg-4">
-							<div class="persona-card">
-								<div class="persona-icon admin-persona">
-									<i class="fa fa-user-tie"></i>
-								</div>
-								<h5>School Administrators</h5>
-								<p class="persona-role">Principals & IT Directors</p>
-								<div class="persona-benefits">
-									<h6>What You Get:</h6>
-									<ul>
-										<li>Real-time dashboards with KPIs</li>
-										<li>Comprehensive financial reports</li>
-										<li>Staff and student insights</li>
-										<li>System-wide compliance tracking</li>
-										<li>Audit logs and security controls</li>
-									</ul>
-								</div>
-								<div class="time-saved"><i class="fa fa-clock"></i> Save 15+ hours/week</div>
-							</div>
-						</div>
-						<!-- Teachers -->
-						<div class="col-12 col-md-6 col-lg-4">
-							<div class="persona-card">
-								<div class="persona-icon teacher-persona">
-									<i class="fa fa-chalkboard-user"></i>
-								</div>
-								<h5>Teachers</h5>
-								<p class="persona-role">Faculty & Staff</p>
-								<div class="persona-benefits">
-									<h6>What You Get:</h6>
-									<ul>
-										<li>Automated attendance tracking</li>
-										<li>Easy grade entry and management</li>
-										<li>Lesson planning tools</li>
-										<li>Parent communication channels</li>
-										<li>Student performance analytics</li>
-									</ul>
-								</div>
-								<div class="time-saved"><i class="fa fa-clock"></i> Save 8+ hours/week</div>
-							</div>
-						</div>
-						<!-- Parents -->
-						<div class="col-12 col-md-6 col-lg-4">
-							<div class="persona-card">
-								<div class="persona-icon parent-persona">
-									<i class="fa fa-users"></i>
-								</div>
-								<h5>Parents</h5>
-								<p class="persona-role">Families & Guardians</p>
-								<div class="persona-benefits">
-									<h6>What You Get:</h6>
-									<ul>
-										<li>Real-time student progress tracking</li>
-										<li>Instant attendance alerts</li>
-										<li>Grade updates and notifications</li>
-										<li>Fee payment history</li>
-										<li>Direct communication with teachers</li>
-									</ul>
-								</div>
-								<div class="time-saved"><i class="fa fa-check-circle"></i> Peace of Mind</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</section>
-
-			<!-- Security & Reliability -->
-			<section class="security-section">
-				<div class="container">
-					<h2 class="section-title text-center mb-5">Your School's Data is Sacred</h2>
-					<p class="security-intro text-center mb-5">Schools entrust us with sensitive data. Here's how we protect it:</p>
-					<div class="row g-4">
-						<div class="col-12 col-md-6 col-lg-4">
-							<div class="security-card">
-								<div class="security-icon">
-									<i class="fa fa-lock"></i>
-								</div>
-								<h5>End-to-End Encryption</h5>
-								<p>All data encrypted in transit and at rest using military-grade AES-256 encryption</p>
-							</div>
-						</div>
-						<div class="col-12 col-md-6 col-lg-4">
-							<div class="security-card">
-								<div class="security-icon">
-									<i class="fa fa-shield-alt"></i>
-								</div>
-								<h5>Role-Based Access Control</h5>
-								<p>Permissions ensure only authorized personnel access sensitive information</p>
-							</div>
-						</div>
-						<div class="col-12 col-md-6 col-lg-4">
-							<div class="security-card">
-								<div class="security-icon">
-									<i class="fa fa-database"></i>
-								</div>
-								<h5>Redundant Backups</h5>
-								<p>Automatic daily backups across multiple geographic locations ensure zero data loss</p>
-							</div>
-						</div>
-						<div class="col-12 col-md-6 col-lg-4">
-							<div class="security-card">
-								<div class="security-icon">
-									<i class="fa fa-check-double"></i>
-								</div>
-								<h5>Compliance Ready</h5>
-								<p>GDPR, HIPAA and regional education privacy laws fully supported</p>
-							</div>
-						</div>
-						<div class="col-12 col-md-6 col-lg-4">
-							<div class="security-card">
-								<div class="security-icon">
-									<i class="fa fa-history"></i>
-								</div>
-								<h5>Complete Audit Trails</h5>
-								<p>Track every change to sensitive data with immutable audit logs</p>
-							</div>
-						</div>
-						<div class="col-12 col-md-6 col-lg-4">
-							<div class="security-card">
-								<div class="security-icon">
-									<i class="fa fa-heartbeat"></i>
-								</div>
-								<h5>99.9% Uptime SLA</h5>
-								<p>Enterprise-grade redundancy and failover systems keep your school connected</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</section>
-
-			<!-- Testimonials -->
-			<section class="testimonials-section">
-				<div class="container">
-					<h2 class="section-title text-center mb-5">Hear from Our School Partners</h2>
-					<div class="row g-4">
-						<div class="col-12 col-md-6 col-lg-4">
-							<div class="testimonial-card">
-								<div class="stars mb-3">
-									<i class="fa fa-star"></i>
-									<i class="fa fa-star"></i>
-									<i class="fa fa-star"></i>
-									<i class="fa fa-star"></i>
-									<i class="fa fa-star"></i>
-								</div>
-								<p class="testimonial-text">
-									"GOO transformed how we operate. We've cut administrative time by 60% and parents are happier with real-time updates. It's been a
-									game-changer."
-								</p>
-								<div class="testimonial-author">
-									<h6>Dr. Maria Santos</h6>
-									<p>Principal, Verde Valley Academy</p>
-								</div>
-							</div>
-						</div>
-						<div class="col-12 col-md-6 col-lg-4">
-							<div class="testimonial-card">
-								<div class="stars mb-3">
-									<i class="fa fa-star"></i>
-									<i class="fa fa-star"></i>
-									<i class="fa fa-star"></i>
-									<i class="fa fa-star"></i>
-									<i class="fa fa-star"></i>
-								</div>
-								<p class="testimonial-text">
-									"As an IT Director, I love the modular architecture and security. Easy to integrate with our existing systems and the team is incredibly
-									responsive."
-								</p>
-								<div class="testimonial-author">
-									<h6>James Chen</h6>
-									<p>IT Director, Westside International School</p>
-								</div>
-							</div>
-						</div>
-						<div class="col-12 col-md-6 col-lg-4">
-							<div class="testimonial-card">
-								<div class="stars mb-3">
-									<i class="fa fa-star"></i>
-									<i class="fa fa-star"></i>
-									<i class="fa fa-star"></i>
-									<i class="fa fa-star"></i>
-									<i class="fa fa-star"></i>
-								</div>
-								<p class="testimonial-text">
-									"Teachers finally have time to teach instead of manage data. Grades sync automatically, parent communication is seamless. This is what we've
-									needed for years."
-								</p>
-								<div class="testimonial-author">
-									<h6>Emma Wilson</h6>
-									<p>Head of Faculty, Sunrise Educational Centre</p>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</section>
-
-			<!-- Final CTA -->
-			<section class="final-cta-section">
-				<div class="container">
-					<div class="row">
-						<div class="col-12 col-lg-8 mx-auto text-center">
-							<h2 class="section-title mb-4">Ready to Transform Your School?</h2>
-							<p class="lead mb-4">
-								Join hundreds of schools already using GOO to streamline operations, improve communication and focus on what matters most: education.
-							</p>
-							<p class="cta-subtitle mb-4">No setup required. See your dashboard in minutes.</p>
-							<div class="final-cta-actions gap-3">
-								<button class="btn btn-primary btn-lg">Book Your Demo Today</button>
-								<button class="btn btn-outline-primary btn-lg">Contact Sales</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			</section>
+			</div>
 		</div>
 
-		<!-- Footer -->
-		<footer class="footer">
-			<div class="footer__logo"><span class="nav__logo-bracket">[</span><a href="https://iqverse.net">IQVerse</a><span class="nav__logo-bracket">]</span></div>
-			<div class="footer-inner">
-				<span> Made with ❤️ by <a href="https://sekmen.dev" target="_blank">Sekmen.Dev</a> </span>
+		<!-- CHALLENGE & SOLUTION -->
+		<section class="challenge-bg" id="challenge">
+			<div class="section-inner">
+				<div class="challenge-grid">
+					<div>
+						<div class="section-tag">The Challenge</div>
+						<h2>Why Traditional School Management <em>Falls Short</em></h2>
+						<p class="section-sub">
+							Paper forms, disconnected spreadsheets and fragmented email chains create friction that slows everyone down — from principals to parents.
+						</p>
+						<div class="challenge-cards">
+							<div class="challenge-card">
+								<div class="challenge-icon">📋</div>
+								<div>
+									<h4>Paperwork Overload</h4>
+									<p>Manual records and duplicate data entry waste hours every week, pulling staff away from what matters.</p>
+								</div>
+							</div>
+							<div class="challenge-card">
+								<div class="challenge-icon">📊</div>
+								<div>
+									<h4>Fragmented Data</h4>
+									<p>Information scattered across spreadsheets, emails and disconnected tools creates confusion and costly errors.</p>
+								</div>
+							</div>
+							<div class="challenge-card">
+								<div class="challenge-icon">🔗</div>
+								<div>
+									<h4>Poor Communication</h4>
+									<p>Parents kept in the dark, teachers lacking timely updates — coordination becomes difficult and trust erodes.</p>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div>
+						<div class="solution-box">
+							<div class="section-tag">The GOO Solution</div>
+							<h3>One Platform. Every School Need Covered.</h3>
+							<ul class="solution-list">
+								<li>
+									<span class="icon">✓</span>
+									<div><strong>One Source of Truth</strong> <span>— All data synchronized in real-time across every department and role.</span></div>
+								</li>
+								<li>
+									<span class="icon">✓</span>
+									<div><strong>Instant Insights</strong> <span>— Role-specific dashboards so everyone sees exactly what they need.</span></div>
+								</li>
+								<li>
+									<span class="icon">✓</span>
+									<div><strong>Seamless Communication</strong> <span>— Parent portals, SMS alerts and in-app notifications out of the box.</span></div>
+								</li>
+								<li>
+									<span class="icon">✓</span>
+									<div><strong>Security by Design</strong> <span>— Encryption, role-based access and compliance are non-negotiable defaults.</span></div>
+								</li>
+								<li>
+									<span class="icon">✓</span>
+									<div><strong>Modular Architecture</strong> <span>— Enable only the modules you need. Scale as your institution grows.</span></div>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
 			</div>
-		</footer>
+		</section>
 
-		<script src="scripts.js"></script>
+		<!-- FEATURES -->
+		<section id="features">
+			<div class="section-inner">
+				<div class="section-tag">Features</div>
+				<h2>Built for <em>Every Aspect</em> of School Life</h2>
+				<p class="section-sub">
+					Each module is purpose-built to remove friction from a specific workflow — then connected so data flows seamlessly between them all.
+				</p>
+				<div class="features-grid">
+					<div class="feature-card">
+						<div class="feature-icon">🎓</div>
+						<h4>Academic Management</h4>
+						<p>Attendance tracking, grade management, scheduling and automated report cards — all in one workflow.</p>
+					</div>
+					<div class="feature-card">
+						<div class="feature-icon">💳</div>
+						<h4>Financial Suite</h4>
+						<p>Fee collection, invoice generation, payroll management and detailed financial reports with one click.</p>
+					</div>
+					<div class="feature-card">
+						<div class="feature-icon">📣</div>
+						<h4>Communication Hub</h4>
+						<p>Parent alerts, SMS notifications, email campaigns and direct parent-teacher messaging portals.</p>
+					</div>
+					<div class="feature-card">
+						<div class="feature-icon">🏫</div>
+						<h4>Admissions & HR</h4>
+						<p>Automated admissions pipelines, staff management, compliance tracking and digital onboarding.</p>
+					</div>
+					<div class="feature-card">
+						<div class="feature-icon">📅</div>
+						<h4>Timetable Builder</h4>
+						<p>Drag-and-drop schedule builder that detects conflicts instantly and exports to every format.</p>
+					</div>
+					<div class="feature-card">
+						<div class="feature-icon">📈</div>
+						<h4>Analytics & Reports</h4>
+						<p>KPI dashboards, trend analysis, custom exportable reports — platform-wide or per class, per student.</p>
+					</div>
+					<div class="feature-card">
+						<div class="feature-icon">📚</div>
+						<h4>Library Management</h4>
+						<p>Catalogue books, track loans, manage reservations and send overdue reminders automatically.</p>
+					</div>
+					<div class="feature-card">
+						<div class="feature-icon">🔔</div>
+						<h4>Real-Time Notifications</h4>
+						<p>Instant alerts for absences, low grades, unpaid fees and custom triggers you define per role.</p>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- PERSONAS -->
+		<section class="personas-bg" id="personas">
+			<div class="section-inner">
+				<div class="section-tag">Who It's For</div>
+				<h2>Designed for <em>Everyone</em> in Your Institution</h2>
+				<p class="section-sub">One platform, three distinct experiences — each crafted around what that role genuinely needs to do their best work.</p>
+				<div class="personas-grid">
+					<div class="persona-card">
+						<div class="persona-head">
+							<div class="persona-label">Administrators</div>
+							<h3>School & Campus Admins</h3>
+							<div class="sub">Principals, IT Directors, Coordinators</div>
+						</div>
+						<div class="persona-body">
+							<ul class="persona-perks">
+								<li>Real-time KPI dashboards across every department</li>
+								<li>Platform-wide statistics and performance trends</li>
+								<li>Role-based access — control who sees what</li>
+								<li>Full audit trail of every session and admin action</li>
+								<li>Multi-tenant architecture for large institutions</li>
+							</ul>
+						</div>
+						<div class="persona-cta">
+							<div class="persona-badge">🔐 Enterprise-grade control</div>
+						</div>
+					</div>
+					<div class="persona-card">
+						<div class="persona-head">
+							<div class="persona-label">Educators</div>
+							<h3>Teachers & Faculty</h3>
+							<div class="sub">Classroom teachers, lecturers, tutors</div>
+						</div>
+						<div class="persona-body">
+							<ul class="persona-perks">
+								<li>Automated attendance — no more paper registers</li>
+								<li>Easy grade entry with bulk import support</li>
+								<li>Lesson planning tools and curriculum tracking</li>
+								<li>Direct parent communication channels built-in</li>
+								<li>Per-student performance analytics at a glance</li>
+							</ul>
+						</div>
+						<div class="persona-cta">
+							<div class="persona-badge">⚡ Save 8+ hours per week</div>
+						</div>
+					</div>
+					<div class="persona-card">
+						<div class="persona-head">
+							<div class="persona-label">Families</div>
+							<h3>Parents & Guardians</h3>
+							<div class="sub">Families of enrolled students</div>
+						</div>
+						<div class="persona-body">
+							<ul class="persona-perks">
+								<li>Real-time student progress and attendance tracking</li>
+								<li>Instant alerts for absences and grade updates</li>
+								<li>Fee payment history and online payment portal</li>
+								<li>Direct messaging with teachers and admin staff</li>
+								<li>Works on any device — phone, tablet or desktop</li>
+							</ul>
+						</div>
+						<div class="persona-cta">
+							<div class="persona-badge">🎯 Peace of mind, always</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- SECURITY -->
+		<section id="security">
+			<div class="section-inner">
+				<div class="section-tag">Security & Compliance</div>
+				<h2>Your School's Data Is <em>Sacred</em></h2>
+				<p class="section-sub">
+					Schools entrust us with their most sensitive data. We treat exam integrity and data privacy as non-negotiable foundations — not afterthoughts.
+				</p>
+				<div class="security-grid">
+					<div class="security-card">
+						<div class="sec-icon">🔐</div>
+						<h4>End-to-End Encryption</h4>
+						<p>All data encrypted in transit and at rest with AES-256. Sensitive records are never exposed to unauthorized parties.</p>
+					</div>
+					<div class="security-card">
+						<div class="sec-icon">👤</div>
+						<h4>Role-Based Access Control</h4>
+						<p>Granular permissions ensure admins, educators, parents and students see exactly what they should — and nothing more.</p>
+					</div>
+					<div class="security-card">
+						<div class="sec-icon">🧾</div>
+						<h4>Full Audit Trails</h4>
+						<p>Every session, record change and admin action is logged immutably. Know exactly what happened and when.</p>
+					</div>
+					<div class="security-card">
+						<div class="sec-icon">☁️</div>
+						<h4>Redundant Backups</h4>
+						<p>Automatic daily backups across multiple geographic locations. Your student data is never at risk of loss.</p>
+					</div>
+					<div class="security-card">
+						<div class="sec-icon">⚖️</div>
+						<h4>GDPR & KVKK Compliant</h4>
+						<p>Data handling fully aligned with GDPR, KVKK and regional education privacy regulations. Your data is yours.</p>
+					</div>
+					<div class="security-card">
+						<div class="sec-icon">🛡️</div>
+						<h4>99.9% Uptime SLA</h4>
+						<p>Enterprise-grade infrastructure with redundancy and automatic failover — so your school never goes offline mid-day.</p>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- TESTIMONIALS -->
+		<section class="testimonials-bg" id="testimonials">
+			<div class="section-inner">
+				<div class="section-tag">Testimonials</div>
+				<h2>Loved by <em>School Leaders</em> Worldwide</h2>
+				<p class="section-sub">Real results from real institutions that made the switch to GOO.</p>
+				<div class="testi-grid">
+					<div class="testi-card">
+						<div class="stars">★★★★★</div>
+						<p class="testi-text">
+							"GOO transformed how we operate. We've cut administrative time by 60% and parents are genuinely happier with real-time updates. It's been a
+							complete game-changer for our staff."
+						</p>
+						<div class="testi-author">
+							<div class="testi-avatar">MS</div>
+							<div>
+								<div class="testi-name">Dr. Maria Santos</div>
+								<div class="testi-title">Principal, Verde Valley Academy</div>
+							</div>
+						</div>
+					</div>
+					<div class="testi-card">
+						<div class="stars">★★★★★</div>
+						<p class="testi-text">
+							"As an IT Director I love the modular architecture and security controls. Easy to integrate with our existing systems and the support team is
+							incredibly responsive."
+						</p>
+						<div class="testi-author">
+							<div class="testi-avatar">JC</div>
+							<div>
+								<div class="testi-name">James Chen</div>
+								<div class="testi-title">IT Director, Westside Int'l School</div>
+							</div>
+						</div>
+					</div>
+					<div class="testi-card">
+						<div class="stars">★★★★★</div>
+						<p class="testi-text">
+							"Teachers finally have time to teach instead of manage data. Grades sync automatically, parent communication is seamless. This is exactly what
+							we'd needed for years."
+						</p>
+						<div class="testi-author">
+							<div class="testi-avatar">EW</div>
+							<div>
+								<div class="testi-name">Emma Wilson</div>
+								<div class="testi-title">Head of Faculty, Sunrise Educational Centre</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- PRICING -->
+		<section id="pricing">
+			<div class="section-inner">
+				<div class="section-tag">Pricing</div>
+				<h2>Simple Plans for <em>Every Institution</em></h2>
+				<p class="section-sub">No hidden fees. Scale up or down as your school grows. All plans include onboarding support.</p>
+				<div class="pricing-grid">
+					<div class="price-card">
+						<div class="price-name">Starter</div>
+						<div class="price-amount">Free</div>
+						<div class="price-period">Up to 100 students · Forever free</div>
+						<ul class="price-list">
+							<li>Academic & attendance module</li>
+							<li>Basic parent communication</li>
+							<li>5 staff accounts</li>
+							<li>Standard support</li>
+						</ul>
+						<a class="btn btn-outline" href="#" style="width: 100%; justify-content: center">Get Started Free</a>
+					</div>
+					<div class="price-card featured">
+						<div class="price-badge">Most Popular</div>
+						<div class="price-name">Professional</div>
+						<div class="price-amount">$4<span style="font-size: 1rem; font-weight: 400">/student/mo</span></div>
+						<div class="price-period">Billed annually · Minimum 100 students</div>
+						<ul class="price-list">
+							<li>All modules included</li>
+							<li>Financial suite & invoicing</li>
+							<li>SMS & email notifications</li>
+							<li>Analytics & custom reports</li>
+							<li>Priority support & onboarding</li>
+						</ul>
+						<a class="btn btn-primary" href="#" style="width: 100%; justify-content: center">Start Free Trial →</a>
+					</div>
+					<div class="price-card">
+						<div class="price-name">Enterprise</div>
+						<div class="price-amount">Custom</div>
+						<div class="price-period">For large institutions & networks</div>
+						<ul class="price-list">
+							<li>Multi-campus / multi-tenant</li>
+							<li>Custom integrations & API</li>
+							<li>Dedicated account manager</li>
+							<li>SLA guarantees & SSO</li>
+							<li>On-premise deployment option</li>
+						</ul>
+						<a class="btn btn-ghost" href="#" style="width: 100%; justify-content: center">Contact Sales</a>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- CTA -->
+		<section class="cta-section" id="contact">
+			<div class="cta-glow"></div>
+			<div class="section-tag">🚀 Ready to Get Started?</div>
+			<h2>Transform How <em>Your School</em> Operates</h2>
+			<p>Join hundreds of institutions already using GOO to save time, gain real insights and focus on what matters most: education.</p>
+			<div class="cta-actions">
+				<a class="btn btn-primary btn-lg" href="#">Book Your Demo Today →</a>
+				<a class="btn btn-outline btn-lg" href="#">Contact Sales</a>
+			</div>
+			<div class="cta-note">No credit card required · Free plan available · See your dashboard in minutes</div>
+		</section>
+
+		<!-- FOOTER -->
+		<footer>
+			<a class="nav-brand" href="#" style="font-size: 1rem">
+				<span class="brand-dot"></span>GOO
+				<span style="font-size: 0.75rem; color: var(--muted); font-weight: 400; margin-left: 0.25rem">— School Management System</span>
+			</a>
+			<div class="footer-links">
+				<a href="#features">Features</a>
+				<a href="#personas">Who It's For</a>
+				<a href="#security">Security</a>
+				<a href="https://iqverse.net">IQVerse</a>
+			</div>
+			<div class="footer-copy">© 2025 GOO · <a href="https://iqverse.net">IQVerse</a> · Made with ❤️ by <a href="https://sekmen.dev">Sekmen.Dev</a></div>
+		</footer>
 	</body>
 </html>
