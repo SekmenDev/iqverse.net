@@ -2,6 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "iqverse-goo",
   "compatibility_date": "2026-04-06",
+  "workers_dev": false,
   "observability": {
     "enabled": true
   },
