@@ -581,8 +581,8 @@ section {
 
 .final-cta-actions {
 	display: flex;
-	flex-direction: column;
-	justify-content: center;
+	flex-direction: row;
+	justify-content: space-between;
 }
 
 /* Buttons */
@@ -642,6 +642,7 @@ section {
 /* Responsive Grid Layout */
 .row {
 	display: grid;
+	grid-template-columns: 1fr;
 	gap: 1.5rem;
 }
 
@@ -649,6 +650,9 @@ section {
 	gap: 1.5rem;
 }
 
+.col-6 {
+	grid-column: span 6;
+}
 .col-12 {
 	grid-column: 1 / -1;
 }
@@ -675,32 +679,20 @@ section {
 		flex-direction: row;
 	}
 
+	.row {
+		grid-template-columns: repeat(12, 1fr);
+	}
+
 	.col-md-6 {
 		grid-column: span 6;
 	}
 
 	.trust-logos {
-		grid-template-columns: repeat(4, 1fr);
+		grid-template-columns: repeat(3, 1fr);
 	}
 
 	.certifications {
 		flex-direction: row;
-	}
-
-	.col-lg-3 {
-		grid-column: span 3;
-	}
-
-	.col-lg-4 {
-		grid-column: span 4;
-	}
-
-	.col-lg-6 {
-		grid-column: span 6;
-	}
-
-	.col-lg-8 {
-		grid-column: 3 / 11;
 	}
 
 	.mx-auto {
@@ -735,12 +727,32 @@ section {
 		margin-top: 0;
 	}
 
+	.row {
+		grid-template-columns: repeat(12, 1fr);
+	}
+
 	.trust-logos {
-		grid-template-columns: repeat(4, 1fr);
+		grid-template-columns: repeat(3, 1fr);
 	}
 
 	.solution-banner {
 		padding: 3rem;
+	}
+
+	.col-lg-3 {
+		grid-column: span 3;
+	}
+
+	.col-lg-4 {
+		grid-column: span 4;
+	}
+
+	.col-lg-6 {
+		grid-column: span 6;
+	}
+
+	.col-lg-8 {
+		grid-column: 3 / 11;
 	}
 
 	.btn-lg {
@@ -810,6 +822,7 @@ a:focus {
 .logo {
 	display: flex;
 	align-items: center;
+	gap: 10px;
 	font-family: Arial, sans-serif;
 	font-weight: 700;
 	font-size: 24px;
@@ -962,4 +975,7 @@ a:focus {
 	.mobile-menu {
 		display: none !important;
 	}
+}
+.gap-3 {
+	gap: 1rem;
 }
