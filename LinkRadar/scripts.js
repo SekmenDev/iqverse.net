@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────
-//  LINKRADAR — Core Scanner Engine
+//  LINKRADAR | Core Scanner Engine
 // ─────────────────────────────────────────────────────────────────────
 
 const CONCURRENCY = 5;
@@ -215,7 +215,7 @@ async function runScan(rootUrl, opts) {
 								queue.push({ ...link, depth: item.depth + 1 });
 							}
 						}
-						logLine(`  ↳ crawled ${item.url} — found ${subLinks.length} links`, "info");
+						logLine(`  ↳ crawled ${item.url}, found ${subLinks.length} links`, "info");
 					}
 				} catch (e) {
 					if (e.name !== "AbortError") logLine(`  ↳ crawl failed: ${e.message}`, "warn");
@@ -283,7 +283,7 @@ function renderTable() {
 		tbody.innerHTML = page
 			.map((r) => {
 				const shortUrl = r.url.length > 60 ? r.url.slice(0, 60) + "…" : r.url;
-				const srcPage = r.sourceUrl ? (r.sourceUrl.length > 50 ? r.sourceUrl.slice(0, 50) + "…" : r.sourceUrl) : "—";
+				const srcPage = r.sourceUrl ? (r.sourceUrl.length > 50 ? r.sourceUrl.slice(0, 50) + "…" : r.sourceUrl) : "-";
 				return `
       <tr>
         <td class="td-status">${badgeHtml(r.status)}</td>
@@ -296,12 +296,12 @@ function renderTable() {
         <td class="td-src">
           <div class="src-snippet">
             <span class="src-page" title="${escHtml(r.sourceUrl || "")}">${escHtml(srcPage)}</span>
-            <span class="src-tag">${escHtml(r.tag || "—")}</span>
+            <span class="src-tag">${escHtml(r.tag || "-")}</span>
             ${r.text ? `<span class="src-anchor">"${escHtml(r.text)}"</span>` : ""}
           </div>
         </td>
         <td class="td-time">${r.time}ms</td>
-        <td class="td-depth">${r.depth ?? "—"}</td>
+        <td class="td-depth">${r.depth ?? "-"}</td>
       </tr>`;
 			})
 			.join("");
@@ -416,7 +416,7 @@ function finishScan() {
 	if (scanResults.length > 0) {
 		updateStats();
 		renderTable();
-		logLine(`Scan complete — ${scanResults.length} URLs checked.`, "ok");
+		logLine(`Scan complete. ${scanResults.length} URLs checked.`, "ok");
 		document.getElementById("report-section").classList.add("visible");
 	}
 }

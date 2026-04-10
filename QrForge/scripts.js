@@ -1,5 +1,5 @@
 /* =============================
-   QR Forge — app.js
+   QR Forge - app.js
    ============================= */
 
 const state = {
@@ -107,10 +107,10 @@ function updateMeta(data) {
 	const len = new TextEncoder().encode(data).length;
 	document.getElementById("meta-data-length").textContent = `${len} bytes`;
 	document.getElementById("meta-ec").textContent = {
-		L: "Low — 7%",
-		M: "Medium — 15%",
-		Q: "Quartile — 25%",
-		H: "High — 30%",
+		L: "Low - 7%",
+		M: "Medium - 15%",
+		Q: "Quartile - 25%",
+		H: "High - 30%",
 	}[state.errorLevel];
 	// Version is harder to extract; estimate
 	const v = Math.max(1, Math.ceil(len / 25));

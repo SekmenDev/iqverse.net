@@ -1,4 +1,4 @@
-// IQVerse Tools — script.js
+// IQVerse Tools - script.js
 
 // ── Intersection Observer for scroll reveals ──────────────────────────────
 

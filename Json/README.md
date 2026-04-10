@@ -1,7 +1,7 @@
 # Favicon & Meta Generator
 
 > **Generate production-ready favicons and meta tags instantly.**  
-> Drop your logo, fill in the details and get complete `<head>` HTML — all in your browser.
+> Drop your logo, fill in the details and get complete `<head>` HTML. All in your browser.
 
 ![License](https://img.shields.io/badge/license-MIT-green) ![Open Source](https://img.shields.io/badge/open-source-blue) ![Browser](https://img.shields.io/badge/browser-based-9cf)
 
