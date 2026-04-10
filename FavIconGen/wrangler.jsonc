@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "favicon-gen",
+  "name": "iqverse-favicongen",
   "compatibility_date": "2026-04-07",
   "observability": {
     "enabled": true
