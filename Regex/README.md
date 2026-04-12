@@ -7,6 +7,7 @@
 ## Features
 
 ### 01 — Pattern (Tester)
+
 - Live regex testing with real-time match highlighting in the preview panel
 - Flag controls: `g` `i` `m` `s` `u` — toggle individually
 - Match count badge and full match list with index positions
@@ -15,20 +16,22 @@
 - Stats bar: matches · groups · steps · execution time (µs)
 
 ### 02 — Explainer
+
 - Visual **token strip** — every part of your pattern color-coded by type (anchor, quantifier, group, character class, escape, literal, alternation)
 - **Step-by-step breakdown** with title and plain-English description per token
 - **Plain English explanation** of the full pattern
 - **Dynamic cheat sheet** — shows only the tokens present in your current pattern
 
 ### 03 — Library
+
 - 30+ curated, production-ready regex patterns
 - Categories: Validation · Extraction · Formatting · Security · Web · Dates
 - Search and filter
-- One-click **Use in Tester**, **Copy**, or **Explain** per pattern
+- One-click **Use in Tester**, **Copy** or **Explain** per pattern
 
 ### 04 — Reference
-- Complete regex reference table with 8 categories:
-  Anchors · Character Classes · Quantifiers · Groups & Lookarounds · Flags · Escape Sequences · Alternation · Replacement Tokens
+
+- Complete regex reference table with 8 categories: Anchors · Character Classes · Quantifiers · Groups & Lookarounds · Flags · Escape Sequences · Alternation · Replacement Tokens
 
 ---
 
@@ -81,4 +84,4 @@ MIT — Open source, no tracking, no servers.
 
 ---
 
-*Part of [IQVerse](https://iqverse.net) · Made with ❤️ by [Sekmen.Dev](https://sekmen.dev)*
+_Part of [IQVerse](https://iqverse.net) · Made with ❤️ by [Sekmen.Dev](https://sekmen.dev)_
