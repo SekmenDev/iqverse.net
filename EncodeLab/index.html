@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>EncodeLab | Base64 & URL Encoder/Decoder</title>
+
+		<!-- SEO Meta Tags -->
+		<meta
+			name="description"
+			content="EncodeLab: Free online Base64 & URL encoder/decoder. Encode and decode Base64, URL parameters, JWT tokens, data URIs and compare files. All tools in the browser, no uploads needed."
+		/>
+		<meta
+			name="keywords"
+			content="base64 encoder, base64 decoder, URL encoder, URL decoder, JWT inspector, data URI converter, file encoding, online encoder decoder, text encoding"
+		/>
+		<meta name="author" content="Sekmen.Dev" />
+		<meta name="robots" content="index, follow" />
+		<meta name="language" content="English" />
+
+		<!-- Open Graph Tags (Social Media) -->
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content="EncodeLab - Base64 & URL Encoder/Decoder" />
+		<meta
+			property="og:description"
+			content="EncodeLab: Free online Base64 & URL encoder/decoder. Encode and decode Base64, URL parameters, JWT tokens, data URIs and compare files. All tools in the browser, no uploads needed."
+		/>
+		<meta property="og:url" content="https://encodelab.iqverse.net/" />
+		<meta property="og:site_name" content="EncodeLab" />
+		<meta property="og:image" content="https://encodelab.iqverse.net/og-image-1200x630.png" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+
+		<!-- Twitter Card Tags -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="EncodeLab - Base64 & URL Encoder/Decoder" />
+		<meta
+			name="twitter:description"
+			content="EncodeLab: Free online Base64 & URL encoder/decoder. Encode and decode Base64, URL parameters, JWT tokens, data URIs and compare files. All tools in the browser, no uploads needed."
+		/>
+		<meta name="twitter:image" content="https://encodelab.iqverse.net/og-image-1200x630.png" />
+
+		<!-- Canonical URL -->
+		<link rel="canonical" href="https://encodelab.iqverse.net/" />
+
+		<!-- Stylesheets and Fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&family=JetBrains+Mono:wght@400;500&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="styles.css" />
+
+		<!-- Favicon and Touch Icons -->
+		<link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png" />
+		<link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png" />
+		<link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png" />
+		<link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png" />
+		<link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png" />
+		<link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png" />
+		<link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png" />
+		<link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png" />
+		<link rel="icon" type="image/png" sizes="192x192" href="/android-icon-192x192.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+		<link rel="manifest" href="/manifest.json" />
+		<meta name="msapplication-TileColor" content="#ffffff" />
+		<meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
+		<meta name="theme-color" content="#ffffff" />
+	</head>
+	<body>
+		<!-- Header -->
+		<header class="header">
+			<div class="header-inner">
+				<div class="logo">
+					<img src="logo.png" alt="EncodeLab logo" />
+					<span>EncodeLab</span>
+				</div>
+				<nav class="header-nav">
+					<a href="https://iqverse.net/" class="nav-tag" target="_blank">All Tools</a>
+					<a href="https://github.com/SekmenDev/iqverse.net" target="_blank" class="nav-tag">Source Code</a>
+				</nav>
+			</div>
+		</header>
+
+		<!-- Hero -->
+		<section class="hero">
+			<div class="hero-inner">
+				<h1>Base64 &amp; URL<br /><span class="accent">Encoder / Decoder</span></h1>
+				<p class="hero-sub">Debug JWTs · Handle data URIs · Fix URL parameters · Encode files · Everything encoding.</p>
+			</div>
+		</section>
+
+		<!-- Tab Bar -->
+		<div class="tab-bar-wrap">
+			<div class="tab-bar">
+				<button class="tab active" data-tab="base64"><span class="tab-num">01</span> Base64</button>
+				<button class="tab" data-tab="url"><span class="tab-num">02</span> URL Encode</button>
+				<button class="tab" data-tab="jwt"><span class="tab-num">03</span> JWT Inspector</button>
+				<button class="tab" data-tab="file"><span class="tab-num">04</span> File → Base64</button>
+				<button class="tab" data-tab="datauri"><span class="tab-num">05</span> Data URI</button>
+				<button class="tab" data-tab="diff"><span class="tab-num">06</span> Diff / Compare</button>
+			</div>
+		</div>
+
+		<!-- Main Content -->
+		<main class="main-content">
+			<!-- ── BASE64 TAB ── -->
+			<section class="panel active" id="tab-base64">
+				<div class="panel-grid">
+					<div class="card full-width">
+						<div class="card-header">
+							<h2 class="card-title">Base64 Encoder / Decoder</h2>
+							<div class="mode-toggle">
+								<button class="mode-btn active" id="b64-encode-btn">Encode</button>
+								<button class="mode-btn" id="b64-decode-btn">Decode</button>
+							</div>
+						</div>
+
+						<div class="options-row">
+							<label class="option-chip"> <input type="checkbox" id="b64-urlsafe" /> URL-safe variant </label>
+							<label class="option-chip"> <input type="checkbox" id="b64-nopad" /> No padding </label>
+							<label class="option-chip"> <input type="checkbox" id="b64-linebreak" /> Line breaks (76 chars) </label>
+							<label class="option-chip"> <input type="checkbox" id="b64-utf8" checked /> UTF-8 input </label>
+						</div>
+
+						<div class="io-grid">
+							<div class="io-box">
+								<div class="io-label">
+									<span id="b64-input-label">Plain Text</span>
+									<div class="io-actions">
+										<button class="icon-btn" id="b64-paste-btn" title="Paste">
+											<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+												<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+												<rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+											</svg>
+											Paste
+										</button>
+										<button class="icon-btn" id="b64-clear-in-btn" title="Clear">✕ Clear</button>
+									</div>
+								</div>
+								<textarea class="code-area" id="b64-input" placeholder="Enter text to encode or paste Base64 to decode…" rows="8" spellcheck="false"></textarea>
+								<div class="char-count"><span id="b64-in-count">0</span> chars</div>
+							</div>
+
+							<div class="io-center">
+								<button class="convert-btn" id="b64-convert-btn">
+									<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+								</button>
+								<button class="swap-btn" id="b64-swap-btn" title="Swap input/output">
+									<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+										<path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
+									</svg>
+								</button>
+							</div>
+
+							<div class="io-box">
+								<div class="io-label">
+									<span id="b64-output-label">Base64 Output</span>
+									<div class="io-actions">
+										<button class="icon-btn" id="b64-copy-btn">
+											<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+												<rect x="9" y="9" width="13" height="13" rx="2" />
+												<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+											</svg>
+											Copy
+										</button>
+										<button class="icon-btn" id="b64-download-btn">
+											<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+												<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+											</svg>
+											Save
+										</button>
+									</div>
+								</div>
+								<textarea class="code-area output-area" id="b64-output" placeholder="Output will appear here…" rows="8" spellcheck="false" readonly></textarea>
+								<div class="char-count"><span id="b64-out-count">0</span> chars · <span id="b64-ratio"></span></div>
+							</div>
+						</div>
+
+						<div id="b64-error" class="error-banner hidden"></div>
+
+						<div class="stats-row" id="b64-stats">
+							<div class="stat-chip"><span>Input bytes</span><strong id="b64-stat-in-bytes">—</strong></div>
+							<div class="stat-chip"><span>Output bytes</span><strong id="b64-stat-out-bytes">—</strong></div>
+							<div class="stat-chip"><span>Overhead</span><strong id="b64-stat-overhead">—</strong></div>
+							<div class="stat-chip"><span>Valid Base64</span><strong id="b64-stat-valid">—</strong></div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- ── URL ENCODE TAB ── -->
+			<section class="panel" id="tab-url">
+				<div class="panel-grid">
+					<div class="card full-width">
+						<div class="card-header">
+							<h2 class="card-title">URL Encoder / Decoder</h2>
+							<div class="mode-toggle">
+								<button class="mode-btn active" id="url-encode-btn">Encode</button>
+								<button class="mode-btn" id="url-decode-btn">Decode</button>
+							</div>
+						</div>
+
+						<div class="options-row">
+							<label class="option-chip"> <input type="radio" name="url-mode" value="component" checked /> encodeURIComponent </label>
+							<label class="option-chip"> <input type="radio" name="url-mode" value="full" /> encodeURI (full) </label>
+							<label class="option-chip"> <input type="radio" name="url-mode" value="rfc3986" /> RFC 3986 strict </label>
+							<label class="option-chip"> <input type="radio" name="url-mode" value="form" /> Form encode (+spaces) </label>
+						</div>
+
+						<div class="io-grid">
+							<div class="io-box">
+								<div class="io-label">
+									<span>Raw / Decoded</span>
+									<div class="io-actions">
+										<button class="icon-btn" id="url-paste-btn">
+											<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+												<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+												<rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+											</svg>
+											Paste
+										</button>
+										<button class="icon-btn" id="url-clear-btn">✕ Clear</button>
+									</div>
+								</div>
+								<textarea
+									class="code-area"
+									id="url-input"
+									placeholder="https://example.com/search?q=hello world&lang=en"
+									rows="7"
+									spellcheck="false"
+								></textarea>
+							</div>
+
+							<div class="io-center">
+								<button class="convert-btn" id="url-convert-btn">
+									<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+								</button>
+								<button class="swap-btn" id="url-swap-btn" title="Swap">
+									<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+										<path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
+									</svg>
+								</button>
+							</div>
+
+							<div class="io-box">
+								<div class="io-label">
+									<span>Encoded</span>
+									<div class="io-actions">
+										<button class="icon-btn" id="url-copy-btn">
+											<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+												<rect x="9" y="9" width="13" height="13" rx="2" />
+												<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+											</svg>
+											Copy
+										</button>
+									</div>
+								</div>
+								<textarea class="code-area output-area" id="url-output" placeholder="Output will appear here…" rows="7" spellcheck="false" readonly></textarea>
+							</div>
+						</div>
+
+						<div id="url-error" class="error-banner hidden"></div>
+
+						<!-- URL Parameter Parser -->
+						<div class="sub-section">
+							<div class="sub-section-header">
+								<h3>Query Parameter Parser</h3>
+								<button class="icon-btn" id="url-parse-btn">Parse URL</button>
+							</div>
+							<div id="url-params-table" class="params-table hidden">
+								<div class="params-head"><span>Parameter</span><span>Value</span><span>Decoded</span></div>
+								<div id="url-params-body"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- ── JWT TAB ── -->
+			<section class="panel" id="tab-jwt">
+				<div class="panel-grid">
+					<div class="card full-width">
+						<div class="card-header">
+							<h2 class="card-title">JWT Inspector</h2>
+							<div class="badge-row">
+								<span class="badge" id="jwt-alg-badge">—</span>
+								<span class="badge" id="jwt-status-badge">—</span>
+							</div>
+						</div>
+
+						<div class="io-box" style="margin-bottom: 1.5rem">
+							<div class="io-label">
+								<span>JWT Token</span>
+								<div class="io-actions">
+									<button class="icon-btn" id="jwt-paste-btn">
+										<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+											<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+											<rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+										</svg>
+										Paste
+									</button>
+									<button class="icon-btn" id="jwt-sample-btn">Load Sample</button>
+									<button class="icon-btn" id="jwt-clear-btn">✕ Clear</button>
+								</div>
+							</div>
+							<textarea
+								class="code-area jwt-input"
+								id="jwt-input"
+								placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+								rows="4"
+								spellcheck="false"
+							></textarea>
+						</div>
+
+						<!-- Visual Token Parts -->
+						<div class="jwt-visual" id="jwt-visual">
+							<span class="jwt-part header-part" id="jwt-vis-header" title="Header">—</span>
+							<span class="jwt-dot">.</span>
+							<span class="jwt-part payload-part" id="jwt-vis-payload" title="Payload">—</span>
+							<span class="jwt-dot">.</span>
+							<span class="jwt-part sig-part" id="jwt-vis-sig" title="Signature">—</span>
+						</div>
+
+						<div class="jwt-grid">
+							<div class="jwt-section">
+								<div class="jwt-section-label header-label">Header</div>
+								<pre class="json-display" id="jwt-header-display">—</pre>
+							</div>
+							<div class="jwt-section">
+								<div class="jwt-section-label payload-label">Payload</div>
+								<pre class="json-display" id="jwt-payload-display">—</pre>
+							</div>
+							<div class="jwt-section">
+								<div class="jwt-section-label sig-label">Signature</div>
+								<pre class="json-display sig-display" id="jwt-sig-display">—</pre>
+							</div>
+						</div>
+
+						<!-- Claims Table -->
+						<div class="sub-section" id="jwt-claims-wrap" style="display: none">
+							<div class="sub-section-header">
+								<h3>Standard Claims</h3>
+							</div>
+							<div id="jwt-claims-table" class="params-table">
+								<div class="params-head"><span>Claim</span><span>Value</span><span>Meaning</span></div>
+								<div id="jwt-claims-body"></div>
+							</div>
+						</div>
+
+						<div id="jwt-error" class="error-banner hidden"></div>
+
+						<div class="stats-row" id="jwt-stats">
+							<div class="stat-chip"><span>Issued at</span><strong id="jwt-iat">—</strong></div>
+							<div class="stat-chip"><span>Expires</span><strong id="jwt-exp">—</strong></div>
+							<div class="stat-chip"><span>Not before</span><strong id="jwt-nbf">—</strong></div>
+							<div class="stat-chip"><span>Algorithm</span><strong id="jwt-alg-stat">—</strong></div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- ── FILE TAB ── -->
+			<section class="panel" id="tab-file">
+				<div class="panel-grid">
+					<div class="card full-width">
+						<div class="card-header">
+							<h2 class="card-title">File → Base64</h2>
+							<div class="mode-toggle">
+								<button class="mode-btn active" id="file-enc-btn">File to Base64</button>
+								<button class="mode-btn" id="file-dec-btn">Base64 to File</button>
+							</div>
+						</div>
+
+						<div id="file-to-b64-panel">
+							<div class="dropzone" id="file-dropzone">
+								<input type="file" id="file-input" hidden />
+								<div class="dropzone-inner">
+									<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5">
+										<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+										<polyline points="17 8 12 3 7 8" />
+										<line x1="12" y1="3" x2="12" y2="15" />
+									</svg>
+									<p>Drop any file here or <button class="link-btn" id="file-browse-btn">browse</button></p>
+									<small>All file types supported · Processed locally in your browser</small>
+								</div>
+							</div>
+
+							<div id="file-info" class="file-info hidden">
+								<div class="file-info-row">
+									<div class="file-icon" id="file-icon">📄</div>
+									<div class="file-details">
+										<strong id="file-name">—</strong>
+										<span id="file-size">—</span>
+										<span id="file-type">—</span>
+									</div>
+									<button class="icon-btn" id="file-remove-btn">✕ Remove</button>
+								</div>
+							</div>
+
+							<div class="options-row" style="margin-top: 1rem">
+								<label class="option-chip"> <input type="checkbox" id="file-datauri" checked /> Include Data URI prefix </label>
+								<label class="option-chip"> <input type="checkbox" id="file-linebreak-b64" /> Add line breaks </label>
+							</div>
+
+							<div class="io-box" style="margin-top: 1rem" id="file-output-wrap">
+								<div class="io-label">
+									<span>Base64 Output</span>
+									<div class="io-actions">
+										<button class="icon-btn" id="file-copy-btn">
+											<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+												<rect x="9" y="9" width="13" height="13" rx="2" />
+												<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+											</svg>
+											Copy
+										</button>
+										<button class="icon-btn" id="file-dl-btn">
+											<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+												<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+											</svg>
+											Save .txt
+										</button>
+									</div>
+								</div>
+								<textarea
+									class="code-area output-area"
+									id="file-output"
+									rows="8"
+									spellcheck="false"
+									readonly
+									placeholder="Encoded output will appear here after dropping a file…"
+								></textarea>
+							</div>
+						</div>
+
+						<!-- Base64 to File panel -->
+						<div id="b64-to-file-panel" class="hidden">
+							<div class="io-box">
+								<div class="io-label">
+									<span>Base64 or Data URI</span>
+									<div class="io-actions">
+										<button class="icon-btn" id="b64file-paste-btn">
+											<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+												<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+												<rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+											</svg>
+											Paste
+										</button>
+									</div>
+								</div>
+								<textarea
+									class="code-area"
+									id="b64file-input"
+									rows="8"
+									spellcheck="false"
+									placeholder="Paste Base64 string or data URI (data:image/png;base64,…)"
+								></textarea>
+							</div>
+							<div class="options-row" style="margin-top: 1rem">
+								<label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-muted)">
+									Filename:
+									<input type="text" id="b64file-name" value="decoded_file" class="inline-input" placeholder="decoded_file" />
+								</label>
+								<label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-muted)">
+									Extension:
+									<input type="text" id="b64file-ext" value="bin" class="inline-input" placeholder="bin" style="width: 60px" />
+								</label>
+							</div>
+							<div style="margin-top: 1rem; display: flex; gap: 0.75rem; align-items: center">
+								<button class="primary-btn" id="b64file-dl-btn">Download File</button>
+								<div class="file-preview-wrap" id="b64file-preview"></div>
+							</div>
+							<div id="b64file-error" class="error-banner hidden"></div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- ── DATA URI TAB ── -->
+			<section class="panel" id="tab-datauri">
+				<div class="panel-grid">
+					<div class="card full-width">
+						<div class="card-header">
+							<h2 class="card-title">Data URI Builder / Inspector</h2>
+						</div>
+
+						<div class="datauri-grid">
+							<div class="io-box">
+								<div class="io-label">
+									<span>Input Data URI or URL</span>
+									<div class="io-actions">
+										<button class="icon-btn" id="duri-paste-btn">
+											<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+												<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+												<rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+											</svg>
+											Paste
+										</button>
+										<button class="icon-btn" id="duri-clear-btn">✕ Clear</button>
+									</div>
+								</div>
+								<textarea
+									class="code-area"
+									id="duri-input"
+									rows="6"
+									spellcheck="false"
+									placeholder="data:image/png;base64,iVBORw0KGgo…  or  data:text/html;charset=utf-8,<h1>Hello</h1>"
+								></textarea>
+							</div>
+
+							<div class="duri-meta" id="duri-meta">
+								<div class="meta-grid">
+									<div class="meta-item"><span>MIME Type</span><strong id="duri-mime">—</strong></div>
+									<div class="meta-item"><span>Encoding</span><strong id="duri-encoding">—</strong></div>
+									<div class="meta-item"><span>Data length</span><strong id="duri-length">—</strong></div>
+									<div class="meta-item"><span>Decoded size</span><strong id="duri-size">—</strong></div>
+								</div>
+							</div>
+
+							<div class="preview-box" id="duri-preview-box">
+								<div class="preview-label">Preview</div>
+								<div id="duri-preview" class="duri-preview-area">
+									<span class="preview-placeholder">Preview will appear here</span>
+								</div>
+								<div class="io-actions" style="margin-top: 0.75rem">
+									<button class="icon-btn" id="duri-download-btn">
+										<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+											<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+										</svg>
+										Download
+									</button>
+								</div>
+							</div>
+						</div>
+
+						<!-- Builder -->
+						<div class="sub-section">
+							<div class="sub-section-header"><h3>Builder — Text to Data URI</h3></div>
+							<div class="options-row">
+								<label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-muted)">
+									MIME:
+									<select id="duri-build-mime" class="inline-select">
+										<option>text/plain</option>
+										<option>text/html</option>
+										<option>text/css</option>
+										<option>application/json</option>
+										<option>application/javascript</option>
+										<option>image/svg+xml</option>
+									</select>
+								</label>
+								<label class="option-chip"> <input type="checkbox" id="duri-build-b64" checked /> Base64 encode </label>
+							</div>
+							<textarea class="code-area" id="duri-build-input" rows="4" spellcheck="false" placeholder="Enter your text / HTML / SVG / JSON here…"></textarea>
+							<div class="io-box" style="margin-top: 0.75rem">
+								<div class="io-label">
+									<span>Generated Data URI</span>
+									<button class="icon-btn" id="duri-build-copy-btn">
+										<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+											<rect x="9" y="9" width="13" height="13" rx="2" />
+											<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+										</svg>
+										Copy
+									</button>
+								</div>
+								<textarea
+									class="code-area output-area"
+									id="duri-build-output"
+									rows="3"
+									spellcheck="false"
+									readonly
+									placeholder="Generated URI appears here…"
+								></textarea>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- ── DIFF TAB ── -->
+			<section class="panel" id="tab-diff">
+				<div class="panel-grid">
+					<div class="card full-width">
+						<div class="card-header">
+							<h2 class="card-title">Encode / Decode Diff Viewer</h2>
+							<div class="mode-toggle">
+								<button class="mode-btn active" id="diff-b64-btn">Base64</button>
+								<button class="mode-btn" id="diff-url-btn">URL</button>
+							</div>
+						</div>
+						<p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem">
+							Compare two encoded strings and see their decoded differences highlighted.
+						</p>
+
+						<div class="io-grid">
+							<div class="io-box">
+								<div class="io-label"><span>String A</span></div>
+								<textarea class="code-area" id="diff-a" rows="6" spellcheck="false" placeholder="First encoded string…"></textarea>
+							</div>
+							<div class="io-center">
+								<button class="convert-btn" id="diff-run-btn">
+									<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+										<circle cx="11" cy="11" r="8" />
+										<path d="m21 21-4.35-4.35" />
+									</svg>
+								</button>
+							</div>
+							<div class="io-box">
+								<div class="io-label"><span>String B</span></div>
+								<textarea class="code-area" id="diff-b" rows="6" spellcheck="false" placeholder="Second encoded string…"></textarea>
+							</div>
+						</div>
+
+						<div id="diff-result" class="diff-result hidden">
+							<div class="diff-cols">
+								<div>
+									<div class="diff-label">Decoded A</div>
+									<div class="diff-content" id="diff-content-a"></div>
+								</div>
+								<div>
+									<div class="diff-label">Decoded B</div>
+									<div class="diff-content" id="diff-content-b"></div>
+								</div>
+							</div>
+							<div class="stats-row" style="margin-top: 1rem">
+								<div class="stat-chip"><span>Same</span><strong id="diff-same">—</strong></div>
+								<div class="stat-chip"><span>Changed</span><strong id="diff-changed">—</strong></div>
+								<div class="stat-chip"><span>A length</span><strong id="diff-len-a">—</strong></div>
+								<div class="stat-chip"><span>B length</span><strong id="diff-len-b">—</strong></div>
+							</div>
+						</div>
+						<div id="diff-error" class="error-banner hidden"></div>
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<!-- Toast -->
+		<div id="toast" class="toast hidden"></div>
+
+		<!-- Footer -->
+		<footer class="footer">
+			<div class="footer__logo"><span class="nav__logo-bracket">[</span><a href="https://iqverse.net">IQVerse</a><span class="nav__logo-bracket">]</span></div>
+			<div class="footer-inner">
+				<span>
+					Made with ❤️ by <a href="https://sekmen.dev" target="_blank">Sekmen.Dev</a> and published on
+					<a href="https://github.com/SekmenDev/iqverse.net" target="_blank">Github</a>
+				</span>
+			</div>
+			<div class="footer-inner">
+				<span> Open source. MIT License. No servers. No tracking. No cost. </span>
+			</div>
+		</footer>
+
+		<script src="scripts.js"></script>
+	</body>
+</html>
