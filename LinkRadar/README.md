@@ -29,8 +29,6 @@
 - [Report Reference](#report-reference)
 - [CORS & Limitations](#cors--limitations)
 - [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [License](#license)
 
 ---
 
@@ -344,27 +342,16 @@ Because LinkRadar runs entirely in your browser, all requests are subject to bro
 
 ---
 
-## License
+## 📄 License
 
-MIT License © LinkRadar Contributors
-
-```text
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software to use, copy, modify, merge, publish, distribute and/or
-sublicense it, subject to the conditions in the full LICENSE file.
-```
+All tools are released under the **MIT License**. See individual repositories for license details.
 
 ---
 
-<div align="center">
+## 🔗 Links
 
-Built with ♥ by developers, for developers.
-
-**No servers. No tracking. No cost. Forever.**
-
-[⭐ Star on GitHub](https://github.com/your-org/linkradar) · [🐛 Report a Bug](../../issues) · [💡 Request a Feature](../../issues)
-
-</div>
+- **IQVerse:** [iqverse.net](https://iqverse.net)
+- **Sekmen.Dev** [Sekmen.Dev](https://sekmen.dev)
 
 ---
 

@@ -2,8 +2,9 @@
 
 A fast, privacy-first browser tool for everything encoding. No servers, no tracking, no cost.
 
-**Live at:** [iqverse.net](https://iqverse.net/)  
-**Part of the IQVerse toolset by [Sekmen.Dev](https://sekmen.dev)**
+![License](https://img.shields.io/badge/license-MIT-green) ![Open Source](https://img.shields.io/badge/open-source-blue) ![Browser](https://img.shields.io/badge/browser-based-9cf)
+
+📍 [Launch Tool](https://encodelab.net/)
 
 ---
 
@@ -86,10 +87,17 @@ Everything runs in your browser.
 
 ---
 
-## License
+## 📄 License
 
-MIT — Open source, fork freely.
+All tools are released under the **MIT License**. See individual repositories for license details.
 
 ---
 
-_Part of [IQVerse](https://iqverse.net/) · Made by [Sekmen.Dev](https://sekmen.dev) · Published on [GitHub](https://github.com/SekmenDev/iqverse.net)_
+## 🔗 Links
+
+- **IQVerse:** [iqverse.net](https://iqverse.net)
+- **Sekmen.Dev** [Sekmen.Dev](https://sekmen.dev)
+
+---
+
+**Built with ❤️ by developers, for the developer community.**

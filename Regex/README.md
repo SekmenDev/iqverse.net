@@ -2,6 +2,10 @@
 
 **A browser-based Regex Tester & Explainer** — part of the [IQVerse](https://iqverse.net) open-source tools collection by [Sekmen.Dev](https://sekmen.dev).
 
+![License](https://img.shields.io/badge/license-MIT-green) ![Open Source](https://img.shields.io/badge/open-source-blue) ![Browser](https://img.shields.io/badge/browser-based-9cf)
+
+📍 [Launch Tool](https://regex.iqverse.net/)
+
 ---
 
 ## Features
@@ -59,7 +63,7 @@ python3 -m http.server
 
 ## File Structure
 
-```
+```text
 regex-tester/
 ├── index.html   # Markup & layout
 ├── style.css    # Design system & styles
@@ -78,10 +82,17 @@ regex-tester/
 
 ---
 
-## License
+## 📄 License
 
-MIT — Open source, no tracking, no servers.
+All tools are released under the **MIT License**. See individual repositories for license details.
 
 ---
 
-_Part of [IQVerse](https://iqverse.net) · Made with ❤️ by [Sekmen.Dev](https://sekmen.dev)_
+## 🔗 Links
+
+- **IQVerse:** [iqverse.net](https://iqverse.net)
+- **Sekmen.Dev** [Sekmen.Dev](https://sekmen.dev)
+
+---
+
+**Built with ❤️ by developers, for the developer community.**
