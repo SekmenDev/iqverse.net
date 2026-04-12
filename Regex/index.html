@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>RegEx Forge | Regex Tester & Explainer</title>
+
+		<!-- SEO Meta Tags -->
+		<meta
+			name="description"
+			content="RegEx Forge is your ultimate online regex tester and explainer. Build, test and understand regular expressions with our interactive tool. Perfect for developers, students and anyone looking to master regex patterns."
+		/>
+		<meta name="keywords" content="regex tester, regex explainer, regular expressions, regex tool, online regex tester" />
+		<meta name="author" content="Sekmen.Dev" />
+		<meta name="robots" content="index, follow" />
+		<meta name="language" content="English" />
+
+		<!-- Open Graph Tags (Social Media) -->
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content="RegEx Forge | Regex Tester & Explainer" />
+		<meta
+			property="og:description"
+			content="RegEx Forge is your ultimate online regex tester and explainer. Build, test and understand regular expressions with our interactive tool. Perfect for developers, students and anyone looking to master regex patterns."
+		/>
+		<meta property="og:url" content="https://regex.iqverse.net/" />
+		<meta property="og:site_name" content="RegEx Forge" />
+		<meta property="og:image" content="https://regex.iqverse.net/og-image-1200x630.png" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+
+		<!-- Twitter Card Tags -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="RegEx Forge | Regex Tester & Explainer" />
+		<meta name="twitter:description" content="RegEx Forge is your ultimate online regex tester and explainer. Build, test and understand regular expressions with our interactive tool. Perfect for developers, students and anyone looking to master regex patterns." />
+		<meta name="twitter:image" content="https://regex.iqverse.net/og-image-1200x630.png" />
+
+		<!-- Canonical URL -->
+		<link rel="canonical" href="https://regex.iqverse.net/" />
+
+		<!-- Stylesheets and Fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+		<link rel="stylesheet" href="styles.css" />
+
+		<!-- Favicon and Touch Icons -->
+		<link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png" />
+		<link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png" />
+		<link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png" />
+		<link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png" />
+		<link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png" />
+		<link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png" />
+		<link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png" />
+		<link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png" />
+		<link rel="icon" type="image/png" sizes="192x192" href="/android-icon-192x192.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+		<link rel="manifest" href="/manifest.json" />
+		<meta name="msapplication-TileColor" content="#ffffff" />
+		<meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
+		<meta name="theme-color" content="#ffffff" />
+	</head>
+	<body>
+		<!-- HEADER -->
+		<header class="header">
+			<div class="header-inner">
+				<div class="logo">
+					<img src="logo.png" alt="RegEx Forge logo" />
+					<span>RegEx Forge</span>
+				</div>
+				<nav class="header-nav">
+					<a href="https://iqverse.net/" class="nav-tag" target="_blank">All Tools</a>
+					<a href="https://github.com/SekmenDev/iqverse.net" target="_blank" class="nav-tag">Source Code</a>
+				</nav>
+			</div>
+		</header>
+
+		<!-- TABS -->
+		<div class="tabs-bar">
+			<button class="tab active" data-tab="tester">
+				<span class="tab-num">01</span>
+				<span class="tab-label">Pattern</span>
+			</button>
+			<button class="tab" data-tab="explainer">
+				<span class="tab-num">02</span>
+				<span class="tab-label">Explainer</span>
+			</button>
+			<button class="tab" data-tab="library">
+				<span class="tab-num">03</span>
+				<span class="tab-label">Library</span>
+			</button>
+			<button class="tab" data-tab="reference">
+				<span class="tab-num">04</span>
+				<span class="tab-label">Reference</span>
+			</button>
+		</div>
+
+		<!-- MAIN LAYOUT -->
+		<main class="main">
+			<!-- ===================== TAB: TESTER ===================== -->
+			<section class="tab-content active" id="tab-tester">
+				<div class="panel-grid">
+					<!-- LEFT PANEL -->
+					<div class="panel">
+						<!-- Regex Input -->
+						<div class="section-block">
+							<div class="block-header">
+								<span class="block-title">Regular Expression</span>
+								<div class="flag-group">
+									<label class="flag-btn" title="Global"><input type="checkbox" id="flag-g" checked /><span>g</span></label>
+									<label class="flag-btn" title="Case Insensitive"><input type="checkbox" id="flag-i" /><span>i</span></label>
+									<label class="flag-btn" title="Multiline"><input type="checkbox" id="flag-m" /><span>m</span></label>
+									<label class="flag-btn" title="Single-line (dotAll)"><input type="checkbox" id="flag-s" /><span>s</span></label>
+									<label class="flag-btn" title="Unicode"><input type="checkbox" id="flag-u" /><span>u</span></label>
+								</div>
+							</div>
+							<div class="regex-input-wrap">
+								<span class="regex-delim">/</span>
+								<input type="text" id="regex-input" class="regex-input" placeholder="Enter your regex pattern…" spellcheck="false" autocomplete="off" />
+								<span class="regex-delim">/</span>
+								<span class="regex-flags-display" id="flags-display">g</span>
+							</div>
+							<div class="regex-error" id="regex-error"></div>
+						</div>
+
+						<!-- Test String -->
+						<div class="section-block">
+							<div class="block-header">
+								<span class="block-title">Test String</span>
+								<div class="header-actions">
+									<span class="match-badge" id="match-count">0 matches</span>
+									<button class="icon-btn" id="btn-clear-test" title="Clear">
+										<svg viewBox="0 0 16 16">
+											<path d="M2 4h12M5 4V2h6v2M6 7v5M10 7v5M3 4l1 10h8l1-10H3z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
+										</svg>
+									</button>
+								</div>
+							</div>
+							<textarea id="test-input" class="test-textarea" placeholder="Enter test string here…" spellcheck="false"></textarea>
+						</div>
+
+						<!-- Substitution -->
+						<div class="section-block">
+							<div class="block-header">
+								<span class="block-title">Substitution</span>
+								<label class="toggle-label">
+									<input type="checkbox" id="sub-toggle" />
+									<span class="toggle-slider"></span>
+								</label>
+							</div>
+							<input type="text" id="sub-input" class="sub-input" placeholder="Replacement (use $1, $2 for groups)…" disabled />
+							<div class="sub-result-label">Result:</div>
+							<div class="sub-result" id="sub-result">—</div>
+						</div>
+
+						<!-- Groups Info -->
+						<div class="section-block" id="groups-section" style="display: none">
+							<div class="block-header"><span class="block-title">Capture Groups</span></div>
+							<div id="groups-list" class="groups-list"></div>
+						</div>
+					</div>
+
+					<!-- RIGHT PANEL: PREVIEW -->
+					<div class="panel panel-preview">
+						<div class="block-header">
+							<span class="block-title">Live Preview</span>
+							<div class="header-actions">
+								<button class="icon-btn" id="btn-copy-regex" title="Copy regex">
+									<svg viewBox="0 0 16 16">
+										<rect x="5" y="5" width="9" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5" fill="none" />
+										<path d="M3 11H2a1 1 0 01-1-1V2a1 1 0 011-1h8a1 1 0 011 1v2" stroke="currentColor" stroke-width="1.5" fill="none" />
+									</svg>
+								</button>
+							</div>
+						</div>
+
+						<!-- Highlighted preview -->
+						<div class="preview-box" id="preview-box"></div>
+
+						<!-- Match Details -->
+						<div class="matches-label">Match Details</div>
+						<div class="matches-list" id="matches-list">
+							<div class="empty-state">Enter a pattern and test string to see matches.</div>
+						</div>
+
+						<!-- Stats Bar -->
+						<div class="stats-bar" id="stats-bar">
+							<div class="stat"><span class="stat-val" id="stat-matches">0</span><span class="stat-key">Matches</span></div>
+							<div class="stat"><span class="stat-val" id="stat-groups">0</span><span class="stat-key">Groups</span></div>
+							<div class="stat"><span class="stat-val" id="stat-steps">—</span><span class="stat-key">Steps</span></div>
+							<div class="stat"><span class="stat-val" id="stat-time">—</span><span class="stat-key">Time (µs)</span></div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- ===================== TAB: EXPLAINER ===================== -->
+			<section class="tab-content" id="tab-explainer">
+				<div class="panel-grid">
+					<div class="panel">
+						<div class="section-block">
+							<div class="block-header"><span class="block-title">Pattern to Explain</span></div>
+							<div class="regex-input-wrap">
+								<span class="regex-delim">/</span>
+								<input type="text" id="explain-input" class="regex-input" placeholder="Enter regex to explain…" spellcheck="false" autocomplete="off" />
+								<span class="regex-delim">/</span>
+							</div>
+							<div class="explain-hint">Breakdown is generated automatically as you type.</div>
+						</div>
+
+						<div class="section-block">
+							<div class="block-header"><span class="block-title">Visual Token Breakdown</span></div>
+							<div class="token-strip" id="token-strip">
+								<div class="empty-state">Tokens will appear here.</div>
+							</div>
+						</div>
+
+						<div class="section-block">
+							<div class="block-header"><span class="block-title">Plain English Explanation</span></div>
+							<div class="explanation-box" id="explanation-box">
+								<div class="empty-state">Enter a pattern above to see its explanation.</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="panel panel-preview">
+						<div class="block-header"><span class="block-title">Step-by-Step Breakdown</span></div>
+						<div class="steps-box" id="steps-box">
+							<div class="empty-state">Pattern tokens will be listed here with descriptions.</div>
+						</div>
+
+						<div class="block-header" style="margin-top: 24px"><span class="block-title">Cheat Sheet for Pattern</span></div>
+						<div class="cheatsheet-dynamic" id="cheatsheet-dynamic">
+							<div class="empty-state">Relevant tokens from your pattern will appear here.</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- ===================== TAB: LIBRARY ===================== -->
+			<section class="tab-content" id="tab-library">
+				<div class="library-wrap">
+					<div class="library-filter-bar">
+						<input type="text" id="library-search" class="lib-search" placeholder="Search patterns…" />
+						<div class="lib-categories" id="lib-categories">
+							<button class="lib-cat active" data-cat="all">All</button>
+							<button class="lib-cat" data-cat="validation">Validation</button>
+							<button class="lib-cat" data-cat="extraction">Extraction</button>
+							<button class="lib-cat" data-cat="formatting">Formatting</button>
+							<button class="lib-cat" data-cat="security">Security</button>
+							<button class="lib-cat" data-cat="web">Web</button>
+							<button class="lib-cat" data-cat="dates">Dates</button>
+						</div>
+					</div>
+					<div class="library-grid" id="library-grid"></div>
+				</div>
+			</section>
+
+			<!-- ===================== TAB: REFERENCE ===================== -->
+			<section class="tab-content" id="tab-reference">
+				<div class="reference-wrap" id="reference-wrap"></div>
+			</section>
+		</main>
+
+		<!-- FOOTER -->
+		<footer class="footer">
+			<div class="footer__logo"><span class="nav__logo-bracket">[</span><a href="https://iqverse.net">IQVerse</a><span class="nav__logo-bracket">]</span></div>
+			<div class="footer-inner">
+				<span>
+					Made with ❤️ by <a href="https://sekmen.dev" target="_blank">Sekmen.Dev</a> and published on
+					<a href="https://github.com/SekmenDev/iqverse.net" target="_blank">Github</a>
+				</span>
+			</div>
+			<div class="footer-inner">
+				<span> Open source. MIT License. No servers. No tracking. No cost. </span>
+			</div>
+		</footer>
+
+		<script src="scripts.js"></script>
+	</body>
+</html>
