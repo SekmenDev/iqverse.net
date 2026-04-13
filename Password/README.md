@@ -2,7 +2,7 @@
 
 **Password & Secret Generator** — Part of the [IQVerse](https://iqverse.net) toolset by [Sekmen.Dev](https://sekmen.dev)
 
-> Generate secure passwords, tokens, API keys, and environment secrets locally in your browser. No servers. No tracking. No cost.
+> Generate secure passwords, tokens, API keys and environment secrets locally in your browser. No servers. No tracking. No cost.
 
 ![License](https://img.shields.io/badge/license-MIT-green) ![Open Source](https://img.shields.io/badge/open-source-blue) ![Browser](https://img.shields.io/badge/browser-based-9cf)
 
