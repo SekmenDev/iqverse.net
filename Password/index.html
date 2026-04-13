@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>SecretForge | Password & Secret Generator</title>
+
+		<!-- SEO Meta Tags -->
+		<meta
+			name="description"
+			content="Generate strong passwords and secure secrets in seconds. Customize length, character sets, and formats. Perfect for developers, sysadmins, and security-conscious users. All generation happens locally in your browser, no servers involved."
+		/>
+		<meta name="keywords" content="password generator, secret generator, password manager, security tools" />
+		<meta name="author" content="Sekmen.Dev" />
+		<meta name="robots" content="index, follow" />
+		<meta name="language" content="English" />
+
+		<!-- Open Graph Tags (Social Media) -->
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content="SecretForge | Password & Secret Generator" />
+		<meta
+			property="og:description"
+			content="Generate strong passwords and secure secrets in seconds. Customize length, character sets, and formats. Perfect for developers, sysadmins, and security-conscious users. All generation happens locally in your browser, no servers involved."
+		/>
+		<meta property="og:url" content="https://password.iqverse.net/" />
+		<meta property="og:site_name" content="SecretForge | Password & Secret Generator" />
+		<meta property="og:image" content="https://password.iqverse.net/og-image-1200x630.png" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+
+		<!-- Twitter Card Tags -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="SecretForge | Password & Secret Generator" />
+		<meta
+			name="twitter:description"
+			content="Generate strong passwords and secure secrets in seconds. Customize length, character sets, and formats. Perfect for developers, sysadmins, and security-conscious users. All generation happens locally in your browser, no servers involved."
+		/>
+		<meta name="twitter:image" content="https://password.iqverse.net/og-image-1200x630.png" />
+
+		<!-- Canonical URL -->
+		<link rel="canonical" href="https://password.iqverse.net/" />
+
+		<!-- Stylesheets and Fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&family=JetBrains+Mono:wght@400;500&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="styles.css" />
+
+		<!-- Favicon and Touch Icons -->
+		<link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png" />
+		<link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png" />
+		<link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png" />
+		<link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png" />
+		<link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png" />
+		<link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png" />
+		<link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png" />
+		<link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png" />
+		<link rel="icon" type="image/png" sizes="192x192" href="/android-icon-192x192.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+		<link rel="manifest" href="/manifest.json" />
+		<meta name="msapplication-TileColor" content="#ffffff" />
+		<meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
+		<meta name="theme-color" content="#ffffff" />
+	</head>
+	<body>
+		<!-- Background effects -->
+		<div class="bg-grid"></div>
+		<div class="bg-glow bg-glow--1"></div>
+		<div class="bg-glow bg-glow--2"></div>
+
+		<!-- Nav -->
+		<header class="header">
+			<div class="header-inner">
+				<div class="logo">
+					<img src="logo.png" alt="Password & Secret Generator logo" />
+					<span>Password & Secret Generator</span>
+				</div>
+				<nav class="header-nav">
+					<a href="https://iqverse.net/" class="nav-tag" target="_blank">All Tools</a>
+					<a href="https://github.com/SekmenDev/iqverse.net" target="_blank" class="nav-tag">Source Code</a>
+				</nav>
+			</div>
+		</header>
+
+		<!-- Main -->
+		<main class="main">
+			<div class="container">
+				<!-- Tab Navigation -->
+				<div class="tabs">
+					<button class="tab active" data-tab="password">
+						<span class="tab-num">01</span>
+						<span class="tab-label">Password</span>
+					</button>
+					<button class="tab" data-tab="secret">
+						<span class="tab-num">02</span>
+						<span class="tab-label">Secret / Token</span>
+					</button>
+					<button class="tab" data-tab="bulk">
+						<span class="tab-num">03</span>
+						<span class="tab-label">Bulk Generate</span>
+					</button>
+					<button class="tab" data-tab="analyze">
+						<span class="tab-num">04</span>
+						<span class="tab-label">Analyze</span>
+					</button>
+				</div>
+
+				<div class="workspace">
+					<!-- Left Panel: Controls -->
+					<div class="panel controls-panel">
+						<!-- PASSWORD TAB -->
+						<div class="tab-content active" id="tab-password">
+							<h2 class="panel-title">Password Generator</h2>
+
+							<div class="field-group">
+								<label class="field-label">Length <span class="field-value" id="pwd-len-display">20</span></label>
+								<input type="range" id="pwd-length" min="4" max="128" value="20" class="slider" />
+								<div class="range-hints"><span>4</span><span>128</span></div>
+							</div>
+
+							<div class="field-group">
+								<label class="field-label">Character Sets</label>
+								<div class="checkbox-grid">
+									<label class="check-item">
+										<input type="checkbox" id="pwd-upper" checked />
+										<span class="checkmark"></span>
+										<span>Uppercase (A–Z)</span>
+									</label>
+									<label class="check-item">
+										<input type="checkbox" id="pwd-lower" checked />
+										<span class="checkmark"></span>
+										<span>Lowercase (a–z)</span>
+									</label>
+									<label class="check-item">
+										<input type="checkbox" id="pwd-digits" checked />
+										<span class="checkmark"></span>
+										<span>Digits (0–9)</span>
+									</label>
+									<label class="check-item">
+										<input type="checkbox" id="pwd-symbols" checked />
+										<span class="checkmark"></span>
+										<span>Symbols (!@#$…)</span>
+									</label>
+									<label class="check-item">
+										<input type="checkbox" id="pwd-similar" />
+										<span class="checkmark"></span>
+										<span>Exclude similar (0Oo1Il)</span>
+									</label>
+									<label class="check-item">
+										<input type="checkbox" id="pwd-ambiguous" />
+										<span class="checkmark"></span>
+										<span>Exclude ambiguous ({[(&lt;&gt;)</span>
+									</label>
+								</div>
+							</div>
+
+							<div class="field-group">
+								<label class="field-label">Custom Symbols</label>
+								<input type="text" id="pwd-custom-symbols" class="text-input" placeholder="Leave blank for default: !@#$%^&*" />
+							</div>
+
+							<div class="field-group">
+								<label class="field-label">Must Include (min counts)</label>
+								<div class="mini-grid">
+									<div class="mini-field">
+										<label>Uppercase</label>
+										<input type="number" id="min-upper" min="0" max="20" value="1" class="num-input" />
+									</div>
+									<div class="mini-field">
+										<label>Lowercase</label>
+										<input type="number" id="min-lower" min="0" max="20" value="1" class="num-input" />
+									</div>
+									<div class="mini-field">
+										<label>Digits</label>
+										<input type="number" id="min-digits" min="0" max="20" value="1" class="num-input" />
+									</div>
+									<div class="mini-field">
+										<label>Symbols</label>
+										<input type="number" id="min-symbols" min="0" max="20" value="1" class="num-input" />
+									</div>
+								</div>
+							</div>
+
+							<div class="field-group">
+								<label class="field-label">Prefix / Suffix</label>
+								<div class="row-2">
+									<input type="text" id="pwd-prefix" class="text-input" placeholder="Prefix" />
+									<input type="text" id="pwd-suffix" class="text-input" placeholder="Suffix" />
+								</div>
+							</div>
+
+							<button class="btn-generate" id="btn-generate-pwd">
+								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+								</svg>
+								Generate Password
+							</button>
+						</div>
+
+						<!-- SECRET TAB -->
+						<div class="tab-content" id="tab-secret">
+							<h2 class="panel-title">Secret / Token Generator</h2>
+
+							<div class="field-group">
+								<label class="field-label">Type</label>
+								<div class="radio-grid">
+									<label class="radio-item active-radio" data-val="hex">
+										<input type="radio" name="secret-type" value="hex" checked />
+										<span class="radio-dot"></span>
+										<div>
+											<strong>Hex</strong>
+											<small>Database keys, tokens</small>
+										</div>
+									</label>
+									<label class="radio-item" data-val="base64">
+										<input type="radio" name="secret-type" value="base64" />
+										<span class="radio-dot"></span>
+										<div>
+											<strong>Base64</strong>
+											<small>JWT secrets, API keys</small>
+										</div>
+									</label>
+									<label class="radio-item" data-val="base64url">
+										<input type="radio" name="secret-type" value="base64url" />
+										<span class="radio-dot"></span>
+										<div>
+											<strong>Base64URL</strong>
+											<small>URL-safe tokens</small>
+										</div>
+									</label>
+									<label class="radio-item" data-val="uuid">
+										<input type="radio" name="secret-type" value="uuid" />
+										<span class="radio-dot"></span>
+										<div>
+											<strong>UUID v4</strong>
+											<small>Entity IDs, idempotency</small>
+										</div>
+									</label>
+									<label class="radio-item" data-val="ulid">
+										<input type="radio" name="secret-type" value="ulid" />
+										<span class="radio-dot"></span>
+										<div>
+											<strong>ULID</strong>
+											<small>Sortable unique IDs</small>
+										</div>
+									</label>
+									<label class="radio-item" data-val="alphanumeric">
+										<input type="radio" name="secret-type" value="alphanumeric" />
+										<span class="radio-dot"></span>
+										<div>
+											<strong>Alphanumeric</strong>
+											<small>Clean readable tokens</small>
+										</div>
+									</label>
+									<label class="radio-item" data-val="pin">
+										<input type="radio" name="secret-type" value="pin" />
+										<span class="radio-dot"></span>
+										<div>
+											<strong>PIN / OTP</strong>
+											<small>Numeric codes</small>
+										</div>
+									</label>
+									<label class="radio-item" data-val="mnemonic">
+										<input type="radio" name="secret-type" value="mnemonic" />
+										<span class="radio-dot"></span>
+										<div>
+											<strong>Passphrase</strong>
+											<small>Human-memorable</small>
+										</div>
+									</label>
+								</div>
+							</div>
+
+							<div class="field-group" id="secret-bytes-group">
+								<label class="field-label">Bytes of entropy <span class="field-value" id="secret-bytes-display">32</span></label>
+								<input type="range" id="secret-bytes" min="8" max="64" value="32" class="slider" />
+								<div class="range-hints"><span>8 bytes</span><span>64 bytes</span></div>
+							</div>
+
+							<div class="field-group" id="pin-length-group" style="display: none">
+								<label class="field-label">PIN Length <span class="field-value" id="pin-len-display">6</span></label>
+								<input type="range" id="pin-length" min="4" max="12" value="6" class="slider" />
+							</div>
+
+							<div class="field-group" id="mnemonic-group" style="display: none">
+								<label class="field-label">Word Count <span class="field-value" id="word-count-display">5</span></label>
+								<input type="range" id="word-count" min="3" max="12" value="5" class="slider" />
+								<label class="field-label" style="margin-top: 12px">Separator</label>
+								<div class="sep-row">
+									<label class="radio-pill"><input type="radio" name="sep" value="-" checked /> Hyphen</label>
+									<label class="radio-pill"><input type="radio" name="sep" value="." /> Dot</label>
+									<label class="radio-pill"><input type="radio" name="sep" value="_" /> Underscore</label>
+									<label class="radio-pill"><input type="radio" name="sep" value=" " /> Space</label>
+								</div>
+							</div>
+
+							<div class="field-group">
+								<label class="field-label">Output Format</label>
+								<div class="radio-pills-row">
+									<label class="radio-pill"><input type="radio" name="fmt" value="raw" checked /> Raw</label>
+									<label class="radio-pill"><input type="radio" name="fmt" value="env" /> .env KEY=</label>
+									<label class="radio-pill"><input type="radio" name="fmt" value="json" /> JSON</label>
+								</div>
+							</div>
+
+							<div class="field-group" id="env-key-group" style="display: none">
+								<label class="field-label">Variable Name</label>
+								<input type="text" id="env-key-name" class="text-input" placeholder="e.g. JWT_SECRET" value="SECRET_KEY" />
+							</div>
+
+							<button class="btn-generate" id="btn-generate-secret">
+								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+								</svg>
+								Generate Secret
+							</button>
+						</div>
+
+						<!-- BULK TAB -->
+						<div class="tab-content" id="tab-bulk">
+							<h2 class="panel-title">Bulk Generator</h2>
+
+							<div class="field-group">
+								<label class="field-label">Preset Templates</label>
+								<div class="preset-list">
+									<button class="preset-btn" data-preset="dotenv">
+										<span class="preset-icon">⚙️</span>
+										<div><strong>.env File</strong><small>Full app environment</small></div>
+									</button>
+									<button class="preset-btn" data-preset="database">
+										<span class="preset-icon">🗄️</span>
+										<div><strong>Database Credentials</strong><small>User + pass + name</small></div>
+									</button>
+									<button class="preset-btn" data-preset="jwt">
+										<span class="preset-icon">🔐</span>
+										<div><strong>JWT Secrets</strong><small>Access + refresh tokens</small></div>
+									</button>
+									<button class="preset-btn" data-preset="api">
+										<span class="preset-icon">🔑</span>
+										<div><strong>API Keys</strong><small>Public + private pair</small></div>
+									</button>
+									<button class="preset-btn" data-preset="docker">
+										<span class="preset-icon">🐳</span>
+										<div><strong>Docker Secrets</strong><small>Registry + admin</small></div>
+									</button>
+									<button class="preset-btn" data-preset="abp">
+										<span class="preset-icon">🚀</span>
+										<div><strong>ABP Framework</strong><small>Full stack secrets</small></div>
+									</button>
+								</div>
+							</div>
+
+							<div class="field-group">
+								<label class="field-label">Count per type</label>
+								<input type="number" id="bulk-count" min="1" max="50" value="5" class="num-input" style="width: 80px" />
+							</div>
+
+							<button class="btn-generate" id="btn-generate-bulk">
+								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+								</svg>
+								Generate All
+							</button>
+						</div>
+
+						<!-- ANALYZE TAB -->
+						<div class="tab-content" id="tab-analyze">
+							<h2 class="panel-title">Strength Analyzer</h2>
+
+							<div class="field-group">
+								<label class="field-label">Paste your password / secret</label>
+								<textarea id="analyze-input" class="text-area" rows="4" placeholder="Paste any string to analyze…"></textarea>
+							</div>
+
+							<button class="btn-generate" id="btn-analyze">
+								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<path
+										d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+									/>
+								</svg>
+								Analyze
+							</button>
+
+							<div id="analyze-results" class="analyze-results" style="display: none">
+								<div class="strength-bar-wrap">
+									<div class="strength-bar">
+										<div class="strength-fill" id="strength-fill"></div>
+									</div>
+									<span class="strength-label" id="strength-label"></span>
+								</div>
+								<div class="stat-grid" id="stat-grid"></div>
+								<div class="check-list" id="check-list"></div>
+							</div>
+						</div>
+					</div>
+					<!-- /controls-panel -->
+
+					<!-- Right Panel: Output -->
+					<div class="panel output-panel">
+						<div class="output-header">
+							<h2 class="panel-title">Output</h2>
+							<div class="output-actions">
+								<button class="icon-btn" id="btn-copy" title="Copy to clipboard">
+									<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+										<rect x="9" y="9" width="13" height="13" rx="2" />
+										<path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+									</svg>
+									Copy
+								</button>
+								<button class="icon-btn" id="btn-download" title="Download as file">
+									<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+										<path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+										<polyline points="7 10 12 15 17 10" />
+										<line x1="12" y1="15" x2="12" y2="3" />
+									</svg>
+									Download
+								</button>
+								<button class="icon-btn" id="btn-refresh" title="Regenerate">
+									<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+										<path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+									</svg>
+									Refresh
+								</button>
+							</div>
+						</div>
+
+						<!-- Strength badge (password/secret) -->
+						<div id="strength-badge-wrap" class="strength-badge-wrap">
+							<div class="strength-badge" id="strength-badge">
+								<span class="badge-dot"></span>
+								<span class="badge-text">—</span>
+							</div>
+							<div class="entropy-info" id="entropy-info">— bits of entropy</div>
+						</div>
+
+						<!-- Output box -->
+						<div class="output-box" id="output-box">
+							<div class="output-placeholder">
+								<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3">
+									<rect x="3" y="11" width="18" height="11" rx="2" />
+									<path d="M7 11V7a5 5 0 0110 0v4" />
+								</svg>
+								<p>Configure settings and click Generate</p>
+							</div>
+							<pre class="output-text" id="output-text" style="display: none"></pre>
+						</div>
+
+						<!-- History -->
+						<div class="history-wrap">
+							<div class="history-header">
+								<span class="field-label">Recent (session only)</span>
+								<button class="text-btn" id="btn-clear-history">Clear</button>
+							</div>
+							<div class="history-list" id="history-list">
+								<div class="history-empty">No history yet</div>
+							</div>
+						</div>
+
+						<!-- Info card -->
+						<div class="info-card" id="info-card">
+							<div class="info-icon">🔒</div>
+							<p>All generation happens locally in your browser. Nothing is sent to any server.</p>
+						</div>
+					</div>
+					<!-- /output-panel -->
+				</div>
+				<!-- /workspace -->
+			</div>
+		</main>
+
+		<!-- Toast -->
+		<div class="toast" id="toast"></div>
+
+		<!-- Footer -->
+		<footer class="footer">
+			<div class="footer__logo"><span class="nav__logo-bracket">[</span><a href="https://iqverse.net">IQVerse</a><span class="nav__logo-bracket">]</span></div>
+			<div class="footer-inner">
+				<span>
+					Made with ❤️ by <a href="https://sekmen.dev" target="_blank">Sekmen.Dev</a> and published on
+					<a href="https://github.com/SekmenDev/iqverse.net" target="_blank">Github</a>
+				</span>
+			</div>
+			<div class="footer-inner">
+				<span> Open source. MIT License. No servers. No tracking. No cost. </span>
+			</div>
+		</footer>
+
+		<script src="scripts.js"></script>
+	</body>
+</html>

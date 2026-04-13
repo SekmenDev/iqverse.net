@@ -208,7 +208,7 @@ body::after {
 	max-width: none;
 	padding: 0 max(24px, calc((100% - 1280px) / 2 + 24px));
 	z-index: 1;
-  position: relative;
+	position: relative;
 }
 
 .tab {
@@ -261,7 +261,7 @@ body::after {
 }
 .tab-content.active {
 	display: block;
-	animation: fadeIn 0.22s ease;
+	animation: fadeIn 0.1s ease;
 }
 
 @keyframes fadeIn {
@@ -292,7 +292,7 @@ body::after {
 	display: flex;
 	flex-direction: column;
 	gap: 16px;
-	z-index: 1;
+	z-index: 1 !important;
 }
 .panel-preview {
 	gap: 16px;
@@ -997,6 +997,7 @@ body::after {
 		border-color 0.2s,
 		transform 0.2s;
 	cursor: pointer;
+	z-index: 1 !important;
 }
 .lib-card:hover {
 	border-color: var(--border-hi);
@@ -1113,6 +1114,7 @@ body::after {
 	border: 1px solid var(--border);
 	border-radius: var(--radius);
 	padding: 16px;
+	z-index: 1 !important;
 }
 .ref-section-title {
 	font-size: 0.78rem;
