@@ -1,0 +1,5 @@
+# XML Sitemaps
+Sitemap: https://iqverse.net/sitemap.xml
+
+User-agent: *
+Allow: /

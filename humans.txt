@@ -1,0 +1,11 @@
+﻿/* COMPANY */
+Sekmen.Dev
+/* TEAM */
+Hüseyin Sekmenoğlu
+Zeliha Sekmenoğlu
+Amine Sekmenoğlu
+/* SITE */
+https://sekmen.dev/
+https://huseyin.sekmen.dev/
+https://zeliha.sekmen.dev/
+https://amine.sekmen.dev/
