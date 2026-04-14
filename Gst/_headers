@@ -1,0 +1,12 @@
+https://gst.iqverse.net/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  Permissions-Policy: fullscreen=(*)
+  Content-Security-Policy: default-src 'self'; img-src 'self' data: https://*.iqverse.net; script-src 'self' 'unsafe-inline' 'unsafe-eval' *.cloudflare.com cdn.jsdelivr.net www.googletagmanager.com www.google-analytics.com *.cloudflareinsights.com; connect-src 'self' *.jsdelivr.net www.google-analytics.com *.cloudflareinsights.com; style-src 'self' 'unsafe-inline' use.fontawesome.com fonts.googleapis.com cdn.jsdelivr.net; font-src 'self' fonts.gstatic.com fonts.googleapis.com use.fontawesome.com; frame-src *.cloudflare.com
+
+/assets/*
+  Cache-Control: public, max-age=31556952, immutable
+
+/media/*
+  Cache-Control: public, max-age=31556952, immutable

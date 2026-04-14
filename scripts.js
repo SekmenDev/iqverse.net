@@ -27,22 +27,6 @@ const observer = new IntersectionObserver(
 
 revealEls.forEach((el) => observer.observe(el));
 
-// ── Nav scroll state ──────────────────────────────────────────────────────
-
-const nav = document.querySelector(".nav");
-
-window.addEventListener(
-	"scroll",
-	() => {
-		if (window.scrollY > 40) {
-			nav.style.borderBottomColor = "rgba(255,255,255,0.1)";
-		} else {
-			nav.style.borderBottomColor = "rgba(255,255,255,0.07)";
-		}
-	},
-	{ passive: true },
-);
-
 // ── Smooth scroll for anchor links ────────────────────────────────────────
 
 document.querySelectorAll('a[href^="#"]').forEach((link) => {
