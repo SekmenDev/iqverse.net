@@ -1,0 +1,257 @@
+<!-- _______. _______  __  ___ .___  ___.  _______ .__   __.     _______   ___________    ____
+	/       ||   ____||  |/  / |   \/   | |   ____||  \ |  |    |       \ |   ____\   \  /   /
+   |   (----`|  |__   |  '  /  |  \  /  | |  |__   |   \|  |    |  .--.  ||  |__   \   \/   /
+	\   \    |   __|  |    <   |  |\/|  | |   __|  |  . `  |    |  |  |  ||   __|   \      /
+.----)   |   |  |____ |  .  \  |  |  |  | |  |____ |  |\   |  __|  '--'  ||  |____   \    /
+|_______/    |_______||__|\__\ |__|  |__| |_______||__| \__| (__)_______/ |_______|   \__/-->
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>HeaderScan | HTTP Security Headers Analyzer</title>
+
+		<!-- SEO Meta Tags -->
+		<meta
+			name="description"
+			content="Analyze HTTP response headers for security, performance, and best practices. Get a comprehensive report with actionable insights to improve your website's header configuration. Perfect for developers, security professionals, and site owners looking to enhance their site's security posture."
+		/>
+		<meta name="keywords" content="HTTP headers, security headers, header analyzer, web security, performance optimization" />
+		<meta name="author" content="Sekmen.Dev" />
+		<meta name="robots" content="index, follow" />
+		<meta name="language" content="English" />
+
+		<!-- Open Graph Tags (Social Media) -->
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content="HeaderScan | HTTP Security Headers Analyzer" />
+		<meta
+			property="og:description"
+			content="Analyze HTTP response headers for security, performance, and best practices. Get a comprehensive report with actionable insights to improve your website's header configuration. Perfect for developers, security professionals, and site owners looking to enhance their site's security posture."
+		/>
+		<meta property="og:url" content="https://headerscan.iqverse.net/" />
+		<meta property="og:site_name" content="HeaderScan | HTTP Security Headers Analyzer" />
+		<meta property="og:image" content="https://headerscan.iqverse.net/og-image-1200x630.png" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+
+		<!-- Twitter Card Tags -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="HeaderScan | HTTP Security Headers Analyzer" />
+		<meta
+			name="twitter:description"
+			content="Analyze HTTP response headers for security, performance, and best practices. Get a comprehensive report with actionable insights to improve your website's header configuration. Perfect for developers, security professionals, and site owners looking to enhance their site's security posture."
+		/>
+		<meta name="twitter:image" content="https://headerscan.iqverse.net/og-image-1200x630.png" />
+
+		<!-- Canonical URL -->
+		<link rel="canonical" href="https://headerscan.iqverse.net/" />
+
+		<!-- Stylesheets and Fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&family=JetBrains+Mono:wght@400;500&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="styles.css" />
+
+		<!-- Favicon and Touch Icons -->
+		<link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png" />
+		<link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png" />
+		<link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png" />
+		<link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png" />
+		<link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png" />
+		<link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png" />
+		<link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png" />
+		<link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png" />
+		<link rel="icon" type="image/png" sizes="192x192" href="/android-icon-192x192.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+		<link rel="manifest" href="/manifest.json" />
+		<meta name="msapplication-TileColor" content="#ffffff" />
+		<meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
+		<meta name="theme-color" content="#ffffff" />
+	</head>
+	<body>
+		<!-- Background effects -->
+		<div class="bg-grid"></div>
+		<div class="bg-glow bg-glow--1"></div>
+		<div class="bg-glow bg-glow--2"></div>
+
+		<!-- Nav -->
+		<header class="header">
+			<div class="header-inner">
+				<div class="logo">
+					<img src="logo.png" alt="Favicon Generator logo" />
+					<span>Favicon Generator</span>
+				</div>
+				<nav class="header-nav">
+					<a href="https://iqverse.net/" class="nav-tag" target="_blank">All Tools</a>
+					<a href="https://github.com/SekmenDev/iqverse.net" target="_blank" class="nav-tag">Source Code</a>
+				</nav>
+			</div>
+		</header>
+
+		<!-- Main -->
+		<main class="app-main">
+			<!-- Left Panel: URL Input + Results -->
+			<section class="panel panel-left">
+				<div class="url-input-section">
+					<h1 class="section-title">Analyze Headers</h1>
+					<p class="section-desc">Check HTTP response headers for security, performance, and best practices.</p>
+
+					<div class="input-row">
+						<div class="input-wrapper">
+							<svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+								<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+							</svg>
+							<input type="text" id="urlInput" placeholder="https://example.com" autocomplete="off" spellcheck="false" />
+						</div>
+						<button class="btn-primary" id="analyzeBtn" onclick="runAnalysis()">
+							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<circle cx="11" cy="11" r="8" />
+								<path d="m21 21-4.35-4.35" />
+							</svg>
+							Analyze
+						</button>
+					</div>
+
+					<div class="quick-links">
+						<span class="quick-label">Try:</span>
+						<button class="chip" onclick="setUrl('https://github.com')">github.com</button>
+						<button class="chip" onclick="setUrl('https://google.com')">google.com</button>
+						<button class="chip" onclick="setUrl('https://cloudflare.com')">cloudflare.com</button>
+						<button class="chip" onclick="setUrl('https://mozilla.org')">mozilla.org</button>
+					</div>
+				</div>
+
+				<!-- Score Banner -->
+				<div class="score-banner" id="scoreBanner" style="display: none">
+					<div class="score-ring-wrap">
+						<svg class="score-ring" viewBox="0 0 80 80" width="80" height="80">
+							<circle cx="40" cy="40" r="34" fill="none" stroke="var(--border)" stroke-width="6" />
+							<circle
+								cx="40"
+								cy="40"
+								r="34"
+								fill="none"
+								stroke="var(--score-color, var(--accent))"
+								stroke-width="6"
+								stroke-linecap="round"
+								stroke-dasharray="213.6"
+								stroke-dashoffset="213.6"
+								id="scoreCircle"
+								transform="rotate(-90 40 40)"
+							/>
+						</svg>
+						<span class="score-number" id="scoreNumber">0</span>
+					</div>
+					<div class="score-info">
+						<div class="score-grade" id="scoreGrade">—</div>
+						<div class="score-label" id="scoreLabel">Security Score</div>
+						<div class="score-url" id="scoreUrl"></div>
+					</div>
+					<div class="score-summary">
+						<div class="summary-item">
+							<span class="summary-dot dot-pass"></span>
+							<span id="passCount">0</span> Passed
+						</div>
+						<div class="summary-item">
+							<span class="summary-dot dot-warn"></span>
+							<span id="warnCount">0</span> Warnings
+						</div>
+						<div class="summary-item">
+							<span class="summary-dot dot-fail"></span>
+							<span id="failCount">0</span> Missing
+						</div>
+					</div>
+					<div class="score-actions">
+						<button class="btn-secondary btn-sm" onclick="copyReport()">
+							<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<rect x="9" y="9" width="13" height="13" rx="2" />
+								<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+							</svg>
+							Copy Report
+						</button>
+						<button class="btn-secondary btn-sm" onclick="downloadReport()">
+							<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+								<polyline points="7 10 12 15 17 10" />
+								<line x1="12" y1="15" x2="12" y2="3" />
+							</svg>
+							Download
+						</button>
+					</div>
+				</div>
+
+				<!-- Loading State -->
+				<div class="loading-state" id="loadingState" style="display: none">
+					<div class="spinner"></div>
+					<p>Fetching headers via proxy…</p>
+				</div>
+
+				<!-- Error State -->
+				<div class="error-state" id="errorState" style="display: none">
+					<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+						<circle cx="12" cy="12" r="10" />
+						<line x1="12" y1="8" x2="12" y2="12" />
+						<line x1="12" y1="16" x2="12.01" y2="16" />
+					</svg>
+					<p id="errorMsg">Could not fetch headers. Check the URL and try again.</p>
+					<p class="error-note">Note: Some sites block CORS. You may need to use a server-side proxy.</p>
+				</div>
+
+				<!-- Results Tabs -->
+				<div class="results-area" id="resultsArea" style="display: none">
+					<div class="tabs">
+						<button class="tab active" onclick="switchTab('security', this)">🔐 Security</button>
+						<button class="tab" onclick="switchTab('performance', this)">⚡ Performance</button>
+						<button class="tab" onclick="switchTab('info', this)">ℹ️ Info</button>
+						<button class="tab" onclick="switchTab('raw', this)">📋 Raw Headers</button>
+					</div>
+
+					<div class="tab-content" id="tab-security"></div>
+					<div class="tab-content" id="tab-performance" style="display: none"></div>
+					<div class="tab-content" id="tab-info" style="display: none"></div>
+					<div class="tab-content" id="tab-raw" style="display: none"></div>
+				</div>
+			</section>
+
+			<!-- Right Panel: Reference / Info -->
+			<aside class="panel panel-right">
+				<div class="reference-section">
+					<h2 class="panel-title">Header Reference</h2>
+
+					<div class="filter-bar">
+						<button class="filter-chip active" onclick="filterRef('all', this)">All</button>
+						<button class="filter-chip" onclick="filterRef('critical', this)">Critical</button>
+						<button class="filter-chip" onclick="filterRef('recommended', this)">Recommended</button>
+						<button class="filter-chip" onclick="filterRef('optional', this)">Optional</button>
+					</div>
+
+					<div class="ref-list" id="refList"></div>
+				</div>
+			</aside>
+		</main>
+
+		<!-- Footer -->
+		<footer class="footer">
+			<div class="footer__logo"><span class="nav__logo-bracket">[</span><a href="https://iqverse.net">IQVerse</a><span class="nav__logo-bracket">]</span></div>
+			<div class="footer-inner">
+				<span>
+					Made with ❤️ by <a href="https://sekmen.dev" target="_blank">Sekmen.Dev</a> and published on
+					<a href="https://github.com/SekmenDev/iqverse.net" target="_blank">Github</a>
+				</span>
+			</div>
+			<div class="footer-inner">
+				<span> Open source. MIT License. No servers. No tracking. No cost. </span>
+			</div>
+		</footer>
+		<div class="toast" id="toast"></div>
+
+		<script src="scripts.js"></script>
+	</body>
+</html>
