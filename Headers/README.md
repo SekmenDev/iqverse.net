@@ -1,12 +1,12 @@
 # HeaderScan — HTTP Security Headers Analyzer
 
-A browser-based tool to analyze HTTP response headers for security, performance, and best practices. Part of the [IQVerse](https://iqverse.net) toolset.
+A browser-based tool to analyze HTTP response headers for security, performance and best practices. Part of the [IQVerse](https://iqverse.net) toolset.
 
 ## Features
 
 - **Security Score** — Instant A–F grade with animated progress ring
-- **20 Headers Analyzed** — CSP, HSTS, X-Frame-Options, Referrer-Policy, CORS, Permissions-Policy, COOP, COEP, CORP, cookies, server leakage, and more
-- **Directive Breakdown** — CSP, Cache-Control, Set-Cookie, and Permissions-Policy directives are parsed and annotated inline
+- **20 Headers Analyzed** — CSP, HSTS, X-Frame-Options, Referrer-Policy, CORS, Permissions-Policy, COOP, COEP, CORP, cookies, server leakage and more
+- **Directive Breakdown** — CSP, Cache-Control, Set-Cookie and Permissions-Policy directives are parsed and annotated inline
 - **4 Analysis Tabs**
   - 🔐 Security — all security-relevant headers, sorted by severity
   - ⚡ Performance — caching, compression, encoding headers
@@ -35,28 +35,28 @@ README.md    This file
 
 ## Headers Covered
 
-| Header | Priority | Category |
-|---|---|---|
-| Content-Security-Policy | Critical | Security |
-| Strict-Transport-Security | Critical | Security |
-| X-Content-Type-Options | Critical | Security |
-| X-Frame-Options | Critical | Security |
-| Set-Cookie flags | Critical | Security |
-| Referrer-Policy | Recommended | Security |
-| Permissions-Policy | Recommended | Security |
-| X-XSS-Protection | Recommended | Security |
-| Access-Control-Allow-Origin | Recommended | Security |
-| Cross-Origin-Opener-Policy | Recommended | Security |
-| Cross-Origin-Embedder-Policy | Optional | Security |
-| Cross-Origin-Resource-Policy | Optional | Security |
-| Expect-CT | Optional | Security |
-| Server | Recommended | Info |
-| X-Powered-By | Recommended | Info |
-| Content-Type | Critical | Performance |
-| Cache-Control | Recommended | Performance |
-| Content-Encoding | Recommended | Performance |
-| Transfer-Encoding | Optional | Performance |
-| Vary | Optional | Performance |
+| Header                       | Priority    | Category    |
+| ---------------------------- | ----------- | ----------- |
+| Content-Security-Policy      | Critical    | Security    |
+| Strict-Transport-Security    | Critical    | Security    |
+| X-Content-Type-Options       | Critical    | Security    |
+| X-Frame-Options              | Critical    | Security    |
+| Set-Cookie flags             | Critical    | Security    |
+| Referrer-Policy              | Recommended | Security    |
+| Permissions-Policy           | Recommended | Security    |
+| X-XSS-Protection             | Recommended | Security    |
+| Access-Control-Allow-Origin  | Recommended | Security    |
+| Cross-Origin-Opener-Policy   | Recommended | Security    |
+| Cross-Origin-Embedder-Policy | Optional    | Security    |
+| Cross-Origin-Resource-Policy | Optional    | Security    |
+| Expect-CT                    | Optional    | Security    |
+| Server                       | Recommended | Info        |
+| X-Powered-By                 | Recommended | Info        |
+| Content-Type                 | Critical    | Performance |
+| Cache-Control                | Recommended | Performance |
+| Content-Encoding             | Recommended | Performance |
+| Transfer-Encoding            | Optional    | Performance |
+| Vary                         | Optional    | Performance |
 
 ## Limitations
 

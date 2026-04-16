@@ -4,7 +4,7 @@ A fast, privacy-first browser tool for everything encoding. No servers, no track
 
 ![License](https://img.shields.io/badge/license-MIT-green) ![Open Source](https://img.shields.io/badge/open-source-blue) ![Browser](https://img.shields.io/badge/browser-based-9cf)
 
-📍 [Launch Tool](https://encodelab.net/)
+📍 [Launch Tool](https://encodelab.iqverse.net/)
 
 ---
 
@@ -61,22 +61,6 @@ A fast, privacy-first browser tool for everything encoding. No servers, no track
 - Decodes both and shows a word-level diff side-by-side
 - Color-coded: green = added, red = removed, plain = unchanged
 - Stats: same chars, changed chars, length per side
-
----
-
-## Usage
-
-No build step. Just open `index.html` in any modern browser.
-
-```text
-encoder/
-├── index.html   # App shell, tab layout, all panels
-├── style.css    # Dark theme, all component styles
-├── app.js       # All logic — zero dependencies
-└── README.md
-```
-
-For deployment, copy all three files to any static host (Easypanel, Vercel, GitHub Pages, Nginx, etc.).
 
 ---
 

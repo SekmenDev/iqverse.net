@@ -1,0 +1,428 @@
+<!-- _______. _______  __  ___ .___  ___.  _______ .__   __.     _______   ___________    ____
+	/       ||   ____||  |/  / |   \/   | |   ____||  \ |  |    |       \ |   ____\   \  /   /
+   |   (----`|  |__   |  '  /  |  \  /  | |  |__   |   \|  |    |  .--.  ||  |__   \   \/   /
+	\   \    |   __|  |    <   |  |\/|  | |   __|  |  . `  |    |  |  |  ||   __|   \      /
+.----)   |   |  |____ |  .  \  |  |  |  | |  |____ |  |\   |  __|  '--'  ||  |____   \    /
+|_______/    |_______||__|\__\ |__|  |__| |_______||__| \__| (__)_______/ |_______|   \__/-->
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Chromata | Color Palette Generator</title>
+
+		<!-- SEO Meta Tags -->
+		<meta
+			name="description"
+			content="Chromata: Free online color palette generator. Create and customize color palettes with ease. Perfect for designers and developers."
+		/>
+		<meta
+			name="keywords"
+			content="color palette, color generator, design tools, web development, UI design"
+		/>
+		<meta name="author" content="Sekmen.Dev" />
+		<meta name="robots" content="index, follow" />
+		<meta name="language" content="English" />
+
+		<!-- Open Graph Tags (Social Media) -->
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content="Chromata - Color Palette Generator" />
+		<meta
+			property="og:description"
+			content="Chromata: Free online color palette generator. Create and customize color palettes with ease. Perfect for designers and developers."
+		/>
+		<meta property="og:url" content="https://chromata.iqverse.net/" />
+		<meta property="og:site_name" content="Chromata" />
+		<meta property="og:image" content="https://chromata.iqverse.net/og-image-1200x630.png" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+
+		<!-- Twitter Card Tags -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="Chromata - Color Palette Generator" />
+		<meta
+			name="twitter:description"
+			content="Chromata: Free online color palette generator. Create and customize color palettes with ease. Perfect for designers and developers."
+		/>
+		<meta name="twitter:image" content="https://chromata.iqverse.net/og-image-1200x630.png" />
+
+		<!-- Canonical URL -->
+		<link rel="canonical" href="https://chromata.iqverse.net/" />
+
+		<!-- Stylesheets and Fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&family=JetBrains+Mono:wght@400;500&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="styles.css" />
+
+		<!-- Favicon and Touch Icons -->
+		<link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png" />
+		<link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png" />
+		<link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png" />
+		<link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png" />
+		<link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png" />
+		<link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png" />
+		<link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png" />
+		<link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png" />
+		<link rel="icon" type="image/png" sizes="192x192" href="/android-icon-192x192.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+		<link rel="manifest" href="/manifest.json" />
+		<meta name="msapplication-TileColor" content="#ffffff" />
+		<meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
+		<meta name="theme-color" content="#ffffff" />
+	</head>
+	<body>
+		<!-- Header -->
+		<header class="header">
+			<div class="header-inner">
+				<div class="logo">
+					<img src="logo.png" alt="Chromata logo" />
+					<span>Chromata</span>
+				</div>
+				<nav class="header-nav">
+					<a href="https://iqverse.net/" class="nav-tag" target="_blank">All Tools</a>
+					<a href="https://github.com/SekmenDev/iqverse.net" target="_blank" class="nav-tag">Source Code</a>
+				</nav>
+			</div>
+		</header>
+
+		<div class="app-layout">
+			<!-- Sidebar -->
+			<aside class="sidebar">
+
+				<div class="steps-nav">
+					<button class="step-btn active" data-step="seed">
+						<span class="step-num">01</span>
+						<span class="step-label">Seed Color</span>
+					</button>
+					<button class="step-btn" data-step="harmony">
+						<span class="step-num">02</span>
+						<span class="step-label">Harmony</span>
+					</button>
+					<button class="step-btn" data-step="refine">
+						<span class="step-num">03</span>
+						<span class="step-label">Refine</span>
+					</button>
+					<button class="step-btn" data-step="export">
+						<span class="step-num">04</span>
+						<span class="step-label">Export</span>
+					</button>
+				</div>
+
+				<!-- Step 1: Seed Color -->
+				<div class="step-panel active" id="panel-seed">
+					<div class="panel-title">Seed Color</div>
+
+					<div class="field-group">
+						<label class="field-label">Pick a color</label>
+						<div class="color-input-row">
+							<input type="color" id="seedColorPicker" value="#6366f1" class="color-picker-swatch" />
+							<input type="text" id="seedColorHex" value="#6366f1" class="hex-input" maxlength="7" spellcheck="false" />
+						</div>
+					</div>
+
+					<div class="field-group">
+						<label class="field-label">Random seed</label>
+						<button class="btn-outline btn-full" id="btnRandom">
+							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<polyline points="16 3 21 3 21 8" />
+								<line x1="4" y1="20" x2="21" y2="3" />
+								<polyline points="21 16 21 21 16 21" />
+								<line x1="15" y1="15" x2="21" y2="21" />
+							</svg>
+							Randomize Color
+						</button>
+					</div>
+
+					<div class="field-group">
+						<label class="field-label">Shades count</label>
+						<div class="slider-row">
+							<input type="range" id="shadesCount" min="5" max="15" value="10" class="range-input" />
+							<span class="range-value" id="shadesCountVal">10</span>
+						</div>
+					</div>
+
+					<div class="field-group">
+						<label class="field-label">Lightness curve</label>
+						<div class="segment-control" id="lightnessCurve">
+							<button class="seg-btn active" data-val="linear">Linear</button>
+							<button class="seg-btn" data-val="ease-in">Ease In</button>
+							<button class="seg-btn" data-val="ease-out">Ease Out</button>
+						</div>
+					</div>
+
+					<div class="field-group">
+						<label class="field-label">Saturation boost</label>
+						<div class="slider-row">
+							<input type="range" id="satBoost" min="-50" max="50" value="0" class="range-input" />
+							<span class="range-value" id="satBoostVal">0</span>
+						</div>
+					</div>
+
+					<button class="btn-next" data-next="harmony">Next: Harmony →</button>
+				</div>
+
+				<!-- Step 2: Harmony -->
+				<div class="step-panel" id="panel-harmony">
+					<div class="panel-title">Color Harmony</div>
+
+					<div class="field-group">
+						<label class="field-label">Harmony rule</label>
+						<div class="harmony-grid" id="harmonyGrid">
+							<button class="harmony-btn active" data-harmony="complementary">
+								<div class="harmony-icon comp-icon"></div>
+								<span>Complementary</span>
+							</button>
+							<button class="harmony-btn" data-harmony="triadic">
+								<div class="harmony-icon tri-icon"></div>
+								<span>Triadic</span>
+							</button>
+							<button class="harmony-btn" data-harmony="analogous">
+								<div class="harmony-icon ana-icon"></div>
+								<span>Analogous</span>
+							</button>
+							<button class="harmony-btn" data-harmony="split-complementary">
+								<div class="harmony-icon split-icon"></div>
+								<span>Split-Comp</span>
+							</button>
+							<button class="harmony-btn" data-harmony="tetradic">
+								<div class="harmony-icon tet-icon"></div>
+								<span>Tetradic</span>
+							</button>
+							<button class="harmony-btn" data-harmony="monochromatic">
+								<div class="harmony-icon mono-icon"></div>
+								<span>Mono</span>
+							</button>
+						</div>
+					</div>
+
+					<div class="field-group">
+						<label class="field-label">Include neutrals</label>
+						<label class="toggle-label">
+							<input type="checkbox" id="includeNeutrals" checked />
+							<span class="toggle"></span>
+							<span>Generate neutral scale</span>
+						</label>
+					</div>
+
+					<div class="field-group">
+						<label class="field-label">Include semantic colors</label>
+						<label class="toggle-label">
+							<input type="checkbox" id="includeSemantic" checked />
+							<span class="toggle"></span>
+							<span>Success, Warning, Danger</span>
+						</label>
+					</div>
+
+					<button class="btn-next" data-next="refine">Next: Refine →</button>
+				</div>
+
+				<!-- Step 3: Refine -->
+				<div class="step-panel" id="panel-refine">
+					<div class="panel-title">Refine & Accessibility</div>
+
+					<div class="field-group">
+						<label class="field-label">Contrast check target</label>
+						<div class="segment-control" id="contrastTarget">
+							<button class="seg-btn active" data-val="white">on White</button>
+							<button class="seg-btn" data-val="black">on Black</button>
+							<button class="seg-btn" data-val="both">Both</button>
+						</div>
+					</div>
+
+					<div class="field-group">
+						<label class="field-label">WCAG level</label>
+						<div class="segment-control" id="wcagLevel">
+							<button class="seg-btn" data-val="A">A</button>
+							<button class="seg-btn active" data-val="AA">AA</button>
+							<button class="seg-btn" data-val="AAA">AAA</button>
+						</div>
+					</div>
+
+					<div class="field-group">
+						<label class="field-label">Color blindness simulation</label>
+						<select id="colorBlindMode" class="select-input">
+							<option value="none">None (Normal vision)</option>
+							<option value="deuteranopia">Deuteranopia (Red-green)</option>
+							<option value="protanopia">Protanopia (Red)</option>
+							<option value="tritanopia">Tritanopia (Blue-yellow)</option>
+							<option value="achromatopsia">Achromatopsia (No color)</option>
+						</select>
+					</div>
+
+					<div class="field-group">
+						<label class="field-label">Hue rotation offset</label>
+						<div class="slider-row">
+							<input type="range" id="hueRotate" min="-180" max="180" value="0" class="range-input" />
+							<span class="range-value" id="hueRotateVal">0°</span>
+						</div>
+					</div>
+
+					<div class="field-group">
+						<label class="field-label">Global lightness shift</label>
+						<div class="slider-row">
+							<input type="range" id="lightnessShift" min="-30" max="30" value="0" class="range-input" />
+							<span class="range-value" id="lightnessShiftVal">0</span>
+						</div>
+					</div>
+
+					<button class="btn-next" data-next="export">Next: Export →</button>
+				</div>
+
+				<!-- Step 4: Export -->
+				<div class="step-panel" id="panel-export">
+					<div class="panel-title">Export</div>
+
+					<div class="field-group">
+						<label class="field-label">Format</label>
+						<div class="export-format-grid" id="exportFormatGrid">
+							<button class="format-btn active" data-format="css">
+								<span class="format-ext">CSS</span>
+								<span class="format-desc">Variables</span>
+							</button>
+							<button class="format-btn" data-format="tailwind">
+								<span class="format-ext">TW</span>
+								<span class="format-desc">Tailwind</span>
+							</button>
+							<button class="format-btn" data-format="figma">
+								<span class="format-ext">FIG</span>
+								<span class="format-desc">Figma Tokens</span>
+							</button>
+							<button class="format-btn" data-format="sass">
+								<span class="format-ext">SASS</span>
+								<span class="format-desc">Variables</span>
+							</button>
+							<button class="format-btn" data-format="json">
+								<span class="format-ext">JSON</span>
+								<span class="format-desc">Raw JSON</span>
+							</button>
+							<button class="format-btn" data-format="swift">
+								<span class="format-ext">Swift</span>
+								<span class="format-desc">UIColor</span>
+							</button>
+						</div>
+					</div>
+
+					<div class="field-group">
+						<label class="field-label">Prefix / namespace</label>
+						<input type="text" id="exportPrefix" value="color" class="text-input" placeholder="e.g. brand, app, ds" />
+					</div>
+
+					<div class="field-group">
+						<label class="field-label">Color format</label>
+						<div class="segment-control" id="colorFormat">
+							<button class="seg-btn active" data-val="hex">HEX</button>
+							<button class="seg-btn" data-val="rgb">RGB</button>
+							<button class="seg-btn" data-val="hsl">HSL</button>
+						</div>
+					</div>
+
+					<div class="code-block-wrapper">
+						<div class="code-block-header">
+							<span id="codeBlockLabel">CSS Variables</span>
+							<div class="code-actions">
+								<button class="icon-btn" id="btnCopyCode" title="Copy to clipboard">
+									<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+										<rect x="9" y="9" width="13" height="13" rx="2" />
+										<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+									</svg>
+								</button>
+							</div>
+						</div>
+						<pre class="code-block" id="codeOutput"></pre>
+					</div>
+
+					<button class="btn-primary btn-full" id="btnDownload">
+						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+							<polyline points="7 10 12 15 17 10" />
+							<line x1="12" y1="15" x2="12" y2="3" />
+						</svg>
+						Download File
+					</button>
+				</div>
+			</aside>
+
+			<!-- Main Preview Area -->
+			<main class="preview-area">
+				<div class="preview-header">
+					<div class="preview-title-row">
+						<h1 class="preview-title">Color Palette</h1>
+						<div class="preview-meta" id="previewMeta">
+							<span id="metaSeed">#6366f1</span>
+							<span class="meta-sep">·</span>
+							<span id="metaHarmony">Complementary</span>
+							<span class="meta-sep">·</span>
+							<span id="metaCount">10 shades</span>
+						</div>
+					</div>
+					<div class="preview-actions">
+						<button class="icon-btn-lg" id="btnToggleView" title="Toggle view mode">
+							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<rect x="3" y="3" width="7" height="7" />
+								<rect x="14" y="3" width="7" height="7" />
+								<rect x="14" y="14" width="7" height="7" />
+								<rect x="3" y="14" width="7" height="7" />
+							</svg>
+						</button>
+						<button class="icon-btn-lg" id="btnSavePalette" title="Save palette">
+							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+								<polyline points="17 21 17 13 7 13 7 21" />
+								<polyline points="7 3 7 8 15 8" />
+							</svg>
+						</button>
+					</div>
+				</div>
+
+				<div class="palette-container" id="paletteContainer">
+					<!-- Generated dynamically -->
+				</div>
+
+				<!-- Accessibility panel -->
+				<div class="a11y-panel" id="a11yPanel">
+					<div class="a11y-header">
+						<span class="a11y-title">Accessibility Report</span>
+						<span class="a11y-badge" id="a11yBadge">—</span>
+					</div>
+					<div class="a11y-grid" id="a11yGrid">
+						<!-- Generated dynamically -->
+					</div>
+				</div>
+
+				<!-- Saved palettes -->
+				<div class="saved-section" id="savedSection" style="display: none">
+					<div class="saved-header">
+						<span class="saved-title">Saved Palettes</span>
+						<button class="icon-btn" id="btnClearSaved">Clear all</button>
+					</div>
+					<div class="saved-list" id="savedList"></div>
+				</div>
+			</main>
+		</div>
+
+		<div class="toast" id="toast"></div>
+
+		<!-- Footer -->
+		<footer class="footer">
+			<div class="footer__logo"><span class="nav__logo-bracket">[</span><a href="https://iqverse.net">IQVerse</a><span class="nav__logo-bracket">]</span></div>
+			<div class="footer-inner">
+				<span>
+					Made with ❤️ by <a href="https://sekmen.dev" target="_blank">Sekmen.Dev</a> and published on
+					<a href="https://github.com/SekmenDev/iqverse.net" target="_blank">Github</a>
+				</span>
+			</div>
+			<div class="footer-inner">
+				<span> Open source. MIT License. No servers. No tracking. No cost. </span>
+			</div>
+		</footer>
+
+		<script src="scripts.js"></script>
+	</body>
+</html>
