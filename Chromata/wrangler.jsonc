@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "iqverse-color",
+  "name": "iqverse-chromata",
   "compatibility_date": "2026-04-06",
   "workers_dev": false,
   "observability": {
