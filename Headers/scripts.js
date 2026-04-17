@@ -428,35 +428,34 @@ function getCacheNote(key) {
 	return notes[key] || "";
 }
 
-/* ── CORS Proxy Providers ───────────────────────────────────── */
-const PROXIES = [(url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`, (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`];
-
 /* ── State ──────────────────────────────────────────────────── */
 let currentTab = "security";
 window.__rawHeaders = {};
 
 /* ── Fetch Headers ──────────────────────────────────────────── */
 async function fetchHeaders(url) {
-	// Try a HEAD request first via proxy
-	// We use allorigins to get response headers
-	const headersUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-	const r = await fetch(headersUrl);
-	if (!r.ok) throw new Error("Proxy returned " + r.status);
-	const json = await r.json();
-	// allorigins returns response_headers as an object
-	let headers = {};
-	if (json.response_headers) {
-		// normalize to lower-case keys
-		for (const [k, v] of Object.entries(json.response_headers)) {
-			headers[k.toLowerCase()] = Array.isArray(v) ? v.join(", ") : v;
+	// Use Hackertarget API to fetch HTTP headers
+	const apiUrl = `https://api.hackertarget.com/httpheaders/?q=${encodeURIComponent(url)}`;
+	const r = await fetch(apiUrl);
+	if (!r.ok) throw new Error("Hackertarget API returned " + r.status);
+	const text = await r.text();
+
+	// Parse plain text HTTP headers
+	const headers = {};
+	const lines = text.split("\n");
+
+	for (const line of lines) {
+		// Skip empty lines or status line
+		if (!line.trim() || line.startsWith("HTTP/")) continue;
+
+		const colonIdx = line.indexOf(":");
+		if (colonIdx > -1) {
+			const key = line.slice(0, colonIdx).trim().toLowerCase();
+			const val = line.slice(colonIdx + 1).trim();
+			headers[key] = val;
 		}
-	} else {
-		// Fallback: try direct fetch (works if CORS is enabled by target)
-		const direct = await fetch(url, { method: "HEAD", mode: "cors" });
-		direct.headers.forEach((v, k) => {
-			headers[k.toLowerCase()] = v;
-		});
 	}
+
 	return headers;
 }
 
