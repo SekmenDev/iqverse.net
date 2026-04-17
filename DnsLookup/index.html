@@ -1,0 +1,344 @@
+<!-- _______. _______  __  ___ .___  ___.  _______ .__   __.     _______   ___________    ____
+	/       ||   ____||  |/  / |   \/   | |   ____||  \ |  |    |       \ |   ____\   \  /   /
+   |   (----`|  |__   |  '  /  |  \  /  | |  |__   |   \|  |    |  .--.  ||  |__   \   \/   /
+	\   \    |   __|  |    <   |  |\/|  | |   __|  |  . `  |    |  |  |  ||   __|   \      /
+.----)   |   |  |____ |  .  \  |  |  |  | |  |____ |  |\   |  __|  '--'  ||  |____   \    /
+|_______/    |_______||__|\__\ |__|  |__| |_______||__| \__| (__)_______/ |_______|   \__/-->
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>DNS Lookup | IQVerse</title>
+
+		<!-- SEO Meta Tags -->
+		<meta
+			name="description"
+			content="Professional DNS lookup tool. Query A, AAAA, MX, TXT, NS, CNAME, SOA, SRV records and more. No server. No tracking. Just fast, private DNS queries powered by Google Public DNS-over-HTTPS."
+		/>
+		<meta
+			name="keywords"
+			content="dns lookup, dns query, dns records, a record, aaaa record, mx record, txt record, ns record, cname record, soa record, srv record"
+		/>
+		<meta name="author" content="Sekmen.Dev" />
+		<meta name="robots" content="index, follow" />
+		<meta name="language" content="English" />
+
+		<!-- Open Graph Tags (Social Media) -->
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content="DNS Lookup | IQVerse" />
+		<meta
+			property="og:description"
+			content="Professional DNS lookup tool. Query A, AAAA, MX, TXT, NS, CNAME, SOA, SRV records and more. No server. No tracking. Just fast, private DNS queries powered by Google Public DNS-over-HTTPS."
+		/>
+		<meta property="og:url" content="https://dnslookup.iqverse.net/" />
+		<meta property="og:site_name" content="DNS Lookup" />
+		<meta property="og:image" content="https://dnslookup.iqverse.net/og-image-1200x630.png" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+
+		<!-- Twitter Card Tags -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="DNS Lookup | IQVerse" />
+		<meta
+			name="twitter:description"
+			content="Professional DNS lookup tool. Query A, AAAA, MX, TXT, NS, CNAME, SOA, SRV records and more. No server. No tracking. Just fast, private DNS queries powered by Google Public DNS-over-HTTPS."
+		/>
+		<meta name="twitter:image" content="https://dnslookup.iqverse.net/og-image-1200x630.png" />
+
+		<!-- Canonical URL -->
+		<link rel="canonical" href="https://dnslookup.iqverse.net/" />
+
+		<!-- Stylesheets and Fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&family=JetBrains+Mono:wght@400;500&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="styles.css" />
+
+		<!-- Favicon and Touch Icons -->
+		<link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png" />
+		<link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png" />
+		<link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png" />
+		<link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png" />
+		<link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png" />
+		<link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png" />
+		<link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png" />
+		<link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png" />
+		<link rel="icon" type="image/png" sizes="192x192" href="/android-icon-192x192.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+		<link rel="manifest" href="/manifest.json" />
+		<meta name="msapplication-TileColor" content="#ffffff" />
+		<meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
+		<meta name="theme-color" content="#ffffff" />
+	</head>
+	<body>
+		<!-- Background effects -->
+		<div class="bg-grid"></div>
+		<div class="bg-glow bg-glow--1"></div>
+		<div class="bg-glow bg-glow--2"></div>
+
+		<!-- Header -->
+		<header class="header">
+			<div class="header-inner">
+				<div class="logo">
+					<img src="logo.png" alt="DNS Lookup logo" />
+					<span>DNS Lookup</span>
+				</div>
+				<nav class="header-nav">
+					<a href="https://iqverse.net/" class="nav-tag" target="_blank">All Tools</a>
+					<a href="https://github.com/SekmenDev/iqverse.net" target="_blank" class="nav-tag">Source Code</a>
+				</nav>
+			</div>
+		</header>
+
+		<section class="hero">
+			<div class="hero-eyebrow">
+				<span class="eyebrow-dot"></span>
+				<span>Networking · DevOps</span>
+			</div>
+			<h1 class="hero-title">DNS <span class="accent">Lookup</span></h1>
+			<p class="hero-subtitle">
+				Query DNS records for any domain — A, AAAA, MX, TXT, NS, CNAME, SOA, SRV and more.<br />Powered by Google Public DNS-over-HTTPS. No servers. No
+				tracking.
+			</p>
+		</section>
+
+		<main class="tool-wrapper">
+			<!-- Query Panel -->
+			<section class="panel query-panel">
+				<div class="panel-header">
+					<span class="panel-label">01</span>
+					<h2 class="panel-title">Query</h2>
+				</div>
+
+				<div class="input-group">
+					<label class="field-label" for="domain-input">Domain / Hostname</label>
+					<div class="input-row">
+						<input
+							id="domain-input"
+							type="text"
+							class="text-input"
+							placeholder="e.g. example.com or mail.google.com"
+							autocomplete="off"
+							autocorrect="off"
+							autocapitalize="off"
+							spellcheck="false"
+						/>
+						<button class="btn-primary" id="lookup-btn">
+							<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+								<circle cx="11" cy="11" r="8" />
+								<path d="m21 21-4.35-4.35" />
+							</svg>
+							Lookup
+						</button>
+					</div>
+				</div>
+
+				<div class="input-group">
+					<label class="field-label">Record Types</label>
+					<div class="type-grid">
+						<button class="type-btn active" data-type="ALL">ALL</button>
+						<button class="type-btn" data-type="A">A</button>
+						<button class="type-btn" data-type="AAAA">AAAA</button>
+						<button class="type-btn" data-type="MX">MX</button>
+						<button class="type-btn" data-type="TXT">TXT</button>
+						<button class="type-btn" data-type="NS">NS</button>
+						<button class="type-btn" data-type="CNAME">CNAME</button>
+						<button class="type-btn" data-type="SOA">SOA</button>
+						<button class="type-btn" data-type="SRV">SRV</button>
+						<button class="type-btn" data-type="PTR">PTR</button>
+						<button class="type-btn" data-type="CAA">CAA</button>
+						<button class="type-btn" data-type="DS">DS</button>
+						<button class="type-btn" data-type="DNSKEY">DNSKEY</button>
+					</div>
+				</div>
+
+				<div class="input-group">
+					<label class="field-label">Options</label>
+					<div class="options-row">
+						<label class="toggle-label">
+							<input type="checkbox" id="dnssec-toggle" class="toggle-input" />
+							<span class="toggle-track"><span class="toggle-thumb"></span></span>
+							<span>Request DNSSEC data</span>
+						</label>
+						<label class="toggle-label">
+							<input type="checkbox" id="cd-toggle" class="toggle-input" />
+							<span class="toggle-track"><span class="toggle-thumb"></span></span>
+							<span>Disable DNSSEC validation (CD bit)</span>
+						</label>
+						<label class="toggle-label">
+							<input type="checkbox" id="edns-toggle" class="toggle-input" checked />
+							<span class="toggle-track"><span class="toggle-thumb"></span></span>
+							<span>Send EDNS Client Subnet</span>
+						</label>
+					</div>
+				</div>
+
+				<div class="input-group">
+					<label class="field-label">Quick Presets</label>
+					<div class="preset-row">
+						<button class="preset-btn" data-domain="google.com">google.com</button>
+						<button class="preset-btn" data-domain="cloudflare.com">cloudflare.com</button>
+						<button class="preset-btn" data-domain="github.com">github.com</button>
+						<button class="preset-btn" data-domain="amazon.com">amazon.com</button>
+						<button class="preset-btn" data-domain="netflix.com">netflix.com</button>
+					</div>
+				</div>
+			</section>
+
+			<!-- Results Panel -->
+			<section class="panel results-panel" id="results-panel">
+				<div class="idle-state" id="idle-state">
+					<div class="idle-icon">
+						<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+							<circle cx="11" cy="11" r="8" />
+							<path d="m21 21-4.35-4.35" />
+						</svg>
+					</div>
+					<p class="idle-text">Enter a domain and hit <strong>Lookup</strong> to query DNS records.</p>
+					<p class="idle-hint">Supports A · AAAA · MX · TXT · NS · CNAME · SOA · SRV · PTR · CAA · DS · DNSKEY</p>
+				</div>
+
+				<div class="loading-state hidden" id="loading-state">
+					<div class="spinner"></div>
+					<p class="loading-text" id="loading-text">Querying DNS records…</p>
+				</div>
+
+				<div class="error-state hidden" id="error-state">
+					<div class="error-icon">
+						<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+							<circle cx="12" cy="12" r="10" />
+							<line x1="12" y1="8" x2="12" y2="12" />
+							<line x1="12" y1="16" x2="12.01" y2="16" />
+						</svg>
+					</div>
+					<p class="error-title" id="error-title">Query failed</p>
+					<p class="error-msg" id="error-msg">Something went wrong. Please try again.</p>
+					<button class="btn-ghost" id="retry-btn">Try again</button>
+				</div>
+
+				<div class="results-content hidden" id="results-content">
+					<div class="summary-bar" id="summary-bar">
+						<div class="summary-item">
+							<span class="summary-key">Domain</span>
+							<span class="summary-val mono" id="sum-domain">—</span>
+						</div>
+						<div class="summary-item">
+							<span class="summary-key">Status</span>
+							<span class="summary-val" id="sum-status">—</span>
+						</div>
+						<div class="summary-item">
+							<span class="summary-key">Records</span>
+							<span class="summary-val" id="sum-count">—</span>
+						</div>
+						<div class="summary-item">
+							<span class="summary-key">Query Time</span>
+							<span class="summary-val mono" id="sum-time">—</span>
+						</div>
+						<div class="summary-item">
+							<span class="summary-key">Authoritative</span>
+							<span class="summary-val" id="sum-auth">—</span>
+						</div>
+						<div class="summary-item">
+							<span class="summary-key">DNSSEC</span>
+							<span class="summary-val" id="sum-dnssec">—</span>
+						</div>
+					</div>
+
+					<div class="result-tabs" id="result-tabs"></div>
+					<div class="table-wrap" id="table-wrap"></div>
+
+					<div class="action-bar">
+						<button class="btn-ghost small" id="copy-json-btn">
+							<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<rect x="9" y="9" width="13" height="13" rx="2" />
+								<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+							</svg>
+							Copy JSON
+						</button>
+						<button class="btn-ghost small" id="copy-raw-btn">
+							<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<polyline points="16 18 22 12 16 6" />
+								<polyline points="8 6 2 12 8 18" />
+							</svg>
+							Copy Raw
+						</button>
+						<button class="btn-ghost small" id="export-csv-btn">
+							<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+								<polyline points="7 10 12 15 17 10" />
+								<line x1="12" y1="15" x2="12" y2="3" />
+							</svg>
+							Export CSV
+						</button>
+						<button class="btn-ghost small" id="share-btn">
+							<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<circle cx="18" cy="5" r="3" />
+								<circle cx="6" cy="12" r="3" />
+								<circle cx="18" cy="19" r="3" />
+								<line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+								<line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+							</svg>
+							Share Link
+						</button>
+						<button class="btn-ghost small" id="new-lookup-btn">
+							<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<polyline points="1 4 1 10 7 10" />
+								<path d="M3.51 15a9 9 0 1 0 .49-3.51" />
+							</svg>
+							New Lookup
+						</button>
+					</div>
+
+					<details class="raw-details">
+						<summary class="raw-summary">
+							<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<polyline points="16 18 22 12 16 6" />
+								<polyline points="8 6 2 12 8 18" />
+							</svg>
+							Raw JSON Response
+						</summary>
+						<pre class="raw-pre" id="raw-pre"></pre>
+					</details>
+				</div>
+			</section>
+
+			<!-- History Panel -->
+			<section class="panel history-panel">
+				<div class="panel-header">
+					<span class="panel-label">History</span>
+					<h2 class="panel-title">Recent Lookups</h2>
+					<button class="btn-ghost small" id="clear-history-btn">Clear</button>
+				</div>
+				<div class="history-list" id="history-list">
+					<p class="history-empty">No lookups yet. Run your first query above.</p>
+				</div>
+			</section>
+		</main>
+
+		<!-- Toast -->
+		<div class="toast" id="toast"></div>
+
+		<!-- Footer -->
+		<footer class="footer">
+			<div class="footer__logo"><span class="nav__logo-bracket">[</span><a href="https://iqverse.net">IQVerse</a><span class="nav__logo-bracket">]</span></div>
+			<div class="footer-inner">
+				<span>
+					Made with ❤️ by <a href="https://sekmen.dev" target="_blank">Sekmen.Dev</a> and published on
+					<a href="https://github.com/SekmenDev/iqverse.net" target="_blank">Github</a>
+				</span>
+			</div>
+			<div class="footer-inner">
+				<span> Open source. MIT License. No servers. No tracking. No cost. </span>
+			</div>
+		</footer>
+
+		<script src="scripts.js"></script>
+	</body>
+</html>
