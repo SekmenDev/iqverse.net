@@ -175,6 +175,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 14px;
   overflow: hidden;
+  z-index: 1;
 }
 
 .panel-left { display: flex; flex-direction: column; }
