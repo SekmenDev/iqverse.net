@@ -6,84 +6,105 @@
 
         <url>
             <loc>https://iqverse.net/</loc>
-            <lastmod>2026-04-14</lastmod>
+            <lastmod>2026-04-19</lastmod>
             <changefreq>weekly</changefreq>
             <priority>1.0</priority>
         </url>
 
         <url>
             <loc>https://qrforge.iqverse.net/</loc>
-            <lastmod>2026-04-14</lastmod>
+            <lastmod>2026-04-19</lastmod>
             <changefreq>monthly</changefreq>
             <priority>0.8</priority>
         </url>
 
         <url>
             <loc>https://linkradar.iqverse.net/</loc>
-            <lastmod>2026-04-14</lastmod>
+            <lastmod>2026-04-19</lastmod>
             <changefreq>monthly</changefreq>
             <priority>0.8</priority>
         </url>
 
         <url>
             <loc>https://favicongen.iqverse.net/</loc>
-            <lastmod>2026-04-14</lastmod>
+            <lastmod>2026-04-19</lastmod>
             <changefreq>monthly</changefreq>
             <priority>0.8</priority>
         </url>
 
         <url>
             <loc>https://jsonformatter.iqverse.net/</loc>
-            <lastmod>2026-04-14</lastmod>
+            <lastmod>2026-04-19</lastmod>
             <changefreq>monthly</changefreq>
             <priority>0.8</priority>
         </url>
 
         <url>
             <loc>https://encodelab.iqverse.net/</loc>
-            <lastmod>2026-04-14</lastmod>
+            <lastmod>2026-04-19</lastmod>
             <changefreq>monthly</changefreq>
             <priority>0.8</priority>
         </url>
 
         <url>
             <loc>https://regex.iqverse.net/</loc>
-            <lastmod>2026-04-14</lastmod>
+            <lastmod>2026-04-19</lastmod>
             <changefreq>monthly</changefreq>
             <priority>0.8</priority>
         </url>
 
         <url>
             <loc>https://password.iqverse.net/</loc>
-            <lastmod>2026-04-14</lastmod>
+            <lastmod>2026-04-19</lastmod>
+            <changefreq>monthly</changefreq>
+            <priority>0.8</priority>
+        </url>
+
+        <url>
+            <loc>https://chromata.iqverse.net/</loc>
+            <lastmod>2026-04-19</lastmod>
+            <changefreq>monthly</changefreq>
+            <priority>0.8</priority>
+        </url>
+
+        <url>
+            <loc>https://headerscan.iqverse.net/</loc>
+            <lastmod>2026-04-19</lastmod>
+            <changefreq>monthly</changefreq>
+            <priority>0.8</priority>
+        </url>
+
+        <url>
+            <loc>https://dnslookup.iqverse.net/</loc>
+            <lastmod>2026-04-19</lastmod>
             <changefreq>monthly</changefreq>
             <priority>0.8</priority>
         </url>
 
         <url>
             <loc>https://goo.iqverse.net/</loc>
-            <lastmod>2026-04-14</lastmod>
+            <lastmod>2026-04-19</lastmod>
             <changefreq>weekly</changefreq>
             <priority>0.7</priority>
         </url>
 
         <url>
             <loc>https://ges.iqverse.net/</loc>
-            <lastmod>2026-04-14</lastmod>
+            <lastmod>2026-04-19</lastmod>
             <changefreq>weekly</changefreq>
             <priority>0.7</priority>
         </url>
 
         <url>
             <loc>https://gyp.iqverse.net/</loc>
-            <lastmod>2026-04-14</lastmod>
+            <lastmod>2026-04-19</lastmod>
             <changefreq>weekly</changefreq>
             <priority>0.7</priority>
         </url>
 
         <url>
             <loc>https://gst.iqverse.net/</loc>
-            <lastmod>2026-04-14</lastmod>
+            <lastmod>2026-04-19</lastmod>
             <changefreq>weekly</changefreq>
             <priority>0.7</priority>
         </url>
