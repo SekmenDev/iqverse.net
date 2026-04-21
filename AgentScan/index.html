@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>AgentScan | AI Agent Readiness Analyzer</title>
+
+		<!-- SEO Meta Tags -->
+		<meta
+			name="description"
+			content="Scan any website to discover how compatible it is with AI agents. We check robots.txt, MCP endpoints, OAuth discovery, markdown negotiation, sitemaps, agent commerce and more. Get a detailed report on your site's agent-readiness and actionable recommendations for improvement."
+		/>
+		<meta
+			name="keywords"
+			content="AI agents, website compatibility, robots.txt, MCP endpoints, OAuth discovery, markdown negotiation, sitemaps, agent commerce"
+		/>
+		<meta name="author" content="Sekmen.Dev" />
+		<meta name="robots" content="index, follow" />
+		<meta name="language" content="English" />
+
+		<!-- Open Graph Tags (Social Media) -->
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content="AgentScan | AI Agent Readiness Analyzer" />
+		<meta
+			property="og:description"
+			content="Scan any website to discover how compatible it is with AI agents. We check robots.txt, MCP endpoints, OAuth discovery, markdown negotiation, sitemaps, agent commerce and more. Get a detailed report on your site's agent-readiness and actionable recommendations for improvement."
+		/>
+		<meta property="og:url" content="https://agentscan.iqverse.net/" />
+		<meta property="og:site_name" content="AgentScan | AI Agent Readiness Analyzer" />
+		<meta property="og:image" content="https://agentscan.iqverse.net/og-image-1200x630.png" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+
+		<!-- Twitter Card Tags -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="AgentScan | AI Agent Readiness Analyzer" />
+		<meta
+			name="twitter:description"
+			content="Scan any website to discover how compatible it is with AI agents. We check robots.txt, MCP endpoints, OAuth discovery, markdown negotiation, sitemaps, agent commerce and more. Get a detailed report on your site's agent-readiness and actionable recommendations for improvement."
+		/>
+		<meta name="twitter:image" content="https://agentscan.iqverse.net/og-image-1200x630.png" />
+
+		<!-- Canonical URL -->
+		<link rel="canonical" href="https://agentscan.iqverse.net/" />
+
+		<!-- Stylesheets and Fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&family=JetBrains+Mono:wght@400;500&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="styles.css" />
+
+		<!-- Favicon and Touch Icons -->
+		<link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png" />
+		<link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png" />
+		<link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png" />
+		<link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png" />
+		<link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png" />
+		<link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png" />
+		<link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png" />
+		<link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png" />
+		<link rel="icon" type="image/png" sizes="192x192" href="/android-icon-192x192.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+		<link rel="manifest" href="/manifest.json" />
+		<meta name="msapplication-TileColor" content="#ffffff" />
+		<meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
+		<meta name="theme-color" content="#ffffff" />
+	</head>
+	<body>
+		<!-- Background effects -->
+		<div class="bg-grid"></div>
+		<div class="bg-glow bg-glow--1"></div>
+		<div class="bg-glow bg-glow--2"></div>
+
+		<!-- Nav -->
+		<header class="header">
+			<div class="header-inner">
+				<div class="logo">
+					<img src="logo.png" alt="AgentScan logo" />
+					<span>AgentScan</span>
+				</div>
+				<nav class="header-nav">
+					<a href="https://iqverse.net/" class="nav-tag" target="_blank">All Tools</a>
+					<a href="https://github.com/SekmenDev/iqverse.net" target="_blank" class="nav-tag">Source Code</a>
+				</nav>
+			</div>
+		</header>
+
+		<!-- Hero -->
+		<section class="hero">
+			<div class="hero-eyebrow">
+				<span class="eyebrow-dot"></span>
+				<span>AI Agent Readiness Scanner</span>
+			</div>
+			<h1 class="hero-title">Is Your Site<br /><span class="hero-accent">Agent-Ready?</span></h1>
+			<p class="hero-subtitle">
+				Scan any website to discover how compatible it is with AI agents. We check
+				<strong>robots.txt</strong>, <strong>MCP endpoints</strong>, <strong>OAuth discovery</strong>, <strong>markdown negotiation</strong>,
+				<strong>sitemaps</strong>, <strong>agent commerce</strong> and more.
+			</p>
+
+			<!-- Scanner Input -->
+			<div class="scanner-card">
+				<div class="scanner-input-row">
+					<div class="input-wrapper">
+						<span class="input-icon">
+							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<circle cx="12" cy="12" r="10" />
+								<path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+							</svg>
+						</span>
+						<input type="url" id="urlInput" class="url-input" placeholder="https://example.com" autocomplete="off" spellcheck="false" />
+						<button id="clearBtn" class="clear-btn" title="Clear" style="display: none">×</button>
+					</div>
+					<button id="scanBtn" class="scan-btn">
+						<span class="scan-btn-text">Scan Site</span>
+						<svg class="scan-btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+							<path d="M5 12h14M12 5l7 7-7 7" />
+						</svg>
+					</button>
+				</div>
+
+				<!-- Filter Bar -->
+				<div class="filter-bar">
+					<span class="filter-label">Filter checks:</span>
+					<div class="filter-pills">
+						<button class="filter-pill active" data-filter="all">All</button>
+						<button class="filter-pill" data-filter="discoverability">Discoverability</button>
+						<button class="filter-pill" data-filter="content">Content</button>
+						<button class="filter-pill" data-filter="bot-access">Bot Access</button>
+						<button class="filter-pill" data-filter="protocol">Protocol / MCP</button>
+						<button class="filter-pill" data-filter="commerce">Commerce</button>
+					</div>
+				</div>
+
+				<!-- Quick Examples -->
+				<div class="quick-examples">
+					<span class="examples-label">Try:</span>
+					<button class="example-btn" data-url="https://cloudflare.com">cloudflare.com</button>
+					<button class="example-btn" data-url="https://github.com">github.com</button>
+					<button class="example-btn" data-url="https://openai.com">openai.com</button>
+					<button class="example-btn" data-url="https://stripe.com">stripe.com</button>
+					<button class="example-btn" data-url="https://anthropic.com">anthropic.com</button>
+				</div>
+			</div>
+		</section>
+
+		<!-- Results Area -->
+		<section class="results-section" id="resultsSection" style="display: none">
+			<div class="results-container">
+				<!-- Score Panel -->
+				<div class="score-panel" id="scorePanel">
+					<div class="score-left">
+						<div class="score-site-info">
+							<div class="score-favicon" id="scoreFavicon"></div>
+							<div>
+								<div class="score-domain" id="scoreDomain">—</div>
+								<div class="score-scanned-at" id="scoreScannedAt">—</div>
+							</div>
+						</div>
+						<div class="score-badges" id="scoreBadges"></div>
+					</div>
+					<div class="score-right">
+						<div class="score-ring-wrapper">
+							<svg class="score-ring" viewBox="0 0 120 120" width="120" height="120">
+								<circle class="ring-bg" cx="60" cy="60" r="50" />
+								<circle class="ring-fg" id="ringFg" cx="60" cy="60" r="50" stroke-dasharray="314" stroke-dashoffset="314" />
+							</svg>
+							<div class="score-number-wrap">
+								<span class="score-number" id="scoreNumber">0</span>
+								<span class="score-denom">/100</span>
+							</div>
+						</div>
+						<div class="score-grade" id="scoreGrade">—</div>
+					</div>
+				</div>
+
+				<!-- Category Breakdown -->
+				<div class="category-breakdown" id="categoryBreakdown"></div>
+
+				<!-- Checks Grid -->
+				<div class="checks-header">
+					<h2 class="checks-title">Check Results</h2>
+					<div class="checks-controls">
+						<button class="view-toggle active" id="viewGrid" title="Grid view">
+							<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+								<rect x="3" y="3" width="7" height="7" />
+								<rect x="14" y="3" width="7" height="7" />
+								<rect x="3" y="14" width="7" height="7" />
+								<rect x="14" y="14" width="7" height="7" />
+							</svg>
+						</button>
+						<button class="view-toggle" id="viewList" title="List view">
+							<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+								<rect x="3" y="5" width="18" height="2" />
+								<rect x="3" y="11" width="18" height="2" />
+								<rect x="3" y="17" width="18" height="2" />
+							</svg>
+						</button>
+						<select class="sort-select" id="sortSelect">
+							<option value="category">Group by category</option>
+							<option value="status">Sort by status</option>
+							<option value="name">Sort by name</option>
+						</select>
+					</div>
+				</div>
+				<div class="checks-grid" id="checksGrid"></div>
+
+				<!-- Recommendations -->
+				<div class="recommendations-panel" id="recommendationsPanel" style="display: none">
+					<div class="rec-header">
+						<h2 class="rec-title">
+							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+							</svg>
+							Improvement Recommendations
+						</h2>
+						<button class="copy-rec-btn" id="copyRecBtn">
+							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<rect x="9" y="9" width="13" height="13" rx="2" />
+								<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+							</svg>
+							Copy All
+						</button>
+					</div>
+					<div class="rec-list" id="recList"></div>
+				</div>
+
+				<!-- Raw Data Panel -->
+				<div class="raw-panel" id="rawPanel" style="display: none">
+					<div class="raw-header">
+						<h2 class="raw-title">Raw Scan Data</h2>
+						<button class="raw-toggle-btn" id="rawToggleBtn">Show</button>
+					</div>
+					<pre class="raw-output" id="rawOutput" style="display: none"></pre>
+				</div>
+
+				<!-- Rescan -->
+				<div class="rescan-bar">
+					<button class="rescan-btn" id="rescanBtn">
+						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<path d="M23 4v6h-6" />
+							<path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+						</svg>
+						Rescan
+					</button>
+					<button class="new-scan-btn" id="newScanBtn">Scan another site</button>
+					<button class="export-btn" id="exportBtn">
+						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+							<polyline points="7 10 12 15 17 10" />
+							<line x1="12" y1="15" x2="12" y2="3" />
+						</svg>
+						Export JSON
+					</button>
+				</div>
+			</div>
+		</section>
+
+		<!-- Info Section -->
+		<section class="info-section">
+			<div class="info-grid">
+				<div class="info-card">
+					<div class="info-icon">🔍</div>
+					<h3 class="info-title">Discoverability</h3>
+					<p class="info-desc">robots.txt, Sitemap, Link response headers, meta tags — can agents find and index your content?</p>
+				</div>
+				<div class="info-card">
+					<div class="info-icon">📄</div>
+					<h3 class="info-title">Content Accessibility</h3>
+					<p class="info-desc">Markdown negotiation, structured data, clean content signals — can agents consume your content efficiently?</p>
+				</div>
+				<div class="info-card">
+					<div class="info-icon">🤖</div>
+					<h3 class="info-title">Bot Access Control</h3>
+					<p class="info-desc">AI-specific robot rules, Web Bot Auth, Content Signals — do you explicitly manage AI agent access?</p>
+				</div>
+				<div class="info-card">
+					<div class="info-icon">🔌</div>
+					<h3 class="info-title">Protocol / MCP</h3>
+					<p class="info-desc">MCP Server Card, OAuth discovery, A2A Agent Cards, Agent Skills, WebMCP, API Catalog endpoints.</p>
+				</div>
+				<div class="info-card">
+					<div class="info-icon">💳</div>
+					<h3 class="info-title">Commerce</h3>
+					<p class="info-desc">x402 payment protocol, UCP, ACP — can AI agents transact on your behalf?</p>
+				</div>
+				<div class="info-card">
+					<div class="info-icon">⚡</div>
+					<h3 class="info-title">Performance</h3>
+					<p class="info-desc">Response times, HTTPS, HSTS, security headers — is your site fast and secure for automated access?</p>
+				</div>
+			</div>
+		</section>
+
+		<!-- Loading Overlay -->
+		<div class="loading-overlay" id="loadingOverlay" style="display: none">
+			<div class="loading-card">
+				<div class="loading-spinner">
+					<svg viewBox="0 0 50 50" width="48" height="48">
+						<circle class="spinner-track" cx="25" cy="25" r="20" />
+						<circle class="spinner-head" cx="25" cy="25" r="20" />
+					</svg>
+				</div>
+				<div class="loading-label" id="loadingLabel">Initializing scan…</div>
+				<div class="loading-progress">
+					<div class="loading-bar" id="loadingBar"></div>
+				</div>
+				<div class="loading-checks" id="loadingChecks"></div>
+			</div>
+		</div>
+
+		<footer class="footer">
+			<div class="footer__logo"><span class="nav__logo-bracket">[</span><a href="https://iqverse.net">IQVerse</a><span class="nav__logo-bracket">]</span></div>
+			<div class="footer-inner">
+				<span>
+					Made with ❤️ by <a href="https://sekmen.dev" target="_blank">Sekmen.Dev</a> and published on
+					<a href="https://github.com/SekmenDev/iqverse.net" target="_blank">Github</a>
+				</span>
+			</div>
+			<div class="footer-inner">
+				<span> Open source. MIT License. No servers. No tracking. No cost. </span>
+			</div>
+		</footer>
+
+		<script src="scripts.js"></script>
+	</body>
+</html>
