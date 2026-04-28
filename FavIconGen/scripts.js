@@ -111,12 +111,12 @@ function generateAll() {
   <link rel="shortcut icon" href="${f32}">`
 		: `
   <!-- Favicons (add your favicon files) -->
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="/favicons/android-chrome-192x192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="/favicons/android-chrome-512x512.png">
-  <link rel="shortcut icon" href="/favicons/favicon.ico">`;
+  <link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicons/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="favicons/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="favicons/android-chrome-512x512.png">
+  <link rel="shortcut icon" href="favicons/favicon.ico">`;
 
 	const ogImage = loadedImage ? f512 : `${url}/og-image.png`;
 
@@ -142,7 +142,7 @@ ${kw ? `<meta name="keywords" content="${esc(kw)}">` : ""}
 ${faviconLines}
 
   <!-- Web Manifest -->
-  <link rel="manifest" href="/site.webmanifest">
+  <link rel="manifest" href="site.webmanifest">
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="${ogType}">
@@ -179,7 +179,7 @@ ${desc ? `<meta name="twitter:description" content="${esc(desc)}">` : ""}
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="${name}">
 <meta name="msapplication-TileColor" content="${theme}">
-<meta name="msapplication-config" content="/browserconfig.xml">`;
+<meta name="msapplication-config" content="browserconfig.xml">`;
 
 	document.getElementById("outputCode").textContent = code;
 	document.getElementById("outputSection").style.display = "block";
