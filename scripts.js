@@ -39,6 +39,34 @@ document.querySelectorAll('a[href^="#"]').forEach((link) => {
 	});
 });
 
+// ── Make tool-cards clickable ─────────────────────────────────────────────
+
+document.querySelectorAll(".tool-card[data-href]").forEach((card) => {
+	card.style.cursor = "pointer";
+	card.addEventListener("click", (e) => {
+		// Don't navigate if clicking on a text selection
+		if (window.getSelection().toString()) return;
+		const href = card.getAttribute("data-href");
+		if (href) {
+			const target = href.includes("https") ? "_blank" : "_self";
+			window.open(href, target);
+		}
+	});
+	// Add keyboard support (Enter key)
+	card.setAttribute("role", "button");
+	card.setAttribute("tabindex", "0");
+	card.addEventListener("keypress", (e) => {
+		if (e.key === "Enter" || e.key === " ") {
+			e.preventDefault();
+			const href = card.getAttribute("data-href");
+			if (href) {
+				const target = href.includes("https") ? "_blank" : "_self";
+				window.open(href, target);
+			}
+		}
+	});
+});
+
 // ── Subtle cursor glow follow on tool cards ───────────────────────────────
 
 function initCursorGlow() {
