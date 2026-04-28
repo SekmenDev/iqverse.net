@@ -3,7 +3,7 @@ https://iqverse.net/*
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer
   Permissions-Policy: fullscreen=(*)
-  Content-Security-Policy: default-src 'self'; img-src 'self' data: https://*.iqverse.net; script-src 'self' 'unsafe-inline' 'unsafe-eval' *.cloudflare.com cdn.jsdelivr.net www.googletagmanager.com www.google-analytics.com *.cloudflareinsights.com; connect-src *; style-src 'self' 'unsafe-inline' use.fontawesome.com fonts.googleapis.com cdn.jsdelivr.net; font-src 'self' fonts.gstatic.com fonts.googleapis.com use.fontawesome.com; frame-src *.cloudflare.com
+  Content-Security-Policy: default-src 'self'; img-src 'self' data: *.iqverse.net *.githubusercontent.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' *.cloudflare.com *.jsdelivr.net *.googletagmanager.com *.google-analytics.com *.cloudflareinsights.com; connect-src *; style-src 'self' 'unsafe-inline' *.fontawesome.com fonts.googleapis.com *.jsdelivr.net; font-src 'self' *.gstatic.com *.googleapis.com *.fontawesome.com; frame-src *.cloudflare.com
 
 /*.css
   Cache-Control: public, max-age=31536000, immutable
@@ -27,6 +27,8 @@ https://iqverse.net/*
   Cache-Control: public, max-age=31536000, immutable
 /*.otf
   Cache-Control: public, max-age=31536000, immutable
+/*.json
+  Cache-Control: public, max-age=31536000, immutable
 /*/*.css
   Cache-Control: public, max-age=31536000, immutable
 /*/*.js
@@ -48,4 +50,6 @@ https://iqverse.net/*
 /*/*.eot
   Cache-Control: public, max-age=31536000, immutable
 /*/*.otf
+  Cache-Control: public, max-age=31536000, immutable
+/*/*.json
   Cache-Control: public, max-age=31536000, immutable
