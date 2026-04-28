@@ -4,7 +4,7 @@ Scan any website to discover how compatible it is with AI agents. AgentScan chec
 
 ![License](https://img.shields.io/badge/license-MIT-green) ![Open Source](https://img.shields.io/badge/open-source-blue) ![Browser](https://img.shields.io/badge/browser-based-9cf)
 
-📍 [Launch Tool](https://agentscan.iqverse.net/)
+📍 [Launch Tool](https://iqverse.net/agentscan/)
 
 ---
 

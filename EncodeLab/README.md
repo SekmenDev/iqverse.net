@@ -4,7 +4,7 @@ A fast, privacy-first browser tool for everything encoding. No servers, no track
 
 ![License](https://img.shields.io/badge/license-MIT-green) ![Open Source](https://img.shields.io/badge/open-source-blue) ![Browser](https://img.shields.io/badge/browser-based-9cf)
 
-📍 [Launch Tool](https://encodelab.iqverse.net/)
+📍 [Launch Tool](https://iqverse.net/encodelab/)
 
 ---
 

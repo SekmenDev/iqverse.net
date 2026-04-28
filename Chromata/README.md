@@ -5,7 +5,7 @@
 
 ![License](https://img.shields.io/badge/license-MIT-green) ![Open Source](https://img.shields.io/badge/open-source-blue) ![Browser](https://img.shields.io/badge/browser-based-9cf)
 
-📍 [Launch Tool](https://chromata.iqverse.net/)
+📍 [Launch Tool](https://iqverse.net/chromata/)
 
 ---
 

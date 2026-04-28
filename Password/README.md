@@ -6,7 +6,7 @@
 
 ![License](https://img.shields.io/badge/license-MIT-green) ![Open Source](https://img.shields.io/badge/open-source-blue) ![Browser](https://img.shields.io/badge/browser-based-9cf)
 
-📍 [Launch Tool](https://password.iqverse.net/)
+📍 [Launch Tool](https://iqverse.net/password/)
 
 ---
 
@@ -24,16 +24,16 @@
 
 ### 02 — Secret / Token Generator
 
-| Type | Use Case |
-| ---- | -------- |
-| **Hex** | Database keys, raw secrets |
-| **Base64** | JWT secrets, general API keys |
-| **Base64URL** | URL-safe tokens, OAuth |
-| **UUID v4** | Entity IDs, idempotency keys |
-| **ULID** | Sortable unique identifiers |
-| **Alphanumeric** | Clean readable tokens |
-| **PIN / OTP** | Numeric codes (4–12 digits) |
-| **Passphrase** | Human-memorable secrets |
+| Type             | Use Case                      |
+| ---------------- | ----------------------------- |
+| **Hex**          | Database keys, raw secrets    |
+| **Base64**       | JWT secrets, general API keys |
+| **Base64URL**    | URL-safe tokens, OAuth        |
+| **UUID v4**      | Entity IDs, idempotency keys  |
+| **ULID**         | Sortable unique identifiers   |
+| **Alphanumeric** | Clean readable tokens         |
+| **PIN / OTP**    | Numeric codes (4–12 digits)   |
+| **Passphrase**   | Human-memorable secrets       |
 
 Output formats: Raw, `.env KEY=VALUE`, JSON
 

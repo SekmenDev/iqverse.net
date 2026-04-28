@@ -2,6 +2,10 @@
 
 A browser-based tool to analyze HTTP response headers for security, performance and best practices. Part of the [IQVerse](https://iqverse.net) toolset.
 
+![License](https://img.shields.io/badge/license-MIT-green) ![Open Source](https://img.shields.io/badge/open-source-blue) ![Browser](https://img.shields.io/badge/browser-based-9cf)
+
+📍 [Launch Tool](https://iqverse.net/headers/)
+
 ## Features
 
 - **Security Score** — Instant A–F grade with animated progress ring
@@ -16,15 +20,6 @@ A browser-based tool to analyze HTTP response headers for security, performance 
 - **Report Export** — Copy to clipboard or download a Markdown report
 - **Quick Links** — One-click presets to test well-known sites
 - **CORS Proxy** — Uses `allorigins.win` to fetch headers from any public URL
-
-## Files
-
-```
-index.html   Main application UI
-style.css    Styles (dark theme, CSS variables)
-app.js       Analysis logic, header definitions, rendering
-README.md    This file
-```
 
 ## Usage
 
@@ -64,8 +59,17 @@ README.md    This file
 - For production use, run a server-side proxy to fetch headers directly
 - Some proxies may strip or normalize certain headers
 
-## License
+## 📄 License
 
-MIT — Open source. No tracking. No servers. No cost.
+All tools are released under the **MIT License**. See individual repositories for license details.
 
-Built by [Sekmen.Dev](https://sekmen.dev) · Part of [IQVerse](https://iqverse.net)
+---
+
+## 🔗 Links
+
+- **IQVerse:** [iqverse.net](https://iqverse.net)
+- **Sekmen.Dev** [Sekmen.Dev](https://sekmen.dev)
+
+---
+
+**Built with ❤️ by developers, for the developer community.**

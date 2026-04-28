@@ -13,7 +13,7 @@
 
 [![MIT License](https://img.shields.io/badge/license-MIT-00ff87?style=flat-square)](./LICENSE) [![No Server Required](https://img.shields.io/badge/backend-none-00d4ff?style=flat-square)](/) [![Zero Dependencies](https://img.shields.io/badge/dependencies-0-a855f7?style=flat-square)](/) [![Single File](https://img.shields.io/badge/deployment-single%20HTML%20file-ffd166?style=flat-square)](/) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-ff9640?style=flat-square)](./CONTRIBUTING.md)
 
-📍 [Launch Tool](https://linkradar.iqverse.net/)
+📍 [Launch Tool](https://iqverse.net/linkradar/)
 
 </div>
 
@@ -185,10 +185,10 @@ doc.querySelectorAll("a[href]").forEach((el) => links.push({ url: el.href, tag: 
 ```js
 const visited = new Set();
 while (queue.length > 0) {
-  const item = queue.shift();
-  if (visited.has(item.url)) continue;
-  visited.add(item.url);
-  // ... process
+	const item = queue.shift();
+	if (visited.has(item.url)) continue;
+	visited.add(item.url);
+	// ... process
 }
 ```
 
@@ -278,13 +278,13 @@ The **Source** column is the "fix-it" context it tells you exactly where to look
 
 ```json
 {
-  "url": "https://example.com/missing",
-  "status": 404,
-  "time": 204,
-  "depth": 1,
-  "sourceUrl": "https://example.com/",
-  "tag": "<a>",
-  "text": "Read our launch post"
+	"url": "https://example.com/missing",
+	"status": 404,
+	"time": 204,
+	"depth": 1,
+	"sourceUrl": "https://example.com/",
+	"tag": "<a>",
+	"text": "Read our launch post"
 }
 ```
 

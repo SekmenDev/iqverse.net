@@ -4,7 +4,7 @@ A professional, fully client-side DNS lookup tool for networking and DevOps task
 
 ![License](https://img.shields.io/badge/license-MIT-green) ![Open Source](https://img.shields.io/badge/open-source-blue) ![Browser](https://img.shields.io/badge/browser-based-9cf)
 
-📍 [Launch Tool](https://dnslookup.iqverse.net/)
+📍 [Launch Tool](https://iqverse.net/dnslookup/)
 
 ---
 
