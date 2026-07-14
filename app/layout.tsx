@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     template: '%s | IQVerse Tools',
   },
   description:
-    'IQVerse: Free, open-source developer tools built in the browser. JSON formatter, QR code generator, regex tester, link checker, and more. All running 100% in your browser.',
+    'IQVerse: Free, open-source developer tools built in the browser. JSON formatter, QR code generator, regex tester, link checker and more. All running 100% in your browser.',
   keywords: [
     'developer tools',
     'dev tools',
@@ -49,98 +49,30 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <head>
-        <meta name="theme-color" content="#0a0a0a" />
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#0C0E14" />
       </head>
       <body>
-        {/* Background effects */}
-        <div className="bg-grid"></div>
-        <div className="bg-glow bg-glow--1"></div>
-        <div className="bg-glow bg-glow--2"></div>
+        {children}
 
-        {/* Content */}
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          <Header />
-          <main>{children}</main>
-          <Footer />
-        </div>
+        <footer className="pageFooter">
+            <span className="footerNote">
+                Made with ❤️ by <a href="https://sekmen.dev" target="_blank">Sekmen.Dev</a> and published on <a href="https://github.com/SekmenDev/iqverse.net" target="_blank">Github</a>
+            </span>
+            <span className="footerNote">
+                Open source. MIT License. No servers. No tracking. No cost.
+            </span>
+        </footer>
       </body>
     </html>
-  );
-}
-
-function Header() {
-  return (
-    <header
-      style={{
-        borderBottom: '1px solid var(--border)',
-        background: 'rgba(10, 10, 10, 0.7)',
-        backdropFilter: 'blur(10px)',
-        position: 'sticky',
-        top: 0,
-        zIndex: 100,
-      }}
-    >
-      <div className="container" style={{ padding: '1rem 2rem' }}>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '2rem',
-          }}
-        >
-          <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <img
-              src="/logo.png"
-              alt="IQVerse logo"
-              width={32}
-              height={32}
-              style={{ borderRadius: 'var(--radius-sm)' }}
-            />
-            <span style={{ color: 'var(--text)', fontWeight: 600, fontSize: '1.1rem' }}>IQVerse</span>
-          </a>
-          <nav style={{ display: 'flex', gap: '1.5rem', marginLeft: 'auto' }}>
-            <a
-              href="https://github.com/SekmenDev/iqverse.net"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                color: 'var(--text-muted)',
-                fontSize: '0.9rem',
-                transition: 'color 200ms ease',
-              }}
-            >
-              Source Code
-            </a>
-          </nav>
-        </div>
-      </div>
-    </header>
-  );
-}
-
-function Footer() {
-  return (
-    <footer
-      style={{
-        borderTop: '1px solid var(--border)',
-        marginTop: '4rem',
-        padding: '2rem',
-        textAlign: 'center',
-        color: 'var(--text-muted)',
-        fontSize: '0.875rem',
-      }}
-    >
-      <p>
-        Built with ❤️ by developers, for the developer community. MIT Licensed.{' '}
-        <a href="https://sekmen.dev" target="_blank" rel="noopener noreferrer">
-          Sekmen.Dev
-        </a>
-      </p>
-    </footer>
   );
 }
