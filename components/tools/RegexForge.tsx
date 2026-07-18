@@ -43,7 +43,7 @@ export default function RegexForge() {
         <section className="tool-form card">
           <div className="section-header">
             <h2>Regex Tester</h2>
-            <p>Write a pattern, pick flags, and test it against sample text.</p>
+            <p>Write a pattern, pick flags and test it against sample text.</p>
           </div>
 
           <div className="field-group">
@@ -98,7 +98,7 @@ export default function RegexForge() {
         <section className="tool-preview card">
           <div className="section-header">
             <h2>Results</h2>
-            <p>Matches, details, and replacement output.</p>
+            <p>Matches, details and replacement output.</p>
           </div>
 
           <div className="match-summary">

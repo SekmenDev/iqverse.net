@@ -353,7 +353,7 @@ export default function HeaderScan() {
       <section className={styles.heroCard}>
         <div className={styles.heroCopy}>
           <p className={styles.eyebrow}>HTTP HEADER ANALYZER</p>
-          <h2>Inspect response headers for security, performance, and privacy best practices.</h2>
+          <h2>Inspect response headers for security, performance and privacy best practices.</h2>
           <p>Paste any URL and review a fast report with actionable recommendations.</p>
         </div>
 

@@ -60,7 +60,7 @@ const CHECK_DEFS: CheckDef[] = [
   { id: 'hsts', name: 'HSTS Header', category: 'performance', desc: 'Checks for Strict-Transport-Security header.', weight: 3 },
   { id: 'security_headers', name: 'Security Headers', category: 'performance', desc: 'Checks for X-Content-Type-Options, X-Frame-Options, CSP and other security headers.', weight: 3 },
   { id: 'cors_headers', name: 'CORS Headers', category: 'performance', desc: 'Checks for Access-Control-Allow-Origin headers needed for cross-origin API access by agents.', weight: 4 },
-  { id: 'response_time', name: 'Response Time', category: 'performance', desc: 'Measures how fast the site responds — important for agent workflows with tight timeouts.', weight: 4 },
+  { id: 'response_time', name: 'Response Time', category: 'performance', desc: 'Measures how fast the site responds. Important for agent workflows with tight timeouts.', weight: 4 },
 ];
 
 const CATEGORIES: Record<string, { label: string; icon: string }> = {
@@ -108,7 +108,7 @@ function getRecommendationText(id: string) {
   const recs: Record<string, string> = {
     robots_txt: 'Create a /robots.txt file and expose your sitemap.',
     sitemap: 'Create a sitemap.xml and reference it from robots.txt.',
-    ai_bot_rules: 'Add explicit AI bot rules for GPTBot, ClaudeBot, and anthropic-ai.',
+    ai_bot_rules: 'Add explicit AI bot rules for GPTBot, ClaudeBot and anthropic-ai.',
     mcp_server_card: 'Publish /.well-known/mcp.json for MCP discovery.',
     markdown_negotiation: 'Support text/markdown content negotiation via Accept headers.',
     structured_data: 'Add JSON-LD or Schema markup to help agents understand your content.',
@@ -119,7 +119,7 @@ function getRecommendationText(id: string) {
     https: 'Serve your site over HTTPS.',
     hsts: 'Add Strict-Transport-Security headers.',
     content_signals: 'Add Content-Signals headers for AI usage permissions.',
-    security_headers: 'Add X-Content-Type-Options, X-Frame-Options, and CSP headers.',
+    security_headers: 'Add X-Content-Type-Options, X-Frame-Options and CSP headers.',
     cors_headers: 'Add Access-Control-Allow-Origin header for cross-origin API access.',
   };
   return recs[id] || 'Review the scan details and improve this signal.';
@@ -288,7 +288,7 @@ export default function AgentScan() {
     const hasOg = /<meta[^>]+property=["']og:/i.test(homepageHtml);
     const hasTwitter = /<meta[^>]+name=["']twitter:/i.test(homepageHtml);
     const metaScore = [hasDescription, hasOg, hasTwitter].filter(Boolean).length;
-    addResult('meta_tags', metaScore >= 2 ? 'pass' : metaScore === 1 ? 'warn' : 'fail', metaScore >= 2 ? 'Meta and social discovery tags detected.' : metaScore === 1 ? 'Some discovery meta tags found.' : 'No description, Open Graph, or Twitter metadata found.');
+    addResult('meta_tags', metaScore >= 2 ? 'pass' : metaScore === 1 ? 'warn' : 'fail', metaScore >= 2 ? 'Meta and social discovery tags detected.' : metaScore === 1 ? 'Some discovery meta tags found.' : 'No description, Open Graph or Twitter metadata found.');
 
     const hasFavicon = /favicon/i.test(homepageHtml) || /<link[^>]+rel=["']icon["']/i.test(homepageHtml);
     addResult('favicon', hasFavicon ? 'pass' : 'warn', hasFavicon ? 'Favicon detected.' : 'No favicon link tag detected in HTML.');

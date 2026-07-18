@@ -23,8 +23,8 @@ export default function NotFoundPage() {
               Lost in the matrix? <span className={styles.titleAccent}>Let’s reroute it.</span>
             </h1>
             <p className={styles.heroText}>
-              The page you were looking for has wandered off, but the tools you need are still here.
-              Search IQVerse for the right utility, or jump straight to a useful shortcut below.
+              The page you were looking for has wandered off but the tools you need are still here.
+              Search IQVerse for the right utility or jump straight to a useful shortcut below.
             </p>
 
             <div className={styles.heroActions}>
@@ -55,7 +55,7 @@ export default function NotFoundPage() {
                   />
                 </div>
                 <div className={styles.searchHint}>
-                  <span>Try “link radar”, “QR forge”, or “JSON formatter”.</span>
+                  <span>Try “link radar”, “QR forge” or “JSON formatter”.</span>
                   <span>Press Esc to clear</span>
                 </div>
               </div>
@@ -86,7 +86,7 @@ export default function NotFoundPage() {
             <Link href="/linkradar/" className={styles.linkCard}>
               <h3 className={styles.linkCardTitle}>Link Radar</h3>
               <p className={styles.linkCardDesc}>
-                Scan pages for broken links and 404s fast — ideal when a missing page interrupts your review.
+                Scan pages for broken links and 404s fast. Ideal when a missing page interrupts your review.
               </p>
             </Link>
             <Link href="/json/" className={styles.linkCard}>
@@ -98,7 +98,7 @@ export default function NotFoundPage() {
             <Link href="/qrforge/" className={styles.linkCard}>
               <h3 className={styles.linkCardTitle}>QR Forge</h3>
               <p className={styles.linkCardDesc}>
-                Generate QR codes for links, credentials, or quick sharing while you stay on track.
+                Generate QR codes for links, credentials or quick sharing while you stay on track.
               </p>
             </Link>
             <Link href="/agentscan/" className={styles.linkCard}>
