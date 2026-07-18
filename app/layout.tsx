@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     template: '%s | IQVerse Tools',
   },
   description:
-    'IQVerse offers free, open-source browser-based developer tools for AI agent scanning, QR generation, link checking, favicon creation, JSON validation, CSS conversion, image optimization, and more — all running locally in your browser with no login, no telemetry, and no cost.',
+    'IQVerse offers free, open-source browser-based developer tools for AI agent scanning, QR generation, link checking, favicon creation, JSON validation, CSS conversion, image optimization, and more. All running locally in your browser with no login, no telemetry, and no cost.',
   keywords: [
     'developer tools',
     'dev tools',

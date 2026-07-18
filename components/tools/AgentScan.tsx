@@ -60,7 +60,7 @@ const CHECK_DEFS: CheckDef[] = [
   { id: 'hsts', name: 'HSTS Header', category: 'performance', desc: 'Checks for Strict-Transport-Security header.', weight: 3 },
   { id: 'security_headers', name: 'Security Headers', category: 'performance', desc: 'Checks for X-Content-Type-Options, X-Frame-Options, CSP and other security headers.', weight: 3 },
   { id: 'cors_headers', name: 'CORS Headers', category: 'performance', desc: 'Checks for Access-Control-Allow-Origin headers needed for cross-origin API access by agents.', weight: 4 },
-  { id: 'response_time', name: 'Response Time', category: 'performance', desc: 'Measures how fast the site responds — important for agent workflows with tight timeouts.', weight: 4 },
+  { id: 'response_time', name: 'Response Time', category: 'performance', desc: 'Measures how fast the site responds. Important for agent workflows with tight timeouts.', weight: 4 },
 ];
 
 const CATEGORIES: Record<string, { label: string; icon: string }> = {

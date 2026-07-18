@@ -86,7 +86,7 @@ export default function NotFoundPage() {
             <Link href="/linkradar/" className={styles.linkCard}>
               <h3 className={styles.linkCardTitle}>Link Radar</h3>
               <p className={styles.linkCardDesc}>
-                Scan pages for broken links and 404s fast — ideal when a missing page interrupts your review.
+                Scan pages for broken links and 404s fast. Ideal when a missing page interrupts your review.
               </p>
             </Link>
             <Link href="/json/" className={styles.linkCard}>
