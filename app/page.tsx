@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { tools, getUniqueCategories, getUniqueStatuses, filterTools, sortTools } from '@/lib/tools';
 import type { Tool } from '@/lib/tools';
@@ -12,6 +12,26 @@ export default function Home() {
   const [activeStatus, setActiveStatus] = useState<'all' | 'open' | 'saas' | 'coming'>('all');
   const [activeSort, setActiveSort] = useState<'default' | 'az'>('default');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const isEditable = !!target && (
+        target.isContentEditable ||
+        ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)
+      );
+
+      if (event.key === '/' && !event.metaKey && !event.ctrlKey && !event.altKey && !isEditable) {
+        event.preventDefault();
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const categories = useMemo(() => getUniqueCategories(), []);
   const statuses = useMemo(() => getUniqueStatuses(), []);
@@ -146,6 +166,7 @@ export default function Home() {
             </svg>
           </span>
           <input
+            ref={searchInputRef}
             id="search"
             type="text"
             placeholder="Search tools… (press /)"
