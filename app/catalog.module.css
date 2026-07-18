@@ -380,15 +380,15 @@
 }
 
 .dotOpen {
-  background: var(--green);
+  color: var(--green) !important;
 }
 
 .dotSaas {
-  background: var(--yellow);
+  color: var(--yellow) !important;
 }
 
 .dotComing {
-  background: var(--muted);
+  color: var(--muted) !important;
 }
 
 .statusLabel {

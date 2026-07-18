@@ -117,16 +117,34 @@ export default function NotFoundPage() {
           </div>
 
           <div className={styles.resultsGrid}>
-            {suggestions.map((tool) => (
-              <Link key={tool.name} href={tool.url || '/'} className={styles.resultCard}>
-                <h3 className={styles.resultTitle}>{tool.name}</h3>
-                <p className={styles.resultDesc}>{tool.desc}</p>
-                <div className={styles.resultMeta}>
-                  <span>Open</span>
-                  <span aria-hidden="true">→</span>
-                </div>
-              </Link>
-            ))}
+            {suggestions.map((tool) => {
+              const href = tool.url || '/';
+              const isExternalLink = /^(https?:\/\/|mailto:)/i.test(href);
+
+              if (isExternalLink) {
+                return (
+                  <a key={tool.name} href={href} className={styles.resultCard} target="_blank" rel="noopener noreferrer">
+                    <h3 className={styles.resultTitle}>{tool.name}</h3>
+                    <p className={styles.resultDesc}>{tool.desc}</p>
+                    <div className={styles.resultMeta}>
+                      <span>Open</span>
+                      <span aria-hidden="true">→</span>
+                    </div>
+                  </a>
+                );
+              }
+
+              return (
+                <Link key={tool.name} href={href} className={styles.resultCard}>
+                  <h3 className={styles.resultTitle}>{tool.name}</h3>
+                  <p className={styles.resultDesc}>{tool.desc}</p>
+                  <div className={styles.resultMeta}>
+                    <span>Open</span>
+                    <span aria-hidden="true">→</span>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </section>
       </div>

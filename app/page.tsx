@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { tools, getUniqueCategories, getUniqueStatuses, filterTools, sortTools } from '@/lib/tools';
 import type { Tool } from '@/lib/tools';
@@ -87,40 +88,56 @@ export default function Home() {
   const renderToolCard = (tool: Tool, query: string) => {
     const coming = tool.type === 'coming';
     const href = tool.url && !coming ? tool.url : '';
+    const isExternalLink = !!href && /^(https?:\/\/|mailto:)/i.test(href);
+
+    const cardContent = (
+      <div className={`${styles.card} ${coming ? styles.cardComing : ''}`}>
+        <div className={styles.cardTop}>
+          <div className={styles.cardIcon}>
+            {isEmoji(tool.icon) ? (
+              <span>{tool.icon}</span>
+            ) : (
+              <Image src={tool.icon} alt={tool.name} height={34} width={34} priority={false} />
+            )}
+          </div>
+          <div className={styles.cardStatus}>
+            <span className={`${styles.statusLabel} ${DOT_CLASS[tool.type]}`}>{STATUS_LABELS[tool.type]}</span>
+          </div>
+        </div>
+        <div className={styles.cardName} dangerouslySetInnerHTML={{ __html: highlightText(tool.name, query) }} />
+        <p className={styles.cardDesc} dangerouslySetInnerHTML={{ __html: highlightText(tool.desc, query) }} />
+        <div className={styles.cardFooter}>
+          <div className={styles.cardTags}>
+            {tool.tags.split(' ').slice(0, 3).map(tag => (
+              <span key={tag} className={styles.tag}>{tag}</span>
+            ))}
+          </div>
+          {!coming && href && (
+            <span className={styles.cardArrow} aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 8h10M8 3l5 5-5 5" />
+              </svg>
+            </span>
+          )}
+        </div>
+      </div>
+    );
+
+    if (!href || coming) {
+      return <div key={tool.name} className={styles.cardLink}>{cardContent}</div>;
+    }
+
+    if (isExternalLink) {
+      return (
+        <a href={href} key={tool.name} className={styles.cardLink} target="_blank" rel="noopener noreferrer">
+          {cardContent}
+        </a>
+      );
+    }
 
     return (
       <Link href={href} key={tool.name} className={styles.cardLink}>
-        <div className={`${styles.card} ${coming ? styles.cardComing : ''}`}>
-          <div className={styles.cardTop}>
-            <div className={styles.cardIcon}>
-              {isEmoji(tool.icon) ? (
-                <span>{tool.icon}</span>
-              ) : (
-                <img src={tool.icon} alt={tool.name} loading="lazy" />
-              )}
-            </div>
-            <div className={styles.cardStatus}>
-              <span className={`${styles.statusDot} ${DOT_CLASS[tool.type]}`}></span>
-              <span className={styles.statusLabel}>{STATUS_LABELS[tool.type]}</span>
-            </div>
-          </div>
-          <div className={styles.cardName} dangerouslySetInnerHTML={{ __html: highlightText(tool.name, query) }} />
-          <p className={styles.cardDesc} dangerouslySetInnerHTML={{ __html: highlightText(tool.desc, query) }} />
-          <div className={styles.cardFooter}>
-            <div className={styles.cardTags}>
-              {tool.tags.split(' ').slice(0, 3).map(tag => (
-                <span key={tag} className={styles.tag}>{tag}</span>
-              ))}
-            </div>
-            {!coming && href && (
-              <span className={styles.cardArrow} aria-hidden="true">
-                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M3 8h10M8 3l5 5-5 5" />
-                </svg>
-              </span>
-            )}
-          </div>
-        </div>
+        {cardContent}
       </Link>
     );
   };
@@ -234,7 +251,11 @@ export default function Home() {
                   setSidebarOpen(false);
                 }}
               >
-                <span className={styles.catIcon}>{s === 'all' ? '⊞' : STATUS_ICONS[s as keyof typeof STATUS_ICONS]}</span>
+                <span
+                  className={`${styles.catIcon} ${s !== 'all' ? DOT_CLASS[s as keyof typeof DOT_CLASS] : ''}`}
+                >
+                  {s === 'all' ? '⊞' : STATUS_ICONS[s as keyof typeof STATUS_ICONS]}
+                </span>
                 <span style={{ flex: 1 }}>{s === 'all' ? 'All' : STATUS_LABELS[s as keyof typeof STATUS_LABELS]}</span>
                 <span className={styles.catCount}>{statusCounts[s]}</span>
               </button>
