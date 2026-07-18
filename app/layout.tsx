@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     template: '%s | IQVerse Tools',
   },
   description:
-    'IQVerse offers free, open-source browser-based developer tools for AI agent scanning, QR generation, link checking, favicon creation, JSON validation, CSS conversion, image optimization, and more. All running locally in your browser with no login, no telemetry, and no cost.',
+    'IQVerse offers free, open-source browser-based developer tools for AI agent scanning, QR generation, link checking, favicon creation, JSON validation, CSS conversion, image optimization and more. All running locally in your browser with no login, no telemetry and no cost.',
   keywords: [
     'developer tools',
     'dev tools',
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     siteName: 'IQVerse',
     title: 'IQVerse | Free Open-Source Online Developer Tools & Utilities',
     description:
-      'Explore IQVerse’s free, open-source browser tools for AI agent checks, QR codes, link scanning, favicon design, JSON formatting, regex testing, CSS conversion, and image optimization.',
+      'Explore IQVerse’s free, open-source browser tools for AI agent checks, QR codes, link scanning, favicon design, JSON formatting, regex testing, CSS conversion and image optimization.',
     images: [
       {
         url: '/og-image-1200x630.png',
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'IQVerse | Free Open-Source Online Developer Tools & Utilities',
     description:
-      'Free, open-source browser-based developer tools for AI agent scanning, QR codes, link checking, favicon generation, JSON processing, and more.',
+      'Free, open-source browser-based developer tools for AI agent scanning, QR codes, link checking, favicon generation, JSON processing and more.',
     images: ['/og-image-1200x630.png'],
   },
   icons: {

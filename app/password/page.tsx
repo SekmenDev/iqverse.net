@@ -14,7 +14,7 @@ export default function PasswordPage() {
       pill="SECURITY"
       title="SecretForge"
       subtitle="Password & Secret Generator"
-      description="Generate strong passwords and tokens with full control over length, symbols, prefixes, suffixes, and character sets."
+      description="Generate strong passwords and tokens with full control over length, symbols, prefixes, suffixes and character sets."
     >
       <PasswordGenerator />
     </ToolLayout>
