@@ -105,8 +105,10 @@ export default function Home() {
     );
   };
 
+  const showGrouped = activeSort !== 'az' && activeCat === 'all' && !activeQuery;
+
   const groupedTools = useMemo(() => {
-    if (activeCat !== 'all' || activeQuery) {
+    if (!showGrouped) {
       return {};
     }
     const groups: Record<string, Tool[]> = {};
@@ -115,7 +117,7 @@ export default function Home() {
       groups[t.cat].push(t);
     });
     return groups;
-  }, [filtered, activeCat, activeQuery]);
+  }, [filtered, showGrouped]);
 
   return (
     <div className={styles.container}>
@@ -250,11 +252,7 @@ export default function Home() {
                 <h3>No tools found</h3>
                 <p>Try a different search or filter.</p>
               </div>
-            ) : activeCat !== 'all' || activeQuery ? (
-              <div className={styles.cardGrid}>
-                {filtered.map(t => renderToolCard(t, activeQuery))}
-              </div>
-            ) : (
+            ) : showGrouped ? (
               <>
                 {Object.entries(groupedTools).map(([cat, tools]) => (
                   <div key={cat}>
@@ -267,6 +265,10 @@ export default function Home() {
                   </div>
                 ))}
               </>
+            ) : (
+              <div className={styles.cardGrid}>
+                {filtered.map(t => renderToolCard(t, activeQuery))}
+              </div>
             )}
           </div>
         </main>
