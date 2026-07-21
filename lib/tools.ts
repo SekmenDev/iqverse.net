@@ -96,7 +96,7 @@ export function getToolBySlug(slug: string): Tool | undefined {
 
 export function getSecureRandomNumber(min: number, max: number): number {
   if (typeof globalThis.crypto?.getRandomValues !== 'function') {
-    throw new Error('Secure random generation is unavailable in this environment.');
+    throw new TypeError('Secure random generation is unavailable in this environment.');
   }
 
   const randomValue = globalThis.crypto.getRandomValues(new Uint32Array(1))[0];
