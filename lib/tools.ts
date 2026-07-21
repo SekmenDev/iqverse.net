@@ -94,6 +94,16 @@ export function getToolBySlug(slug: string): Tool | undefined {
   return tools.find(t => t.url === `/${slug}/`);
 }
 
+export function getSecureRandomNumber(min: number, max: number): number {
+  if (typeof globalThis.crypto?.getRandomValues !== 'function') {
+    throw new Error('Secure random generation is unavailable in this environment.');
+  }
+
+  const randomValue = globalThis.crypto.getRandomValues(new Uint32Array(1))[0];
+  const ratio = randomValue / 0x100000000;
+  return min + ratio * (max - min);
+}
+
 export function getToolMetadata(slug: string) {
   const tool = getToolBySlug(slug);
   if (!tool) return null;

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { getSecureRandomNumber } from '@/lib/tools';
 import sharedStyles from '@/styles/shared-tool-styles.module.css';
 import styles from '@/styles/chromata.module.css';
 
@@ -1005,8 +1006,8 @@ export default function Chromata() {
 }
 
 function randomHex() {
-  const h = Math.random() * 360;
-  const s = 55 + Math.random() * 35;
-  const l = 40 + Math.random() * 25;
+  const h = getSecureRandomNumber(0, 360);
+  const s = getSecureRandomNumber(55, 90);
+  const l = getSecureRandomNumber(40, 65);
   return hslToHex(h, s, l);
 }
