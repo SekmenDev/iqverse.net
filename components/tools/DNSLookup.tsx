@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { timeAgo, escapeHtml, normalizeDomain, formatTTL } from '@/lib/utils';
 import styles from '@/styles/dnslookup.module.css';
 
 type DNSRecordType = 'A' | 'AAAA' | 'MX' | 'TXT' | 'NS' | 'CNAME' | 'SOA' | 'SRV' | 'PTR' | 'CAA' | 'DS' | 'DNSKEY' | 'ALL';
@@ -39,13 +40,6 @@ const RCODE_NAMES: Record<number, string> = {
 
 const PRESET_DOMAINS = ['google.com', 'cloudflare.com', 'github.com', 'amazon.com', 'netflix.com'];
 
-const timeAgo = (ts: number): string => {
-  const s = Math.round((Date.now() - ts) / 1000);
-  if (s < 60) return `${s}s ago`;
-  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
-  if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
-  return `${Math.floor(s / 86400)}d ago`;
-};
 
 const downloadCSV = (results: DNSResult, showToast: (msg: string) => void) => {
   const rows: (string | number)[][] = [['Type', 'Name', 'TTL (s)', 'Data']];
@@ -122,31 +116,9 @@ export default function DNSLookup() {
     toastTimeoutRef.current = setTimeout(() => setToast(''), 2200);
   };
 
-  const normalizeDomain = (input: string): string => {
-    return input.replace(/^https?:\/\//i, '').split('/')[0].split('?')[0].toLowerCase();
-  };
-
-  const escapeHtml = (str: string): string => {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  };
-
   const typeNumberToName = (num: number): string => {
     const n = parseInt(String(num));
     return Object.entries(TYPE_MAP).find(([, v]) => v === n)?.[0] || String(num);
-  };
-
-  const formatTTL = (seconds: number | undefined): string => {
-    if (seconds === undefined || seconds === null) return '—';
-    const s = parseInt(String(seconds));
-    if (isNaN(s)) return '—';
-    if (s < 60) return `${s}s`;
-    if (s < 3600) return `${Math.floor(s / 60)}m ${s % 60}s`;
-    if (s < 86400) return `${Math.floor(s / 3600)}h ${Math.floor((s % 3600) / 60)}m`;
-    return `${Math.floor(s / 86400)}d ${Math.floor((s % 86400) / 3600)}h`;
   };
 
   const parseMXPriority = (data: string): string => {
