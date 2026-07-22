@@ -138,15 +138,3 @@
 .hiddenCanvas {
   display: none;
 }
-
-.cursorGlow {
-  position: fixed;
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(129, 140, 248, 0.24), transparent 70%);
-  pointer-events: none;
-  transform: translate(-50%, -50%);
-  opacity: 0;
-  transition: opacity 180ms ease;
-}

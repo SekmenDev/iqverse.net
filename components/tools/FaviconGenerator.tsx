@@ -39,37 +39,6 @@ export default function FaviconGenerator() {
   const fileRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  useEffect(() => {
-    const glow = document.createElement('div');
-    glow.className = styles.cursorGlow;
-    document.body.appendChild(glow);
-    let fadeTimeout: number | undefined;
-
-    const handleMove = (event: MouseEvent) => {
-      glow.style.left = `${event.clientX}px`;
-      glow.style.top = `${event.clientY}px`;
-      glow.style.opacity = '1';
-      glow.style.zIndex = '0';
-      window.clearTimeout(fadeTimeout);
-      fadeTimeout = window.setTimeout(() => {
-        glow.style.opacity = '0';
-      }, 900);
-    };
-
-    const handleLeave = () => {
-      glow.style.opacity = '0';
-    };
-
-    document.addEventListener('mousemove', handleMove);
-    document.addEventListener('mouseleave', handleLeave);
-
-    return () => {
-      document.removeEventListener('mousemove', handleMove);
-      document.removeEventListener('mouseleave', handleLeave);
-      document.body.removeChild(glow);
-    };
-  }, []);
-
   const handleFile = (file?: File | null) => {
     if (!file) return;
     const reader = new FileReader();
