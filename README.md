@@ -21,17 +21,17 @@
 
 ## 💡 Overview
 
-**IQVerse** is a modern, high-performance suite of web utilities, developer tools, security instruments, and software hubs built for developers, designers, network engineers, and privacy enthusiasts.
+**IQVerse** is a modern, high-performance suite of web utilities, developer tools, security instruments and software hubs built for developers, designers, network engineers and privacy enthusiasts.
 
-Unlike traditional web tools that send your input data to remote API endpoints, **IQVerse executes 100% of its computations directly inside your web browser**. Your secrets, tokens, passwords, image files, and code payloads never leave your client machine.
+Unlike traditional web tools that send your input data to remote API endpoints, **IQVerse executes 100% of its computations directly inside your web browser**. Your secrets, tokens, passwords, image files and code payloads never leave your client machine.
 
 ### ✨ Key Highlights
 
-- **🔒 100% Privacy & Client-Side Processing**: Zero server requests for tool computations. Your passwords, Base64 strings, JSON payloads, and regex inputs stay on your hardware.
-- **🚫 Zero Telemetry & No Paywalls**: No user tracking, no analytics cookies, no paywalls, and no login forms.
-- **⚡ Blazing Fast Next.js Architecture**: Built with Next.js App Router, React 19, TypeScript, and pre-rendered as a static export for edge deployment on Cloudflare Pages.
+- **🔒 100% Privacy & Client-Side Processing**: Zero server requests for tool computations. Your passwords, Base64 strings, JSON payloads and regex inputs stay on your hardware.
+- **🚫 Zero Telemetry & No Paywalls**: No user tracking, no analytics cookies, no paywalls and no login forms.
+- **⚡ Blazing Fast Next.js Architecture**: Built with Next.js App Router, React 19, TypeScript and pre-rendered as a static export for edge deployment on Cloudflare Pages.
 - **⌨️ Keyboard-Driven UI**: Built-in keyboard shortcuts (`/` key to instantly focus the global search bar) and filtering by category or status.
-- **🎨 Sleek Dark-Theme Aesthetics**: Designed with glassmorphism touches, crisp typography, responsive grids, and subtle visual micro-interactions.
+- **🎨 Sleek Dark-Theme Aesthetics**: Designed with glassmorphism touches, crisp typography, responsive grids and subtle visual micro-interactions.
 
 ---
 
@@ -44,11 +44,11 @@ IQVerse organizes tools into intuitive categories. Below is the full directory o
 | Tool Name | Route / URL | Description | Tags |
 | :--- | :--- | :--- | :--- |
 | **AI Agents Scanner** | [`/agentscan/`](https://iqverse.net/agentscan/) | Audit site readiness for AI agents (`robots.txt`, `sitemap.xml`, MCP, OAuth, security headers) | `robots`, `sitemap`, `mcp`, `ai`, `security` |
-| **QR Forge** | [`/qrforge/`](https://iqverse.net/qrforge/) | Vector QR code generator for URLs, Wi-Fi credentials, vCards, and custom text | `qr`, `svg`, `png`, `wifi`, `vcard` |
+| **QR Forge** | [`/qrforge/`](https://iqverse.net/qrforge/) | Vector QR code generator for URLs, Wi-Fi credentials, vCards and custom text | `qr`, `svg`, `png`, `wifi`, `vcard` |
 | **Link Radar** | [`/linkradar/`](https://iqverse.net/linkradar/) | Instant client-side broken link detector and 404 URL crawler | `links`, `404`, `redirect`, `scan`, `crawl` |
 | **Favicon Generator** | [`/favicongen/`](https://iqverse.net/favicongen/) | Create complete multi-sized favicons (16x16, 32x32, 180x180) + `manifest.json` | `favicon`, `manifest`, `apple-touch-icon` |
-| **JSON Formatter** | [`/json/`](https://iqverse.net/json/) | Format, validate, minify, and sort JSON objects locally without uploading data | `json`, `format`, `validate`, `minify`, `lint` |
-| **Base64 & URL Encoder** | [`/encodelab/`](https://iqverse.net/encodelab/) | Encode/decode Base64, URL parameters, JWT tokens, and Data URIs | `base64`, `url`, `encode`, `jwt`, `data-uri` |
+| **JSON Formatter** | [`/json/`](https://iqverse.net/json/) | Format, validate, minify and sort JSON objects locally without uploading data | `json`, `format`, `validate`, `minify`, `lint` |
+| **Base64 & URL Encoder** | [`/encodelab/`](https://iqverse.net/encodelab/) | Encode/decode Base64, URL parameters, JWT tokens and Data URIs | `base64`, `url`, `encode`, `jwt`, `data-uri` |
 | **RegEx Forge** | [`/regex/`](https://iqverse.net/regex/) | Interactive regex builder with real-time pattern matching & explanations | `regex`, `pattern`, `test`, `match` |
 
 ### 🔒 Security Tools
@@ -83,7 +83,7 @@ IQVerse organizes tools into intuitive categories. Below is the full directory o
 | Platform Name | Route / URL | Feature Focus |
 | :--- | :--- | :--- |
 | **GOO** | [`/goo/`](https://iqverse.net/goo/) | Modern school platform: student records, attendance, grades & timetables |
-| **GES** | [`/ges/`](https://iqverse.net/ges/) | Real-time quiz creation, online assessment, and analytics dashboard |
+| **GES** | [`/ges/`](https://iqverse.net/ges/) | Real-time quiz creation, online assessment and analytics dashboard |
 | **GYP** | [`/gyp/`](https://iqverse.net/gyp/) | Software license tracker, client CRM, billing & subscription management |
 | **GST** | [`/gst/`](https://iqverse.net/gst/) | Workshop inventory & expense tracking PWA designed for small businesses |
 
@@ -214,7 +214,7 @@ This project is configured for seamless deployment on Cloudflare Pages using `wr
 
 ## 🤝 Contributing
 
-Contributions make the open-source community an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**!
+Contributions make the open-source community an amazing place to learn, inspire and create. Any contributions you make are **greatly appreciated**!
 
 If you want to contribute a new tool or fix a bug:
 
