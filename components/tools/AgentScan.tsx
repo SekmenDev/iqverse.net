@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { getHeader } from '@/lib/utils';
 import styles from '@/styles/agentscan.module.css';
 
 const PROXY = 'https://api.allorigins.win/get?url=';
@@ -84,10 +85,6 @@ const FILTERS = ['all', ...Object.keys(CATEGORIES)] as Array<'all' | keyof typeo
 
 const QUICK_EXAMPLES = ['https://cloudflare.com', 'https://github.com', 'https://openai.com', 'https://stripe.com', 'https://anthropic.com'];
 
-function getHeader(headers: Record<string, string>, name: string) {
-  const key = Object.keys(headers).find((k) => k.toLowerCase() === name.toLowerCase());
-  return key ? headers[key] : null;
-}
 
 function formatStatusLabel(status: CheckStatus) {
   switch (status) {

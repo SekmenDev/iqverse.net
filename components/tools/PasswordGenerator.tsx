@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { pickRandom, shuffle } from '@/lib/random';
 import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
 const DEFAULT_SYMBOLS = '!@#$%^&*()-_=+[]{}|;:,.<>?';
@@ -9,31 +10,6 @@ const LOWER = 'abcdefghijklmnopqrstuvwxyz';
 const DIGITS = '0123456789';
 const SIMILAR = '0Oo1IlL';
 const AMBIGUOUS = '{}[]()/\\\'"`~,;:.<>?';
-
-function randBytes(size: number) {
-  const buffer = new Uint8Array(size);
-  crypto.getRandomValues(buffer);
-  return buffer;
-}
-
-function randInt(max: number) {
-  const bytes = randBytes(4);
-  const view = new DataView(bytes.buffer);
-  return view.getUint32(0, true) % max;
-}
-
-function pickRandom<T>(items: T[]) {
-  return items[randInt(items.length)];
-}
-
-function shuffle<T>(items: T[]) {
-  const arr = [...items];
-  for (let i = arr.length - 1; i > 0; i -= 1) {
-    const j = randInt(i + 1);
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
 
 export default function PasswordGenerator() {
   const [length, setLength] = useState(20);

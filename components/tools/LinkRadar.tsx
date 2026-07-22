@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { normalizeUrl } from '@/lib/utils';
 import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
 const CONCURRENCY = 5;
@@ -14,14 +15,6 @@ type ScanItem = {
 };
 
 type ResultItem = ScanItem & { status: number; time?: number; error?: string };
-
-function normalizeUrl(base: string, href: string) {
-  try {
-    return new URL(href, base).href;
-  } catch {
-    return null;
-  }
-}
 
 async function checkUrl(url: string, signal?: AbortSignal) {
   const t0 = Date.now();

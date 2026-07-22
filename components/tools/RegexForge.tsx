@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { safeRegExp } from '@/lib/utils';
 
 const options = [
   { value: 'g', label: 'Global' },
@@ -10,14 +11,6 @@ const options = [
   { value: 'u', label: 'Unicode' },
   { value: 'y', label: 'Sticky' },
 ];
-
-function safeRegExp(pattern: string, flags: string) {
-  try {
-    return new RegExp(pattern, flags);
-  } catch {
-    return null;
-  }
-}
 
 export default function RegexForge() {
   const [pattern, setPattern] = useState('https?://[^\s]+');

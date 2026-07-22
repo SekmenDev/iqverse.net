@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import QRCode from 'qrcode';
+import { buildQRPayload } from '@/lib/utils';
 
 const typeOptions = [
   { value: 'url', label: 'URL' },
@@ -17,21 +18,6 @@ const errorLevels = [
   { value: 'Q', label: 'Quartile (25%)' },
   { value: 'H', label: 'High (30%)' },
 ];
-
-function buildPayload(type: string, values: Record<string, string>) {
-  switch (type) {
-    case 'email':
-      return `mailto:${values.email || ''}?subject=${encodeURIComponent(values.subject || '')}&body=${encodeURIComponent(values.body || '')}`;
-    case 'wifi':
-      return `WIFI:T:${values.security || ''};S:${values.ssid || ''};P:${values.password || ''};;`;
-    case 'vcard':
-      return `BEGIN:VCARD\nVERSION:3.0\nFN:${values.name || ''}\nTEL:${values.phone || ''}\nEMAIL:${values.email || ''}\nORG:${values.company || ''}\nURL:${values.url || ''}\nEND:VCARD`;
-    case 'text':
-      return values.text || '';
-    default:
-      return values.url || '';
-  }
-}
 
 export default function QRForge() {
   const [type, setType] = useState('url');
@@ -56,7 +42,7 @@ export default function QRForge() {
   const [dataUri, setDataUri] = useState('');
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  const payload = useMemo(() => buildPayload(type, values), [type, values]);
+  const payload = useMemo(() => buildQRPayload(type, values), [type, values]);
 
   useEffect(() => {
     const canvas = canvasRef.current;

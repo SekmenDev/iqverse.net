@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useCallback, useRef, useState } from 'react';
+import { escapeHtml as esc } from '@/lib/utils';
 import styles from '@/styles/favicongen.module.css';
 
 type PreviewImage = {
@@ -457,8 +458,4 @@ ${desc ? `<meta name="twitter:description" content="${esc(desc)}">` : ''}
       <canvas ref={canvasRef} className={styles.hiddenCanvas} />
     </div>
   );
-}
-
-function esc(value: string) {
-  return value.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }

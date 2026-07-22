@@ -1,30 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { b64Encode, b64Decode } from '@/lib/encoding';
 import sharedStyles from '@/styles/shared-tool-styles.module.css';
-
-function b64Encode(input: string, urlSafe = false) {
-  try {
-    const encoded = typeof btoa !== 'undefined' ? btoa(unescape(encodeURIComponent(input))) : Buffer.from(input, 'utf-8').toString('base64');
-    return urlSafe ? encoded.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '') : encoded;
-  } catch {
-    return 'Encoding error';
-  }
-}
-
-function b64Decode(input: string, urlSafe = false) {
-  try {
-    let data = input;
-    if (urlSafe) {
-      data = data.replace(/-/g, '+').replace(/_/g, '/');
-      while (data.length % 4) data += '=';
-    }
-    const decoded = typeof atob !== 'undefined' ? decodeURIComponent(escape(atob(data))) : Buffer.from(data, 'base64').toString('utf-8');
-    return decoded;
-  } catch {
-    return 'Decoding error';
-  }
-}
 
 export default function EncodeLab() {
   const [text, setText] = useState('');
