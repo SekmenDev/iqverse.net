@@ -26,9 +26,9 @@ async function checkUrl(url: string, signal?: AbortSignal) {
     try {
       const res = await fetch(url, { method: 'GET', mode: 'cors', redirect: 'follow', signal, cache: 'no-store' });
       return { status: res.status, time: Date.now() - t0 };
-    } catch (e2: any) {
-      if (e2?.name === 'AbortError') return null;
-      return { status: 0, time: Date.now() - t0, error: e2?.message };
+    } catch (error_: any) {
+      if (error_.name === 'AbortError') return null;
+      return { status: 0, time: Date.now() - t0, error: error_.message };
     }
   }
 }
@@ -187,7 +187,7 @@ export default function LinkRadar() {
         <div className={sharedStyles.sectionLabel}>Live Output</div>
         <div className={sharedStyles.card} style={{ maxHeight: 300, overflow: 'auto' }}>
           <div style={{ fontFamily: 'monospace', fontSize: 13 }}>
-            {log.map((l, i) => <div key={i}>{l}</div>)}
+            {log.map((l, i) => <div key={i + "d"}>{l}</div>)}
           </div>
         </div>
         <div style={{ marginTop: 12, display: 'flex', gap: 12 }}>
@@ -225,7 +225,7 @@ export default function LinkRadar() {
                 </thead>
                 <tbody>
                   {results.map((r, i) => (
-                    <tr key={i}>
+                    <tr key={i + "t"}>
                       <td>{r.status}</td>
                       <td style={{ maxWidth: 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}><a href={r.url} target="_blank" rel="noreferrer">{r.url}</a></td>
                       <td>{r.sourceUrl}</td>

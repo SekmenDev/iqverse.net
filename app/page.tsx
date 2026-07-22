@@ -204,8 +204,7 @@ export default function Home() {
         </button>
 
         <Link href="/" className={styles.navLogo}>
-          <span className={styles.navLogoDot}></span>
-          IQVerse
+          <span className={styles.navLogoDot}></span> IQVerse
         </Link>
 
         <div className={styles.navSearchWrap}>
@@ -250,11 +249,11 @@ export default function Home() {
         </div>
       </nav>
 
-      <div className={`${styles.sidebarOverlay} ${sidebarOpen ? styles.sidebarOverlayShow : ''}`} onClick={() => setSidebarOpen(false)} />
+      <button className={`${styles.sidebarOverlay} ${sidebarOpen ? styles.sidebarOverlayShow : ''}`} onClick={() => setSidebarOpen(false)} />
 
       <div className={styles.layout}>
         {/* SIDEBAR */}
-        <aside className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ''}`} role="navigation" aria-label="Tool categories">
+        <nav className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ''}`} aria-label="Tool categories">
           <span className={styles.sidebarLabel}>Categories</span>
           <div>
             {categories.map(cat => (
@@ -294,7 +293,7 @@ export default function Home() {
               </button>
             ))}
           </div>
-        </aside>
+        </nav>
 
         {/* MAIN */}
         <main className={styles.main} id="main-content">
@@ -302,7 +301,7 @@ export default function Home() {
             <span className={styles.resultCount}>
               <strong>{filtered.length}</strong> tool{filtered.length !== 1 ? 's' : ''}
             </span>
-            <div className={styles.sortWrap} role="group" aria-label="Sort options">
+            <optgroup className={styles.sortWrap} aria-label="Sort options">
               <button
                 className={`${styles.sortBtn} ${activeSort === 'default' ? styles.sortBtnActive : ''}`}
                 onClick={() => setActiveSort('default')}
@@ -317,7 +316,7 @@ export default function Home() {
               >
                 A-Z
               </button>
-            </div>
+            </optgroup>
           </div>
 
           <div id="content-area">{content}</div>
