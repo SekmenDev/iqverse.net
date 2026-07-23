@@ -25,7 +25,9 @@ export const tools: Tool[] = [
   { name: "Compression", desc: "Compress and decompress text using browser-native Deflate support.", icon: "🗜️", url: "/compression/", type: "open", tags: "compress decompress deflate base64 text", cat: "Browser Tools" },
   { name: "Data Converter", desc: "Convert JSON, CSV, Hex, and Base64 data in the browser without uploading anything.", icon: "🔁", url: "/dataconverter/", type: "open", tags: "json csv hex base64 convert format", cat: "Browser Tools" },
   { name: "RegEx Forge", desc: "Build and test regular expressions with live highlighting and explanations", icon: "/regex/logoX4.png", url: "/regex/", type: "open", tags: "regex regexp pattern match test explain", cat: "Browser Tools" },
-  
+    { name: "Image Optimizer", desc: "Compress PNG, JPEG and WebP in-browser while keeping files local", icon: "🖼️", url: "/imageoptimizer/", type: "open", tags: "image compress webp png jpeg optimize performance", cat: "Browser Tools" },
+  { name: "CSV Viewer & Converter", desc: "View CSV as a sortable table, export to JSON, Markdown or SQL", icon: "📊", url: "/csvviewer/", type: "open", tags: "csv json sql table data convert format", cat: "Browser Tools" },
+
   // Security
   { name: "Password Generator", desc: "Generate strong passwords and secrets. All generation happens locally", icon: "/password/logoX4.png", url: "/password/", type: "open", tags: "password secret random secure generate entropy", cat: "Security" },
   { name: "HeaderScan", desc: "Inspect HTTP response headers for any URL with detailed breakdowns", icon: "/headers/logoX4.png", url: "/headers/", type: "open", tags: "http headers security inspect network response", cat: "Security" },
@@ -33,6 +35,7 @@ export const tools: Tool[] = [
   
   // Design
   { name: "Color Palette Generator", desc: "Create harmonious color palettes and extract colors from images", icon: "/chromata/logoX4.png", url: "/chromata/", type: "open", tags: "color palette css design hex rgb hsl", cat: "Design" },
+  { name: "CSS Units Converter", desc: "Convert px, rem, em, vw, vh and more with live browser context", icon: "📐", url: "/cssunits/", type: "open", tags: "css units rem px em vw convert design", cat: "Design" },
   
   // Network
   { name: "DNS Lookup", desc: "Query A, AAAA, MX, TXT, CNAME and NS records for any domain", icon: "/dnslookup/logoX4.png", url: "/dnslookup/", type: "open", tags: "dns domain mx txt a aaaa cname ns lookup", cat: "Network" },
@@ -47,23 +50,18 @@ export const tools: Tool[] = [
   { name: "GES: Quiz Platform", desc: "Create and deploy quizzes, track student performance in real-time", icon: "/ges/logoX4.png", url: "/ges/", type: "saas", tags: "quiz assessment education analytics reports", cat: "SaaS" },
   { name: "GYP: License Tracker", desc: "Manage clients, software licenses, payments and service requests", icon: "/gyp/logoX4.png", url: "/gyp/", type: "saas", tags: "license crm billing clients software management", cat: "SaaS" },
   { name: "GST: Stock Tracker", desc: "Inventory and expense tracking for small workshops, mobile-first PWA", icon: "/gst/logoX4.png", url: "/gst/", type: "saas", tags: "inventory stock expense mobile pwa shop", cat: "SaaS" },
-  
-  // Coming soon
-  { name: "CSS Units Converter", desc: "Convert px, rem, em, vw, vh and more with live browser context", icon: "📐", url: "", type: "coming", tags: "css units rem px em vw convert design", cat: "Design" },
-  { name: "Image Optimizer", desc: "Compress PNG, JPEG and WebP in-browser via WebAssembly, files stay local", icon: "🖼️", url: "", type: "coming", tags: "image compress webp png jpeg optimize performance", cat: "Browser Tools" },
-  { name: "CSV Viewer & Converter", desc: "View CSV as a sortable table, export to JSON, Markdown or SQL", icon: "📊", url: "", type: "coming", tags: "csv json sql table data convert format", cat: "Browser Tools" },
 ];
 
 export function getUniqueCategories(): string[] {
   const cats = new Set(tools.map(t => t.cat));
-  return ["all", ...Array.from(cats).sort()];
+  return ["all", ...Array.from(cats).sort((a, b) => a.localeCompare(b))];
 }
 
 export function getUniqueStatuses(): Array<Tool['type'] | 'all'> {
   return ["all", "open", "saas", "coming"];
 }
 
-export function filterTools(query: string, category: string, status: string | 'all'): Tool[] {
+export function filterTools(query: string, category: string, status: string | 'all' | Tool['type']): Tool[] {
   const lq = query.toLowerCase().trim();
   let filtered = [...tools];
 

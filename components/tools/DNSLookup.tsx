@@ -175,35 +175,35 @@ export default function DNSLookup() {
 
   const getColumns = (type: string): RecordColumn[] => {
     const base: RecordColumn[] = [
-      { label: 'Name', cls: styles['td-name'], render: (a) => escapeHtml(a.name || '') },
-      { label: 'TTL', cls: styles['td-ttl'], render: (a) => formatTTL(a.TTL) }
+      { label: 'Name', cls: styles.tdName, render: (a) => escapeHtml(a.name || '') },
+      { label: 'TTL', cls: styles.tdTtl, render: (a) => formatTTL(a.TTL) }
     ];
 
     switch (type) {
       case 'MX':
         return [...base,
           { label: 'Priority', render: (a) => escapeHtml(parseMXPriority(a.data)) },
-          { label: 'Mail Server', cls: styles['td-data'], render: (a) => escapeHtml(parseMXHost(a.data)) }
+          { label: 'Mail Server', cls: styles.tdData, render: (a) => escapeHtml(parseMXHost(a.data)) }
         ];
       case 'SOA':
-        return [...base, { label: 'Value', cls: styles['td-data'], render: (a) => formatSOA(a.data) }];
+        return [...base, { label: 'Value', cls: styles.tdData, render: (a) => formatSOA(a.data) }];
       case 'SRV':
         return [...base,
           { label: 'Priority', render: (a) => escapeHtml(parseSRVField(a.data, 0)) },
           { label: 'Weight', render: (a) => escapeHtml(parseSRVField(a.data, 1)) },
           { label: 'Port', render: (a) => escapeHtml(parseSRVField(a.data, 2)) },
-          { label: 'Target', cls: styles['td-data'], render: (a) => escapeHtml(parseSRVField(a.data, 3)) }
+          { label: 'Target', cls: styles.tdData, render: (a) => escapeHtml(parseSRVField(a.data, 3)) }
         ];
       case 'TXT':
-        return [...base, { label: 'Text', cls: styles['td-data'], render: (a) => formatTXT(a.data) }];
+        return [...base, { label: 'Text', cls: styles.tdData, render: (a) => formatTXT(a.data) }];
       case 'CAA':
         return [...base,
           { label: 'Flags', render: (a) => escapeHtml(parseCAAField(a.data, 0)) },
           { label: 'Tag', render: (a) => escapeHtml(parseCAAField(a.data, 1)) },
-          { label: 'Value', cls: styles['td-data'], render: (a) => escapeHtml(parseCAAField(a.data, 2)) }
+          { label: 'Value', cls: styles.tdData, render: (a) => escapeHtml(parseCAAField(a.data, 2)) }
         ];
       default:
-        return [...base, { label: 'Value', cls: styles['td-data'], render: (a) => escapeHtml(a.data || '') }];
+        return [...base, { label: 'Value', cls: styles.tdData, render: (a) => escapeHtml(a.data || '') }];
     }
   };
 
@@ -352,11 +352,11 @@ export default function DNSLookup() {
       });
 
       if (allAnswers.length === 0) {
-        return <div className={styles['no-records']}>No records found for this domain.</div>;
+        return <div className={styles.noRecords}>No records found for this domain.</div>;
       }
 
       return (
-        <table className={styles['results-table']}>
+        <table className={styles.resultsTable}>
           <thead>
             <tr>
               <th>Type</th>
@@ -368,10 +368,10 @@ export default function DNSLookup() {
           <tbody>
             {allAnswers.map((ans, idx) => (
               <tr key={idx}>
-                <td className={styles['td-type']}>{escapeHtml(typeNumberToName(ans.type) || ans._type)}</td>
-                <td className={styles['td-name']}>{escapeHtml(ans.name || '')}</td>
-                <td className={styles['td-ttl']}>{formatTTL(ans.TTL)}</td>
-                <td className={styles['td-data']} dangerouslySetInnerHTML={{ __html: formatData(ans) }} />
+                <td className={styles.tdType}>{escapeHtml(typeNumberToName(ans.type) || ans._type)}</td>
+                <td className={styles.tdName}>{escapeHtml(ans.name || '')}</td>
+                <td className={styles.tdTtl}>{formatTTL(ans.TTL)}</td>
+                <td className={styles.tdData} dangerouslySetInnerHTML={{ __html: formatData(ans) }} />
               </tr>
             ))}
           </tbody>
@@ -380,7 +380,7 @@ export default function DNSLookup() {
     } else {
       const res = lastResults.data[activeTab];
       if (!res || res.Status === -1) {
-        return <div className={styles['no-records']}>Error querying {activeTab}: {escapeHtml(res?._error || 'Unknown error')}</div>;
+        return <div className={styles.noRecords}>Error querying {activeTab}: {escapeHtml(res?._error || 'Unknown error')}</div>;
       }
 
       const rcode = res.Status;
@@ -391,12 +391,12 @@ export default function DNSLookup() {
         if (res.Authority && res.Authority.length > 0) {
           msg += ` (SOA authority: ${res.Authority[0]?.data || ''})`;
         }
-        return <div className={styles['no-records']}>{escapeHtml(msg)}</div>;
+        return <div className={styles.noRecords}>{escapeHtml(msg)}</div>;
       }
 
       const cols = getColumns(activeTab);
       return (
-        <table className={styles['results-table']}>
+        <table className={styles.resultsTable}>
           <thead>
             <tr>
               {cols.map((c, idx) => (
@@ -440,7 +440,7 @@ export default function DNSLookup() {
     summaryData = {
       domain: lastResults.domain,
       status: rcodeName,
-      statusClass: rcode === 0 ? styles['status-ok'] : rcode === 3 ? styles['status-nxdomain'] : styles['status-err'],
+      statusClass: rcode === 0 ? styles.statusOk : rcode === 3 ? styles.statusNxdomain : styles.statusErr,
       count: `${total} record${total !== 1 ? 's' : ''}`,
       time: `${lastResults.elapsed}ms`,
       auth: firstGood?.AD ? 'Yes' : 'No',
@@ -452,27 +452,27 @@ export default function DNSLookup() {
     <div className={styles.container}>
       {/* Query Panel */}
       <section className={styles.panel}>
-        <div className={styles['panel-header']}>
-          <span className={styles['panel-label']}>01</span>
-          <h2 className={styles['panel-title']}>Query</h2>
+        <div className={styles.panelHeader}>
+          <span className={styles.panelLabel}>01</span>
+          <h2 className={styles.panelTitle}>Query</h2>
         </div>
 
-        <div className={styles['input-group']}>
-          <label className={styles['field-label']} htmlFor="domain-input">
+        <div className={styles.inputGroup}>
+          <label className={styles.fieldLabel} htmlFor="domain-input">
             Domain / Hostname
           </label>
-          <div className={styles['input-row']}>
+          <div className={styles.inputRow}>
             <input
               id="domain-input"
               type="text"
-              className={styles['text-input']}
+              className={styles.textInput}
               placeholder="e.g. example.com or mail.google.com"
               value={domainInput}
               onChange={(e) => setDomainInput(e.target.value)}
               onKeyDown={handleKeyDown}
               autoComplete="off"
             />
-            <button className={styles['btn-primary']} onClick={runLookup} disabled={state === 'loading'}>
+            <button className={styles.btnPrimary} onClick={runLookup} disabled={state === 'loading'}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <circle cx="11" cy="11" r="8" />
                 <path d="m21 21-4.35-4.35" />
@@ -482,13 +482,13 @@ export default function DNSLookup() {
           </div>
         </div>
 
-        <div className={styles['input-group']}>
-          <label className={styles['field-label']}>Record Types</label>
-          <div className={styles['type-grid']}>
+        <div className={styles.inputGroup}>
+          <label className={styles.fieldLabel}>Record Types</label>
+          <div className={styles.typeGrid}>
             {['ALL', ...ALL_TYPES].map((type) => (
               <button
                 key={type}
-                className={`${styles['type-btn']} ${selectedType === type ? styles.active : ''}`}
+                className={`${styles.typeBtn} ${selectedType === type ? styles.active : ''}`}
                 onClick={() => setSelectedType(type as DNSRecordType)}
               >
                 {type}
@@ -497,55 +497,55 @@ export default function DNSLookup() {
           </div>
         </div>
 
-        <div className={styles['input-group']}>
-          <label className={styles['field-label']}>Options</label>
-          <div className={styles['options-row']}>
-            <label className={styles['toggle-label']}>
+        <div className={styles.inputGroup}>
+          <label className={styles.fieldLabel}>Options</label>
+          <div className={styles.optionsRow}>
+            <label className={styles.toggleLabel}>
               <input
                 type="checkbox"
                 checked={dnssecToggle}
                 onChange={(e) => setDnssecToggle(e.target.checked)}
-                className={styles['toggle-input']}
+                className={styles.toggleInput}
               />
-              <span className={styles['toggle-track']}>
-                <span className={styles['toggle-thumb']}></span>
+              <span className={styles.toggleTrack}>
+                <span className={styles.toggleThumb}></span>
               </span>
               <span>Request DNSSEC data</span>
             </label>
-            <label className={styles['toggle-label']}>
+            <label className={styles.toggleLabel}>
               <input
                 type="checkbox"
                 checked={cdToggle}
                 onChange={(e) => setCdToggle(e.target.checked)}
-                className={styles['toggle-input']}
+                className={styles.toggleInput}
               />
-              <span className={styles['toggle-track']}>
-                <span className={styles['toggle-thumb']}></span>
+              <span className={styles.toggleTrack}>
+                <span className={styles.toggleThumb}></span>
               </span>
               <span>Disable DNSSEC validation (CD bit)</span>
             </label>
-            <label className={styles['toggle-label']}>
+            <label className={styles.toggleLabel}>
               <input
                 type="checkbox"
                 checked={ednsToggle}
                 onChange={(e) => setEdnsToggle(e.target.checked)}
-                className={styles['toggle-input']}
+                className={styles.toggleInput}
               />
-              <span className={styles['toggle-track']}>
-                <span className={styles['toggle-thumb']}></span>
+              <span className={styles.toggleTrack}>
+                <span className={styles.toggleThumb}></span>
               </span>
               <span>Send EDNS Client Subnet</span>
             </label>
           </div>
         </div>
 
-        <div className={styles['input-group']}>
-          <label className={styles['field-label']}>Quick Presets</label>
-          <div className={styles['preset-row']} ref={presetRowRef}>
+        <div className={styles.inputGroup}>
+          <label className={styles.fieldLabel}>Quick Presets</label>
+          <div className={styles.presetRow} ref={presetRowRef}>
             {PRESET_DOMAINS.map((domain) => (
               <button
                 key={domain}
-                className={styles['preset-btn']}
+                className={styles.presetBtn}
                 onClick={() => handlePresetClick(domain)}
               >
                 {domain}
@@ -556,98 +556,98 @@ export default function DNSLookup() {
       </section>
 
       {/* Results Panel */}
-      <section className={styles['results-panel']}>
+      <section className={styles.resultsPanel}>
         {state === 'idle' && (
-          <div className={styles['idle-state']}>
-            <div className={styles['idle-icon']}>
+          <div className={styles.idleState}>
+            <div className={styles.idleIcon}>
               <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
                 <circle cx="11" cy="11" r="8" />
                 <path d="m21 21-4.35-4.35" />
               </svg>
             </div>
-            <p className={styles['idle-text']}>
+            <p className={styles.idleText}>
               Enter a domain and hit <strong>Lookup</strong> to query DNS records.
             </p>
-            <p className={styles['idle-hint']}>Supports A · AAAA · MX · TXT · NS · CNAME · SOA · SRV · PTR · CAA · DS · DNSKEY</p>
+            <p className={styles.idleHint}>Supports A · AAAA · MX · TXT · NS · CNAME · SOA · SRV · PTR · CAA · DS · DNSKEY</p>
           </div>
         )}
 
         {state === 'loading' && (
-          <div className={styles['loading-state']}>
+          <div className={styles.loadingState}>
             <div className={styles.spinner}></div>
-            <p className={styles['loading-text']}>Querying DNS records…</p>
+            <p className={styles.loadingText}>Querying DNS records…</p>
           </div>
         )}
 
         {state === 'error' && (
-          <div className={styles['error-state']}>
-            <div className={styles['error-icon']}>
+            <div className={styles.errorState}>
+              <div className={styles.errorIcon}>
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
                 <circle cx="12" cy="12" r="10" />
                 <line x1="12" y1="8" x2="12" y2="12" />
                 <line x1="12" y1="16" x2="12.01" y2="16" />
               </svg>
             </div>
-            <p className={styles['error-title']}>{errorTitle}</p>
-            <p className={styles['error-msg']}>{errorMsg}</p>
-            <button className={styles['btn-ghost']} onClick={runLookup}>
+            <p className={styles.errorTitle}>{errorTitle}</p>
+            <p className={styles.errorMsg}>{errorMsg}</p>
+            <button className={styles.btnGhost} onClick={runLookup}>
               Try again
             </button>
           </div>
         )}
 
         {state === 'results' && lastResults && (
-          <div className={styles['results-content']}>
-            <div className={styles['summary-bar']}>
-              <div className={styles['summary-item']}>
-                <span className={styles['summary-key']}>Domain</span>
-                <span className={`${styles['summary-val']} ${styles.mono}`}>{summaryData.domain}</span>
+          <div className={styles.resultsContent}>
+            <div className={styles.summaryBar}>
+              <div className={styles.summaryItem}>
+                <span className={styles.summaryKey}>Domain</span>
+                <span className={`${styles.summaryVal} ${styles.mono}`}>{summaryData.domain}</span>
               </div>
-              <div className={styles['summary-item']}>
-                <span className={styles['summary-key']}>Status</span>
-                <span className={`${styles['summary-val']} ${summaryData.statusClass}`}>{summaryData.status}</span>
+              <div className={styles.summaryItem}>
+                <span className={styles.summaryKey}>Status</span>
+                <span className={`${styles.summaryVal} ${summaryData.statusClass}`}>{summaryData.status}</span>
               </div>
-              <div className={styles['summary-item']}>
-                <span className={styles['summary-key']}>Records</span>
-                <span className={styles['summary-val']}>{summaryData.count}</span>
+              <div className={styles.summaryItem}>
+                <span className={styles.summaryKey}>Records</span>
+                <span className={styles.summaryVal}>{summaryData.count}</span>
               </div>
-              <div className={styles['summary-item']}>
-                <span className={styles['summary-key']}>Query Time</span>
-                <span className={`${styles['summary-val']} ${styles.mono}`}>{summaryData.time}</span>
+              <div className={styles.summaryItem}>
+                <span className={styles.summaryKey}>Query Time</span>
+                <span className={`${styles.summaryVal} ${styles.mono}`}>{summaryData.time}</span>
               </div>
-              <div className={styles['summary-item']}>
-                <span className={styles['summary-key']}>Authoritative</span>
-                <span className={styles['summary-val']}>{summaryData.auth}</span>
+              <div className={styles.summaryItem}>
+                <span className={styles.summaryKey}>Authoritative</span>
+                <span className={styles.summaryVal}>{summaryData.auth}</span>
               </div>
-              <div className={styles['summary-item']}>
-                <span className={styles['summary-key']}>DNSSEC</span>
-                <span className={styles['summary-val']}>{summaryData.dnssec}</span>
+              <div className={styles.summaryItem}>
+                <span className={styles.summaryKey}>DNSSEC</span>
+                <span className={styles.summaryVal}>{summaryData.dnssec}</span>
               </div>
             </div>
 
-            <div className={styles['result-tabs']}>
+            <div className={styles.resultTabs}>
               <button
-                className={`${styles['result-tab']} ${activeTab === 'ALL' ? styles.active : ''}`}
+                className={`${styles.resultTab} ${activeTab === 'ALL' ? styles.active : ''}`}
                 onClick={() => setActiveTab('ALL')}
               >
-                ALL <span className={styles['tab-count']}>{countAllRecords(lastResults.data)}</span>
+                ALL <span className={styles.tabCount}>{countAllRecords(lastResults.data)}</span>
               </button>
               {Object.keys(lastResults.data).map((type) => (
                 <button
                   key={type}
-                  className={`${styles['result-tab']} ${activeTab === type ? styles.active : ''}`}
+                  className={`${styles.resultTab} ${activeTab === type ? styles.active : ''}`}
                   onClick={() => setActiveTab(type)}
                 >
-                  {type} <span className={styles['tab-count']}>{(lastResults.data[type]?.Answer || []).length}</span>
+                  {type} <span className={styles.tabCount}>{(lastResults.data[type]?.Answer || []).length}</span>
                 </button>
               ))}
             </div>
 
-            <div className={styles['table-wrap']}>{renderTable()}</div>
+            <div className={styles.tableWrap}>{renderTable()}</div>
 
-            <div className={styles['action-bar']}>
+            <div className={styles.actionBar}>
               <button
-                className={`${styles['btn-ghost']} ${styles.small}`}
+                className={`${styles.btnGhost} ${styles.small}`}
                 onClick={() => {
                   copyText(JSON.stringify(lastResults, null, 2));
                   showToast('JSON copied!');
@@ -660,7 +660,7 @@ export default function DNSLookup() {
                 Copy JSON
               </button>
               <button
-                className={`${styles['btn-ghost']} ${styles.small}`}
+                className={`${styles.btnGhost} ${styles.small}`}
                 onClick={() => {
                   copyText(buildRawText(lastResults));
                   showToast('Raw text copied!');
@@ -673,7 +673,7 @@ export default function DNSLookup() {
                 Copy Raw
               </button>
               <button
-                className={`${styles['btn-ghost']} ${styles.small}`}
+                className={`${styles.btnGhost} ${styles.small}`}
                 onClick={() => downloadCSV(lastResults, showToast)}
               >
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -684,7 +684,7 @@ export default function DNSLookup() {
                 Export CSV
               </button>
               <button
-                className={`${styles['btn-ghost']} ${styles.small}`}
+                className={`${styles.btnGhost} ${styles.small}`}
                 onClick={() => {
                   const url = `${typeof window !== 'undefined' ? window.location.origin + window.location.pathname : ''}?domain=${encodeURIComponent(lastResults.domain)}&type=${encodeURIComponent(selectedType)}`;
                   copyText(url);
@@ -700,7 +700,7 @@ export default function DNSLookup() {
                 </svg>
                 Share Link
               </button>
-              <button className={`${styles['btn-ghost']} ${styles.small}`} onClick={handleNewLookup}>
+              <button className={`${styles.btnGhost} ${styles.small}`} onClick={handleNewLookup}>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polyline points="1 4 1 10 7 10" />
                   <path d="M3.51 15a9 9 0 1 0 .49-3.51" />
@@ -709,15 +709,15 @@ export default function DNSLookup() {
               </button>
             </div>
 
-            <details className={styles['raw-details']}>
-              <summary className={styles['raw-summary']}>
+            <details className={styles.rawDetails}>
+              <summary className={styles.rawSummary}>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polyline points="16 18 22 12 16 6" />
                   <polyline points="8 6 2 12 8 18" />
                 </svg>
                 Raw JSON Response
               </summary>
-              <pre className={styles['raw-pre']}>{JSON.stringify(lastResults.data, null, 2)}</pre>
+              <pre className={styles.rawPre}>{JSON.stringify(lastResults.data, null, 2)}</pre>
             </details>
           </div>
         )}
@@ -725,27 +725,27 @@ export default function DNSLookup() {
 
       {/* History Panel */}
       <section className={styles.panel}>
-        <div className={styles['panel-header']}>
-          <span className={styles['panel-label']}>History</span>
-          <h2 className={styles['panel-title']}>Recent Lookups</h2>
-          <button className={`${styles['btn-ghost']} ${styles.small}`} onClick={handleClearHistory}>
+        <div className={styles.panelHeader}>
+          <span className={styles.panelLabel}>History</span>
+          <h2 className={styles.panelTitle}>Recent Lookups</h2>
+          <button className={`${styles.btnGhost} ${styles.small}`} onClick={handleClearHistory}>
             Clear
           </button>
         </div>
-        <div className={styles['history-list']}>
+        <div className={styles.historyList}>
           {history.length === 0 ? (
-            <p className={styles['history-empty']}>No lookups yet. Run your first query above.</p>
+            <p className={styles.historyEmpty}>No lookups yet. Run your first query above.</p>
           ) : (
             history.map((item, idx) => (
               <div
                 key={idx}
-                className={styles['history-item']}
+                className={styles.historyItem}
                 onClick={() => handleHistoryClick(item)}
               >
-                <span className={item.ok ? styles['history-status-ok'] : styles['history-status-err']}></span>
-                <span className={styles['history-domain']}>{escapeHtml(item.domain)}</span>
-                <span className={styles['history-type']}>{escapeHtml(item.type)}</span>
-                <span className={styles['history-time']}>{timeAgo(item.ts)}</span>
+                <span className={item.ok ? styles.historyStatusOk : styles.historyStatusErr}></span>
+                <span className={styles.historyDomain}>{escapeHtml(item.domain)}</span>
+                <span className={styles.historyType}>{escapeHtml(item.type)}</span>
+                <span className={styles.historyTime}>{timeAgo(item.ts)}</span>
               </div>
             ))
           )}
