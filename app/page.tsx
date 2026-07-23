@@ -63,6 +63,7 @@ export default function Home() {
   }, [statuses]);
 
   const CAT_ICONS: Record<string, string> = {
+    'AI & Agents': '🤖',
     'Browser Tools': '🧰',
     'Security': '🔒',
     'Design': '🎨',
