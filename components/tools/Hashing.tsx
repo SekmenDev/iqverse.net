@@ -40,7 +40,7 @@ async function computeDigest(algorithm: string, text: string, key: string | null
   if (algorithm.startsWith('HMAC-')) {
     const hashAlgo = algorithm.slice(5);
     if (!key) {
-      throw new Error('A key is required for HMAC algorithms.');
+      throw new TypeError('A key is required for HMAC algorithms.');
     }
 
     const cryptoKey = await crypto.subtle.importKey(

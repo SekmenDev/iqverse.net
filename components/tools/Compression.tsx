@@ -5,7 +5,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
 async function compressText(text: string): Promise<string> {
   if (typeof CompressionStream === 'undefined') {
-    throw new Error('CompressionStream is not available in this browser.');
+    throw new TypeError('CompressionStream is not available in this browser.');
   }
 
   const encoder = new TextEncoder();
@@ -17,7 +17,7 @@ async function compressText(text: string): Promise<string> {
 
 async function decompressText(base64: string): Promise<string> {
   if (typeof DecompressionStream === 'undefined') {
-    throw new Error('DecompressionStream is not available in this browser.');
+    throw new TypeError('DecompressionStream is not available in this browser.');
   }
 
   const binary = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
