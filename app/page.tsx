@@ -195,6 +195,7 @@ export default function Home() {
       {/* TOP NAV */}
       <nav className={styles.topNav}>
         <button
+          type="button"
           className={styles.menuToggle}
           onClick={() => setSidebarOpen(!sidebarOpen)}
           aria-label="Toggle menu"
@@ -250,7 +251,7 @@ export default function Home() {
         </div>
       </nav>
 
-      <button className={`${styles.sidebarOverlay} ${sidebarOpen ? styles.sidebarOverlayShow : ''}`} onClick={() => setSidebarOpen(false)} />
+      <button type="button" className={`${styles.sidebarOverlay} ${sidebarOpen ? styles.sidebarOverlayShow : ''}`} onClick={() => setSidebarOpen(false)} />
 
       <div className={styles.layout}>
         {/* SIDEBAR */}
@@ -259,6 +260,7 @@ export default function Home() {
           <div>
             {categories.map(cat => (
               <button
+                type="button"
                 key={cat}
                 className={`${styles.catBtn} ${activeCat === cat ? styles.catBtnActive : ''}`}
                 onClick={() => {
@@ -277,6 +279,7 @@ export default function Home() {
           <div>
             {statuses.map(s => (
               <button
+                type="button"
                 key={s}
                 className={`${styles.catBtn} ${activeStatus === s ? styles.catBtnActive : ''}`}
                 onClick={() => {
@@ -304,6 +307,7 @@ export default function Home() {
             </span>
             <div className={styles.sortWrap} aria-label="Sort options">
               <button
+                type="button"
                 className={`${styles.sortBtn} ${activeSort === 'default' ? styles.sortBtnActive : ''}`}
                 onClick={() => setActiveSort('default')}
                 aria-pressed={activeSort === 'default'}
@@ -311,6 +315,7 @@ export default function Home() {
                 Default
               </button>
               <button
+                type="button"
                 className={`${styles.sortBtn} ${activeSort === 'az' ? styles.sortBtnActive : ''}`}
                 onClick={() => setActiveSort('az')}
                 aria-pressed={activeSort === 'az'}

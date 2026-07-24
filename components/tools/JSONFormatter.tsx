@@ -71,24 +71,28 @@ export default function JSONFormatter() {
           </div>
           <div className={sharedStyles.buttonGroup}>
             <button
+              type="button"
               className={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
               onClick={handleFormat}
             >
               Format (Pretty Print)
             </button>
             <button
+              type="button"
               className={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`}
               onClick={handleMinify}
             >
               Minify
             </button>
             <button
+              type="button"
               className={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`}
               onClick={handleValidate}
             >
               Validate
             </button>
             <button
+              type="button"
               className={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`}
               onClick={handleClear}
             >
@@ -109,6 +113,7 @@ export default function JSONFormatter() {
               className={sharedStyles.outputArea}
             />
             <button
+              type="button"
               className={`${sharedStyles.button} ${sharedStyles.buttonSmall}`}
               onClick={handleCopy}
             >

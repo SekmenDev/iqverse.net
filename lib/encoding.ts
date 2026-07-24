@@ -37,16 +37,16 @@ export function hexDecode(input: string): string {
   try {
     const cleaned = input.replace(/\s+/g, '');
     if (cleaned.length % 2 !== 0) {
-      throw new Error('Hex input must have an even length.');
+      throw new TypeError('Hex input must have an even length.');
     }
-    const bytes = new Uint8Array(cleaned.length / 2);
-    for (let i = 0; i < bytes.length; i += 1) {
-      const byte = parseInt(cleaned.slice(i * 2, i * 2 + 2), 16);
+    const hexPairs = cleaned.match(/.{1,2}/g) || [];
+    const bytes = Uint8Array.from(hexPairs, (pair) => {
+      const byte = parseInt(pair, 16);
       if (Number.isNaN(byte)) {
-        throw new Error('Invalid hex input.');
+        throw new TypeError('Invalid hex input.');
       }
-      bytes[i] = byte;
-    }
+      return byte;
+    });
     const decoder = typeof TextDecoder !== 'undefined' ? new TextDecoder() : null;
     return decoder ? decoder.decode(bytes) : Buffer.from(bytes).toString('utf-8');
   } catch {

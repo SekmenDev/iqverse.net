@@ -45,7 +45,7 @@ export default function DataConverter() {
         setOutput(JSON.stringify(parsed, null, 2));
       } else if (outputFormat === 'csv') {
         if (!Array.isArray(parsed) || parsed.length === 0 || typeof parsed[0] !== 'object' || parsed[0] === null) {
-          throw new Error('CSV output requires an array of objects.');
+          throw new TypeError('CSV output requires an array of objects.');
         }
         const rows = parsed as Record<string, unknown>[];
         const headers = Array.from(new Set(rows.flatMap((row) => Object.keys(row))));
@@ -126,7 +126,7 @@ export default function DataConverter() {
           </div>
 
           <div className={sharedStyles.buttonGroup}>
-            <button className={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`} onClick={convert}>
+            <button type="button" className={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`} onClick={convert}>
               Convert
             </button>
           </div>

@@ -306,8 +306,9 @@ ${desc ? `<meta name="twitter:description" content="${esc(desc)}">` : ''}
           </div>
 
           <div className="field-group">
-            <label>Site name</label>
+            <label htmlFor="site-name">Site name</label>
             <input
+              id="site-name"
               value={form.siteName}
               onChange={(event) => setForm((prev) => ({ ...prev, siteName: event.target.value }))}
               placeholder="My Awesome Site"
@@ -315,8 +316,9 @@ ${desc ? `<meta name="twitter:description" content="${esc(desc)}">` : ''}
           </div>
 
           <div className="field-group">
-            <label>Site URL</label>
+            <label htmlFor="site-url">Site URL</label>
             <input
+              id="site-url"
               value={form.siteUrl}
               onChange={(event) => setForm((prev) => ({ ...prev, siteUrl: event.target.value }))}
               placeholder="https://example.com"
@@ -324,8 +326,9 @@ ${desc ? `<meta name="twitter:description" content="${esc(desc)}">` : ''}
           </div>
 
           <div className="field-group">
-            <label>Short description</label>
+            <label htmlFor="site-desc">Short description</label>
             <textarea
+              id="site-desc"
               rows={3}
               value={form.siteDesc}
               onChange={(event) => setForm((prev) => ({ ...prev, siteDesc: event.target.value }))}
@@ -335,14 +338,16 @@ ${desc ? `<meta name="twitter:description" content="${esc(desc)}">` : ''}
 
           <div className="field-group color-fields">
             <div>
-              <label>Theme color</label>
+              <label htmlFor="theme-color-picker">Theme color</label>
               <div className={styles.colorRow}>
                 <input
+                  id="theme-color-picker"
                   type="color"
                   value={form.themeColor}
                   onChange={(event) => setForm((prev) => ({ ...prev, themeColor: event.target.value }))}
                 />
                 <input
+                  id="theme-color-text"
                   value={form.themeColor}
                   onChange={(event) => setForm((prev) => ({ ...prev, themeColor: event.target.value }))}
                   placeholder="#1a1a1a"
@@ -350,8 +355,9 @@ ${desc ? `<meta name="twitter:description" content="${esc(desc)}">` : ''}
               </div>
             </div>
             <div>
-              <label>Content type</label>
+              <label htmlFor="content-type">Content type</label>
               <select
+                id="content-type"
                 value={form.ogType}
                 onChange={(event) => setForm((prev) => ({ ...prev, ogType: event.target.value }))}
               >
@@ -362,8 +368,9 @@ ${desc ? `<meta name="twitter:description" content="${esc(desc)}">` : ''}
               </select>
             </div>
             <div>
-              <label>Language</label>
+              <label htmlFor="language-select">Language</label>
               <select
+                id="language-select"
                 value={form.htmlLang}
                 onChange={(event) => setForm((prev) => ({ ...prev, htmlLang: event.target.value }))}
               >
@@ -381,8 +388,9 @@ ${desc ? `<meta name="twitter:description" content="${esc(desc)}">` : ''}
           </div>
 
           <div className="field-group">
-            <label>Keywords</label>
+            <label htmlFor="keywords">Keywords</label>
             <input
+              id="keywords"
               value={form.keywords}
               onChange={(event) => setForm((prev) => ({ ...prev, keywords: event.target.value }))}
               placeholder="portfolio, design, creative studio"

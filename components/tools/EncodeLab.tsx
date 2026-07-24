@@ -52,39 +52,39 @@ export default function EncodeLab() {
         <div className={sharedStyles.sectionLabel}>EncodeLab</div>
         <div className={sharedStyles.card}>
           <div className={sharedStyles.field}>
-            <label className={sharedStyles.fieldLabel}>Input</label>
-            <textarea value={text} onChange={(e) => setText(e.target.value)} className={sharedStyles.textarea} rows={6} />
+            <label className={sharedStyles.fieldLabel} htmlFor="encode-input">Input</label>
+            <textarea id="encode-input" value={text} onChange={(e) => setText(e.target.value)} className={sharedStyles.textarea} rows={6} />
           </div>
 
           <div className={sharedStyles.buttonGroup}>
-            <button className={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`} onClick={() => handleB64Encode(false)}>Base64 Encode</button>
-            <button className={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`} onClick={() => handleB64Encode(true)}>Base64 URL Safe</button>
-            <button className={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`} onClick={() => handleB64Decode(false)}>Base64 Decode</button>
-            <button className={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`} onClick={() => handleB64Decode(true)}>Base64 URL Decode</button>
+            <button type="button" className={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`} onClick={() => handleB64Encode(false)}>Base64 Encode</button>
+            <button type="button" className={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`} onClick={() => handleB64Encode(true)}>Base64 URL Safe</button>
+            <button type="button" className={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`} onClick={() => handleB64Decode(false)}>Base64 Decode</button>
+            <button type="button" className={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`} onClick={() => handleB64Decode(true)}>Base64 URL Decode</button>
           </div>
 
           <div style={{ marginTop: 12 }} className={sharedStyles.field}>
-            <label className={sharedStyles.fieldLabel}>Base64 Output</label>
-            <textarea readOnly value={b64Out || b64In} className={sharedStyles.outputArea} rows={4} />
+            <label className={sharedStyles.fieldLabel} htmlFor="b64-output">Base64 Output</label>
+            <textarea id="b64-output" readOnly value={b64Out || b64In} className={sharedStyles.outputArea} rows={4} />
           </div>
 
           <hr style={{ margin: '18px 0', border: 'none', borderTop: '1px solid rgba(255,255,255,0.04)' }} />
 
           <div className={sharedStyles.buttonGroup}>
-            <button className={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`} onClick={() => handleUrlEncode(false)}>encodeURIComponent</button>
-            <button className={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`} onClick={() => handleUrlEncode(true)}>encodeURI (full)</button>
-            <button className={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`} onClick={handleUrlDecode}>Decode</button>
+            <button type="button" className={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`} onClick={() => handleUrlEncode(false)}>encodeURIComponent</button>
+            <button type="button" className={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`} onClick={() => handleUrlEncode(true)}>encodeURI (full)</button>
+            <button type="button" className={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`} onClick={handleUrlDecode}>Decode</button>
           </div>
 
           <div style={{ marginTop: 12 }} className={sharedStyles.field}>
-            <label className={sharedStyles.fieldLabel}>URL Output</label>
-            <textarea readOnly value={urlOut || urlIn} className={sharedStyles.outputArea} rows={3} />
+            <label className={sharedStyles.fieldLabel} htmlFor="url-output">URL Output</label>
+            <textarea id="url-output" readOnly value={urlOut || urlIn} className={sharedStyles.outputArea} rows={3} />
           </div>
 
           <hr style={{ margin: '18px 0', border: 'none', borderTop: '1px solid rgba(255,255,255,0.04)' }} />
 
           <div className={sharedStyles.buttonGroup}>
-            <button className={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`} onClick={inspectJWT}>Inspect JWT</button>
+            <button type="button" className={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`} onClick={inspectJWT}>Inspect JWT</button>
           </div>
 
           {jwtParts && (

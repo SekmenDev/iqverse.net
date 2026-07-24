@@ -40,8 +40,9 @@ export default function RegexForge() {
           </div>
 
           <div className="field-group">
-            <label>Pattern</label>
+            <label htmlFor="regex-pattern">Pattern</label>
             <input
+              id="regex-pattern"
               value={pattern}
               onChange={(event) => setPattern(event.target.value)}
               placeholder="Enter regular expression pattern"
@@ -49,11 +50,12 @@ export default function RegexForge() {
           </div>
 
           <div className="field-group">
-            <label>Flags</label>
+            <label htmlFor="flag-g">Flags</label>
             <div className="select-group wrap">
               {options.map((option) => (
-                <label key={option.value} className="checkbox-pill">
+                <label key={option.value} htmlFor={`flag-${option.value}`} className="checkbox-pill">
                   <input
+                    id={`flag-${option.value}`}
                     type="checkbox"
                     checked={flags.includes(option.value)}
                     onChange={(event) => {
@@ -70,8 +72,9 @@ export default function RegexForge() {
           </div>
 
           <div className="field-group">
-            <label>Test text</label>
+            <label htmlFor="regex-input">Test text</label>
             <textarea
+              id="regex-input"
               value={input}
               onChange={(event) => setInput(event.target.value)}
               rows={6}
@@ -79,8 +82,9 @@ export default function RegexForge() {
           </div>
 
           <div className="field-group">
-            <label>Replacement</label>
+            <label htmlFor="regex-replacement">Replacement</label>
             <input
+              id="regex-replacement"
               value={replacement}
               onChange={(event) => setReplacement(event.target.value)}
               placeholder="Replacement text"

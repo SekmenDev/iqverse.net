@@ -77,9 +77,9 @@ export default function CSVViewer() {
           </div>
 
           <div className={sharedStyles.buttonGroup}>
-            <button className={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`} onClick={exportJson}>Export JSON</button>
-            <button className={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`} onClick={exportMarkdown}>Export Markdown</button>
-            <button className={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`} onClick={exportSql}>Export SQL</button>
+            <button type="button" className={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`} onClick={exportJson}>Export JSON</button>
+            <button type="button" className={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`} onClick={exportMarkdown}>Export Markdown</button>
+            <button type="button" className={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`} onClick={exportSql}>Export SQL</button>
           </div>
         </div>
       </section>

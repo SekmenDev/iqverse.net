@@ -28,8 +28,8 @@ function arrayBufferToHex(buffer: ArrayBuffer): string {
 function arrayBufferToBase64(buffer: ArrayBuffer): string {
   const bytes = new Uint8Array(buffer);
   let binary = '';
-  for (let i = 0; i < bytes.length; i += 1) {
-    binary += String.fromCharCode(bytes[i]);
+  for (const byte of bytes) {
+    binary += String.fromCodePoint(byte);
   }
   return typeof btoa !== 'undefined' ? btoa(binary) : Buffer.from(bytes).toString('base64');
 }
@@ -40,7 +40,7 @@ async function computeDigest(algorithm: string, text: string, key: string | null
   if (algorithm.startsWith('HMAC-')) {
     const hashAlgo = algorithm.slice(5);
     if (!key) {
-      throw new Error('A key is required for HMAC algorithms.');
+      throw new TypeError('A key is required for HMAC algorithms.');
     }
 
     const cryptoKey = await crypto.subtle.importKey(
@@ -95,29 +95,25 @@ export default function Hashing() {
           </div>
 
           <div className={sharedStyles.buttonGroup} style={{ alignItems: 'center' }}>
-            <label>
-              Algorithm
-              <select value={algorithm} onChange={(e) => setAlgorithm(e.target.value)} style={{ marginLeft: 8 }}>
-                {algorithms.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <label htmlFor="algorithm-select">Algorithm</label>
+            <select id="algorithm-select" value={algorithm} onChange={(e) => setAlgorithm(e.target.value)} style={{ marginLeft: 8 }}>
+              {algorithms.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
 
-            <label>
-              Output
-              <select value={format} onChange={(e) => setFormat(e.target.value)} style={{ marginLeft: 8 }}>
-                {outputFormats.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <label htmlFor="output-format">Output</label>
+            <select id="output-format" value={format} onChange={(e) => setFormat(e.target.value)} style={{ marginLeft: 8 }}>
+              {outputFormats.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
 
-            <button className={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`} onClick={handleCompute}>
+            <button type="button" className={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`} onClick={handleCompute}>
               Compute
             </button>
           </div>
@@ -140,8 +136,8 @@ export default function Hashing() {
           )}
 
           <div style={{ marginTop: 18 }} className={sharedStyles.field}>
-            <label className={sharedStyles.fieldLabel}>Output</label>
-            <textarea readOnly value={output} className={sharedStyles.outputArea} rows={6} />
+            <label className={sharedStyles.fieldLabel} htmlFor="hash-output">Output</label>
+            <textarea id="hash-output" readOnly value={output} className={sharedStyles.outputArea} rows={6} />
           </div>
 
           {error && (

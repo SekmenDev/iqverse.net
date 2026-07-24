@@ -472,7 +472,7 @@ export default function DNSLookup() {
               onKeyDown={handleKeyDown}
               autoComplete="off"
             />
-            <button className={styles.btnPrimary} onClick={runLookup} disabled={state === 'loading'}>
+            <button type="button" className={styles.btnPrimary} onClick={runLookup} disabled={state === 'loading'}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <circle cx="11" cy="11" r="8" />
                 <path d="m21 21-4.35-4.35" />
@@ -483,10 +483,11 @@ export default function DNSLookup() {
         </div>
 
         <div className={styles.inputGroup}>
-          <label className={styles.fieldLabel}>Record Types</label>
-          <div className={styles.typeGrid}>
+          <div className={styles.fieldLabel} id="record-types-label">Record Types</div>
+          <div className={styles.typeGrid} role="group" aria-labelledby="record-types-label">
             {['ALL', ...ALL_TYPES].map((type) => (
               <button
+                type="button"
                 key={type}
                 className={`${styles.typeBtn} ${selectedType === type ? styles.active : ''}`}
                 onClick={() => setSelectedType(type as DNSRecordType)}
@@ -498,10 +499,11 @@ export default function DNSLookup() {
         </div>
 
         <div className={styles.inputGroup}>
-          <label className={styles.fieldLabel}>Options</label>
-          <div className={styles.optionsRow}>
-            <label className={styles.toggleLabel}>
+          <div className={styles.fieldLabel} id="lookup-options-label">Options</div>
+          <div className={styles.optionsRow} role="group" aria-labelledby="lookup-options-label">
+            <label className={styles.toggleLabel} htmlFor="dnssec-toggle">
               <input
+                id="dnssec-toggle"
                 type="checkbox"
                 checked={dnssecToggle}
                 onChange={(e) => setDnssecToggle(e.target.checked)}
@@ -512,8 +514,9 @@ export default function DNSLookup() {
               </span>
               <span>Request DNSSEC data</span>
             </label>
-            <label className={styles.toggleLabel}>
+            <label className={styles.toggleLabel} htmlFor="cd-toggle">
               <input
+                id="cd-toggle"
                 type="checkbox"
                 checked={cdToggle}
                 onChange={(e) => setCdToggle(e.target.checked)}
@@ -524,8 +527,9 @@ export default function DNSLookup() {
               </span>
               <span>Disable DNSSEC validation (CD bit)</span>
             </label>
-            <label className={styles.toggleLabel}>
+            <label className={styles.toggleLabel} htmlFor="edns-toggle">
               <input
+                id="edns-toggle"
                 type="checkbox"
                 checked={ednsToggle}
                 onChange={(e) => setEdnsToggle(e.target.checked)}
@@ -540,10 +544,11 @@ export default function DNSLookup() {
         </div>
 
         <div className={styles.inputGroup}>
-          <label className={styles.fieldLabel}>Quick Presets</label>
-          <div className={styles.presetRow} ref={presetRowRef}>
+          <div className={styles.fieldLabel} id="quick-presets-label">Quick Presets</div>
+          <div className={styles.presetRow} ref={presetRowRef} role="group" aria-labelledby="quick-presets-label">
             {PRESET_DOMAINS.map((domain) => (
               <button
+                type="button"
                 key={domain}
                 className={styles.presetBtn}
                 onClick={() => handlePresetClick(domain)}
@@ -590,7 +595,7 @@ export default function DNSLookup() {
             </div>
             <p className={styles.errorTitle}>{errorTitle}</p>
             <p className={styles.errorMsg}>{errorMsg}</p>
-            <button className={styles.btnGhost} onClick={runLookup}>
+            <button type="button" className={styles.btnGhost} onClick={runLookup}>
               Try again
             </button>
           </div>
@@ -627,6 +632,7 @@ export default function DNSLookup() {
 
             <div className={styles.resultTabs}>
               <button
+                type="button"
                 className={`${styles.resultTab} ${activeTab === 'ALL' ? styles.active : ''}`}
                 onClick={() => setActiveTab('ALL')}
               >
@@ -634,6 +640,7 @@ export default function DNSLookup() {
               </button>
               {Object.keys(lastResults.data).map((type) => (
                 <button
+                  type="button"
                   key={type}
                   className={`${styles.resultTab} ${activeTab === type ? styles.active : ''}`}
                   onClick={() => setActiveTab(type)}
@@ -647,6 +654,7 @@ export default function DNSLookup() {
 
             <div className={styles.actionBar}>
               <button
+                type="button"
                 className={`${styles.btnGhost} ${styles.small}`}
                 onClick={() => {
                   copyText(JSON.stringify(lastResults, null, 2));
@@ -660,6 +668,7 @@ export default function DNSLookup() {
                 Copy JSON
               </button>
               <button
+                type="button"
                 className={`${styles.btnGhost} ${styles.small}`}
                 onClick={() => {
                   copyText(buildRawText(lastResults));
@@ -673,6 +682,7 @@ export default function DNSLookup() {
                 Copy Raw
               </button>
               <button
+                type="button"
                 className={`${styles.btnGhost} ${styles.small}`}
                 onClick={() => downloadCSV(lastResults, showToast)}
               >
@@ -684,6 +694,7 @@ export default function DNSLookup() {
                 Export CSV
               </button>
               <button
+                type="button"
                 className={`${styles.btnGhost} ${styles.small}`}
                 onClick={() => {
                   const url = `${typeof window !== 'undefined' ? window.location.origin + window.location.pathname : ''}?domain=${encodeURIComponent(lastResults.domain)}&type=${encodeURIComponent(selectedType)}`;
@@ -700,7 +711,7 @@ export default function DNSLookup() {
                 </svg>
                 Share Link
               </button>
-              <button className={`${styles.btnGhost} ${styles.small}`} onClick={handleNewLookup}>
+              <button type="button" className={`${styles.btnGhost} ${styles.small}`} onClick={handleNewLookup}>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polyline points="1 4 1 10 7 10" />
                   <path d="M3.51 15a9 9 0 1 0 .49-3.51" />
@@ -728,7 +739,7 @@ export default function DNSLookup() {
         <div className={styles.panelHeader}>
           <span className={styles.panelLabel}>History</span>
           <h2 className={styles.panelTitle}>Recent Lookups</h2>
-          <button className={`${styles.btnGhost} ${styles.small}`} onClick={handleClearHistory}>
+          <button type="button" className={`${styles.btnGhost} ${styles.small}`} onClick={handleClearHistory}>
             Clear
           </button>
         </div>

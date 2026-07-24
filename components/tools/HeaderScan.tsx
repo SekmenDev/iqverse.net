@@ -380,13 +380,13 @@ export default function HeaderScan() {
               placeholder="https://example.com"
               spellCheck={false}
             />
-            <button className={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`} onClick={() => void runAnalysis(input)}>
+            <button type="button" className={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`} onClick={() => void runAnalysis(input)}>
               {loading ? 'Analyzing…' : 'Analyze'}
             </button>
           </div>
           <div className={styles.quickLinks}>
             {SAMPLE_URLS.map((sample) => (
-              <button key={sample} className={styles.chip} onClick={() => setInput(sample)}>
+              <button type="button" key={sample} className={styles.chip} onClick={() => setInput(sample)}>
                 {sample}
               </button>
             ))}
@@ -427,10 +427,10 @@ export default function HeaderScan() {
                 <span className={styles.summaryItem}>ℹ {counts.info} info</span>
               </div>
               <div className={styles.actionsRow}>
-                <button className={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`} onClick={copySummary}>
+                <button type="button" className={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`} onClick={copySummary}>
                   Copy report
                 </button>
-                <button className={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`} onClick={downloadReport}>
+                <button type="button" className={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`} onClick={downloadReport}>
                   Download JSON
                 </button>
               </div>
@@ -442,6 +442,7 @@ export default function HeaderScan() {
               <div className={styles.tabRow}>
                 {(['security', 'performance', 'info', 'raw'] as TabKey[]).map((tab) => (
                   <button
+                    type="button"
                     key={tab}
                     className={`${styles.tabButton} ${activeTab === tab ? styles.tabButtonActive : ''}`}
                     onClick={() => setActiveTab(tab)}
@@ -482,6 +483,7 @@ export default function HeaderScan() {
               <div className={styles.filterRow}>
                 {(['all', 'critical', 'recommended', 'optional'] as const).map((filter) => (
                   <button
+                    type="button"
                     key={filter}
                     className={`${styles.filterChip} ${activeFilter === filter ? styles.filterChipActive : ''}`}
                     onClick={() => setActiveFilter(filter)}
