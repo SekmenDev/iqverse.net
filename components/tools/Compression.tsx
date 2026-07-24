@@ -54,12 +54,13 @@ export default function Compression() {
         <div className={sharedStyles.sectionLabel}>Compression</div>
         <div className={sharedStyles.card}>
           <div className={sharedStyles.field}>
-            <label className={sharedStyles.fieldLabel}>Mode</label>
-            <div className={sharedStyles.buttonGroup} style={{ margin: 0 }}>
+            <span className={sharedStyles.fieldLabel}>Mode</span>
+            <div className={sharedStyles.buttonGroup} style={{ margin: 0 }} role="group" aria-label="Compression mode">
               <button
                 className={`${sharedStyles.button} ${mode === 'compress' ? sharedStyles.buttonPrimary : sharedStyles.buttonSecondary}`}
                 type="button"
                 onClick={() => setMode('compress')}
+                aria-pressed={mode === 'compress'}
               >
                 Compress
               </button>
@@ -67,6 +68,7 @@ export default function Compression() {
                 className={`${sharedStyles.button} ${mode === 'decompress' ? sharedStyles.buttonPrimary : sharedStyles.buttonSecondary}`}
                 type="button"
                 onClick={() => setMode('decompress')}
+                aria-pressed={mode === 'decompress'}
               >
                 Decompress
               </button>
@@ -93,8 +95,8 @@ export default function Compression() {
           </div>
 
           <div style={{ marginTop: 18 }} className={sharedStyles.field}>
-            <label className={sharedStyles.fieldLabel}>Output</label>
-            <textarea readOnly value={output} className={sharedStyles.outputArea} rows={6} />
+            <label className={sharedStyles.fieldLabel} htmlFor="compressionOutput">Output</label>
+            <textarea id="compressionOutput" readOnly value={output} className={sharedStyles.outputArea} rows={6} />
           </div>
 
           {error && (

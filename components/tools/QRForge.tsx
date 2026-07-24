@@ -80,8 +80,8 @@ export default function QRForge() {
           </div>
 
           <div className="field-group">
-            <label>Data type</label>
-            <div className="select-group">
+            <label htmlFor="qrType">Data type</label>
+            <div className="select-group" id="qrType">
               {typeOptions.map((option) => (
                 <button
                   type="button"
@@ -97,8 +97,9 @@ export default function QRForge() {
 
           {type === 'url' && (
             <div className="field-group">
-              <label>URL</label>
+              <label htmlFor="qrUrl">URL</label>
               <input
+                id="qrUrl"
                 value={values.url}
                 onChange={(event) => handleFieldChange('url', event.target.value)}
                 placeholder="https://example.com"
@@ -108,8 +109,9 @@ export default function QRForge() {
 
           {type === 'text' && (
             <div className="field-group">
-              <label>Plain text</label>
+              <label htmlFor="qrText">Plain text</label>
               <textarea
+                id="qrText"
                 value={values.text}
                 onChange={(event) => handleFieldChange('text', event.target.value)}
                 placeholder="Enter your message…"
@@ -121,8 +123,9 @@ export default function QRForge() {
           {type === 'email' && (
             <>
               <div className="field-group">
-                <label>Email address</label>
+                <label htmlFor="qrEmail">Email address</label>
                 <input
+                  id="qrEmail"
                   type="email"
                   value={values.email}
                   onChange={(event) => handleFieldChange('email', event.target.value)}
@@ -130,16 +133,18 @@ export default function QRForge() {
                 />
               </div>
               <div className="field-group">
-                <label>Subject</label>
+                <label htmlFor="qrSubject">Subject</label>
                 <input
+                  id="qrSubject"
                   value={values.subject}
                   onChange={(event) => handleFieldChange('subject', event.target.value)}
                   placeholder="Subject line"
                 />
               </div>
               <div className="field-group">
-                <label>Body</label>
+                <label htmlFor="qrBody">Body</label>
                 <textarea
+                  id="qrBody"
                   value={values.body}
                   onChange={(event) => handleFieldChange('body', event.target.value)}
                   placeholder="Email body…"
@@ -152,24 +157,27 @@ export default function QRForge() {
           {type === 'wifi' && (
             <>
               <div className="field-group">
-                <label>Network name (SSID)</label>
+                <label htmlFor="qrSsid">Network name (SSID)</label>
                 <input
+                  id="qrSsid"
                   value={values.ssid}
                   onChange={(event) => handleFieldChange('ssid', event.target.value)}
                   placeholder="MyNetwork"
                 />
               </div>
               <div className="field-group">
-                <label>Password</label>
+                <label htmlFor="qrPassword">Password</label>
                 <input
+                  id="qrPassword"
                   value={values.password}
                   onChange={(event) => handleFieldChange('password', event.target.value)}
                   placeholder="password123"
                 />
               </div>
               <div className="field-group">
-                <label>Security</label>
+                <label htmlFor="qrSecurity">Security</label>
                 <select
+                  id="qrSecurity"
                   value={values.security}
                   onChange={(event) => handleFieldChange('security', event.target.value)}
                 >
@@ -184,16 +192,18 @@ export default function QRForge() {
           {type === 'vcard' && (
             <>
               <div className="field-group">
-                <label>Full name</label>
+                <label htmlFor="qrName">Full name</label>
                 <input
+                  id="qrName"
                   value={values.name}
                   onChange={(event) => handleFieldChange('name', event.target.value)}
                   placeholder="Jane Smith"
                 />
               </div>
               <div className="field-group">
-                <label>Phone</label>
+                <label htmlFor="qrPhone">Phone</label>
                 <input
+                  id="qrPhone"
                   type="tel"
                   value={values.phone}
                   onChange={(event) => handleFieldChange('phone', event.target.value)}
@@ -201,8 +211,9 @@ export default function QRForge() {
                 />
               </div>
               <div className="field-group">
-                <label>Email</label>
+                <label htmlFor="qrVcardEmail">Email</label>
                 <input
+                  id="qrVcardEmail"
                   type="email"
                   value={values.email}
                   onChange={(event) => handleFieldChange('email', event.target.value)}
@@ -210,16 +221,18 @@ export default function QRForge() {
                 />
               </div>
               <div className="field-group">
-                <label>Company</label>
+                <label htmlFor="qrCompany">Company</label>
                 <input
+                  id="qrCompany"
                   value={values.company}
                   onChange={(event) => handleFieldChange('company', event.target.value)}
                   placeholder="Acme Inc."
                 />
               </div>
               <div className="field-group">
-                <label>Website</label>
+                <label htmlFor="qrWebsite">Website</label>
                 <input
+                  id="qrWebsite"
                   value={values.urlv}
                   onChange={(event) => handleFieldChange('urlv', event.target.value)}
                   placeholder="https://example.com"
@@ -229,8 +242,9 @@ export default function QRForge() {
           )}
 
           <div className="field-group">
-            <label>Error correction</label>
+            <label htmlFor="qrErrorLevel">Error correction</label>
             <select
+              id="qrErrorLevel"
               value={errorLevel}
               onChange={(event) => setErrorLevel(event.target.value)}
             >
@@ -244,24 +258,27 @@ export default function QRForge() {
 
           <div className="field-group color-fields">
             <div>
-              <label>Dot color</label>
+              <label htmlFor="qrDotColor">Dot color</label>
               <input
+                id="qrDotColor"
                 type="color"
                 value={dotColor}
                 onChange={(event) => setDotColor(event.target.value)}
               />
             </div>
             <div>
-              <label>Background</label>
+              <label htmlFor="qrBgColor">Background</label>
               <input
+                id="qrBgColor"
                 type="color"
                 value={bgColor}
                 onChange={(event) => setBgColor(event.target.value)}
               />
             </div>
             <div>
-              <label>Corner color</label>
+              <label htmlFor="qrCornerColor">Corner color</label>
               <input
+                id="qrCornerColor"
                 type="color"
                 value={cornerColor}
                 onChange={(event) => setCornerColor(event.target.value)}

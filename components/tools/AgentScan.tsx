@@ -510,15 +510,25 @@ export default function AgentScan() {
 
           <div className={styles.controlsRow}>
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>View</label>
-              <select value={viewMode} onChange={(event) => setViewMode(event.target.value as 'grid' | 'list')} className={styles.selectInput}>
+              <label className={styles.controlLabel} htmlFor="view-mode">View</label>
+              <select
+                id="view-mode"
+                value={viewMode}
+                onChange={(event) => setViewMode(event.target.value as 'grid' | 'list')}
+                className={styles.selectInput}
+              >
                 <option value="grid">Grid</option>
                 <option value="list">List</option>
               </select>
             </div>
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>Sort</label>
-              <select value={sortMode} onChange={(event) => setSortMode(event.target.value as 'category' | 'status' | 'name')} className={styles.selectInput}>
+              <label className={styles.controlLabel} htmlFor="sort-mode">Sort</label>
+              <select
+                id="sort-mode"
+                value={sortMode}
+                onChange={(event) => setSortMode(event.target.value as 'category' | 'status' | 'name')}
+                className={styles.selectInput}
+              >
                 <option value="category">Group by category</option>
                 <option value="status">Sort by status</option>
                 <option value="name">Sort by name</option>

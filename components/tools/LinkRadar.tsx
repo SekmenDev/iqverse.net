@@ -175,10 +175,22 @@ export default function LinkRadar() {
           </div>
 
           <div style={{ marginTop: 12, display: 'flex', gap: 12, alignItems: 'center' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}><input type="checkbox" checked={opts.checkExternal} onChange={(e) => setOpts(o => ({...o, checkExternal: e.target.checked}))} /> Check external links</label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}><input type="checkbox" checked={opts.checkImages} onChange={(e) => setOpts(o => ({...o, checkImages: e.target.checked}))} /> Check images & assets</label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}><input type="checkbox" checked={opts.crawlSubpages} onChange={(e) => setOpts(o => ({...o, crawlSubpages: e.target.checked}))} /> Crawl sub-pages</label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>Max depth: <input type="number" value={opts.maxDepth} min={1} max={6} onChange={(e) => setOpts(o=>({...o, maxDepth: Number(e.target.value)}))} style={{ width: 60, marginLeft: 6 }} /></label>
+            <label htmlFor="check-external" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <input id="check-external" type="checkbox" checked={opts.checkExternal} onChange={(e) => setOpts(o => ({...o, checkExternal: e.target.checked}))} />
+              Check external links
+            </label>
+            <label htmlFor="check-images" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <input id="check-images" type="checkbox" checked={opts.checkImages} onChange={(e) => setOpts(o => ({...o, checkImages: e.target.checked}))} />
+              Check images & assets
+            </label>
+            <label htmlFor="crawl-subpages" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <input id="crawl-subpages" type="checkbox" checked={opts.crawlSubpages} onChange={(e) => setOpts(o => ({...o, crawlSubpages: e.target.checked}))} />
+              Crawl sub-pages
+            </label>
+            <label htmlFor="max-depth" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              Max depth:
+              <input id="max-depth" type="number" value={opts.maxDepth} min={1} max={6} onChange={(e) => setOpts(o=>({...o, maxDepth: Number(e.target.value)}))} style={{ width: 60, marginLeft: 6 }} />
+            </label>
           </div>
         </div>
       </section>

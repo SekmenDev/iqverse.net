@@ -262,15 +262,18 @@ export default function Chromata() {
               <div className={styles.panelTitle}>Seed Color</div>
 
               <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Pick a color</label>
+                <label className={styles.fieldLabel} htmlFor="seed-color-text">Pick a color</label>
                 <div className={styles.colorInputRow}>
                   <input
+                    id="seed-color-picker"
                     type="color"
                     value={seedHex}
                     className={styles.colorPickerSwatch}
+                    aria-label="Pick a color"
                     onChange={(event) => setSeedHex(event.target.value)}
                   />
                   <input
+                    id="seed-color-text"
                     type="text"
                     value={seedHex}
                     className={styles.hexInput}
@@ -282,16 +285,17 @@ export default function Chromata() {
               </div>
 
               <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Random seed</label>
+                <div className={styles.fieldLabel}>Random seed</div>
                 <button type="button" className={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`} onClick={() => setSeedHex(randomHex())}>
                   Randomize Color
                 </button>
               </div>
 
               <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Shades count</label>
+                <label className={styles.fieldLabel} htmlFor="shades-count">Shades count</label>
                 <div className={styles.sliderRow}>
                   <input
+                    id="shades-count"
                     type="range"
                     min={5}
                     max={15}
@@ -304,7 +308,7 @@ export default function Chromata() {
               </div>
 
               <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Lightness curve</label>
+                <div className={styles.fieldLabel}>Lightness curve</div>
                 <div className={styles.segmentControl}>
                   {['linear', 'ease-in', 'ease-out'].map((value) => (
                     <button
@@ -320,9 +324,10 @@ export default function Chromata() {
               </div>
 
               <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Saturation boost</label>
+                <label className={styles.fieldLabel} htmlFor="saturation-boost">Saturation boost</label>
                 <div className={styles.sliderRow}>
                   <input
+                    id="saturation-boost"
                     type="range"
                     min={-50}
                     max={50}
@@ -345,7 +350,7 @@ export default function Chromata() {
               <div className={styles.panelTitle}>Color Harmony</div>
 
               <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Harmony rule</label>
+                <div className={styles.fieldLabel}>Harmony rule</div>
                 <div className={styles.harmonyGrid}>
                   {HARMONY_OPTIONS.map((option) => (
                     <button
@@ -361,8 +366,9 @@ export default function Chromata() {
               </div>
 
               <div className={styles.fieldGroup}>
-                <label className={styles.toggleLabel}>
+                <label className={styles.toggleLabel} htmlFor="include-neutrals">
                   <input
+                    id="include-neutrals"
                     type="checkbox"
                     checked={includeNeutrals}
                     onChange={(event) => setIncludeNeutrals(event.target.checked)}
@@ -373,8 +379,9 @@ export default function Chromata() {
               </div>
 
               <div className={styles.fieldGroup}>
-                <label className={styles.toggleLabel}>
+                <label className={styles.toggleLabel} htmlFor="include-semantic">
                   <input
+                    id="include-semantic"
                     type="checkbox"
                     checked={includeSemantic}
                     onChange={(event) => setIncludeSemantic(event.target.checked)}
@@ -395,7 +402,7 @@ export default function Chromata() {
               <div className={styles.panelTitle}>Refine & Accessibility</div>
 
               <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Contrast check target</label>
+                <div className={styles.fieldLabel}>Contrast check target</div>
                 <div className={styles.segmentControl}>
                   {['white', 'black', 'both'].map((value) => (
                     <button
@@ -411,7 +418,7 @@ export default function Chromata() {
               </div>
 
               <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>WCAG level</label>
+                <div className={styles.fieldLabel}>WCAG level</div>
                 <div className={styles.segmentControl}>
                   {['A', 'AA', 'AAA'].map((value) => (
                     <button
@@ -427,8 +434,9 @@ export default function Chromata() {
               </div>
 
               <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Color blindness simulation</label>
+                <label className={styles.fieldLabel} htmlFor="color-blindness-mode">Color blindness simulation</label>
                 <select
+                  id="color-blindness-mode"
                   value={colorBlindMode}
                   className={styles.selectInput}
                   onChange={(event) => setColorBlindMode(event.target.value)}
@@ -440,9 +448,10 @@ export default function Chromata() {
               </div>
 
               <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Hue rotation offset</label>
+                <label className={styles.fieldLabel} htmlFor="hue-rotation-offset">Hue rotation offset</label>
                 <div className={styles.sliderRow}>
                   <input
+                    id="hue-rotation-offset"
                     type="range"
                     min={-180}
                     max={180}
@@ -455,9 +464,10 @@ export default function Chromata() {
               </div>
 
               <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Global lightness shift</label>
+                <label className={styles.fieldLabel} htmlFor="global-lightness-shift">Global lightness shift</label>
                 <div className={styles.sliderRow}>
                   <input
+                    id="global-lightness-shift"
                     type="range"
                     min={-30}
                     max={30}
@@ -480,7 +490,7 @@ export default function Chromata() {
               <div className={styles.panelTitle}>Export</div>
 
               <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Format</label>
+                <div className={styles.fieldLabel}>Format</div>
                 <div className={styles.exportFormatGrid}>
                   {EXPORT_FORMATS.map((format) => (
                     <button
@@ -496,8 +506,9 @@ export default function Chromata() {
               </div>
 
               <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Prefix / namespace</label>
+                <label className={styles.fieldLabel} htmlFor="export-prefix">Prefix / namespace</label>
                 <input
+                  id="export-prefix"
                   type="text"
                   value={exportPrefix}
                   className={styles.textInput}
@@ -507,7 +518,7 @@ export default function Chromata() {
               </div>
 
               <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Color format</label>
+                <div className={styles.fieldLabel}>Color format</div>
                 <div className={styles.segmentControl}>
                   {COLOR_FORMATS.map((format) => (
                     <button

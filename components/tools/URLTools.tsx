@@ -130,8 +130,9 @@ export default function URLTools() {
           </div>
 
           <div className={sharedStyles.field}>
-            <label className={sharedStyles.fieldLabel}>Protocol</label>
+            <label className={sharedStyles.fieldLabel} htmlFor="urlProtocol">Protocol</label>
             <input
+              id="urlProtocol"
               type="text"
               value={protocol}
               onChange={(e) => setProtocol(e.target.value)}
@@ -141,8 +142,9 @@ export default function URLTools() {
           </div>
 
           <div className={sharedStyles.field}>
-            <label className={sharedStyles.fieldLabel}>Hostname</label>
+            <label className={sharedStyles.fieldLabel} htmlFor="urlHost">Hostname</label>
             <input
+              id="urlHost"
               type="text"
               value={host}
               onChange={(e) => setHost(e.target.value)}
@@ -152,8 +154,9 @@ export default function URLTools() {
           </div>
 
           <div className={sharedStyles.field}>
-            <label className={sharedStyles.fieldLabel}>Port</label>
+            <label className={sharedStyles.fieldLabel} htmlFor="urlPort">Port</label>
             <input
+              id="urlPort"
               type="text"
               value={port}
               onChange={(e) => setPort(e.target.value)}
@@ -163,8 +166,9 @@ export default function URLTools() {
           </div>
 
           <div className={sharedStyles.field}>
-            <label className={sharedStyles.fieldLabel}>Pathname</label>
+            <label className={sharedStyles.fieldLabel} htmlFor="urlPathname">Pathname</label>
             <input
+              id="urlPathname"
               type="text"
               value={pathname}
               onChange={(e) => setPathname(e.target.value)}
@@ -174,8 +178,9 @@ export default function URLTools() {
           </div>
 
           <div className={sharedStyles.field}>
-            <label className={sharedStyles.fieldLabel}>Hash</label>
+            <label className={sharedStyles.fieldLabel} htmlFor="urlHash">Hash</label>
             <input
+              id="urlHash"
               type="text"
               value={hash}
               onChange={(e) => setHash(e.target.value)}
@@ -185,8 +190,9 @@ export default function URLTools() {
           </div>
 
           <div className={sharedStyles.field}>
-            <label className={sharedStyles.fieldLabel}>Query Parameters</label>
+            <label className={sharedStyles.fieldLabel} htmlFor="urlQueryParams">Query Parameters</label>
             <textarea
+              id="urlQueryParams"
               value={queryText}
               onChange={(e) => setQueryText(e.target.value)}
               className={sharedStyles.textarea}
@@ -196,8 +202,8 @@ export default function URLTools() {
           </div>
 
           <div style={{ marginTop: 18 }} className={sharedStyles.field}>
-            <label className={sharedStyles.fieldLabel}>Output URL</label>
-            <textarea readOnly value={outputUrl} className={sharedStyles.outputArea} rows={4} />
+            <label className={sharedStyles.fieldLabel} htmlFor="urlOutput">Output URL</label>
+            <textarea id="urlOutput" readOnly value={outputUrl} className={sharedStyles.outputArea} rows={4} />
           </div>
 
           {error && (

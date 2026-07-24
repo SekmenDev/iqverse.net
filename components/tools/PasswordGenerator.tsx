@@ -145,31 +145,31 @@ export default function PasswordGenerator() {
           </div>
 
           <div className={sharedStyles.field}>
-            <label className={sharedStyles.fieldLabel}>Character sets</label>
+            <div className={sharedStyles.fieldLabel}>Character sets</div>
             <div style={{ display: 'grid', gap: '0.75rem' }}>
-              <label>
-                <input type="checkbox" checked={useUpper} onChange={(event) => setUseUpper(event.target.checked)} /> Uppercase (A-Z)
+              <label htmlFor="useUpper">
+                <input id="useUpper" type="checkbox" checked={useUpper} onChange={(event) => setUseUpper(event.target.checked)} /> Uppercase (A-Z)
               </label>
-              <label>
-                <input type="checkbox" checked={useLower} onChange={(event) => setUseLower(event.target.checked)} /> Lowercase (a-z)
+              <label htmlFor="useLower">
+                <input id="useLower" type="checkbox" checked={useLower} onChange={(event) => setUseLower(event.target.checked)} /> Lowercase (a-z)
               </label>
-              <label>
-                <input type="checkbox" checked={useDigits} onChange={(event) => setUseDigits(event.target.checked)} /> Digits (0-9)
+              <label htmlFor="useDigits">
+                <input id="useDigits" type="checkbox" checked={useDigits} onChange={(event) => setUseDigits(event.target.checked)} /> Digits (0-9)
               </label>
-              <label>
-                <input type="checkbox" checked={useSymbols} onChange={(event) => setUseSymbols(event.target.checked)} /> Symbols
+              <label htmlFor="useSymbols">
+                <input id="useSymbols" type="checkbox" checked={useSymbols} onChange={(event) => setUseSymbols(event.target.checked)} /> Symbols
               </label>
             </div>
           </div>
 
           <div className={sharedStyles.field}>
-            <label className={sharedStyles.fieldLabel}>Filters</label>
+            <div className={sharedStyles.fieldLabel}>Filters</div>
             <div style={{ display: 'grid', gap: '0.75rem' }}>
-              <label>
-                <input type="checkbox" checked={excludeSimilar} onChange={(event) => setExcludeSimilar(event.target.checked)} /> Exclude similar characters (0Oo1IlL)
+              <label htmlFor="excludeSimilar">
+                <input id="excludeSimilar" type="checkbox" checked={excludeSimilar} onChange={(event) => setExcludeSimilar(event.target.checked)} /> Exclude similar characters (0Oo1IlL)
               </label>
-              <label>
-                <input type="checkbox" checked={excludeAmbiguous} onChange={(event) => setExcludeAmbiguous(event.target.checked)} /> Exclude ambiguous characters ({`{}[]()/\\'"\~,;:.<>?`})
+              <label htmlFor="excludeAmbiguous">
+                <input id="excludeAmbiguous" type="checkbox" checked={excludeAmbiguous} onChange={(event) => setExcludeAmbiguous(event.target.checked)} /> Exclude ambiguous characters ({AMBIGUOUS})
               </label>
             </div>
           </div>
@@ -187,16 +187,20 @@ export default function PasswordGenerator() {
           </div>
 
           <div className={sharedStyles.field}>
-            <label className={sharedStyles.fieldLabel}>Prefix / Suffix</label>
+            <div className={sharedStyles.fieldLabel}>Prefix / Suffix</div>
             <div style={{ display: 'grid', gap: '0.75rem' }}>
+              <label htmlFor="pwdPrefix" className={sharedStyles.fieldLabel}>Prefix</label>
               <input
+                id="pwdPrefix"
                 type="text"
                 value={prefix}
                 onChange={(event) => setPrefix(event.target.value)}
                 placeholder="Prefix"
                 className={sharedStyles.textarea}
               />
+              <label htmlFor="pwdSuffix" className={sharedStyles.fieldLabel}>Suffix</label>
               <input
+                id="pwdSuffix"
                 type="text"
                 value={suffix}
                 onChange={(event) => setSuffix(event.target.value)}
@@ -207,52 +211,48 @@ export default function PasswordGenerator() {
           </div>
 
           <div className={sharedStyles.field}>
-            <label className={sharedStyles.fieldLabel}>Minimum counts</label>
+            <div className={sharedStyles.fieldLabel}>Minimum counts</div>
             <div style={{ display: 'grid', gap: '0.75rem' }}>
-              <label>
-                Uppercase min
-                <input
-                  type="number"
-                  min={0}
-                  max={128}
-                  value={minUpper}
-                  onChange={(event) => setMinUpper(Number(event.target.value))}
-                  className={sharedStyles.textarea}
-                />
-              </label>
-              <label>
-                Lowercase min
-                <input
-                  type="number"
-                  min={0}
-                  max={128}
-                  value={minLower}
-                  onChange={(event) => setMinLower(Number(event.target.value))}
-                  className={sharedStyles.textarea}
-                />
-              </label>
-              <label>
-                Digits min
-                <input
-                  type="number"
-                  min={0}
-                  max={128}
-                  value={minDigits}
-                  onChange={(event) => setMinDigits(Number(event.target.value))}
-                  className={sharedStyles.textarea}
-                />
-              </label>
-              <label>
-                Symbols min
-                <input
-                  type="number"
-                  min={0}
-                  max={128}
-                  value={minSymbols}
-                  onChange={(event) => setMinSymbols(Number(event.target.value))}
-                  className={sharedStyles.textarea}
-                />
-              </label>
+              <label htmlFor="minUpper" className={sharedStyles.fieldLabel}>Uppercase min</label>
+              <input
+                id="minUpper"
+                type="number"
+                min={0}
+                max={128}
+                value={minUpper}
+                onChange={(event) => setMinUpper(Number(event.target.value))}
+                className={sharedStyles.textarea}
+              />
+              <label htmlFor="minLower" className={sharedStyles.fieldLabel}>Lowercase min</label>
+              <input
+                id="minLower"
+                type="number"
+                min={0}
+                max={128}
+                value={minLower}
+                onChange={(event) => setMinLower(Number(event.target.value))}
+                className={sharedStyles.textarea}
+              />
+              <label htmlFor="minDigits" className={sharedStyles.fieldLabel}>Digits min</label>
+              <input
+                id="minDigits"
+                type="number"
+                min={0}
+                max={128}
+                value={minDigits}
+                onChange={(event) => setMinDigits(Number(event.target.value))}
+                className={sharedStyles.textarea}
+              />
+              <label htmlFor="minSymbols" className={sharedStyles.fieldLabel}>Symbols min</label>
+              <input
+                id="minSymbols"
+                type="number"
+                min={0}
+                max={128}
+                value={minSymbols}
+                onChange={(event) => setMinSymbols(Number(event.target.value))}
+                className={sharedStyles.textarea}
+              />
             </div>
           </div>
 

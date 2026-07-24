@@ -483,8 +483,8 @@ export default function DNSLookup() {
         </div>
 
         <div className={styles.inputGroup}>
-          <label className={styles.fieldLabel}>Record Types</label>
-          <div className={styles.typeGrid}>
+          <div className={styles.fieldLabel} id="record-types-label">Record Types</div>
+          <div className={styles.typeGrid} role="group" aria-labelledby="record-types-label">
             {['ALL', ...ALL_TYPES].map((type) => (
               <button
                 type="button"
@@ -499,10 +499,11 @@ export default function DNSLookup() {
         </div>
 
         <div className={styles.inputGroup}>
-          <label className={styles.fieldLabel}>Options</label>
-          <div className={styles.optionsRow}>
-            <label className={styles.toggleLabel}>
+          <div className={styles.fieldLabel} id="lookup-options-label">Options</div>
+          <div className={styles.optionsRow} role="group" aria-labelledby="lookup-options-label">
+            <label className={styles.toggleLabel} htmlFor="dnssec-toggle">
               <input
+                id="dnssec-toggle"
                 type="checkbox"
                 checked={dnssecToggle}
                 onChange={(e) => setDnssecToggle(e.target.checked)}
@@ -513,8 +514,9 @@ export default function DNSLookup() {
               </span>
               <span>Request DNSSEC data</span>
             </label>
-            <label className={styles.toggleLabel}>
+            <label className={styles.toggleLabel} htmlFor="cd-toggle">
               <input
+                id="cd-toggle"
                 type="checkbox"
                 checked={cdToggle}
                 onChange={(e) => setCdToggle(e.target.checked)}
@@ -525,8 +527,9 @@ export default function DNSLookup() {
               </span>
               <span>Disable DNSSEC validation (CD bit)</span>
             </label>
-            <label className={styles.toggleLabel}>
+            <label className={styles.toggleLabel} htmlFor="edns-toggle">
               <input
+                id="edns-toggle"
                 type="checkbox"
                 checked={ednsToggle}
                 onChange={(e) => setEdnsToggle(e.target.checked)}
@@ -541,8 +544,8 @@ export default function DNSLookup() {
         </div>
 
         <div className={styles.inputGroup}>
-          <label className={styles.fieldLabel}>Quick Presets</label>
-          <div className={styles.presetRow} ref={presetRowRef}>
+          <div className={styles.fieldLabel} id="quick-presets-label">Quick Presets</div>
+          <div className={styles.presetRow} ref={presetRowRef} role="group" aria-labelledby="quick-presets-label">
             {PRESET_DOMAINS.map((domain) => (
               <button
                 type="button"
