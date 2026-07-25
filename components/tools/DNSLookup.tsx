@@ -339,83 +339,97 @@ export default function DNSLookup() {
     setTimeout(() => runLookup(), 0);
   };
 
+  const renderAllRecordsTable = (data: Record<string, any>) => {
+    const allAnswers: any[] = [];
+    Object.entries(data).forEach(([type, res]) => {
+      if (res.Answer) {
+        res.Answer.forEach((ans: any) => allAnswers.push({ ...ans, _type: type }));
+      }
+    });
+
+    if (allAnswers.length === 0) {
+      return <div className={styles.noRecords}>No records found for this domain.</div>;
+    }
+
+    return (
+      <table className={styles.resultsTable}>
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Name</th>
+            <th>TTL</th>
+            <th>Data</th>
+          </tr>
+        </thead>
+        <tbody>
+          {allAnswers.map((ans, idx) => (
+            <tr key={idx}>
+              <td className={styles.tdType}>{escapeHtml(typeNumberToName(ans.type) || ans._type)}</td>
+              <td className={styles.tdName}>{escapeHtml(ans.name || '')}</td>
+              <td className={styles.tdTtl}>{formatTTL(ans.TTL)}</td>
+              <td className={styles.tdData} dangerouslySetInnerHTML={{ __html: formatData(ans) }} />
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  };
+
+  const getSingleTypeErrorMessage = (res: any, tab: string): string | null => {
+    if (!res || res.Status === -1) {
+      return `Error querying ${tab}: ${escapeHtml(res?._error || 'Unknown error')}`;
+    }
+
+    const rcode = res.Status;
+    const rcodeName = RCODE_NAMES[rcode] || `RCODE ${rcode}`;
+
+    if (rcode !== 0 || !res.Answer || res.Answer.length === 0) {
+      let msg = rcode === 0 ? `No ${tab} records found.` : `DNS response: ${rcodeName}`;
+      if (res.Authority && res.Authority.length > 0) {
+        msg += ` (SOA authority: ${res.Authority[0]?.data || ''})`;
+      }
+      return msg;
+    }
+
+    return null;
+  };
+
+  const renderSingleTypeTable = (res: any, tab: string) => {
+    const errorMsg = getSingleTypeErrorMessage(res, tab);
+    if (errorMsg) {
+      return <div className={styles.noRecords}>{escapeHtml(errorMsg)}</div>;
+    }
+
+    const cols = getColumns(tab);
+    return (
+      <table className={styles.resultsTable}>
+        <thead>
+          <tr>
+            {cols.map((c, idx) => (
+              <th key={idx}>{c.label}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {res.Answer.map((ans: any, idx: number) => (
+            <tr key={idx}>
+              {cols.map((c, cidx) => (
+                <td key={cidx} className={c.cls} dangerouslySetInnerHTML={{ __html: c.render(ans) }} />
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  };
+
   // Render results table
   const renderTable = () => {
     if (!lastResults) return null;
-
     if (activeTab === 'ALL') {
-      const allAnswers: any[] = [];
-      Object.entries(lastResults.data).forEach(([type, res]) => {
-        if (res.Answer) {
-          res.Answer.forEach((ans: any) => allAnswers.push({ ...ans, _type: type }));
-        }
-      });
-
-      if (allAnswers.length === 0) {
-        return <div className={styles.noRecords}>No records found for this domain.</div>;
-      }
-
-      return (
-        <table className={styles.resultsTable}>
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>Name</th>
-              <th>TTL</th>
-              <th>Data</th>
-            </tr>
-          </thead>
-          <tbody>
-            {allAnswers.map((ans, idx) => (
-              <tr key={idx}>
-                <td className={styles.tdType}>{escapeHtml(typeNumberToName(ans.type) || ans._type)}</td>
-                <td className={styles.tdName}>{escapeHtml(ans.name || '')}</td>
-                <td className={styles.tdTtl}>{formatTTL(ans.TTL)}</td>
-                <td className={styles.tdData} dangerouslySetInnerHTML={{ __html: formatData(ans) }} />
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      );
-    } else {
-      const res = lastResults.data[activeTab];
-      if (!res || res.Status === -1) {
-        return <div className={styles.noRecords}>Error querying {activeTab}: {escapeHtml(res?._error || 'Unknown error')}</div>;
-      }
-
-      const rcode = res.Status;
-      const rcodeName = RCODE_NAMES[rcode] || `RCODE ${rcode}`;
-
-      if (rcode !== 0 || !res.Answer || res.Answer.length === 0) {
-        let msg = rcode === 0 ? `No ${activeTab} records found.` : `DNS response: ${rcodeName}`;
-        if (res.Authority && res.Authority.length > 0) {
-          msg += ` (SOA authority: ${res.Authority[0]?.data || ''})`;
-        }
-        return <div className={styles.noRecords}>{escapeHtml(msg)}</div>;
-      }
-
-      const cols = getColumns(activeTab);
-      return (
-        <table className={styles.resultsTable}>
-          <thead>
-            <tr>
-              {cols.map((c, idx) => (
-                <th key={idx}>{c.label}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {res.Answer.map((ans: any, idx: number) => (
-              <tr key={idx}>
-                {cols.map((c, cidx) => (
-                  <td key={cidx} className={c.cls} dangerouslySetInnerHTML={{ __html: c.render(ans) }} />
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      );
+      return renderAllRecordsTable(lastResults.data);
     }
+    return renderSingleTypeTable(lastResults.data[activeTab], activeTab);
   };
 
   // Calculate summary data
