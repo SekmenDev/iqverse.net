@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { tools, getUniqueCategories, getUniqueStatuses, filterTools, sortTools } from '@/lib/tools';
 import type { Tool } from '@/lib/tools';
+import ThemeToggle from '@/components/layout/ThemeToggle';
 import styles from './catalog.module.css';
 
 export default function Home() {
@@ -237,6 +238,7 @@ export default function Home() {
         </div>
 
         <div className={styles.navRight}>
+          <ThemeToggle />
           <a
             href="https://github.com/SekmenDev/iqverse.net"
             target="_blank"

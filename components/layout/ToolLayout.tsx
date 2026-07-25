@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import React from 'react';
+import ThemeToggle from './ThemeToggle';
 import styles from '@/styles/tool-layout.module.css';
 
 interface ToolLayoutProps {
@@ -34,6 +35,7 @@ export default function ToolLayout({
         </div>
 
         <div className={styles.navRight}>
+          <ThemeToggle />
           <Link href="/">Home</Link>
           <a href="https://github.com/SekmenDev/iqverse.net" target="_blank" rel="noreferrer">
             Source

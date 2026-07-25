@@ -15,7 +15,7 @@
   align-items: center;
   gap: 16px;
   padding: 0 20px;
-  background: rgba(12, 14, 20, 0.92);
+  background: var(--nav-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
