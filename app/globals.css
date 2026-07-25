@@ -16,11 +16,32 @@
   --green:       #34D399;
   --yellow:      #FBBF24;
   --red:         #F87171;
+  --nav-bg:      rgba(12, 14, 20, 0.92);
   --font-mono:   'Menlo', 'Consolas', 'Liberation Mono', monospace;
   --radius-sm:   16px;
   --radius-lg:   24px;
   --sidebar-w:   220px;
   --nav-h:       56px;
+}
+
+[data-theme='light'] {
+  --bg:          #F8FAFC;
+  --surface:     #FFFFFF;
+  --card:        #FFFFFF;
+  --card-hover:  #F1F5F9;
+  --border:      rgba(0, 0, 0, 0.08);
+  --border-acc:  rgba(99, 102, 241, 0.4);
+  --text:        #0F172A;
+  --text-dark:   #334155;
+  --text-muted:  #475569;
+  --muted:       #64748B;
+  --accent:      #6366F1;
+  --accent-dark: #4F46E5;
+  --accent-dim:  rgba(99, 102, 241, 0.10);
+  --green:       #059669;
+  --yellow:      #D97706;
+  --red:         #DC2626;
+  --nav-bg:      rgba(255, 255, 255, 0.92);
 }
 
 /* Reset and Base Styles */
@@ -375,6 +396,12 @@ textarea {
   background-size: 50px 50px;
   pointer-events: none;
   z-index: 0;
+}
+
+[data-theme='light'] .bg-grid {
+  background-image: 
+	linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+	linear-gradient(90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
 }
 
 .bg-glow {

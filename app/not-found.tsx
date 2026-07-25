@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { filterTools } from '@/lib/tools';
+import ThemeToggle from '@/components/layout/ThemeToggle';
 import styles from './not-found.module.css';
 
 export default function NotFoundPage() {
@@ -15,6 +16,14 @@ export default function NotFoundPage() {
 
   return (
     <div className={styles.pageShell}>
+      <nav className={styles.topNav}>
+        <Link href="/" className={styles.navLogo}>
+          <span className={styles.navLogoDot}></span> IQVerse
+        </Link>
+        <div className={styles.navRight}>
+          <ThemeToggle />
+        </div>
+      </nav>
       <div className={styles.notFoundPage}>
         <section className={styles.heroBanner}>
           <div className={styles.heroCopy}>

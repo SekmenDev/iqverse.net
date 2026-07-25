@@ -13,6 +13,12 @@
   margin: 0 auto;
 }
 
+.navRight {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .brand {
   display: inline-flex;
   align-items: center;

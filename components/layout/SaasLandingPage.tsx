@@ -1,3 +1,4 @@
+import ThemeToggle from './ThemeToggle';
 import styles from '@/styles/saas-landing.module.css';
 
 export interface LandingCard {
@@ -70,9 +71,12 @@ export default function SaasLandingPage({
           <a href="#solution">Benefits</a>
           <a href="#contact">Contact</a>
         </div>
-        <a className={styles.navCta} href="#contact">
-          Request a Demo
-        </a>
+        <div className={styles.navRight}>
+          <ThemeToggle />
+          <a className={styles.navCta} href="#contact">
+            Request a Demo
+          </a>
+        </div>
       </nav>
 
       <main id="top">

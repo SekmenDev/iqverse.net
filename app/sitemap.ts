@@ -1,34 +1,11 @@
 import type { MetadataRoute } from 'next'
-
+import { tools } from '@/lib/tools'
 export const dynamic = 'force-static'
 
 const baseUrl = 'https://iqverse.net'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const tools = [
-    'agentscan',
-    'qrforge',
-    'linkradar',
-    'favicongen',
-    'json',
-    'encodelab',
-    'regex',
-    'password',
-    'headers',
-    'chromata',
-    'dnslookup',
-    'hashing',
-    'compression',
-    'dataconverter',
-    'cssunits',
-    'csvviewer',
-    'imageoptimizer',
-    'url',
-    'goo',
-    'ges',
-    'gyp',
-    'gst',
-  ]
+  const internalTools = tools.filter((tool) => tool.type !== "coming")
 
   return [
     {
@@ -37,11 +14,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'weekly',
       priority: 1,
     },
-    ...tools.map((tool) => ({
-      url: `${baseUrl}/${tool}/`,
+    ...internalTools.map((tool) => ({
+      url: tool.url.startsWith('/') ? `${baseUrl}${tool.url}` : `${baseUrl}/${tool.url}/`,
       lastModified: new Date(),
       changeFrequency: 'monthly' as const,
       priority: 0.8,
     })),
   ]
 }
+
