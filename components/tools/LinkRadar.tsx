@@ -16,20 +16,73 @@ type ScanItem = {
 
 type ResultItem = ScanItem & { status: number; time?: number; error?: string };
 
-async function checkUrl(url: string, signal?: AbortSignal) {
+async function fetchUrl(url: string, signal?: AbortSignal): Promise<{ status: number; time: number; html?: string; error?: string } | null> {
   const t0 = Date.now();
+  let isSameOrigin = false;
   try {
-    const res = await fetch(url, { method: 'HEAD', mode: 'cors', redirect: 'follow', signal, cache: 'no-store' });
-    return { status: res.status, time: Date.now() - t0 };
-  } catch (e: any) {
-    if (e?.name === 'AbortError') return null;
+    isSameOrigin = typeof window !== 'undefined' && new URL(url).origin === window.location.origin;
+  } catch {
+    isSameOrigin = false;
+  }
+
+  // 1. Direct fetch for same-origin URLs
+  if (isSameOrigin) {
     try {
       const res = await fetch(url, { method: 'GET', mode: 'cors', redirect: 'follow', signal, cache: 'no-store' });
-      return { status: res.status, time: Date.now() - t0 };
-    } catch (error_: any) {
-      if (error_.name === 'AbortError') return null;
-      return { status: 0, time: Date.now() - t0, error: error_.message };
+      const ct = res.headers.get('content-type') || '';
+      let html: string | undefined;
+      if (ct.includes('text/html')) {
+        html = await res.text();
+      }
+      return { status: res.status, time: Date.now() - t0, html };
+    } catch (e: any) {
+      if (e?.name === 'AbortError') return null;
     }
+  }
+
+  // 2. Use CORS Proxy (allorigins) for cross-origin URLs to prevent browser console CORS errors
+  try {
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+    const res = await fetch(proxyUrl, { signal, cache: 'no-store' });
+    if (res.ok) {
+      const json = await res.json();
+      const httpStatus = json.status?.http_code ?? 200;
+      return {
+        status: httpStatus,
+        time: Date.now() - t0,
+        html: json.contents || undefined,
+      };
+    }
+  } catch (proxyError: any) {
+    if (proxyError?.name === 'AbortError') return null;
+  }
+
+  // 3. Fallback: Secondary CORS Proxy (corsproxy.io)
+  try {
+    const proxyUrl2 = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+    const res = await fetch(proxyUrl2, { signal, cache: 'no-store' });
+    const ct = res.headers.get('content-type') || '';
+    let html: string | undefined;
+    if (ct.includes('text/html')) {
+      html = await res.text();
+    }
+    return { status: res.status, time: Date.now() - t0, html };
+  } catch (proxyError2: any) {
+    if (proxyError2?.name === 'AbortError') return null;
+  }
+
+  // 4. Final Fallback: Direct fetch
+  try {
+    const res = await fetch(url, { method: 'GET', mode: 'cors', redirect: 'follow', signal, cache: 'no-store' });
+    const ct = res.headers.get('content-type') || '';
+    let html: string | undefined;
+    if (ct.includes('text/html')) {
+      html = await res.text();
+    }
+    return { status: res.status, time: Date.now() - t0, html };
+  } catch (e: any) {
+    if (e?.name === 'AbortError') return null;
+    return { status: 0, time: Date.now() - t0, error: e?.message || 'Network/CORS error' };
   }
 }
 
@@ -52,11 +105,21 @@ export default function LinkRadar() {
     const out: ScanItem[] = [];
     const add = (href: string | null, tag: string, text?: string) => {
       if (!href) return;
+      if (
+        href.startsWith('javascript:') ||
+        href.startsWith('mailto:') ||
+        href.startsWith('tel:') ||
+        href.startsWith('#') ||
+        href.startsWith('data:')
+      ) {
+        return;
+      }
       const u = normalizeUrl(base, href);
       if (u && (u.startsWith('http://') || u.startsWith('https://'))) {
         out.push({ url: u, tag, text: (text || '').trim().slice(0, 60), sourceUrl: base });
       }
     };
+
     doc.querySelectorAll('a[href]').forEach((el) => add(el.getAttribute('href'), '<a>', el.textContent || (el as HTMLElement).innerText));
     if (opts.checkImages) {
       doc.querySelectorAll('img[src]').forEach((el) => add(el.getAttribute('src'), '<img>', el.getAttribute('alt') || ''));
@@ -65,16 +128,6 @@ export default function LinkRadar() {
     }
     return out;
   }, [opts.checkImages]);
-
-  const processBatch = useCallback(async (items: ScanItem[], signal?: AbortSignal) => {
-    return Promise.all(
-      items.map(async (item) => {
-        const r = await checkUrl(item.url, signal);
-        if (!r) return null;
-        return { ...item, ...r } as ResultItem;
-      })
-    );
-  }, []);
 
   const runScan = useCallback(async (root: string) => {
     const controller = new AbortController();
@@ -85,6 +138,14 @@ export default function LinkRadar() {
     const pageFetched = new Set<string>();
     let checkedCountLocal = 0;
 
+    let rootOrigin = '';
+    try {
+      rootOrigin = new URL(root).origin;
+    } catch {
+      logLine(`Invalid root URL: ${root}`);
+      return;
+    }
+
     setResults([]);
     setLog([]);
     setCheckedCount(0);
@@ -92,48 +153,78 @@ export default function LinkRadar() {
 
     logLine(`Starting scan: ${root}`);
 
-    while (queue.length > 0 && running === false ? false : true) {
-      if (signal.aborted) break;
+    while (queue.length > 0 && !signal.aborted) {
       const batch = queue.splice(0, CONCURRENCY);
       const toCheck = batch.filter((item) => {
         if (visited.has(item.url)) return false;
         visited.add(item.url);
         return true;
       });
+
       if (toCheck.length === 0) continue;
 
-      const resultsBatch = await processBatch(toCheck, signal);
+      const resultsBatch = await Promise.all(
+        toCheck.map(async (item) => {
+          const r = await fetchUrl(item.url, signal);
+          if (!r) return null;
+          return { ...item, ...r };
+        })
+      );
+
       for (let i = 0; i < resultsBatch.length; i++) {
         const r = resultsBatch[i];
-        if (!r) continue;
-        setResults((s) => [...s, r]);
+        if (!r || signal.aborted) continue;
+
+        const { html, ...resultItem } = r;
+        setResults((s) => [...s, resultItem]);
         setCheckedCount((c) => c + 1);
         checkedCountLocal++;
-        const statusText = r.status === 0 ? 'ERR' : String(r.status);
-        logLine(`[${statusText}] ${r.url} (${r.time}ms)`);
+
+        const statusText = resultItem.status === 0 ? 'ERR' : String(resultItem.status);
+        logLine(`[${statusText}] ${resultItem.url} (${resultItem.time}ms)`);
 
         const item = toCheck[i];
+        let itemOrigin = '';
+        try {
+          itemOrigin = new URL(item.url).origin;
+        } catch {
+          continue;
+        }
+
         if (
           opts.crawlSubpages &&
           (item.depth ?? 0) < opts.maxDepth &&
-          new URL(root).origin === new URL(item.url).origin &&
+          itemOrigin === rootOrigin &&
           !pageFetched.has(item.url) &&
-          r.status >= 200 && r.status < 300
+          resultItem.status >= 200 && resultItem.status < 300
         ) {
           pageFetched.add(item.url);
-          try {
-            const res = await fetch(item.url, { mode: 'cors', cache: 'no-store', signal });
-            const ct = res.headers.get('content-type') || '';
-            if (ct.includes('text/html')) {
-              const html = await res.text();
-              const subLinks = extractLinks(html, item.url);
-              for (const link of subLinks) {
-                if (!visited.has(link.url)) queue.push({ ...link, depth: (item.depth ?? 0) + 1 });
+          let pageHtml = html;
+          if (!pageHtml) {
+            const fetched = await fetchUrl(item.url, signal);
+            pageHtml = fetched?.html;
+          }
+
+          if (pageHtml) {
+            const subLinks = extractLinks(pageHtml, item.url);
+            let addedCount = 0;
+            for (const link of subLinks) {
+              let linkOrigin = '';
+              try {
+                linkOrigin = new URL(link.url).origin;
+              } catch {
+                continue;
               }
-              logLine(`  ↳ crawled ${item.url}, found ${subLinks.length} links`);
+
+              const isExternal = linkOrigin !== rootOrigin;
+              if (isExternal && !opts.checkExternal) continue;
+
+              if (!visited.has(link.url)) {
+                queue.push({ ...link, depth: (item.depth ?? 0) + 1 });
+                addedCount++;
+              }
             }
-          } catch (e: any) {
-            if (e?.name !== 'AbortError') logLine(`  ↳ crawl failed: ${e?.message}`);
+            logLine(`  ↳ crawled ${item.url}, found ${subLinks.length} links (${addedCount} queued)`);
           }
         }
       }
@@ -141,8 +232,12 @@ export default function LinkRadar() {
 
     setRunning(false);
     abortRef.current = null;
-    logLine(`Scan finished. ${checkedCountLocal} URLs checked.`);
-  }, [extractLinks, logLine, opts, processBatch, running]);
+    if (signal.aborted) {
+      logLine(`Scan stopped by user. ${checkedCountLocal} URLs checked.`);
+    } else {
+      logLine(`Scan finished. ${checkedCountLocal} URLs checked.`);
+    }
+  }, [extractLinks, logLine, opts]);
 
   useEffect(() => {
     return () => {
@@ -154,7 +249,6 @@ export default function LinkRadar() {
     if (running) {
       if (abortRef.current) abortRef.current.abort();
       setRunning(false);
-      logLine('Scan stopped by user.');
       return;
     }
     let rootUrl = url.trim();
@@ -254,3 +348,5 @@ export default function LinkRadar() {
     </div>
   );
 }
+
+
