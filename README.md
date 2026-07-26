@@ -9,6 +9,8 @@
 [![Next.js](https://img.shields.io/badge/Next.js-16.2.10-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19.2-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![Vitest](https://img.shields.io/badge/Vitest-3.0-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)](https://vitest.dev/)
+[![Playwright](https://img.shields.io/badge/Playwright-1.50-2EAD33?style=for-the-badge&logo=playwright&logoColor=white)](https://playwright.dev/)
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare_Pages-Deployed-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)](https://pages.cloudflare.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald?style=for-the-badge)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen.svg?style=for-the-badge)](https://github.com/SekmenDev/iqverse.net/pulls)
@@ -140,6 +142,9 @@ IQVerse organizes tools into intuitive categories. Below is the full directory o
 
 ```text
 iqverse.net/
+├── 📂 __tests__/                # Vitest unit & component test suites
+│   ├── 📂 components/          # React tool component integration tests
+│   └── 📂 unit/                # Core lib utility function tests
 ├── 📂 app/                      # Next.js App Router routes & tools
 │   ├── 📂 agentscan/           # AI Agents Scanner route
 │   ├── 📂 chromata/            # Color Palette Generator route
@@ -172,6 +177,7 @@ iqverse.net/
 ├── 📂 components/              # Modular UI & Tool React components
 │   ├── 📂 layout/              # Header, Footer, Navigation bars
 │   └── 📂 tools/               # Isolated tool UI component implementations
+├── 📂 e2e/                      # Playwright end-to-end page & navigation tests
 ├── 📂 lib/                     # Core business logic & registries
 │   └── 📄 tools.ts             # Central tool catalog registry, filters & metadata
 ├── 📂 public/                  # Static assets, tool icons, manifest & favicons
@@ -179,7 +185,10 @@ iqverse.net/
 ├── 📄 eslint.config.mjs        # ESLint flat configuration
 ├── 📄 next.config.ts           # Next.js configuration (static export output)
 ├── 📄 package.json             # NPM package manifest and scripts
+├── 📄 playwright.config.ts     # Playwright E2E testing configuration
 ├── 📄 tsconfig.json            # TypeScript configuration
+├── 📄 vitest.config.ts         # Vitest unit/component test configuration
+├── 📄 vitest.setup.ts          # Vitest setup matchers & browser mocks
 ├── 📄 wrangler.jsonc           # Cloudflare Pages / Workers deployment config
 └── 📄 yarn.lock                # Yarn lockfile
 ```
@@ -191,6 +200,7 @@ iqverse.net/
 - **Framework**: [Next.js 16 (App Router)](https://nextjs.org/)
 - **Core Library**: [React 19](https://react.dev/)
 - **Language**: [TypeScript 6](https://www.typescriptlang.org/)
+- **Testing**: [Vitest](https://vitest.dev/) (Unit/Component), [React Testing Library](https://testing-library.com/), [Playwright](https://playwright.dev/) (E2E Page Checks)
 - **Package Manager**: [Yarn Berry](https://yarnpkg.com/)
 - **Styling**: Native CSS Modules + Custom CSS Custom Properties (Tokens)
 - **Compilation**: Static HTML Export (`output: 'export'`)
@@ -236,6 +246,20 @@ Ensure you have the following installed on your system:
    yarn lint
    ```
 
+5. **Run tests & view test reports**:
+
+   IQVerse includes unit, component, and E2E test suites with automated CLI and HTML reporting:
+
+   | Command | Purpose | Output & Report |
+   | :--- | :--- | :--- |
+   | `yarn test` | Run Unit & Component Tests | Fast CLI summary table for functions & React components |
+   | `yarn test:ui` | Launch Vitest Browser UI | Opens interactive visual dashboard (`http://localhost:51204`) |
+   | `yarn test:coverage` | Generate Coverage Report | Outputs code coverage across `lib/` and `components/` |
+   | `yarn test:e2e` | Run E2E Page Tests | Headless Playwright runner testing Next.js page routes |
+   | `yarn test:e2e:ui` | Launch Playwright UI | Interactive Playwright test inspector & debugger |
+   | `yarn test:e2e:report` | View E2E HTML Report | Opens HTML test report with trace logs & screenshot diffs |
+   | `yarn test:all` | Run All Test Suites | Executes both Vitest unit/component tests AND Playwright E2E tests |
+
 ---
 
 ## 📦 Building & Deployment
@@ -247,22 +271,6 @@ Compile the static output folder (`out/`):
 ```bash
 yarn build
 ```
-
-### Cloudflare Pages Deployment
-
-This project is configured for seamless deployment on Cloudflare Pages using `wrangler.jsonc`.
-
-1. **Preview deployment locally with Wrangler**:
-
-   ```bash
-   npx wrangler pages dev out
-   ```
-
-2. **Deploy directly to Cloudflare Pages**:
-
-   ```bash
-   npx wrangler deploy
-   ```
 
 ---
 
