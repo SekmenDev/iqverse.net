@@ -18,71 +18,32 @@ type ResultItem = ScanItem & { status: number; time?: number; error?: string };
 
 async function fetchUrl(url: string, signal?: AbortSignal): Promise<{ status: number; time: number; html?: string; error?: string } | null> {
   const t0 = Date.now();
-  let isSameOrigin = false;
   try {
-    isSameOrigin = typeof window !== 'undefined' && new URL(url).origin === window.location.origin;
-  } catch {
-    isSameOrigin = false;
-  }
+    const res = await fetch(`/api/check-url?url=${encodeURIComponent(url)}`, { signal, cache: 'no-store' });
+    const data = await res.json();
 
-  // 1. Direct fetch for same-origin URLs
-  if (isSameOrigin) {
-    try {
-      const res = await fetch(url, { method: 'GET', mode: 'cors', redirect: 'follow', signal, cache: 'no-store' });
-      const ct = res.headers.get('content-type') || '';
-      let html: string | undefined;
-      if (ct.includes('text/html')) {
-        html = await res.text();
+    let html: string | undefined;
+    if (data.status >= 200 && data.status < 300) {
+      try {
+        const directRes = await fetch(url, { method: 'GET', signal, cache: 'no-store' });
+        const ct = directRes.headers.get('content-type') || '';
+        if (ct.includes('text/html')) {
+          html = await directRes.text();
+        }
+      } catch {
+        // Ignore CORS/network errors when fetching HTML body for crawling
       }
-      return { status: res.status, time: Date.now() - t0, html };
-    } catch (e: any) {
-      if (e?.name === 'AbortError') return null;
     }
-  }
 
-  // 2. Use CORS Proxy (allorigins) for cross-origin URLs to prevent browser console CORS errors
-  try {
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-    const res = await fetch(proxyUrl, { signal, cache: 'no-store' });
-    if (res.ok) {
-      const json = await res.json();
-      const httpStatus = json.status?.http_code ?? 200;
-      return {
-        status: httpStatus,
-        time: Date.now() - t0,
-        html: json.contents || undefined,
-      };
-    }
-  } catch (proxyError: any) {
-    if (proxyError?.name === 'AbortError') return null;
-  }
-
-  // 3. Fallback: Secondary CORS Proxy (corsproxy.io)
-  try {
-    const proxyUrl2 = `https://corsproxy.io/?${encodeURIComponent(url)}`;
-    const res = await fetch(proxyUrl2, { signal, cache: 'no-store' });
-    const ct = res.headers.get('content-type') || '';
-    let html: string | undefined;
-    if (ct.includes('text/html')) {
-      html = await res.text();
-    }
-    return { status: res.status, time: Date.now() - t0, html };
-  } catch (proxyError2: any) {
-    if (proxyError2?.name === 'AbortError') return null;
-  }
-
-  // 4. Final Fallback: Direct fetch
-  try {
-    const res = await fetch(url, { method: 'GET', mode: 'cors', redirect: 'follow', signal, cache: 'no-store' });
-    const ct = res.headers.get('content-type') || '';
-    let html: string | undefined;
-    if (ct.includes('text/html')) {
-      html = await res.text();
-    }
-    return { status: res.status, time: Date.now() - t0, html };
+    return {
+      status: data.status ?? 0,
+      time: data.time ?? (Date.now() - t0),
+      error: data.error,
+      html,
+    };
   } catch (e: any) {
     if (e?.name === 'AbortError') return null;
-    return { status: 0, time: Date.now() - t0, error: e?.message || 'Network/CORS error' };
+    return { status: 0, time: Date.now() - t0, error: e?.message || 'Network error' };
   }
 }
 
