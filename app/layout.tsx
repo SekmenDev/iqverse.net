@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -100,6 +101,7 @@ export default function RootLayout({
             `,
           }}
         />
+        <Script src="https://cdn.jsdelivr.net/npm/cap-widget@latest" type="module" strategy="afterInteractive" />
       </head>
       <body>
         {children}
