@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { getHeader } from '@/lib/utils';
 import styles from '@/styles/agentscan.module.css';
+import CapCaptcha from '@/components/CapCaptcha';
 
 const PROXY = 'https://api.allorigins.win/get?url=';
 
@@ -458,6 +459,10 @@ export default function AgentScan() {
             <button className={styles.scanButton} onClick={handleScan} disabled={loading} type="button">
               {loading ? 'Scanning…' : 'Scan Site'}
             </button>
+          </div>
+
+          <div style={{ marginTop: 12 }}>
+            <CapCaptcha />
           </div>
 
           <div className={styles.filterBar}>

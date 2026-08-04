@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import styles from '@/styles/header-scan.module.css';
 import sharedStyles from '@/styles/shared-tool-styles.module.css';
+import CapCaptcha from '@/components/CapCaptcha';
 
 type TabKey = 'security' | 'performance' | 'info' | 'raw';
 type Priority = 'critical' | 'recommended' | 'optional';
@@ -390,6 +391,9 @@ export default function HeaderScan() {
                 {sample}
               </button>
             ))}
+          </div>
+          <div style={{ marginTop: 12 }}>
+            <CapCaptcha />
           </div>
         </div>
       </section>

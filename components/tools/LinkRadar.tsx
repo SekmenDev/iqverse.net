@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { normalizeUrl } from '@/lib/utils';
 import sharedStyles from '@/styles/shared-tool-styles.module.css';
+import CapCaptcha from '@/components/CapCaptcha';
 
 const CONCURRENCY = 5;
 
@@ -352,6 +353,10 @@ export default function LinkRadar() {
               Max depth:
               <input id="max-depth" type="number" value={opts.maxDepth} min={1} max={6} onChange={(e) => setOpts(o=>({...o, maxDepth: Number(e.target.value)}))} style={{ width: 60, marginLeft: 6 }} />
             </label>
+          </div>
+
+          <div style={{ marginTop: 14 }}>
+            <CapCaptcha />
           </div>
         </div>
       </section>
