@@ -11,6 +11,7 @@ export default function GesPage() {
   return (
     <SaasLandingPage
       brand="GES"
+      appUrl="https://sekmen.dev/products/ges"
       eyebrow="Quiz & Exam Platform"
       heroTitle="Create smarter exams"
       heroAccent="and get real insights"

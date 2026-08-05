@@ -11,6 +11,7 @@ export default function GypPage() {
   return (
     <SaasLandingPage
       brand="GYP"
+      appUrl="https://sekmen.dev/products/gyp"
       eyebrow="Client & License Platform"
       heroTitle="Manage clients and licenses"
       heroAccent="at enterprise scale"
