@@ -11,6 +11,7 @@ export default function GstPage() {
   return (
     <SaasLandingPage
       brand="GST"
+      appUrl="https://sekmen.dev/products/gst"
       eyebrow="Stock & Expense Platform"
       heroTitle="Manage your workshop"
       heroAccent="as simply as a notebook"

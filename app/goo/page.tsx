@@ -11,6 +11,7 @@ export default function GooPage() {
   return (
     <SaasLandingPage
       brand="GOO"
+      appUrl="https://sekmen.dev/products/goo"
       eyebrow="School Management Platform"
       heroTitle="Run your school with"
       heroAccent="one unified platform"

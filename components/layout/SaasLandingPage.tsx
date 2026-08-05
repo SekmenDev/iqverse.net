@@ -37,6 +37,7 @@ export interface SaasLandingPageProps {
   featuresSubtitle: string;
   featureCards: LandingCard[];
   footerText: string;
+  appUrl?: string;
 }
 
 export default function SaasLandingPage({
@@ -58,6 +59,7 @@ export default function SaasLandingPage({
   featuresSubtitle,
   featureCards,
   footerText,
+  appUrl,
 }: SaasLandingPageProps) {
   return (
     <div className={styles.page}>
@@ -73,8 +75,12 @@ export default function SaasLandingPage({
         </div>
         <div className={styles.navRight}>
           <ThemeToggle />
-          <a className={styles.navCta} href="#contact">
-            Request a Demo
+          <a
+            className={styles.navCta}
+            href={appUrl || "#contact"}
+            {...(appUrl ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+          >
+            Request a Demo ↗
           </a>
         </div>
       </nav>
@@ -89,8 +95,12 @@ export default function SaasLandingPage({
             </h1>
             <p>{heroSubtitle}</p>
             <div className={styles.heroActions}>
-              <a className={styles.btnPrimary} href="#contact">
-                Get Started
+              <a
+                className={styles.btnPrimary}
+                href={appUrl || "#contact"}
+                {...(appUrl ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+              >
+                Get Started ↗
               </a>
               <a className={styles.btnSecondary} href="#features">
                 Explore Features
@@ -195,8 +205,12 @@ export default function SaasLandingPage({
       <footer className={styles.footer} id="contact">
         <h2>{brand}</h2>
         <p>{footerText}</p>
-        <a className={styles.btnPrimary} href="mailto:hello@iqverse.net">
-          hello@iqverse.net
+        <a
+          className={styles.btnPrimary}
+          href={appUrl || "mailto:hello@iqverse.net"}
+          {...(appUrl ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+        >
+          {appUrl ? "Visit App ↗" : "hello@iqverse.net"}
         </a>
       </footer>
     </div>
