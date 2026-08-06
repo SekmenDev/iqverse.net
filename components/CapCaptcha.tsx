@@ -42,7 +42,7 @@ interface CapCaptchaProps {
 }
 
 export default function CapCaptcha({
-  endpoint = 'https://captcha.sekmen.dev/31445706ae/',
+  endpoint = 'https://captcha.sekmen.dev/b2962a01e4/',
   onSolve,
   onError,
   onProgress,

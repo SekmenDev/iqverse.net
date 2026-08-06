@@ -65,7 +65,7 @@ export const tools: Tool[] = [
   { name: "CSS Gradient Builder", desc: "Visual linear, radial and conic CSS gradient generator with CSS code export", icon: "🌈", url: "/gradient-builder/", type: "open", tags: "css gradient linear radial conic visual design color", cat: "Design" },
   { name: "Image Format Converter", desc: "Convert PNG, JPEG, WebP and AVIF formats with canvas scaling and quality controls", icon: "🖼️", url: "/image-converter/", type: "open", tags: "image convert webp png jpeg avif canvas resize", cat: "Design" },
   { name: "Icon & Sprite Sheet Generator", desc: "Combine multiple icons into a single sprite sheet with CSS and JSON coordinates", icon: "🧩", url: "/sprite-generator/", type: "open", tags: "sprite sheet icon canvas css mapping export assets", cat: "Design" },
-  { name: "WCAG Contrast Checker", desc: "Calculate contrast ratios for foreground/background colors with WCAG AA/AAA compliance badges", icon: "🎨", url: "", type: "coming", tags: "contrast ratio wcag accessibility color aa aaa compliance", cat: "Design" },
+  { name: "WCAG Contrast Checker", desc: "Calculate contrast ratios for foreground/background colors with WCAG AA/AAA compliance badges", icon: "🎨", url: "/wcag-contrast/", type: "open", tags: "contrast ratio wcag accessibility color aa aaa compliance", cat: "Design" },
 
   // Network
   { name: "DNS Lookup", desc: "Query A, AAAA, MX, TXT, CNAME and NS records for any domain", icon: "/dnslookup/logoX4.png", url: "/dnslookup/", type: "open", tags: "dns domain mx txt a aaaa cname ns lookup", cat: "Network" },
