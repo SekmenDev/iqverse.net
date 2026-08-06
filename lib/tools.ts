@@ -16,7 +16,7 @@ export interface Tool {
 export const tools: Tool[] = [
   // AI & Agents
   { name: "AI Agents Scanner", desc: "Check your site's AI agent readiness: robots.txt, sitemap, MCP and more", icon: "/agentscan/logoX4.png", url: "/agentscan/", type: "open", tags: "robots sitemap mcp oauth security ai agent", cat: "AI & Agents" },
-  { name: "llms.txt Generator & Validator", desc: "Create and validate llms.txt standard files for AI crawler site summaries", icon: "🤖", url: "", type: "coming", tags: "llms txt generator validator ai agent crawl spec", cat: "AI & Agents" },
+  { name: "llms.txt Generator & Validator", desc: "Create and validate llms.txt standard files for AI crawler site summaries", icon: "🤖", url: "/llmstxt/", type: "open", tags: "llms txt generator validator ai agent crawl spec", cat: "AI & Agents" },
   { name: "Structured Data (Schema.org) Validator", desc: "Test JSON-LD structured data and Schema.org markup for AI agents and search crawlers", icon: "🏷️", url: "", type: "coming", tags: "schema jsonld structured data validator seo ai agent", cat: "AI & Agents" },
   { name: "AI Crawler Log Analyzer", desc: "Parse server access logs locally to identify and analyze visits from GPTBot, ClaudeBot, and PerplexityBot", icon: "📊", url: "", type: "coming", tags: "ai crawler logs bot analyzer gptbot claudebot perplexity access", cat: "AI & Agents" },
 
