@@ -205,7 +205,7 @@ export default function DiffChecker() {
                 ))}
               </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', divideX: '1px solid #30363d' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
                 <div style={{ borderRight: '1px solid #30363d', overflowX: 'auto' }}>
                   {diffLines
                     .filter((l) => l.type !== 'added')
