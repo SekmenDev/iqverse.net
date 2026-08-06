@@ -69,7 +69,7 @@ export const tools: Tool[] = [
 
   // Network
   { name: "DNS Lookup", desc: "Query A, AAAA, MX, TXT, CNAME and NS records for any domain", icon: "/dnslookup/logoX4.png", url: "/dnslookup/", type: "open", tags: "dns domain mx txt a aaaa cname ns lookup", cat: "Network" },
-  { name: "IP Info & Geolocation Lookup", desc: "Inspect IP address geolocation, ASN, ISP details and network routing information", icon: "📍", url: "", type: "coming", tags: "ip lookup geolocation asn isp network routing info", cat: "Network" },
+  { name: "IP Info & Geolocation Lookup", desc: "Inspect IP address geolocation, ASN, ISP details and network routing information", icon: "📍", url: "/ip-lookup/", type: "open", tags: "ip lookup geolocation asn isp network routing info", cat: "Network" },
   { name: "Ping & Traceroute Visualizer", desc: "Visualize network latency and hop trace routes via backend diagnostic relay", icon: "📈", url: "", type: "coming", tags: "ping traceroute latency hops network route visualize", cat: "Network" },
   { name: "Port Status & Reference Guide", desc: "Common TCP/UDP port reference guide with service definitions and reachability status checks", icon: "🔌", url: "", type: "coming", tags: "port tcp udp scan reference service status network", cat: "Network" },
   { name: "WHOIS & RDAP Lookup", desc: "Query domain registration metadata, registrar details and expiration timelines via RDAP", icon: "🔍", url: "", type: "coming", tags: "whois rdap domain registrar lookup expiration status", cat: "Network" },
