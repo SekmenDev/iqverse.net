@@ -72,7 +72,7 @@ export const tools: Tool[] = [
   { name: "IP Info & Geolocation Lookup", desc: "Inspect IP address geolocation, ASN, ISP details and network routing information", icon: "📍", url: "/ip-lookup/", type: "open", tags: "ip lookup geolocation asn isp network routing info", cat: "Network" },
   { name: "Ping & Traceroute Visualizer", desc: "Visualize network latency and hop trace routes via backend diagnostic relay", icon: "📈", url: "/ping-visualizer/", type: "open", tags: "ping traceroute latency hops network route visualize", cat: "Network" },
   { name: "Port Status & Reference Guide", desc: "Common TCP/UDP port reference guide with service definitions and reachability status checks", icon: "🔌", url: "/port-reference/", type: "open", tags: "port tcp udp scan reference service status network", cat: "Network" },
-  { name: "WHOIS & RDAP Lookup", desc: "Query domain registration metadata, registrar details and expiration timelines via RDAP", icon: "🔍", url: "", type: "coming", tags: "whois rdap domain registrar lookup expiration status", cat: "Network" },
+  { name: "WHOIS & RDAP Lookup", desc: "Query domain registration metadata, registrar details and expiration timelines via RDAP", icon: "🔍", url: "/whois-lookup/", type: "open", tags: "whois rdap domain registrar lookup expiration status", cat: "Network" },
 
   // Desktop
   { name: "Volumer", desc: "Control system volume via mouse wheel on the Windows taskbar", icon: "🖱️", url: "https://github.com/atagulalan/volumer", type: "open", tags: "windows volume taskbar mouse wheel utility tray", cat: "Desktop" },
