@@ -46,7 +46,7 @@ export const tools: Tool[] = [
   { name: "HTTP Status Code Reference", desc: "Searchable reference of HTTP status codes, standard headers and response scenarios", icon: "📗", url: "/http-status/", type: "open", tags: "http status code 200 404 500 reference header rest", cat: "Browser Tools" },
   { name: "CORS Tester", desc: "Test CORS configuration and header response rules for API endpoints", icon: "📡", url: "/cors-tester/", type: "open", tags: "cors options origin headers api test preflight", cat: "Browser Tools" },
   { name: "Webhook Inspector", desc: "Inspect and debug incoming HTTP webhook payloads and request headers in real time", icon: "🪝", url: "/webhook-inspector/", type: "open", tags: "webhook payload inspect echo request debug http", cat: "Browser Tools" },
-  { name: "Cookie Inspector", desc: "Parse and inspect raw Cookie and Set-Cookie headers for SameSite, Secure and Max-Age flags", icon: "🍪", url: "", type: "coming", tags: "cookie parse inspect samesite secure httpOnly session", cat: "Browser Tools" },
+  { name: "Cookie Inspector", desc: "Parse and inspect raw Cookie and Set-Cookie headers for SameSite, Secure and Max-Age flags", icon: "🍪", url: "/cookie-inspector/", type: "open", tags: "cookie parse inspect samesite secure httpOnly session", cat: "Browser Tools" },
 
   // Security
   { name: "Password Generator", desc: "Generate strong passwords and secrets. All generation happens locally", icon: "/password/logoX4.png", url: "/password/", type: "open", tags: "password secret random secure generate entropy", cat: "Security" },
