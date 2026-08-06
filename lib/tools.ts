@@ -56,7 +56,7 @@ export const tools: Tool[] = [
   { name: "JWT Debugger & Verifier", desc: "Decode JWT headers and claims, and verify signatures locally using Web Crypto API", icon: "🔑", url: "/jwt-debugger/", type: "open", tags: "jwt decode verify signature token claim header security", cat: "Security" },
   { name: "CSP Header Builder", desc: "Interactive Content-Security-Policy generator and security directive validator", icon: "🛡️", url: "/csp-builder/", type: "open", tags: "csp content security policy header builder directives XSS", cat: "Security" },
   { name: "Password Strength & Entropy Analyzer", desc: "Evaluate password strength, calculate bit entropy, and estimate crack time offline", icon: "💪", url: "/password-analyzer/", type: "open", tags: "password strength entropy zxcvbn security crack time", cat: "Security" },
-  { name: "File Hash Verifier", desc: "Calculate and compare MD5, SHA-1, SHA-256 and SHA-512 hashes of local files", icon: "✔️", url: "", type: "coming", tags: "file hash checksum sha256 sha512 md5 verify integrity", cat: "Security" },
+  { name: "File Hash Verifier", desc: "Calculate and compare MD5, SHA-1, SHA-256 and SHA-512 hashes of local files", icon: "✔️", url: "/file-hash/", type: "open", tags: "file hash checksum sha256 sha512 md5 verify integrity", cat: "Security" },
 
   // Design
   { name: "Color Palette Generator", desc: "Create harmonious color palettes and extract colors from images", icon: "/chromata/logoX4.png", url: "/chromata/", type: "open", tags: "color palette css design hex rgb hsl", cat: "Design" },
