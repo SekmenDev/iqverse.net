@@ -199,7 +199,6 @@ export default function AiLogAnalyzer() {
                           background: 'rgba(255, 255, 255, 0.02)',
                           border: '1px solid var(--border-color, #333)',
                           display: 'flex',
-                          justifySpace: 'space-between',
                           justifyContent: 'space-between',
                           alignItems: 'center',
                         }}

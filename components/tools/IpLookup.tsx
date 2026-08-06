@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
 interface IpDetails {

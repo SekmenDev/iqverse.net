@@ -12,7 +12,6 @@ interface HashesResult {
 }
 
 export default function FileHashVerifier() {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [hashes, setHashes] = useState<HashesResult | null>(null);
   const [expectedHash, setExpectedHash] = useState('');
   const [loading, setLoading] = useState(false);
@@ -21,7 +20,6 @@ export default function FileHashVerifier() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setSelectedFile(file);
     setLoading(true);
     setHashes(null);
 
