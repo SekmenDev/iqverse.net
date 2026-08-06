@@ -18,7 +18,7 @@ export const tools: Tool[] = [
   { name: "AI Agents Scanner", desc: "Check your site's AI agent readiness: robots.txt, sitemap, MCP and more", icon: "/agentscan/logoX4.png", url: "/agentscan/", type: "open", tags: "robots sitemap mcp oauth security ai agent", cat: "AI & Agents" },
   { name: "llms.txt Generator & Validator", desc: "Create and validate llms.txt standard files for AI crawler site summaries", icon: "🤖", url: "/llmstxt/", type: "open", tags: "llms txt generator validator ai agent crawl spec", cat: "AI & Agents" },
   { name: "Structured Data (Schema.org) Validator", desc: "Test JSON-LD structured data and Schema.org markup for AI agents and search crawlers", icon: "🏷️", url: "/schema-validator/", type: "open", tags: "schema jsonld structured data validator seo ai agent", cat: "AI & Agents" },
-  { name: "AI Crawler Log Analyzer", desc: "Parse server access logs locally to identify and analyze visits from GPTBot, ClaudeBot, and PerplexityBot", icon: "📊", url: "", type: "coming", tags: "ai crawler logs bot analyzer gptbot claudebot perplexity access", cat: "AI & Agents" },
+  { name: "AI Crawler Log Analyzer", desc: "Parse server access logs locally to identify and analyze visits from GPTBot, ClaudeBot, and PerplexityBot", icon: "📊", url: "/ai-log-analyzer/", type: "open", tags: "ai crawler logs bot analyzer gptbot claudebot perplexity access", cat: "AI & Agents" },
 
   // Browser Tools
   { name: "QR Forge", desc: "Generate QR codes from URLs, plain text, Wi-Fi credentials and vCards", icon: "/qrforge/logoX4.png", url: "/qrforge/", type: "open", tags: "qr code svg png generate wifi vcard", cat: "Browser Tools" },
