@@ -5,7 +5,7 @@ import { getHeader } from '@/lib/utils';
 import styles from '@/styles/agentscan.module.css';
 import CapCaptcha from '@/components/CapCaptcha';
 
-const PROXY = 'https://api.allorigins.win/get?url=';
+const PROXY = '/api/check-url?url=';
 
 type CheckStatus = 'pass' | 'fail' | 'warn' | 'info' | 'skip';
 
@@ -186,14 +186,15 @@ export default function AgentScan() {
     const startedAt = performance.now();
 
     try {
-      const response = await fetch(proxyUrl, { signal: controller.signal });
+      const response = await fetch(proxyUrl, { signal: controller.signal, cache: 'no-store' });
       const json = await response.json();
       return {
-        ok: json.status?.http_code < 400,
-        status: json.status?.http_code ?? 0,
-        body: json.contents ?? '',
-        headers: json.status?.response_headers ?? {},
-        latency: Math.round(performance.now() - startedAt),
+        ok: json.status != null && json.status > 0 && json.status < 400,
+        status: json.status ?? 0,
+        body: json.body ?? json.html ?? '',
+        headers: json.headers ?? {},
+        latency: json.time ?? Math.round(performance.now() - startedAt),
+        error: json.error,
       };
     } catch (error: any) {
       return {
