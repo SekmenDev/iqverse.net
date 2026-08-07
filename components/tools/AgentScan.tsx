@@ -38,7 +38,7 @@ const CHECK_DEFS: CheckDef[] = [
   // 9 Core Scored Signals (Sum = 100)
   { id: 'llms_txt', name: 'llms.txt', category: 'scored', desc: 'A markdown file at /llms.txt that gives AI systems a curated map of your site.', weight: 18 },
   { id: 'robots_ai_bots', name: 'robots.txt AI bots', category: 'scored', desc: 'Rules in /robots.txt applying to AI crawlers (GPTBot, ClaudeBot, PerplexityBot, etc.).', weight: 18 },
-  { id: 'structured_data', name: 'Schema.org JSON-LD', category: 'scored', desc: 'Structured data embedded in the page describing organization, website, and entities.', weight: 14 },
+  { id: 'structured_data', name: 'Schema.org JSON-LD', category: 'scored', desc: 'Structured data embedded in the page describing organization, website and entities.', weight: 14 },
   { id: 'sitemap', name: 'Sitemap', category: 'scored', desc: 'A valid, reachable sitemap.xml — either at root or declared in robots.txt.', weight: 12 },
   { id: 'title_meta', name: 'Title & meta description', category: 'scored', desc: 'Document title and meta description of the page being scanned.', weight: 10 },
   { id: 'llms_full_txt', name: 'llms-full.txt', category: 'scored', desc: 'An optional companion to llms.txt carrying extended context and deeper detail.', weight: 8 },
@@ -98,14 +98,14 @@ function formatStatusLabel(status: CheckStatus) {
 
 function getRecommendationText(id: string) {
   const recs: Record<string, string> = {
-    llms_txt: 'Publish /llms.txt with an H1 title, blockquote summary, and grouped links.',
+    llms_txt: 'Publish /llms.txt with an H1 title, blockquote summary and grouped links.',
     robots_ai_bots: 'Add explicit allow rules in /robots.txt for AI agents (GPTBot, ClaudeBot, etc.).',
     structured_data: 'Add JSON-LD with Organization and WebSite schema to your homepage HTML.',
     sitemap: 'Serve a valid /sitemap.xml and reference it in your robots.txt file.',
     title_meta: 'Write a concise title and a 50–160 character meta description for the page.',
     llms_full_txt: 'Add /llms-full.txt to provide extended context and deeper facts for AI systems.',
     canonical_url: 'Add a <link rel="canonical" href="..."> tag to declare the authoritative page URL.',
-    open_graph: 'Include og:title, og:url, and og:image metadata in your HTML head.',
+    open_graph: 'Include og:title, og:url and og:image metadata in your HTML head.',
     indexable_page: 'Ensure no unwanted noindex directive exists in your robots meta tag.',
     ai_txt: 'Optional: Add /ai.txt or /.well-known/ai.txt to state public AI usage policies.',
     content_signals: 'Optional: Add Content-Signal directives to specify AI search vs training rules.',
@@ -130,9 +130,9 @@ export default function AgentScan() {
     const filtered = activeFilter === 'all'
       ? results
       : results.filter((result) => {
-          const def = CHECK_DEFS.find((item) => item.id === result.id);
-          return def?.category === activeFilter;
-        });
+        const def = CHECK_DEFS.find((item) => item.id === result.id);
+        return def?.category === activeFilter;
+      });
 
     if (sortMode === 'name') {
       return [...filtered].sort((a, b) => {
@@ -274,7 +274,7 @@ export default function AgentScan() {
     // 5. Title & meta description (Weight 10)
     const hasTitle = /<title[^>]*>([^<]+)<\/title>/i.test(homepageHtml);
     const hasDesc = /<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i.test(homepageHtml);
-    addResult('title_meta', hasTitle && hasDesc ? 'pass' : hasTitle || hasDesc ? 'warn' : 'fail', hasTitle && hasDesc ? 'Page title and meta description both present.' : hasTitle ? 'Page title found, but meta description is missing.' : 'Missing document title and meta description.');
+    addResult('title_meta', hasTitle && hasDesc ? 'pass' : hasTitle || hasDesc ? 'warn' : 'fail', hasTitle && hasDesc ? 'Page title and meta description both present.' : hasTitle ? 'Page title found but meta description is missing.' : 'Missing document title and meta description.');
 
     // 6. llms-full.txt (Weight 8)
     const hasLlmsFull = llmsFullRes.ok && llmsFullRes.body.trim().length > 10;
@@ -374,7 +374,7 @@ export default function AgentScan() {
   const faqs = [
     {
       q: 'Does a high score guarantee AI citations?',
-      a: 'No, and be sceptical of anyone who says otherwise. This measures whether engines can read and understand your site — the necessary groundwork. Whether they cite you also depends on your content, your authority and the question being asked.',
+      a: 'No and be sceptical of anyone who says otherwise. This measures whether engines can read and understand your site — the necessary groundwork. Whether they cite you also depends on your content, your authority and the question being asked.',
     },
     {
       q: 'Do you scan the whole site?',
@@ -382,7 +382,7 @@ export default function AgentScan() {
     },
     {
       q: 'What do you do with my data?',
-      a: 'We fetch public URLs and keep the resulting report so its link stays shareable. No login, no private data, nothing executed on your site, and nothing sold. See the privacy note for detail.',
+      a: 'We fetch public URLs and keep the resulting report so its link stays shareable. No login, no private data, nothing executed on your site and nothing sold. See the privacy note for detail.',
     },
     {
       q: 'Will the free scan stay free?',
@@ -401,7 +401,7 @@ export default function AgentScan() {
         <div className={styles.heroLabel}>AI Agent Readiness Scanner</div>
         <h2 className={styles.heroTitle}>Is your site agent-ready?</h2>
         <p className={styles.heroCopy}>
-          Scan any website to discover how compatible it is with AI agents. We evaluate your core signals including llms.txt, robots.txt AI rules, Schema.org JSON-LD, sitemap, Open Graph, canonical metadata, and protocol discovery files.
+          Scan any website to discover how compatible it is with AI agents. We evaluate your core signals including llms.txt, robots.txt AI rules, Schema.org JSON-LD, sitemap, Open Graph, canonical metadata and protocol discovery files.
         </p>
 
         <div className={styles.scannerCard}>
@@ -571,7 +571,7 @@ export default function AgentScan() {
           <span className={styles.sectionBadge}>Methodology</span>
           <h2 className={styles.sectionTitle}>How the scanner works</h2>
           <p className={styles.sectionSub}>
-            No black box. Exactly what we request, how the score is calculated, and — just as importantly — what this scan deliberately does not do.
+            No black box. Exactly what we request, how the score is calculated and — just as importantly — what this scan deliberately does not do.
           </p>
         </div>
 
@@ -588,7 +588,7 @@ export default function AgentScan() {
             <div className={styles.stepNumber}>02</div>
             <h3 className={styles.stepTitle}>Fetch Homepage HTML</h3>
             <p className={styles.stepText}>
-              We fetch the homepage and read its HTML: title, meta description, canonical link, Open Graph tags, robots meta, and any Schema.org JSON-LD.
+              We fetch the homepage and read its HTML: title, meta description, canonical link, Open Graph tags, robots meta and any Schema.org JSON-LD.
             </p>
           </div>
 
@@ -612,7 +612,7 @@ export default function AgentScan() {
             <div className={styles.stepNumber}>05</div>
             <h3 className={styles.stepTitle}>Score and Store</h3>
             <p className={styles.stepText}>
-              We score and store. The report is saved so its link stays shareable, and the score card image is generated from it on demand.
+              We score and store. The report is saved so its link stays shareable and the score card image is generated from it on demand.
             </p>
           </div>
 
@@ -620,7 +620,7 @@ export default function AgentScan() {
             <div className={styles.stepNumber}>06</div>
             <h3 className={styles.stepTitle}>Transparent Requests</h3>
             <p className={styles.stepText}>
-              Requests identify themselves honestly as GEOCheckerScan with a link back here, use normal GET requests, and cap response bodies. A scan is a handful of requests — roughly what one visitor costs you.
+              Requests identify themselves honestly as GEOCheckerScan with a link back here, use normal GET requests and cap response bodies. A scan is a handful of requests — roughly what one visitor costs you.
             </p>
           </div>
         </div>
@@ -680,7 +680,7 @@ export default function AgentScan() {
               <span className={styles.bandBadge}>Needs work</span>
             </div>
             <p className={styles.bandReading}>
-              Some signals are missing or ambiguous. Engines can read the site, but they are filling gaps with guesses.
+              Some signals are missing or ambiguous. Engines can read the site but they are filling gaps with guesses.
             </p>
           </div>
 
@@ -702,7 +702,7 @@ export default function AgentScan() {
           <span className={styles.sectionBadge}>Signal Reference</span>
           <h2 className={styles.sectionTitle}>What we check</h2>
           <p className={styles.sectionSub}>
-            Every signal the scanner looks at, what it means, and what to do when it fails. Nine carry score weight; two are informational. Weights sum to 100. A partial result earns half the weight.
+            Every signal the scanner looks at, what it means and what to do when it fails. Nine carry score weight; two are informational. Weights sum to 100. A partial result earns half the weight.
           </p>
         </div>
 
@@ -715,13 +715,13 @@ export default function AgentScan() {
               <span className={styles.signalWeightBadge}>weight 18/100</span>
             </div>
             <div className={styles.signalBlock}>
-              <strong>What it is:</strong> A markdown file at <code>/llms.txt</code> that gives AI systems a curated map of your site: what you are, and which pages matter.
+              <strong>What it is:</strong> A markdown file at <code>/llms.txt</code> that gives AI systems a curated map of your site: what you are and which pages matter.
             </div>
             <div className={styles.signalBlock}>
               <strong>Why it matters:</strong> It is the emerging convention AI crawlers and agents look for when they want an overview rather than a scrape. Without it, engines assemble their understanding of you from whatever HTML they happen to parse — and you lose control of the narrative.
             </div>
             <div className={styles.signalBlock}>
-              <strong>How to fix it:</strong> Publish <code>/llms.txt</code> as real markdown: an H1 with your name, a one-line summary in a blockquote, then grouped links with short descriptions. Serve it as <code>text/markdown</code> or <code>text/plain</code>, and make sure a missing file returns a real 404 rather than your app shell.
+              <strong>How to fix it:</strong> Publish <code>/llms.txt</code> as real markdown: an H1 with your name, a one-line summary in a blockquote, then grouped links with short descriptions. Serve it as <code>text/markdown</code> or <code>text/plain</code> and make sure a missing file returns a real 404 rather than your app shell.
             </div>
             <div className={styles.signalRef}>
               Reference: <a href="https://llmstxt.org/" target="_blank" rel="noreferrer">llmstxt.org/</a>
@@ -737,7 +737,7 @@ export default function AgentScan() {
               <strong>What it is:</strong> The rules in <code>/robots.txt</code> that apply to AI crawlers — GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot and others.
             </div>
             <div className={styles.signalBlock}>
-              <strong>Why it matters:</strong> Assistants that respect robots.txt decide from this file whether your content can appear in their answers at all. A blanket disallow, or rules written years ago for search engines, can silently remove you from AI search entirely.
+              <strong>Why it matters:</strong> Assistants that respect robots.txt decide from this file whether your content can appear in their answers at all. A blanket disallow or rules written years ago for search engines, can silently remove you from AI search entirely.
             </div>
             <div className={styles.signalBlock}>
               <strong>How to fix it:</strong> Add explicit allow rules for the AI agents you want citing you. Being silent is not neutral — it leaves each crawler to apply its own default.
@@ -775,7 +775,7 @@ export default function AgentScan() {
               <strong>What it is:</strong> A valid, reachable <code>sitemap.xml</code> — either at the root or declared in robots.txt.
             </div>
             <div className={styles.signalBlock}>
-              <strong>Why it matters:</strong> It is how crawlers, classic and AI alike, find pages beyond whatever is linked from your homepage. A missing or broken sitemap means partial coverage of your content, and partial coverage means partial answers.
+              <strong>Why it matters:</strong> It is how crawlers, classic and AI alike, find pages beyond whatever is linked from your homepage. A missing or broken sitemap means partial coverage of your content and partial coverage means partial answers.
             </div>
             <div className={styles.signalBlock}>
               <strong>How to fix it:</strong> Serve a valid <code>/sitemap.xml</code> and declare it in robots.txt. We follow the declared URL, so a sitemap index living elsewhere still counts.
@@ -810,7 +810,7 @@ export default function AgentScan() {
               <strong>Why it matters:</strong> Where llms.txt is the map, llms-full.txt is the territory. Agents that want detail before answering a question about you have somewhere to find it.
             </div>
             <div className={styles.signalBlock}>
-              <strong>How to fix it:</strong> Add <code>/llms-full.txt</code> with the fuller version of your story. Optional, but cheap insurance against an engine guessing.
+              <strong>How to fix it:</strong> Add <code>/llms-full.txt</code> with the fuller version of your story. Optional but cheap insurance against an engine guessing.
             </div>
             <div className={styles.signalRef}>
               Reference: <a href="https://llmstxt.org/" target="_blank" rel="noreferrer">llmstxt.org/</a>
@@ -823,7 +823,7 @@ export default function AgentScan() {
               <span className={styles.signalWeightBadge}>weight 8/100</span>
             </div>
             <div className={styles.signalBlock}>
-              <strong>What it is:</strong> A <code>link rel="canonical"</code> declaring the authoritative URL for the page.
+              <strong>What it is:</strong> A <code>link rel=&quot;canonical&quot;</code> declaring the authoritative URL for the page.
             </div>
             <div className={styles.signalBlock}>
               <strong>Why it matters:</strong> Without it, duplicate and parameterised URLs compete with one another and split whatever authority the page earns — in AI indexes as much as classic ones.
@@ -842,7 +842,7 @@ export default function AgentScan() {
               <strong>What it is:</strong> <code>og:title</code>, <code>og:url</code> and <code>og:image</code> metadata.
             </div>
             <div className={styles.signalBlock}>
-              <strong>Why it matters:</strong> Open Graph controls how your pages appear when shared, and several AI crawlers read it as supplementary metadata. Missing OG data weakens both.
+              <strong>Why it matters:</strong> Open Graph controls how your pages appear when shared and several AI crawlers read it as supplementary metadata. Missing OG data weakens both.
             </div>
             <div className={styles.signalBlock}>
               <strong>How to fix it:</strong> Add <code>og:title</code>, <code>og:url</code> and <code>og:image</code>. Keep them consistent with the page title and canonical URL.
@@ -899,7 +899,7 @@ export default function AgentScan() {
               <strong>What it is:</strong> An emerging robots.txt directive expressing per-purpose permissions — search, AI input, AI training — separately rather than as one all-or-nothing rule.
             </div>
             <div className={styles.signalBlock}>
-              <strong>Why it matters:</strong> Informational for now, so it does not move your score. It lets you say 'yes to being cited, no to being trained on', which is the distinction most publishers actually want.
+              <strong>Why it matters:</strong> Informational for now, so it does not move your score. It lets you say &apos;yes to being cited, no to being trained on&apos;, which is the distinction most publishers actually want.
             </div>
             <div className={styles.signalBlock}>
               <strong>How to fix it:</strong> Optional. Add a Content-Signal line to robots.txt if you want to state purposes explicitly to compliant crawlers.

@@ -14,7 +14,7 @@ export default function PingVisualizerPage() {
       pill="NETWORK"
       title="Ping & Traceroute Visualizer"
       subtitle="Network Latency & Route Diagnostic Tool"
-      description="Visualize round-trip network ping latency, jitter, packet loss, and hop-by-hop traceroute paths."
+      description="Visualize round-trip network ping latency, jitter, packet loss and hop-by-hop traceroute paths."
     >
       <PingVisualizer />
     </ToolLayout>

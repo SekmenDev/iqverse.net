@@ -14,7 +14,7 @@ export default function RobotsGeneratorPage() {
       pill="BROWSER TOOLS"
       title="robots.txt Generator & Validator"
       subtitle="Web Crawler Directive Builder"
-      description="Create, customize, and validate robots.txt files for search engine crawlers and AI bots with path testing."
+      description="Create, customize and validate robots.txt files for search engine crawlers and AI bots with path testing."
     >
       <RobotsGenerator />
     </ToolLayout>

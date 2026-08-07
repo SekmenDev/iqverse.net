@@ -22,7 +22,7 @@ const HTTP_STATUS_CODES: StatusCodeInfo[] = [
   // 2xx
   { code: 200, phrase: 'OK', category: '2xx', spec: 'RFC 9110 §15.3.1', summary: 'Standard successful HTTP response for GET, POST, PUT, DELETE requests.', details: 'The payload contains the requested resource representation.' },
   { code: 201, phrase: 'Created', category: '2xx', spec: 'RFC 9110 §15.3.2', summary: 'Request succeeded and a new resource was created.', details: 'Typically includes a Location header pointing to the new resource.' },
-  { code: 202, phrase: 'Accepted', category: '2xx', spec: 'RFC 9110 §15.3.3', summary: 'Request accepted for background asynchronous processing, but not yet completed.', details: 'Useful for queue jobs and batch tasks.' },
+  { code: 202, phrase: 'Accepted', category: '2xx', spec: 'RFC 9110 §15.3.3', summary: 'Request accepted for background asynchronous processing but not yet completed.', details: 'Useful for queue jobs and batch tasks.' },
   { code: 204, phrase: 'No Content', category: '2xx', spec: 'RFC 9110 §15.3.5', summary: 'Request succeeded but response body is intentionally empty.', details: 'Commonly returned after DELETE or preflight OPTIONS requests.' },
 
   // 3xx
@@ -33,7 +33,7 @@ const HTTP_STATUS_CODES: StatusCodeInfo[] = [
   { code: 308, phrase: 'Permanent Redirect', category: '3xx', spec: 'RFC 9110 §15.4.9', summary: 'Permanent redirect preserving original HTTP method and body.', details: 'Guarantees POST method is preserved during permanent redirection.' },
 
   // 4xx
-  { code: 400, phrase: 'Bad Request', category: '4xx', spec: 'RFC 9110 §15.5.1', summary: 'Server cannot process request due to malformed syntax or invalid payload.', details: 'Client must fix invalid body, parameters, or headers before retrying.' },
+  { code: 400, phrase: 'Bad Request', category: '4xx', spec: 'RFC 9110 §15.5.1', summary: 'Server cannot process request due to malformed syntax or invalid payload.', details: 'Client must fix invalid body, parameters or headers before retrying.' },
   { code: 401, phrase: 'Unauthorized', category: '4xx', spec: 'RFC 9110 §15.5.2', summary: 'Authentication is required and has failed or not been provided.', details: 'Response includes WWW-Authenticate header with auth scheme.' },
   { code: 403, phrase: 'Forbidden', category: '4xx', spec: 'RFC 9110 §15.5.4', summary: 'Server understands request but refuses to authorize access regardless of credentials.', details: 'Indicates insufficient permissions (e.g. role-based access control).' },
   { code: 404, phrase: 'Not Found', category: '4xx', spec: 'RFC 9110 §15.5.5', summary: 'Target resource does not exist on the server.', details: 'Can be returned to hide confidential resources from unauthorized users.' },
@@ -73,7 +73,7 @@ export default function HttpStatusReference() {
           <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 20, flexWrap: 'wrap' }}>
             <div className={sharedStyles.field} style={{ margin: 0, flex: 1, minWidth: 260 }}>
               <label className={sharedStyles.fieldLabel} htmlFor="httpSearch">
-                Search Status Codes, Phrases, or Keywords
+                Search Status Codes, Phrases or Keywords
               </label>
               <input
                 id="httpSearch"
@@ -106,12 +106,12 @@ export default function HttpStatusReference() {
                 item.category === '2xx'
                   ? '#4caf50'
                   : item.category === '3xx'
-                  ? '#2196f3'
-                  : item.category === '4xx'
-                  ? '#faad14'
-                  : item.category === '5xx'
-                  ? '#ff4d4f'
-                  : '#9c27b0';
+                    ? '#2196f3'
+                    : item.category === '4xx'
+                      ? '#faad14'
+                      : item.category === '5xx'
+                        ? '#ff4d4f'
+                        : '#9c27b0';
 
               return (
                 <div

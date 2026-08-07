@@ -14,7 +14,7 @@ export default function YamlJsonTomlConverterPage() {
       pill="BROWSER TOOLS"
       title="YAML / JSON / TOML Converter"
       subtitle="Data Model & Config Converter"
-      description="Convert data and configuration files between JSON, YAML, and TOML formats in your browser."
+      description="Convert data and configuration files between JSON, YAML and TOML formats in your browser."
     >
       <YamlJsonTomlConverter />
     </ToolLayout>

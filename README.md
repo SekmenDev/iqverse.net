@@ -61,7 +61,7 @@ IQVerse organizes tools into intuitive categories. Below is the full directory o
 | **Base64 & URL Encoder** | [`/encodelab/`](https://iqverse.net/encodelab/) | ✦ Live | Encode/decode Base64, URL parameters, JWT tokens and Data URIs |
 | **URL Tools** | [`/url/`](https://iqverse.net/url/) | ✦ Live | Parse, build, encode and decode URLs with query parameter editing |
 | **Compression** | [`/compression/`](https://iqverse.net/compression/) | ✦ Live | Compress and decompress text using browser-native Deflate support |
-| **Data Converter** | [`/dataconverter/`](https://iqverse.net/dataconverter/) | ✦ Live | Convert JSON, CSV, Hex, and Base64 data in the browser locally |
+| **Data Converter** | [`/dataconverter/`](https://iqverse.net/dataconverter/) | ✦ Live | Convert JSON, CSV, Hex and Base64 data in the browser locally |
 | **RegEx Forge** | [`/regex/`](https://iqverse.net/regex/) | ✦ Live | Interactive regex builder with real-time pattern matching & explanations |
 | **Image Optimizer** | [`/imageoptimizer/`](https://iqverse.net/imageoptimizer/) | ✦ Live | Compress PNG, JPEG and WebP in-browser while keeping files local |
 | **CSV Viewer & Converter** | [`/csvviewer/`](https://iqverse.net/csvviewer/) | ✦ Live | View CSV as a sortable table, export to JSON, Markdown or SQL |
@@ -89,9 +89,9 @@ IQVerse organizes tools into intuitive categories. Below is the full directory o
 | **HeaderScan** | [`/headers/`](https://iqverse.net/headers/) | ✦ Live | HTTP response header inspector with detailed security assessment breakdown |
 | **Hashing** | [`/hashing/`](https://iqverse.net/hashing/) | ✦ Live | Compute SHA digests and HMAC values locally with hex or Base64 output |
 | **SSL / TLS Certificate Inspector** | — | ◌ Coming Soon | Inspect SSL/TLS certificate validity, issuer details, expiration & trust chain |
-| **JWT Debugger & Verifier** | — | ◌ Coming Soon | Decode JWT headers and claims, and verify signatures locally |
+| **JWT Debugger & Verifier** | — | ◌ Coming Soon | Decode JWT headers and claims and verify signatures locally |
 | **CSP Header Builder** | — | ◌ Coming Soon | Interactive Content-Security-Policy generator and directive validator |
-| **Password Strength Analyzer** | — | ◌ Coming Soon | Evaluate password strength, calculate bit entropy, and estimate crack time |
+| **Password Strength Analyzer** | — | ◌ Coming Soon | Evaluate password strength, calculate bit entropy and estimate crack time |
 | **File Hash Verifier** | — | ◌ Coming Soon | Calculate and compare MD5, SHA-1, SHA-256 and SHA-512 hashes of local files |
 
 ### 🎨 Design Tools
@@ -248,7 +248,7 @@ Ensure you have the following installed on your system:
 
 5. **Run tests & view test reports**:
 
-   IQVerse includes unit, component, and E2E test suites with automated CLI and HTML reporting:
+   IQVerse includes unit, component and E2E test suites with automated CLI and HTML reporting:
 
    | Command | Purpose | Output & Report |
    | :--- | :--- | :--- |

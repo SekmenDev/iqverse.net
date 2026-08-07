@@ -14,7 +14,7 @@ export default function ImageFormatConverterPage() {
       pill="DESIGN"
       title="Image Format Converter"
       subtitle="In-Browser Image Converter"
-      description="Convert images between PNG, JPEG, and WebP formats locally using browser-native Canvas API."
+      description="Convert images between PNG, JPEG and WebP formats locally using browser-native Canvas API."
     >
       <ImageFormatConverter />
     </ToolLayout>

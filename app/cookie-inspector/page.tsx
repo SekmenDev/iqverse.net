@@ -14,7 +14,7 @@ export default function CookieInspectorPage() {
       pill="BROWSER TOOLS"
       title="Cookie Inspector"
       subtitle="HTTP Cookie & Set-Cookie Header Inspector"
-      description="Parse Set-Cookie headers to audit SameSite, Secure, HttpOnly, and Max-Age flags."
+      description="Parse Set-Cookie headers to audit SameSite, Secure, HttpOnly and Max-Age flags."
     >
       <CookieInspector />
     </ToolLayout>

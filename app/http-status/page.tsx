@@ -14,7 +14,7 @@ export default function HttpStatusReferencePage() {
       pill="BROWSER TOOLS"
       title="HTTP Status Code Reference"
       subtitle="Complete 1xx-5xx HTTP Status Directory"
-      description="Interactive reference guide for 1xx, 2xx, 3xx, 4xx, and 5xx HTTP response status codes with RFC definitions."
+      description="Interactive reference guide for 1xx, 2xx, 3xx, 4xx and 5xx HTTP response status codes with RFC definitions."
     >
       <HttpStatusReference />
     </ToolLayout>

@@ -14,7 +14,7 @@ export default function SslInspectorPage() {
       pill="SECURITY"
       title="SSL / TLS Certificate Inspector"
       subtitle="HTTPS Certificate Expiry & Trust Inspector"
-      description="Inspect SSL/TLS certificate details, expiration timelines, issuer authorities, and SHA-256 fingerprints."
+      description="Inspect SSL/TLS certificate details, expiration timelines, issuer authorities and SHA-256 fingerprints."
     >
       <SslInspector />
     </ToolLayout>

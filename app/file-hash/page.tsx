@@ -14,7 +14,7 @@ export default function FileHashVerifierPage() {
       pill="SECURITY"
       title="File Hash Verifier"
       subtitle="Local File Integrity & Checksum Verifier"
-      description="Compute and compare SHA-256, SHA-512, and SHA-1 checksum hashes of local files with zero server upload."
+      description="Compute and compare SHA-256, SHA-512 and SHA-1 checksum hashes of local files with zero server upload."
     >
       <FileHashVerifier />
     </ToolLayout>

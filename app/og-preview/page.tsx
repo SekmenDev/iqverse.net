@@ -14,7 +14,7 @@ export default function OgPreviewerPage() {
       pill="BROWSER TOOLS"
       title="Meta Tag & Open Graph Previewer"
       subtitle="Social Card & SEO Meta Generator"
-      description="Preview how your web page appears on Google Search, X/Twitter, Facebook, and LinkedIn, and generate copy-paste HTML meta tags."
+      description="Preview how your web page appears on Google Search, X/Twitter, Facebook and LinkedIn and generate copy-paste HTML meta tags."
     >
       <OgPreviewer />
     </ToolLayout>

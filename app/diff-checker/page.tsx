@@ -14,7 +14,7 @@ export default function DiffCheckerPage() {
       pill="BROWSER TOOLS"
       title="Diff Checker"
       subtitle="Text & Code Comparison Tool"
-      description="Compare two text files, JSON snippets, or code blocks with side-by-side or unified line-by-line diff highlighting."
+      description="Compare two text files, JSON snippets or code blocks with side-by-side or unified line-by-line diff highlighting."
     >
       <DiffChecker />
     </ToolLayout>

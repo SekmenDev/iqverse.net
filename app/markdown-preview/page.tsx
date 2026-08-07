@@ -14,7 +14,7 @@ export default function MarkdownPreviewerPage() {
       pill="BROWSER TOOLS"
       title="Markdown Previewer"
       subtitle="Live Editor & HTML Exporter"
-      description="Write Markdown with instant HTML rendering, word counts, reading time analysis, and export options."
+      description="Write Markdown with instant HTML rendering, word counts, reading time analysis and export options."
     >
       <MarkdownPreviewer />
     </ToolLayout>

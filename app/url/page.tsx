@@ -5,7 +5,7 @@ import { getToolMetadata } from '@/lib/tools';
 
 export const metadata: Metadata = getToolMetadata('url') || {
   title: 'URL Tools | Parse, Build, Encode, Decode',
-  description: 'Parse URLs, build URLs from parts, edit query parameters, and encode or decode URLs in your browser.',
+  description: 'Parse URLs, build URLs from parts, edit query parameters and encode or decode URLs in your browser.',
 };
 
 export default function URLPage() {
@@ -14,7 +14,7 @@ export default function URLPage() {
       pill="BROWSER TOOLS"
       title="URL Tools"
       subtitle="Parse, build, encode, decode"
-      description="Inspect URL components, edit query parameters, and convert URLs locally in your browser."
+      description="Inspect URL components, edit query parameters and convert URLs locally in your browser."
     >
       <URLTools />
     </ToolLayout>
