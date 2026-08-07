@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('url') || {
   title: 'URL Tools | Parse, Build, Encode, Decode',
   description: 'Parse URLs, build URLs from parts, edit query parameters and encode or decode URLs in your browser.',
+  alternates: {
+    canonical: 'https://iqverse.net/url/',
+  },
 };
 
 export default function URLPage() {

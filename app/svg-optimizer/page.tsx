@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('svg-optimizer') || {
   title: 'SVG Optimizer | IQVerse',
   description: 'Minify and clean inline SVG markup by stripping redundant metadata and attributes.',
+  alternates: {
+    canonical: 'https://iqverse.net/svg-optimizer/',
+  },
 };
 
 export default function SvgOptimizerPage() {

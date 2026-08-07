@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('ip-lookup') || {
   title: 'IP Info & Geolocation Lookup | IQVerse',
   description: 'Inspect IP address geolocation, ASN, ISP details and network routing information.',
+  alternates: {
+    canonical: 'https://iqverse.net/ip-lookup/',
+  },
 };
 
 export default function IpLookupPage() {

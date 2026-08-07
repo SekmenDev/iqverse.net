@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('password') || {
   title: 'SecretForge | Password & Secret Generator',
   description: 'Generate strong passwords and secure secrets locally in your browser.',
+  alternates: {
+    canonical: 'https://iqverse.net/password/',
+  },
 };
 
 export default function PasswordPage() {

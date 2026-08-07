@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('imageoptimizer') || {
   title: 'Image Optimizer',
   description: 'Compress images locally in your browser and download a lighter preview.',
+  alternates: {
+    canonical: 'https://iqverse.net/imageoptimizer/',
+  },
 };
 
 export default function ImageOptimizerPage() {

@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('file-hash') || {
   title: 'File Hash Verifier | IQVerse',
   description: 'Calculate and compare MD5, SHA-1, SHA-256 and SHA-512 hashes of local files.',
+  alternates: {
+    canonical: 'https://iqverse.net/file-hash/',
+  },
 };
 
 export default function FileHashVerifierPage() {

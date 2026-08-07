@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('password-analyzer') || {
   title: 'Password Strength & Entropy Analyzer | IQVerse',
   description: 'Evaluate password strength, calculate bit entropy and estimate crack time offline.',
+  alternates: {
+    canonical: 'https://iqverse.net/password-analyzer/',
+  },
 };
 
 export default function PasswordAnalyzerPage() {

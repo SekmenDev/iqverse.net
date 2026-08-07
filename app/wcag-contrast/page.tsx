@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('wcag-contrast') || {
   title: 'WCAG Contrast Checker | IQVerse',
   description: 'Calculate contrast ratios for foreground/background colors with WCAG AA/AAA compliance badges.',
+  alternates: {
+    canonical: 'https://iqverse.net/wcag-contrast/',
+  },
 };
 
 export default function WcagContrastCheckerPage() {

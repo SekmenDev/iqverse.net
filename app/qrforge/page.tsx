@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('qrforge') || {
   title: 'QR Forge | Custom QR Code Generator',
   description: 'Create beautiful, custom QR codes with full control over design, colors and logo placement.',
+  alternates: {
+    canonical: 'https://iqverse.net/qrforge/',
+  },
 };
 
 export default function QRForgePage() {

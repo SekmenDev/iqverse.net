@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('schema-validator') || {
   title: 'Structured Data (Schema.org) Validator | IQVerse',
   description: 'Test JSON-LD structured data and Schema.org markup for AI agents and search crawlers.',
+  alternates: {
+    canonical: 'https://iqverse.net/schema-validator/',
+  },
 };
 
 export default function SchemaValidatorPage() {

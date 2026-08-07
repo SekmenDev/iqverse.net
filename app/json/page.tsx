@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('json') || {
   title: 'JSON Formatter & Validator',
   description: 'Format and validate your JSON data with ease.',
+  alternates: {
+    canonical: 'https://iqverse.net/json/',
+  },
 };
 
 export default function JSONFormatterPage() {

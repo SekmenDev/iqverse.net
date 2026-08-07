@@ -5,6 +5,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('gst') || {
   title: 'GST | Minimalist Stock & Expense Tracking System',
   description: 'Track inventory and daily expenses in a simple, mobile-first workspace for small workshops and boutiques.',
+  alternates: {
+    canonical: 'https://iqverse.net/gst/',
+  },
 };
 
 export default function GstPage() {

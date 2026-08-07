@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('dataconverter') || {
   title: 'Data Converter | JSON, CSV, Hex, Base64',
   description: 'Convert data between JSON, CSV, Hex and Base64 formats locally in your browser.',
+  alternates: {
+    canonical: 'https://iqverse.net/dataconverter/',
+  },
 };
 
 export default function DataConverterPage() {

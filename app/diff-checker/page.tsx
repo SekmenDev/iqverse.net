@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('diff-checker') || {
   title: 'Diff Checker | IQVerse',
   description: 'Side-by-side text, JSON and code diff viewer with live change highlighting.',
+  alternates: {
+    canonical: 'https://iqverse.net/diff-checker/',
+  },
 };
 
 export default function DiffCheckerPage() {

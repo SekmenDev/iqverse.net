@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('whois-lookup') || {
   title: 'WHOIS & RDAP Lookup | IQVerse',
   description: 'Query domain registration metadata, registrar details and expiration timelines via RDAP.',
+  alternates: {
+    canonical: 'https://iqverse.net/whois-lookup/',
+  },
 };
 
 export default function WhoisRdapLookupPage() {

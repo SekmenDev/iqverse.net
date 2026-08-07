@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('linkradar') || {
   title: 'Link Radar | Broken Link Scanner',
   description: 'Crawl a site from your browser and find broken links. Client-side scanner with optional crawling and asset checks.',
+  alternates: {
+    canonical: 'https://iqverse.net/linkradar/',
+  },
 };
 
 export default function LinkRadarPage() {

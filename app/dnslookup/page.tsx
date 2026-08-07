@@ -8,6 +8,9 @@ export const metadata: Metadata =
     title: 'DNS Lookup | IQVerse',
     description:
       'Professional DNS lookup tool. Query A, AAAA, MX, TXT, NS, CNAME, SOA, SRV records and more. No server. No tracking. Just fast, private DNS queries powered by Google Public DNS-over-HTTPS.',
+    alternates: {
+      canonical: 'https://iqverse.net/dnslookup/',
+    },
   };
 
 export default function DNSLookupPage() {

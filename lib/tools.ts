@@ -150,6 +150,9 @@ export function getToolMetadata(slug: string) {
   return {
     title: `${tool.name} | IQVerse`,
     description: tool.desc,
+    alternates: {
+      canonical: `https://iqverse.net/${slug}/`,
+    },
     openGraph: {
       title: tool.name,
       description: tool.desc,

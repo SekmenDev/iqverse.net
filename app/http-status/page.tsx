@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('http-status') || {
   title: 'HTTP Status Code Reference | IQVerse',
   description: 'Searchable reference of HTTP status codes, standard headers and response scenarios.',
+  alternates: {
+    canonical: 'https://iqverse.net/http-status/',
+  },
 };
 
 export default function HttpStatusReferencePage() {

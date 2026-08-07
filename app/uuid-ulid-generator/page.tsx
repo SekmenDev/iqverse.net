@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('uuid-ulid-generator') || {
   title: 'UUID / ULID Generator | IQVerse',
   description: 'Batch generate cryptographically secure UUID v4 and sortable ULIDs with one-click copy.',
+  alternates: {
+    canonical: 'https://iqverse.net/uuid-ulid-generator/',
+  },
 };
 
 export default function UuidUlidGeneratorPage() {

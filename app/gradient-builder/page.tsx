@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('gradient-builder') || {
   title: 'CSS Gradient Builder | IQVerse',
   description: 'Visual linear, radial and conic CSS gradient generator with CSS code export.',
+  alternates: {
+    canonical: 'https://iqverse.net/gradient-builder/',
+  },
 };
 
 export default function CssGradientBuilderPage() {

@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('og-preview') || {
   title: 'Meta Tag & Open Graph Previewer | IQVerse',
   description: 'Preview social card appearance across Google, X/Twitter, Facebook and LinkedIn.',
+  alternates: {
+    canonical: 'https://iqverse.net/og-preview/',
+  },
 };
 
 export default function OgPreviewerPage() {

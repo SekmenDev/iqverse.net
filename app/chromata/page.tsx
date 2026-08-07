@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('chromata') || {
   title: 'Chromata | Color Palette Generator',
   description: 'Generate harmonious color palettes and export them as CSS, Tailwind, JSON and more.',
+  alternates: {
+    canonical: 'https://iqverse.net/chromata/',
+  },
 };
 
 export default function ChromataPage() {

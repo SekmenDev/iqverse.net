@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('timestamp-converter') || {
   title: 'Timestamp Converter | IQVerse',
   description: 'Convert Unix timestamps to ISO 8601 and human-readable dates with timezone support.',
+  alternates: {
+    canonical: 'https://iqverse.net/timestamp-converter/',
+  },
 };
 
 export default function TimestampConverterPage() {

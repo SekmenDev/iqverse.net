@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('csp-builder') || {
   title: 'CSP Header Builder | IQVerse',
   description: 'Interactive Content-Security-Policy generator and security directive validator.',
+  alternates: {
+    canonical: 'https://iqverse.net/csp-builder/',
+  },
 };
 
 export default function CspBuilderPage() {

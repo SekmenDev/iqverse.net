@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('headers') || {
   title: 'HeaderScan | HTTP Security Headers Analyzer',
   description: 'Inspect response headers for security, performance and privacy best practices.',
+  alternates: {
+    canonical: 'https://iqverse.net/headers/',
+  },
 };
 
 export default function HeadersPage() {

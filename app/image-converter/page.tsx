@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('image-converter') || {
   title: 'Image Format Converter | IQVerse',
   description: 'Convert PNG, JPEG, WebP and AVIF formats with canvas scaling and quality controls.',
+  alternates: {
+    canonical: 'https://iqverse.net/image-converter/',
+  },
 };
 
 export default function ImageFormatConverterPage() {

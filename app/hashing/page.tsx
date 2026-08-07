@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('hashing') || {
   title: 'Hashing | SHA & HMAC Generator',
   description: 'Compute SHA digests and HMAC values with browser-native cryptography.',
+  alternates: {
+    canonical: 'https://iqverse.net/hashing/',
+  },
 };
 
 export default function HashingPage() {

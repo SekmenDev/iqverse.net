@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('favicongen') || {
   title: 'Favicon Generator | IQVerse',
   description: 'Generate favicons and meta tags for your site in seconds, all in your browser.',
+  alternates: {
+    canonical: 'https://iqverse.net/favicongen/',
+  },
 };
 
 export default function FaviconGeneratorPage() {

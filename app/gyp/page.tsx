@@ -5,6 +5,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('gyp') || {
   title: 'GYP | Client Management & License Tracking Platform',
   description: 'Manage clients, software licenses, payments and service requests from one streamlined workspace.',
+  alternates: {
+    canonical: 'https://iqverse.net/gyp/',
+  },
 };
 
 export default function GypPage() {
