@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import DataConverter from '@/components/tools/DataConverter';
 
 describe('DataConverter Component', () => {
-  it('renders input area, format selectors, and convert button', () => {
+  it('renders input area, format selectors and convert button', () => {
     render(<DataConverter />);
     expect(screen.getByRole('button', { name: /convert/i })).toBeInTheDocument();
   });

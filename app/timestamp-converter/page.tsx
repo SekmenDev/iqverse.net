@@ -14,7 +14,7 @@ export default function TimestampConverterPage() {
       pill="BROWSER TOOLS"
       title="Timestamp Converter"
       subtitle="Unix Epoch & ISO Date Converter"
-      description="Convert Unix timestamps (seconds & milliseconds) to ISO 8601, UTC, and relative human time."
+      description="Convert Unix timestamps (seconds & milliseconds) to ISO 8601, UTC and relative human time."
     >
       <TimestampConverter />
     </ToolLayout>

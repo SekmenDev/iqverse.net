@@ -14,7 +14,7 @@ export default function WebhookInspectorPage() {
       pill="BROWSER TOOLS"
       title="Webhook Inspector"
       subtitle="HTTP Webhook Payload & Signature Inspector"
-      description="Inspect HTTP webhook headers, validate JSON body payloads, and calculate HMAC SHA-256 signatures."
+      description="Inspect HTTP webhook headers, validate JSON body payloads and calculate HMAC SHA-256 signatures."
     >
       <WebhookInspector />
     </ToolLayout>

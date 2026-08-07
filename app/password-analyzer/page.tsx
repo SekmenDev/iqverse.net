@@ -5,7 +5,7 @@ import { getToolMetadata } from '@/lib/tools';
 
 export const metadata: Metadata = getToolMetadata('password-analyzer') || {
   title: 'Password Strength & Entropy Analyzer | IQVerse',
-  description: 'Evaluate password strength, calculate bit entropy, and estimate crack time offline.',
+  description: 'Evaluate password strength, calculate bit entropy and estimate crack time offline.',
 };
 
 export default function PasswordAnalyzerPage() {
@@ -14,7 +14,7 @@ export default function PasswordAnalyzerPage() {
       pill="SECURITY"
       title="Password Strength & Entropy Analyzer"
       subtitle="Bit Entropy & Crack Time Calculator"
-      description="Evaluate password strength, calculate bit entropy, and estimate brute-force crack time offline."
+      description="Evaluate password strength, calculate bit entropy and estimate brute-force crack time offline."
     >
       <PasswordAnalyzer />
     </ToolLayout>

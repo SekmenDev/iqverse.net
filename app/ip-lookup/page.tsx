@@ -14,7 +14,7 @@ export default function IpLookupPage() {
       pill="NETWORK"
       title="IP Info & Geolocation Lookup"
       subtitle="Public IP Address & Geolocation Inspector"
-      description="Lookup IP address geolocation, ISP providers, ASN routing numbers, city/region coordinates, and timezone metadata."
+      description="Lookup IP address geolocation, ISP providers, ASN routing numbers, city/region coordinates and timezone metadata."
     >
       <IpLookup />
     </ToolLayout>

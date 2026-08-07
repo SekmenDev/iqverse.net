@@ -1,7 +1,7 @@
 .agentScanContainer {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 2.5rem;
   width: 100%;
 }
 
@@ -84,6 +84,7 @@
   padding: 0 24px;
   min-width: 130px;
   cursor: pointer;
+  font-weight: 600;
 }
 
 .scanButton:disabled {
@@ -119,6 +120,7 @@
   padding: 8px 14px;
   color: var(--text);
   cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
 }
 
 .activeFilter {
@@ -150,6 +152,7 @@
   border-radius: var(--radius-sm);
   color: var(--text-muted);
   background: rgba(255, 255, 255, 0.03);
+  font-family: var(--font-mono);
 }
 
 .resultsSection {
@@ -177,12 +180,15 @@
 }
 
 .scoreValue {
-  font-size: 3rem;
+  font-size: 3.5rem;
+  font-weight: 700;
   line-height: 1;
+  color: var(--text);
 }
 
 .scoreSubtitle {
   color: var(--text-muted);
+  font-size: 0.85rem;
 }
 
 .badges {
@@ -204,17 +210,17 @@
 
 .badge {
   color: var(--accent);
-  border: 1px solid rgba(110,231,183,0.3);
+  border: 1px solid rgba(110, 231, 183, 0.3);
 }
 
 .badgeWarning {
-  color: var(--yellow);
-  border: 1px solid rgba(251,191,36,0.3);
+  color: var(--yellow, #F59E0B);
+  border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
 .badgeFail {
-  color: var(--red);
-  border: 1px solid rgba(248,113,113,0.3);
+  color: var(--red, #EF4444);
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 .resultActions {
@@ -261,7 +267,7 @@
 
 .checksGrid {
   display: grid;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .listView {
@@ -283,6 +289,7 @@
   font-family: var(--font-mono);
   text-transform: uppercase;
   font-size: 0.85rem;
+  font-weight: 600;
 }
 
 .categoryCards {
@@ -314,7 +321,7 @@
   display: grid;
   place-items: center;
   font-size: 1rem;
-  background: rgba(255,255,255,0.04);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .checkName {
@@ -329,27 +336,24 @@
 .checkDesc {
   color: var(--text-muted);
   line-height: 1.6;
+  font-size: 0.9rem;
 }
 
 .checkDetail {
   color: var(--text);
   font-family: var(--font-mono);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 .detailExtra {
-  background: rgba(255,255,255,0.03);
+  background: rgba(0, 0, 0, 0.2);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 12px;
   overflow: auto;
   font-family: var(--font-mono);
-  font-size: 0.85rem;
-}
-
-.checkLatency {
-  color: var(--text-muted);
   font-size: 0.8rem;
+  max-height: 150px;
 }
 
 .recommendationsPanel,
@@ -375,7 +379,7 @@
 }
 
 .recItem {
-  background: rgba(255,255,255,0.03);
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 16px;
@@ -383,15 +387,17 @@
 
 .recHeading {
   font-weight: 700;
+  margin-bottom: 4px;
 }
 
 .recText {
   color: var(--text-muted);
   line-height: 1.6;
+  margin: 0;
 }
 
 .rawOutput {
-  background: rgba(255,255,255,0.03);
+  background: rgba(0, 0, 0, 0.3);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 16px;
@@ -399,6 +405,358 @@
   font-family: var(--font-mono);
   font-size: 0.85rem;
   max-height: 420px;
+}
+
+/* METHODOLOGY & INFO SECTIONS */
+
+.infoSection {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sectionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sectionBadge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+.sectionTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.sectionSub {
+  color: var(--text-muted);
+  line-height: 1.7;
+  max-width: 800px;
+  margin: 0;
+}
+
+.subsectionTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text);
+}
+
+.stepsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.stepCard {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 12px);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.stepCard:hover {
+  border-color: rgba(110, 231, 183, 0.3);
+}
+
+.stepNumber {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: rgba(110, 231, 183, 0.1);
+  padding: 4px 8px;
+  border-radius: 6px;
+  width: fit-content;
+}
+
+.stepTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.stepText {
+  color: var(--text-muted);
+  line-height: 1.6;
+  font-size: 0.925rem;
+  margin: 0;
+}
+
+.stepText code {
+  font-family: var(--font-mono);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+/* SCORING TABLE & BANDS */
+
+.scoringTableWrapper {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 12px);
+}
+
+.scoringTable {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.scoringTable th,
+.scoringTable td {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.scoringTable th {
+  background: rgba(255, 255, 255, 0.03);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.scoringTable code {
+  font-family: var(--font-mono);
+  color: var(--accent);
+}
+
+.tableTotalRow td {
+  border-bottom: none;
+  background: rgba(110, 231, 183, 0.05);
+}
+
+.scoringNote {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  font-style: italic;
+  margin: 0;
+}
+
+.bandsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.25rem;
+}
+
+.bandCard {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 12px);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.bandStrong {
+  border-left: 4px solid #10B981;
+}
+
+.bandNeedsWork {
+  border-left: 4px solid #F59E0B;
+}
+
+.bandAtRisk {
+  border-left: 4px solid #EF4444;
+}
+
+.bandHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bandScore {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.bandBadge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.bandStrong .bandBadge {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10B981;
+}
+
+.bandNeedsWork .bandBadge {
+  background: rgba(245, 158, 11, 0.15);
+  color: #F59E0B;
+}
+
+.bandAtRisk .bandBadge {
+  background: rgba(239, 68, 68, 0.15);
+  color: #EF4444;
+}
+
+.bandReading {
+  color: var(--text-muted);
+  line-height: 1.6;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* SIGNAL REFERENCE CARDS */
+
+.signalCardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.signalDetailCard {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 12px);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.signalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.signalName {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text);
+}
+
+.signalWeightBadge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  background: rgba(110, 231, 183, 0.12);
+  color: var(--accent);
+  padding: 4px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.signalInfoBadge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  padding: 4px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.signalBlock {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.signalBlock strong {
+  color: var(--text);
+}
+
+.signalBlock code {
+  font-family: var(--font-mono);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+.signalRef {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.signalRef a {
+  color: var(--accent);
+  text-decoration: underline;
+
+}
+
+/* FAQ SECTION */
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.faqCard {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 12px);
+  padding: 1.25rem 1.5rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.faqCard:hover {
+  border-color: rgba(110, 231, 183, 0.3);
+}
+
+.faqActive {
+  background: rgba(110, 231, 183, 0.03);
+  border-color: rgba(110, 231, 183, 0.25);
+}
+
+.faqQuestionRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.faqQuestion {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.faqIcon {
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  color: var(--accent);
+}
+
+.faqAnswer {
+  color: var(--text-muted);
+  line-height: 1.65;
+  font-size: 0.95rem;
+  margin: 1rem 0 0 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 @media (max-width: 768px) {
@@ -412,5 +770,9 @@
 
   .categoryCards {
     grid-template-columns: 1fr;
+  }
+
+  .infoSection {
+    padding: 1.5rem;
   }
 }

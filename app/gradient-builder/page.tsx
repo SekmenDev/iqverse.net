@@ -14,7 +14,7 @@ export default function CssGradientBuilderPage() {
       pill="DESIGN"
       title="CSS Gradient Builder"
       subtitle="Visual Linear, Radial & Conic Gradient Generator"
-      description="Create multi-stop linear, radial, and conic CSS gradients with visual controls and instant CSS code export."
+      description="Create multi-stop linear, radial and conic CSS gradients with visual controls and instant CSS code export."
     >
       <CssGradientBuilder />
     </ToolLayout>

@@ -14,7 +14,7 @@ export default function SitemapGeneratorPage() {
       pill="BROWSER TOOLS"
       title="Sitemap Generator"
       subtitle="XML Sitemap Builder"
-      description="Build XML sitemaps with custom URL priorities, change frequencies, and bulk URL importer."
+      description="Build XML sitemaps with custom URL priorities, change frequencies and bulk URL importer."
     >
       <SitemapGenerator />
     </ToolLayout>

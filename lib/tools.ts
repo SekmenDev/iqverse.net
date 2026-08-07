@@ -18,7 +18,7 @@ export const tools: Tool[] = [
   { name: "AI Agents Scanner", desc: "Check your site's AI agent readiness: robots.txt, sitemap, MCP and more", icon: "/agentscan/logoX4.png", url: "/agentscan/", type: "open", tags: "robots sitemap mcp oauth security ai agent", cat: "AI & Agents" },
   { name: "llms.txt Generator & Validator", desc: "Create and validate llms.txt standard files for AI crawler site summaries", icon: "🤖", url: "/llmstxt/", type: "open", tags: "llms txt generator validator ai agent crawl spec", cat: "AI & Agents" },
   { name: "Structured Data (Schema.org) Validator", desc: "Test JSON-LD structured data and Schema.org markup for AI agents and search crawlers", icon: "🏷️", url: "/schema-validator/", type: "open", tags: "schema jsonld structured data validator seo ai agent", cat: "AI & Agents" },
-  { name: "AI Crawler Log Analyzer", desc: "Parse server access logs locally to identify and analyze visits from GPTBot, ClaudeBot, and PerplexityBot", icon: "📊", url: "/ai-log-analyzer/", type: "open", tags: "ai crawler logs bot analyzer gptbot claudebot perplexity access", cat: "AI & Agents" },
+  { name: "AI Crawler Log Analyzer", desc: "Parse server access logs locally to identify and analyze visits from GPTBot, ClaudeBot and PerplexityBot", icon: "📊", url: "/ai-log-analyzer/", type: "open", tags: "ai crawler logs bot analyzer gptbot claudebot perplexity access", cat: "AI & Agents" },
 
   // Browser Tools
   { name: "QR Forge", desc: "Generate QR codes from URLs, plain text, Wi-Fi credentials and vCards", icon: "/qrforge/logoX4.png", url: "/qrforge/", type: "open", tags: "qr code svg png generate wifi vcard", cat: "Browser Tools" },
@@ -28,7 +28,7 @@ export const tools: Tool[] = [
   { name: "Base64 & URL Encoder", desc: "Encode/decode Base64, URL parameters, JWT tokens and Data URIs", icon: "/encodelab/logoX4.png", url: "/encodelab/", type: "open", tags: "base64 url encode decode jwt data uri", cat: "Browser Tools" },
   { name: "URL Tools", desc: "Parse, build, encode and decode URLs with query parameter editing in the browser.", icon: "🌐", url: "/url/", type: "open", tags: "url parse build encode decode query string", cat: "Browser Tools" },
   { name: "Compression", desc: "Compress and decompress text using browser-native Deflate support.", icon: "🗜️", url: "/compression/", type: "open", tags: "compress decompress deflate base64 text", cat: "Browser Tools" },
-  { name: "Data Converter", desc: "Convert JSON, CSV, Hex, and Base64 data in the browser without uploading anything.", icon: "🔁", url: "/dataconverter/", type: "open", tags: "json csv hex base64 convert format", cat: "Browser Tools" },
+  { name: "Data Converter", desc: "Convert JSON, CSV, Hex and Base64 data in the browser without uploading anything.", icon: "🔁", url: "/dataconverter/", type: "open", tags: "json csv hex base64 convert format", cat: "Browser Tools" },
   { name: "RegEx Forge", desc: "Build and test regular expressions with live highlighting and explanations", icon: "/regex/logoX4.png", url: "/regex/", type: "open", tags: "regex regexp pattern match test explain", cat: "Browser Tools" },
   { name: "Image Optimizer", desc: "Compress PNG, JPEG and WebP in-browser while keeping files local", icon: "🖼️", url: "/imageoptimizer/", type: "open", tags: "image compress webp png jpeg optimize performance", cat: "Browser Tools" },
   { name: "CSV Viewer & Converter", desc: "View CSV as a sortable table, export to JSON, Markdown or SQL", icon: "📊", url: "/csvviewer/", type: "open", tags: "csv json sql table data convert format", cat: "Browser Tools" },
@@ -53,9 +53,9 @@ export const tools: Tool[] = [
   { name: "HeaderScan", desc: "Inspect HTTP response headers for any URL with detailed breakdowns", icon: "/headers/logoX4.png", url: "/headers/", type: "open", tags: "http headers security inspect network response", cat: "Security" },
   { name: "Hashing", desc: "Compute SHA digests and HMAC values locally in your browser with hex or Base64 output.", icon: "🔒", url: "/hashing/", type: "open", tags: "hash sha hmac digest security crypto", cat: "Security" },
   { name: "SSL / TLS Certificate Inspector", desc: "Inspect SSL/TLS certificate validity, issuer details, expiration and trust chain", icon: "📜", url: "/ssl-inspector/", type: "open", tags: "ssl tls certificate expiry issuer chain https security", cat: "Security" },
-  { name: "JWT Debugger & Verifier", desc: "Decode JWT headers and claims, and verify signatures locally using Web Crypto API", icon: "🔑", url: "/jwt-debugger/", type: "open", tags: "jwt decode verify signature token claim header security", cat: "Security" },
+  { name: "JWT Debugger & Verifier", desc: "Decode JWT headers and claims and verify signatures locally using Web Crypto API", icon: "🔑", url: "/jwt-debugger/", type: "open", tags: "jwt decode verify signature token claim header security", cat: "Security" },
   { name: "CSP Header Builder", desc: "Interactive Content-Security-Policy generator and security directive validator", icon: "🛡️", url: "/csp-builder/", type: "open", tags: "csp content security policy header builder directives XSS", cat: "Security" },
-  { name: "Password Strength & Entropy Analyzer", desc: "Evaluate password strength, calculate bit entropy, and estimate crack time offline", icon: "💪", url: "/password-analyzer/", type: "open", tags: "password strength entropy zxcvbn security crack time", cat: "Security" },
+  { name: "Password Strength & Entropy Analyzer", desc: "Evaluate password strength, calculate bit entropy and estimate crack time offline", icon: "💪", url: "/password-analyzer/", type: "open", tags: "password strength entropy zxcvbn security crack time", cat: "Security" },
   { name: "File Hash Verifier", desc: "Calculate and compare MD5, SHA-1, SHA-256 and SHA-512 hashes of local files", icon: "✔️", url: "/file-hash/", type: "open", tags: "file hash checksum sha256 sha512 md5 verify integrity", cat: "Security" },
 
   // Design
@@ -146,7 +146,7 @@ export function getSecureRandomNumber(min: number, max: number): number {
 export function getToolMetadata(slug: string) {
   const tool = getToolBySlug(slug);
   if (!tool) return null;
-  
+
   return {
     title: `${tool.name} | IQVerse`,
     description: tool.desc,

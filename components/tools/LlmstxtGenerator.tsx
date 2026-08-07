@@ -20,12 +20,12 @@ export default function LlmstxtGenerator() {
   // Generator state
   const [siteTitle, setSiteTitle] = useState('IQVerse Tools');
   const [summary, setSummary] = useState('Free open-source developer and AI agent tools operating entirely client-side.');
-  const [details, setDetails] = useState('IQVerse provides fast, secure, browser-native tools for web developers, AI agent engineers, and security researchers.');
+  const [details, setDetails] = useState('IQVerse provides fast, secure, browser-native tools for web developers, AI agent engineers and security researchers.');
   const [sections, setSections] = useState<Section[]>([
     {
       title: 'Core Tools',
       links: [
-        { title: 'AI Agents Scanner', url: 'https://iqverse.net/agentscan/', desc: 'Check website AI agent readiness including robots.txt, sitemaps, and MCP' },
+        { title: 'AI Agents Scanner', url: 'https://iqverse.net/agentscan/', desc: 'Check website AI agent readiness including robots.txt, sitemaps and MCP' },
         { title: 'Favicon Generator', url: 'https://iqverse.net/favicongen/', desc: 'Generate multi-resolution web favicons and manifest.json' },
       ],
     },

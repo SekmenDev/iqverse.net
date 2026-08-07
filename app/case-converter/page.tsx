@@ -14,7 +14,7 @@ export default function TextCaseConverterPage() {
       pill="BROWSER TOOLS"
       title="Text Case Converter"
       subtitle="String Case & Naming Style Converter"
-      description="Convert text between camelCase, snake_case, kebab-case, PascalCase, Title Case, and uppercase styles."
+      description="Convert text between camelCase, snake_case, kebab-case, PascalCase, Title Case and uppercase styles."
     >
       <TextCaseConverter />
     </ToolLayout>

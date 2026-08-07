@@ -14,7 +14,7 @@ export default function SvgOptimizerPage() {
       pill="DESIGN"
       title="SVG Optimizer"
       subtitle="Vector SVG Cleaner & Minifier"
-      description="Clean, minify, and strip unused comments and metadata from inline SVG markup to reduce payload size."
+      description="Clean, minify and strip unused comments and metadata from inline SVG markup to reduce payload size."
     >
       <SvgOptimizer />
     </ToolLayout>

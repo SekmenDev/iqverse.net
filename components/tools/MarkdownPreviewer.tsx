@@ -11,7 +11,7 @@ IQVerse tools run **100% locally** in your browser.
 
 - **Live HTML Preview**: Real-time rendering as you type.
 - *Full Markdown Support*: Headings, lists, code blocks, tables, blockquotes.
-- Statistics: Live word count, character count, and reading time.
+- Statistics: Live word count, character count and reading time.
 
 ### Code Example
 

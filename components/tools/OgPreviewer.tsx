@@ -5,7 +5,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
 export default function OgPreviewer() {
   const [title, setTitle] = useState('IQVerse - Free Developer & AI Agent Tools');
-  const [description, setDescription] = useState('Fast, private, client-side browser tools for developers, AI engineers, and security researchers.');
+  const [description, setDescription] = useState('Fast, private, client-side browser tools for developers, AI engineers and security researchers.');
   const [url, setUrl] = useState('https://iqverse.net');
   const [imageUrl, setImageUrl] = useState('https://iqverse.net/og-banner.png');
   const [siteName, setSiteName] = useState('IQVerse');

@@ -14,7 +14,7 @@ export default function PortReferenceGuidePage() {
       pill="NETWORK"
       title="Port Status & Reference Guide"
       subtitle="TCP & UDP Networking Port Database"
-      description="Searchable reference guide of standard TCP/UDP ports, service protocol definitions, and security recommendations."
+      description="Searchable reference guide of standard TCP/UDP ports, service protocol definitions and security recommendations."
     >
       <PortReferenceGuide />
     </ToolLayout>
