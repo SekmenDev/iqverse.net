@@ -303,6 +303,7 @@ export default function HomeClient() {
 
         {/* MAIN */}
         <main className={styles.main} id="main-content">
+          <h1 className="sr-only">IQVerse Developer Tools &amp; Utilities</h1>
           <div className={styles.toolbar}>
             <span className={styles.resultCount}>
               <strong>{filtered.length}</strong> tool{filtered.length !== 1 ? 's' : ''}

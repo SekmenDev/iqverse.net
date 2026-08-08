@@ -1,5 +1,3 @@
-import React from 'react';
-
 export type JsonLdProps = {
   data: Record<string, unknown> | Array<Record<string, unknown>>;
 };
