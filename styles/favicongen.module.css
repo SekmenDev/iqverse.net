@@ -97,12 +97,12 @@
 
 .badgeSuccess {
   background: rgba(52, 211, 153, 0.16);
-  color: #93f2c6;
+  color: var(--green);
 }
 
 .badgeInfo {
   background: rgba(129, 140, 248, 0.16);
-  color: #b7c0ff;
+  color: var(--accent);
 }
 
 .outputCode {

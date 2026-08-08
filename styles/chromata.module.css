@@ -1,14 +1,10 @@
 :root {
-  --bg: #0d0d0f;
-  --bg2: #131316;
-  --bg3: #1a1a1f;
-  --border: #2a2a32;
-  --border2: #35353f;
-  --text: #e8e8f0;
-  --text2: #9898aa;
-  --text3: #5a5a6a;
-  --accent: #00c896;
-  --accent-glow: rgba(99, 102, 241, 0.25);
+  --bg2: var(--surface);
+  --bg3: var(--card-hover);
+  --border2: var(--border-acc);
+  --text2: var(--text-muted);
+  --text3: var(--muted);
+  --accent-glow: var(--accent-dim);
   --radius: 12px;
 }
 

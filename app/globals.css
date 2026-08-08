@@ -1,9 +1,13 @@
 /* CSS Variables and Theme */
 :root {
+  color-scheme: dark;
   --bg:          #0C0E14;
   --surface:     #13161F;
   --card:        #171B27;
   --card-hover:  #1C2133;
+  --bg-card:     #171B27;
+  --bg-card-hover: #1C2133;
+  --code-bg:     rgba(255, 255, 255, 0.06);
   --border:      rgba(255,255,255,0.07);
   --border-acc:  rgba(129,140,248,0.4);
   --text:        #E8ECF4;
@@ -25,10 +29,14 @@
 }
 
 [data-theme='light'] {
+  color-scheme: light;
   --bg:          #F8FAFC;
   --surface:     #FFFFFF;
   --card:        #FFFFFF;
   --card-hover:  #F1F5F9;
+  --bg-card:     #FFFFFF;
+  --bg-card-hover: #F1F5F9;
+  --code-bg:     rgba(0, 0, 0, 0.05);
   --border:      rgba(0, 0, 0, 0.08);
   --border-acc:  rgba(99, 102, 241, 0.4);
   --text:        #0F172A;
@@ -82,7 +90,7 @@ a {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.1);
+  background: var(--border);
   border-radius: 2px;
 }
 
@@ -146,7 +154,8 @@ em {
 }
 
 code {
-  background: var(--surface);
+  background: var(--code-bg);
+  border: 1px solid var(--border);
   padding: 0.2em 0.4em;
   border-radius: 4px;
   font-family: var(--font-mono);
@@ -411,6 +420,11 @@ textarea {
   mix-blend-mode: screen;
   pointer-events: none;
   z-index: 0;
+}
+
+[data-theme='light'] .bg-glow {
+  mix-blend-mode: multiply;
+  opacity: 0.04;
 }
 
 .bg-glow--1 {

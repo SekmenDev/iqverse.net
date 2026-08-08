@@ -93,7 +93,7 @@
   transform: translateY(-50%);
   font-size: 10px;
   color: var(--muted);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 4px;
   padding: 2px 5px;
@@ -199,8 +199,8 @@
   font-size: 10px;
   font-family: var(--font-mono);
   color: inherit;
-  opacity: 0.6;
-  background: rgba(255, 255, 255, 0.06);
+  opacity: 0.8;
+  background: var(--accent-dim);
   border-radius: 10px;
   padding: 1px 6px;
   flex-shrink: 0;
@@ -256,7 +256,7 @@
 
 .sortBtn:hover {
   color: var(--text);
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: var(--border-acc);
 }
 
 .sortBtnActive {
@@ -430,11 +430,12 @@
 .tag {
   font-size: 10px;
   font-family: var(--font-mono);
+  font-weight: 500;
   padding: 2px 6px;
   border-radius: 3px;
-  background: rgba(129, 140, 248, 0.08);
-  color: rgba(129, 140, 248, 0.7);
-  border: 1px solid rgba(129, 140, 248, 0.12);
+  background: var(--accent-dim);
+  color: var(--accent);
+  border: 1px solid var(--border-acc);
 }
 
 .cardArrow {
