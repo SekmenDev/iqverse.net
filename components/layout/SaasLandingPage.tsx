@@ -1,4 +1,6 @@
 import ThemeToggle from './ThemeToggle';
+import JsonLd from '@/components/JsonLd';
+import { getSaasJsonLd } from '@/lib/jsonld';
 import styles from '@/styles/saas-landing.module.css';
 
 export interface LandingCard {
@@ -38,6 +40,7 @@ export interface SaasLandingPageProps {
   featureCards: LandingCard[];
   footerText: string;
   appUrl?: string;
+  slug?: string;
 }
 
 export default function SaasLandingPage({
@@ -60,9 +63,14 @@ export default function SaasLandingPage({
   featureCards,
   footerText,
   appUrl,
+  slug,
 }: SaasLandingPageProps) {
+  const saasSlug = slug || brand.toLowerCase();
+  const jsonLdData = getSaasJsonLd(brand, heroSubtitle, appUrl, `/${saasSlug}/`);
+
   return (
     <div className={styles.page}>
+      <JsonLd data={jsonLdData} />
       <nav className={styles.nav}>
         <a className={styles.brand} href="#top">
           <span className={styles.brandMark}>{brand.slice(0, 1)}</span>
