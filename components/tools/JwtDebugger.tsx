@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
 const SAMPLE_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjE5OTk5OTk5OTl9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
@@ -17,6 +17,12 @@ export default function JwtDebugger() {
   const [tokenInput, setTokenInput] = useState(SAMPLE_JWT);
   const [secretKey, setSecretKey] = useState('your-256-bit-secret');
   const [sigStatus, setSigStatus] = useState<string | null>(null);
+  const [nowSec, setNowSec] = useState(() => Math.floor(Date.now() / 1000));
+
+  useEffect(() => {
+    const timer = setInterval(() => setNowSec(Math.floor(Date.now() / 1000)), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const decodedJwt = useMemo(() => {
     const parts = tokenInput.trim().split('.');
@@ -29,7 +35,6 @@ export default function JwtDebugger() {
       const payloadObj = JSON.parse(base64UrlDecode(parts[1]));
       const signature = parts[2];
 
-      const nowSec = Math.floor(Date.now() / 1000);
       let expStatus = 'No expiration claim (exp)';
       if (payloadObj.exp) {
         expStatus = payloadObj.exp > nowSec ? `Valid (Expires: ${new Date(payloadObj.exp * 1000).toISOString()})` : `Expired on ${new Date(payloadObj.exp * 1000).toISOString()}`;
@@ -47,7 +52,7 @@ export default function JwtDebugger() {
     } catch (err) {
       return { valid: false, error: `Base64 / JSON Decoding Error: ${(err as Error).message}` };
     }
-  }, [tokenInput]);
+  }, [nowSec, tokenInput]);
 
   const verifySignature = async () => {
     const parts = tokenInput.trim().split('.');

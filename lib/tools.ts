@@ -98,7 +98,7 @@ export function getUniqueStatuses(): Array<Tool['type'] | 'all'> {
   return ["all", "open", "saas", "coming"];
 }
 
-export function filterTools(query: string, category: string, status: string | 'all' | Tool['type']): Tool[] {
+export function filterTools(query: string, category: string, status: 'all' | Tool['type']): Tool[] {
   const lq = query.toLowerCase().trim();
   let filtered = [...tools];
 
