@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState, type ChangeEvent } from 'react';
+import Image from 'next/image';
 import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
 export default function ImageOptimizer() {
@@ -90,7 +91,14 @@ export default function ImageOptimizer() {
 
           {previewUrl && (
             <div style={{ marginTop: 24 }}>
-              <img src={previewUrl} alt="Optimized preview" style={{ maxWidth: '100%', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }} />
+              <Image
+                src={previewUrl}
+                alt="Optimized preview"
+                width={900}
+                height={600}
+                unoptimized
+                style={{ maxWidth: '100%', height: 'auto', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}
+              />
               {downloadLink}
             </div>
           )}

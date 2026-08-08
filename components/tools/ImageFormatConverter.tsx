@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, ChangeEvent } from 'react';
+import NextImage from 'next/image';
 import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
 export default function ImageFormatConverter() {
@@ -152,9 +153,12 @@ export default function ImageFormatConverter() {
                 <div>
                   <h4 style={{ marginBottom: 8 }}>Original Image</h4>
                   {previewUrl && (
-                    <img
+                    <NextImage
                       src={previewUrl}
                       alt="Original Preview"
+                      width={1000}
+                      height={240}
+                      unoptimized
                       style={{ maxWidth: '100%', maxHeight: 240, borderRadius: 6, border: '1px solid var(--border-color, #333)', objectFit: 'contain' }}
                     />
                   )}
@@ -162,9 +166,12 @@ export default function ImageFormatConverter() {
                 <div>
                   <h4 style={{ marginBottom: 8 }}>Converted Preview</h4>
                   {convertedUrl ? (
-                    <img
+                    <NextImage
                       src={convertedUrl}
                       alt="Converted Preview"
+                      width={1000}
+                      height={240}
+                      unoptimized
                       style={{ maxWidth: '100%', maxHeight: 240, borderRadius: 6, border: '1px solid var(--border-color, #333)', objectFit: 'contain' }}
                     />
                   ) : (

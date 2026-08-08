@@ -139,7 +139,7 @@ export default function CspBuilder() {
                       checked={state.self}
                       onChange={() => toggleDirectiveFlag(name, 'self')}
                     />{' '}
-                    'self'
+                    &apos;self&apos;
                   </label>
                   <label style={{ cursor: 'pointer' }}>
                     <input
@@ -147,7 +147,7 @@ export default function CspBuilder() {
                       checked={state.unsafeInline}
                       onChange={() => toggleDirectiveFlag(name, 'unsafeInline')}
                     />{' '}
-                    'unsafe-inline'
+                    &apos;unsafe-inline&apos;
                   </label>
                   <label style={{ cursor: 'pointer' }}>
                     <input

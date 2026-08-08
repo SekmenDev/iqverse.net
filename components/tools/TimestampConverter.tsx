@@ -4,9 +4,9 @@ import { useState, useEffect, useMemo } from 'react';
 import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
 export default function TimestampConverter() {
-  const [nowSec, setNowSec] = useState(Math.floor(Date.now() / 1000));
-  const [timestampInput, setTimestampInput] = useState(Math.floor(Date.now() / 1000).toString());
-  const [dateInput, setDateInput] = useState(new Date().toISOString().slice(0, 16));
+  const [nowSec, setNowSec] = useState(() => Math.floor(Date.now() / 1000));
+  const [timestampInput, setTimestampInput] = useState(() => Math.floor(Date.now() / 1000).toString());
+  const [dateInput, setDateInput] = useState(() => new Date().toISOString().slice(0, 16));
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -29,10 +29,10 @@ export default function TimestampConverter() {
       iso: dateObj.toISOString(),
       utc: dateObj.toUTCString(),
       local: dateObj.toString(),
-      relative: getRelativeTimeString(dateObj),
+      relative: getRelativeTimeString(dateObj, nowSec),
       isMs,
     };
-  }, [timestampInput]);
+  }, [nowSec, timestampInput]);
 
   const parsedFromDate = useMemo(() => {
     if (!dateInput) return null;
@@ -46,8 +46,8 @@ export default function TimestampConverter() {
     };
   }, [dateInput]);
 
-  function getRelativeTimeString(date: Date): string {
-    const deltaSec = Math.floor((Date.now() - date.getTime()) / 1000);
+  function getRelativeTimeString(date: Date, currentTimeSec: number): string {
+    const deltaSec = currentTimeSec - Math.floor(date.getTime() / 1000);
     if (Math.abs(deltaSec) < 60) return `${deltaSec >= 0 ? deltaSec : -deltaSec} seconds ${deltaSec >= 0 ? 'ago' : 'from now'}`;
     const min = Math.floor(Math.abs(deltaSec) / 60);
     if (min < 60) return `${min} minutes ${deltaSec >= 0 ? 'ago' : 'from now'}`;
