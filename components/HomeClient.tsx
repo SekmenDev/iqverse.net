@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { tools, getUniqueCategories, getUniqueStatuses, filterTools, sortTools } from '@/lib/tools';
 import type { Tool } from '@/lib/tools';
@@ -77,8 +76,6 @@ export default function HomeClient() {
   const STATUS_LABELS = { open: 'Open Source', saas: 'SaaS', coming: 'Coming Soon' };
   const DOT_CLASS = { open: styles.dotOpen, saas: styles.dotSaas, coming: styles.dotComing };
 
-  const isEmoji = (s: string) => s.length <= 3 && /\p{Emoji}/u.test(s);
-
   const highlightText = (text: string, query: string) => {
     if (!query) return text;
     const parts = text.split(new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'));
@@ -96,11 +93,7 @@ export default function HomeClient() {
       <div className={`${styles.card} ${coming ? styles.cardComing : ''}`}>
         <div className={styles.cardTop}>
           <div className={styles.cardIcon}>
-            {isEmoji(tool.icon) ? (
-              <span>{tool.icon}</span>
-            ) : (
-              <Image src={tool.icon} alt={tool.name} height={34} width={34} priority={false} />
-            )}
+            <span>{tool.icon}</span>
           </div>
           <div className={styles.cardStatus}>
             <span className={`${styles.statusLabel} ${DOT_CLASS[tool.type]}`}>{STATUS_LABELS[tool.type]}</span>
