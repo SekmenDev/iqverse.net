@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, ChangeEvent } from 'react';
+import Image from 'next/image';
 import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
 interface SpriteIcon {
@@ -206,7 +207,7 @@ export default function SpriteGenerator() {
                       gap: 8,
                     }}
                   >
-                    <img src={icon.previewUrl} alt={icon.name} style={{ width: 24, height: 24, objectFit: 'contain' }} />
+                    <Image src={icon.previewUrl} alt={icon.name} width={24} height={24} unoptimized style={{ objectFit: 'contain' }} />
                     <span style={{ fontSize: '0.8rem', fontFamily: 'monospace' }}>{icon.name}</span>
                     <button type="button" className={sharedStyles.button} onClick={() => removeIcon(idx)} style={{ padding: '2px 6px', color: '#ff4d4f' }}>
                       ✕
@@ -246,7 +247,14 @@ export default function SpriteGenerator() {
                   justifyContent: 'center',
                 }}
               >
-                <img src={output.dataUrl} alt="Sprite Sheet" style={{ border: '1px solid #555' }} />
+                <Image
+                  src={output.dataUrl}
+                  alt="Sprite Sheet"
+                  width={output.width}
+                  height={output.height}
+                  unoptimized
+                  style={{ maxWidth: '100%', height: 'auto', border: '1px solid #555' }}
+                />
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import Image from 'next/image';
 import { buildQRPayload } from '@/lib/utils';
 import styles from '@/styles/qrforge.module.css';
 
@@ -759,7 +760,7 @@ export default function QRForge() {
               </div>
             ) : (
               <div className={styles.logoPreviewRow}>
-                <img src={logoData} alt="logo preview" />
+                <Image src={logoData} alt="logo preview" width={48} height={48} unoptimized />
                 <div>
                   <div className={styles.logoFilename}>{logoFilename}</div>
                   <button type="button" className={styles.removeBtn} onClick={handleRemoveLogo}>
