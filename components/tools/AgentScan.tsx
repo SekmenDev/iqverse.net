@@ -120,35 +120,79 @@ export default function AgentScan() {
   const [scannedAt, setScannedAt] = useState<Date | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeFilter, setActiveFilter] = useState<'all' | keyof typeof CATEGORIES>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | CheckStatus>('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [sortMode, setSortMode] = useState<'category' | 'status' | 'name'>('category');
+  const [sortMode, setSortMode] = useState<'category' | 'status' | 'name' | 'weight'>('category');
   const [loadingMessage, setLoadingMessage] = useState('');
   const [rawVisible, setRawVisible] = useState(false);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
+  const isFiltered = activeFilter !== 'all' || statusFilter !== 'all' || searchQuery.trim() !== '';
+
+  const clearAllFilters = () => {
+    setActiveFilter('all');
+    setStatusFilter('all');
+    setSearchQuery('');
+  };
+
   const filteredResults = useMemo(() => {
-    const filtered = activeFilter === 'all'
-      ? results
-      : results.filter((result) => {
-        const def = CHECK_DEFS.find((item) => item.id === result.id);
-        return def?.category === activeFilter;
-      });
+    return results.filter((result) => {
+      const def = CHECK_DEFS.find((item) => item.id === result.id);
 
-    if (sortMode === 'name') {
-      return [...filtered].sort((a, b) => {
-        const aName = CHECK_DEFS.find((item) => item.id === a.id)?.name || a.id;
-        const bName = CHECK_DEFS.find((item) => item.id === b.id)?.name || b.id;
+      // Status filter
+      if (statusFilter !== 'all' && result.status !== statusFilter) {
+        return false;
+      }
+
+      // Category filter
+      if (activeFilter !== 'all' && def?.category !== activeFilter) {
+        return false;
+      }
+
+      // Search query filter
+      if (searchQuery.trim()) {
+        const query = searchQuery.trim().toLowerCase();
+        const nameMatch = (def?.name || '').toLowerCase().includes(query);
+        const idMatch = result.id.toLowerCase().includes(query);
+        const descMatch = (def?.desc || '').toLowerCase().includes(query);
+        const detailMatch = (result.detail || '').toLowerCase().includes(query);
+        const detailExtraMatch = (result.detail_extra || '').toLowerCase().includes(query);
+        const categoryLabel = (def?.category ? CATEGORIES[def.category]?.label || def.category : '').toLowerCase();
+        const categoryMatch = categoryLabel.includes(query);
+        const statusLabel = formatStatusLabel(result.status).toLowerCase();
+        const statusMatch = statusLabel.includes(query);
+
+        if (!nameMatch && !idMatch && !descMatch && !detailMatch && !detailExtraMatch && !categoryMatch && !statusMatch) {
+          return false;
+        }
+      }
+
+      return true;
+    }).sort((a, b) => {
+      const aDef = CHECK_DEFS.find((item) => item.id === a.id);
+      const bDef = CHECK_DEFS.find((item) => item.id === b.id);
+
+      if (sortMode === 'name') {
+        const aName = aDef?.name || a.id;
+        const bName = bDef?.name || b.id;
         return aName.localeCompare(bName);
-      });
-    }
+      }
 
-    if (sortMode === 'status') {
-      const order: Record<CheckStatus, number> = { fail: 0, warn: 1, info: 2, pass: 3, skip: 4 };
-      return [...filtered].sort((a, b) => order[a.status] - order[b.status]);
-    }
+      if (sortMode === 'status') {
+        const order: Record<CheckStatus, number> = { fail: 0, warn: 1, info: 2, pass: 3, skip: 4 };
+        return order[a.status] - order[b.status];
+      }
 
-    return filtered;
-  }, [activeFilter, results, sortMode]);
+      if (sortMode === 'weight') {
+        const aWeight = aDef?.weight || 0;
+        const bWeight = bDef?.weight || 0;
+        return bWeight - aWeight;
+      }
+
+      return 0;
+    });
+  }, [activeFilter, statusFilter, searchQuery, results, sortMode]);
 
   const score = useMemo(() => {
     let totalMax = 0;
@@ -363,13 +407,16 @@ export default function AgentScan() {
   };
 
   const groupedResults = useMemo(() => {
+    if (sortMode !== 'category') {
+      return { all: filteredResults };
+    }
     return filteredResults.reduce<Record<string, CheckResult[]>>((acc, item) => {
       const category = CHECK_DEFS.find((def) => def.id === item.id)?.category || 'other';
       if (!acc[category]) acc[category] = [];
       acc[category].push(item);
       return acc;
     }, {});
-  }, [filteredResults]);
+  }, [filteredResults, sortMode]);
 
   const faqs = [
     {
@@ -467,9 +514,30 @@ export default function AgentScan() {
               <div className={styles.scoreSubtitle}>{scannedAt ? `Scanned at ${scannedAt.toLocaleTimeString()}` : 'Scan complete'}</div>
             </div>
             <div className={styles.badges}>
-              <span className={styles.badge}>{summaryCounts.passed} Passed</span>
-              <span className={styles.badgeWarning}>{summaryCounts.warnings} Warnings</span>
-              <span className={styles.badgeFail}>{summaryCounts.failed} Failed</span>
+              <button
+                type="button"
+                className={`${styles.badgeBtn} ${styles.badgePass} ${statusFilter === 'pass' ? styles.badgeActivePass : ''}`}
+                onClick={() => setStatusFilter(statusFilter === 'pass' ? 'all' : 'pass')}
+                title="Click to filter by Passed"
+              >
+                {summaryCounts.passed} Passed
+              </button>
+              <button
+                type="button"
+                className={`${styles.badgeBtn} ${styles.badgeWarning} ${statusFilter === 'warn' ? styles.badgeActiveWarn : ''}`}
+                onClick={() => setStatusFilter(statusFilter === 'warn' ? 'all' : 'warn')}
+                title="Click to filter by Warnings"
+              >
+                {summaryCounts.warnings} Warnings
+              </button>
+              <button
+                type="button"
+                className={`${styles.badgeBtn} ${styles.badgeFail} ${statusFilter === 'fail' ? styles.badgeActiveFail : ''}`}
+                onClick={() => setStatusFilter(statusFilter === 'fail' ? 'all' : 'fail')}
+                title="Click to filter by Failed"
+              >
+                {summaryCounts.failed} Failed
+              </button>
             </div>
             <div className={styles.resultActions}>
               <button className={styles.actionBtn} type="button" onClick={copyRecommendations}>Copy Summary</button>
@@ -477,65 +545,151 @@ export default function AgentScan() {
             </div>
           </div>
 
-          <div className={styles.controlsRow}>
-            <div className={styles.controlGroup}>
-              <label className={styles.controlLabel} htmlFor="view-mode">View</label>
-              <select
-                id="view-mode"
-                value={viewMode}
-                onChange={(event) => setViewMode(event.target.value as 'grid' | 'list')}
-                className={styles.selectInput}
-              >
-                <option value="grid">Grid</option>
-                <option value="list">List</option>
-              </select>
+          <div className={styles.resultsToolbar}>
+            <div className={styles.searchWrapper}>
+              <span className={styles.searchIcon}>🔍</span>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Filter results by check name, details, keyword or ID…"
+                className={styles.searchInput}
+                spellCheck={false}
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  className={styles.searchClearBtn}
+                  onClick={() => setSearchQuery('')}
+                  title="Clear search"
+                >
+                  ✕
+                </button>
+              )}
             </div>
-            <div className={styles.controlGroup}>
-              <label className={styles.controlLabel} htmlFor="sort-mode">Sort</label>
-              <select
-                id="sort-mode"
-                value={sortMode}
-                onChange={(event) => setSortMode(event.target.value as 'category' | 'status' | 'name')}
-                className={styles.selectInput}
-              >
-                <option value="category">Group by category</option>
-                <option value="status">Sort by status</option>
-                <option value="name">Sort by name</option>
-              </select>
+
+            <div className={styles.controlsRow}>
+              <div className={styles.controlGroup}>
+                <label className={styles.controlLabel} htmlFor="status-filter">Status</label>
+                <select
+                  id="status-filter"
+                  value={statusFilter}
+                  onChange={(event) => setStatusFilter(event.target.value as 'all' | CheckStatus)}
+                  className={styles.selectInput}
+                >
+                  <option value="all">All Statuses ({results.length})</option>
+                  <option value="pass">Passed ({summaryCounts.passed})</option>
+                  <option value="warn">Warnings ({summaryCounts.warnings})</option>
+                  <option value="fail">Failed ({summaryCounts.failed})</option>
+                  <option value="info">Info / Unscored</option>
+                </select>
+              </div>
+              <div className={styles.controlGroup}>
+                <label className={styles.controlLabel} htmlFor="category-filter">Category</label>
+                <select
+                  id="category-filter"
+                  value={activeFilter}
+                  onChange={(event) => setActiveFilter(event.target.value as 'all' | keyof typeof CATEGORIES)}
+                  className={styles.selectInput}
+                >
+                  <option value="all">All Categories</option>
+                  {Object.entries(CATEGORIES).map(([key, cat]) => (
+                    <option key={key} value={key}>{cat.icon} {cat.label}</option>
+                  ))}
+                </select>
+              </div>
+              <div className={styles.controlGroup}>
+                <label className={styles.controlLabel} htmlFor="sort-mode">Sort</label>
+                <select
+                  id="sort-mode"
+                  value={sortMode}
+                  onChange={(event) => setSortMode(event.target.value as 'category' | 'status' | 'name' | 'weight')}
+                  className={styles.selectInput}
+                >
+                  <option value="category">Group by category</option>
+                  <option value="status">Sort by status (Failures first)</option>
+                  <option value="weight">Sort by weight (Highest first)</option>
+                  <option value="name">Sort by name (A-Z)</option>
+                </select>
+              </div>
+              <div className={styles.controlGroup}>
+                <label className={styles.controlLabel} htmlFor="view-mode">View</label>
+                <select
+                  id="view-mode"
+                  value={viewMode}
+                  onChange={(event) => setViewMode(event.target.value as 'grid' | 'list')}
+                  className={styles.selectInput}
+                >
+                  <option value="grid">Grid</option>
+                  <option value="list">List</option>
+                </select>
+              </div>
+            </div>
+
+            <div className={styles.resultsCountBar}>
+              <span className={styles.resultsCountText}>
+                Showing <strong>{filteredResults.length}</strong> of <strong>{results.length}</strong> checks
+              </span>
+              {isFiltered && (
+                <button
+                  type="button"
+                  className={styles.clearFiltersBtn}
+                  onClick={clearAllFilters}
+                >
+                  Clear filters ✕
+                </button>
+              )}
             </div>
           </div>
 
-          <div className={`${styles.checksGrid} ${viewMode === 'list' ? styles.listView : ''}`}>
-            {Object.entries(groupedResults).map(([category, items]) => (
-              <div key={category} className={styles.categoryBlock}>
-                <div className={styles.categoryHeader}>
-                  <span>{CATEGORIES[category]?.icon || '•'}</span>
-                  <span>{CATEGORIES[category]?.label || category}</span>
-                </div>
-                <div className={styles.categoryCards}>
-                  {items.map((result) => {
-                    const def = CHECK_DEFS.find((item) => item.id === result.id);
-                    return (
-                      <article key={result.id} className={`${styles.checkCard} ${styles[`status_${result.status}`] ?? ''}`}>
-                        <div className={styles.checkHead}>
-                          <span className={styles.checkStatus}>{STATUS_ICONS[result.status]}</span>
-                          <div>
-                            <div className={styles.checkName}>{def?.name ?? result.id}</div>
-                            <div className={styles.checkMeta}>
-                              {formatStatusLabel(result.status)} {def?.weight ? `(weight ${def.weight})` : ''}
+          {filteredResults.length === 0 ? (
+            <div className={styles.emptyStateCard}>
+              <div className={styles.emptyStateIcon}>🔎</div>
+              <h3 className={styles.emptyStateTitle}>No matching checks found</h3>
+              <p className={styles.emptyStateText}>
+                {searchQuery
+                  ? `No checks matched your search query "${searchQuery}".`
+                  : 'No checks matched your selected filter criteria.'}
+              </p>
+              <button type="button" className={styles.actionBtn} onClick={clearAllFilters}>
+                Reset all filters
+              </button>
+            </div>
+          ) : (
+            <div className={`${styles.checksGrid} ${viewMode === 'list' ? styles.listView : ''}`}>
+              {Object.entries(groupedResults).map(([category, items]) => (
+                <div key={category} className={styles.categoryBlock}>
+                  {sortMode === 'category' && CATEGORIES[category] && (
+                    <div className={styles.categoryHeader}>
+                      <span>{CATEGORIES[category]?.icon || '•'}</span>
+                      <span>{CATEGORIES[category]?.label || category}</span>
+                    </div>
+                  )}
+                  <div className={styles.categoryCards}>
+                    {items.map((result) => {
+                      const def = CHECK_DEFS.find((item) => item.id === result.id);
+                      return (
+                        <article key={result.id} className={`${styles.checkCard} ${styles[`status_${result.status}`] ?? ''}`}>
+                          <div className={styles.checkHead}>
+                            <span className={styles.checkStatus}>{STATUS_ICONS[result.status]}</span>
+                            <div>
+                              <div className={styles.checkName}>{def?.name ?? result.id}</div>
+                              <div className={styles.checkMeta}>
+                                {formatStatusLabel(result.status)} {def?.weight ? `(weight ${def.weight})` : ''}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <p className={styles.checkDesc}>{def?.desc}</p>
-                        <div className={styles.checkDetail}>{result.detail}</div>
-                        {result.detail_extra && <pre className={styles.detailExtra}>{result.detail_extra}</pre>}
-                      </article>
-                    );
-                  })}
+                          <p className={styles.checkDesc}>{def?.desc}</p>
+                          <div className={styles.checkDetail}>{result.detail}</div>
+                          {result.detail_extra && <pre className={styles.detailExtra}>{result.detail_extra}</pre>}
+                        </article>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
           <div className={styles.recommendationsPanel}>
             <div className={styles.recommendationsHeader}>
