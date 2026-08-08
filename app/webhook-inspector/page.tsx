@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('webhook-inspector') || {
   title: 'Webhook Inspector | IQVerse',
   description: 'Inspect and debug incoming HTTP webhook payloads and request headers in real time.',
+  alternates: {
+    canonical: 'https://iqverse.net/webhook-inspector/',
+  },
 };
 
 export default function WebhookInspectorPage() {

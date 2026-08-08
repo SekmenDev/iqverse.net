@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('jwt-debugger') || {
   title: 'JWT Debugger & Verifier | IQVerse',
   description: 'Decode JWT headers and claims and verify signatures locally using Web Crypto API.',
+  alternates: {
+    canonical: 'https://iqverse.net/jwt-debugger/',
+  },
 };
 
 export default function JwtDebuggerPage() {

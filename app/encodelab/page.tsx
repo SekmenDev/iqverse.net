@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('encodelab') || {
   title: 'EncodeLab | Base64 & URL Encoder/Decoder',
   description: 'Encode and decode Base64, URL parameters and inspect JWTs in your browser.',
+  alternates: {
+    canonical: 'https://iqverse.net/encodelab/',
+  },
 };
 
 export default function EncodeLabPage() {

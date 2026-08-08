@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('csvviewer') || {
   title: 'CSV Viewer & Converter',
   description: 'Preview CSV data and export it to JSON, Markdown or SQL.',
+  alternates: {
+    canonical: 'https://iqverse.net/csvviewer/',
+  },
 };
 
 export default function CSVViewerPage() {

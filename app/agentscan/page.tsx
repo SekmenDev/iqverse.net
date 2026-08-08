@@ -8,6 +8,9 @@ export const metadata: Metadata =
     title: 'AgentScan | AI Agent Readiness Scanner',
     description:
       'Scan any website to discover how compatible it is with AI agents. Check robots.txt, sitemap, MCP, OAuth, markdown negotiation and commerce metadata using a browser-based scanner.',
+    alternates: {
+      canonical: 'https://iqverse.net/agentscan/',
+    },
   };
 
 export default function AgentScanPage() {

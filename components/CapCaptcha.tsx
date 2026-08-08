@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
 
 /* eslint-disable @typescript-eslint/no-namespace */
 declare global {
@@ -32,24 +32,49 @@ declare global {
   }
 }
 
-interface CapCaptchaProps {
+export interface CapCaptchaRef {
+  reset: () => void;
+}
+
+export interface CapCaptchaProps {
   endpoint?: string;
   onSolve?: (token: string) => void;
   onError?: (error: string) => void;
   onProgress?: (progress: number) => void;
+  onReset?: () => void;
   className?: string;
   style?: React.CSSProperties;
 }
 
-export default function CapCaptcha({
-  endpoint = 'https://captcha.sekmen.dev/b2962a01e4/',
-  onSolve,
-  onError,
-  onProgress,
-  className,
-  style,
-}: CapCaptchaProps) {
+export const CapCaptcha = forwardRef<CapCaptchaRef, CapCaptchaProps>(function CapCaptcha(
+  {
+    endpoint = 'https://captcha.sekmen.dev/b2962a01e4/',
+    onSolve,
+    onError,
+    onProgress,
+    onReset,
+    className,
+    style,
+  },
+  ref
+) {
   const widgetRef = useRef<HTMLElement>(null);
+  const [resetKey, setResetKey] = useState(0);
+
+  const reset = React.useCallback(() => {
+    const el = widgetRef.current;
+    if (el && typeof (el as any).reset === 'function') {
+      try {
+        (el as any).reset();
+      } catch {
+        // Fallback to key increment if element reset throws
+      }
+    }
+    setResetKey((k) => k + 1);
+    onReset?.();
+  }, [onReset]);
+
+  useImperativeHandle(ref, () => ({ reset }), [reset]);
 
   useEffect(() => {
     const el = widgetRef.current;
@@ -80,19 +105,31 @@ export default function CapCaptcha({
     el.addEventListener('error', handleError);
     el.addEventListener('progress', handleProgress);
 
+    const form = el.closest('form');
+    if (form) {
+      form.addEventListener('reset', reset);
+    }
+
     return () => {
       el.removeEventListener('solve', handleSolve);
       el.removeEventListener('error', handleError);
       el.removeEventListener('progress', handleProgress);
+      if (form) {
+        form.removeEventListener('reset', reset);
+      }
     };
-  }, [onSolve, onError, onProgress]);
+  }, [onSolve, onError, onProgress, reset]);
 
   return (
     <div style={{ display: 'inline-flex', alignItems: 'center', margin: '8px 0', ...style }} className={className}>
       <cap-widget
+        key={resetKey}
         ref={widgetRef as any}
         data-cap-api-endpoint={endpoint}
       />
     </div>
   );
-}
+});
+
+export default CapCaptcha;
+

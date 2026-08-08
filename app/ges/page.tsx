@@ -5,6 +5,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('ges') || {
   title: 'GES | Smart Quiz & Exam Platform',
   description: 'Create, share and analyze quizzes and exams in minutes with a polished assessment experience.',
+  alternates: {
+    canonical: 'https://iqverse.net/ges/',
+  },
 };
 
 export default function GesPage() {

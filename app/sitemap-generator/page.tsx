@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('sitemap-generator') || {
   title: 'Sitemap Generator | IQVerse',
   description: 'Crawl web pages or paths to build XML sitemaps ready for search engine indexing.',
+  alternates: {
+    canonical: 'https://iqverse.net/sitemap-generator/',
+  },
 };
 
 export default function SitemapGeneratorPage() {

@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('robots-generator') || {
   title: 'robots.txt Generator & Validator | IQVerse',
   description: 'Build and test robots.txt directives for web crawlers and AI search bots.',
+  alternates: {
+    canonical: 'https://iqverse.net/robots-generator/',
+  },
 };
 
 export default function RobotsGeneratorPage() {

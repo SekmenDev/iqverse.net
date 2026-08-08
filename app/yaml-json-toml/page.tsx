@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('yaml-json-toml') || {
   title: 'YAML / JSON / TOML Converter | IQVerse',
   description: 'Convert seamlessly between YAML, JSON and TOML formats directly in your browser.',
+  alternates: {
+    canonical: 'https://iqverse.net/yaml-json-toml/',
+  },
 };
 
 export default function YamlJsonTomlConverterPage() {

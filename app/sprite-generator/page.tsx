@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('sprite-generator') || {
   title: 'Icon & Sprite Sheet Generator | IQVerse',
   description: 'Combine multiple icons into a single sprite sheet with CSS and JSON coordinates.',
+  alternates: {
+    canonical: 'https://iqverse.net/sprite-generator/',
+  },
 };
 
 export default function SpriteGeneratorPage() {

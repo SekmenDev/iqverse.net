@@ -1,6 +1,9 @@
 import Link from 'next/link';
 import React from 'react';
 import ThemeToggle from './ThemeToggle';
+import JsonLd from '@/components/JsonLd';
+import { getToolJsonLd } from '@/lib/jsonld';
+import { tools } from '@/lib/tools';
 import styles from '@/styles/tool-layout.module.css';
 
 interface ToolLayoutProps {
@@ -8,6 +11,7 @@ interface ToolLayoutProps {
   subtitle?: string;
   description?: string;
   pill?: string;
+  toolSlug?: string;
   children: React.ReactNode;
 }
 
@@ -16,12 +20,17 @@ export default function ToolLayout({
   subtitle,
   description,
   pill = 'TOOL',
+  toolSlug,
   children,
 }: ToolLayoutProps) {
   const initial = title.trim().charAt(0).toUpperCase() || 'T';
+  const matchedTool = tools.find(t => t.name.toLowerCase() === title.toLowerCase()) || (toolSlug ? tools.find(t => t.url.includes(toolSlug)) : undefined);
+  const slug = toolSlug || matchedTool?.url.replace(/\//g, '') || title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  const jsonLdData = getToolJsonLd(title, description, `/${slug}/`);
 
   return (
     <main className={styles.page}>
+      <JsonLd data={jsonLdData} />
       <nav className={styles.topNav}>
         <Link className={styles.navLogo} href="/">
           <span className={styles.navLogoDot} />

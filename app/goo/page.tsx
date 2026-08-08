@@ -5,6 +5,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('goo') || {
   title: 'GOO | Modular School Management System',
   description: 'Simplify campus operations with a modular school management platform for records, communication and insight.',
+  alternates: {
+    canonical: 'https://iqverse.net/goo/',
+  },
 };
 
 export default function GooPage() {

@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('ping-visualizer') || {
   title: 'Ping & Traceroute Visualizer | IQVerse',
   description: 'Visualize network latency and hop trace routes via backend diagnostic relay.',
+  alternates: {
+    canonical: 'https://iqverse.net/ping-visualizer/',
+  },
 };
 
 export default function PingVisualizerPage() {

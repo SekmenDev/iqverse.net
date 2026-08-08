@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('cron-builder') || {
   title: 'Cron Expression Builder | IQVerse',
   description: 'Visual cron schedule generator with human-readable explanations and next execution times.',
+  alternates: {
+    canonical: 'https://iqverse.net/cron-builder/',
+  },
 };
 
 export default function CronBuilderPage() {

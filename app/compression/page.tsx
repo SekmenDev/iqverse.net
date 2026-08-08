@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('compression') || {
   title: 'Compression | Deflate Compress & Decompress',
   description: 'Compress and decompress text using browser-native compression support.',
+  alternates: {
+    canonical: 'https://iqverse.net/compression/',
+  },
 };
 
 export default function CompressionPage() {

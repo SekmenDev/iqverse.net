@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('cookie-inspector') || {
   title: 'Cookie Inspector | IQVerse',
   description: 'Parse and inspect raw Cookie and Set-Cookie headers for SameSite, Secure and Max-Age flags.',
+  alternates: {
+    canonical: 'https://iqverse.net/cookie-inspector/',
+  },
 };
 
 export default function CookieInspectorPage() {

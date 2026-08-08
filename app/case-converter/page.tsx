@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('case-converter') || {
   title: 'Text Case Converter | IQVerse',
   description: 'Toggle between camelCase, snake_case, kebab-case, Title Case and UPPERCASE instantly.',
+  alternates: {
+    canonical: 'https://iqverse.net/case-converter/',
+  },
 };
 
 export default function TextCaseConverterPage() {

@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('ai-log-analyzer') || {
   title: 'AI Crawler Log Analyzer | IQVerse',
   description: 'Parse server access logs locally to identify and analyze visits from GPTBot, ClaudeBot and PerplexityBot.',
+  alternates: {
+    canonical: 'https://iqverse.net/ai-log-analyzer/',
+  },
 };
 
 export default function AiLogAnalyzerPage() {

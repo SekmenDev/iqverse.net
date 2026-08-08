@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('ssl-inspector') || {
   title: 'SSL / TLS Certificate Inspector | IQVerse',
   description: 'Inspect SSL/TLS certificate validity, issuer details, expiration and trust chain.',
+  alternates: {
+    canonical: 'https://iqverse.net/ssl-inspector/',
+  },
 };
 
 export default function SslInspectorPage() {

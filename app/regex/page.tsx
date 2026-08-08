@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('regex') || {
   title: 'RegEx Forge | Regex Tester & Explainer',
   description: 'Build, test and understand regular expressions with a live tester and explainer.',
+  alternates: {
+    canonical: 'https://iqverse.net/regex/',
+  },
 };
 
 export default function RegexForgePage() {

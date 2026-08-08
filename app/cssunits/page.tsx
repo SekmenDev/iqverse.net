@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('cssunits') || {
   title: 'CSS Units Converter',
   description: 'Convert CSS units like px, rem, em, vw, vh and percentages in your browser.',
+  alternates: {
+    canonical: 'https://iqverse.net/cssunits/',
+  },
 };
 
 export default function CSSUnitsPage() {

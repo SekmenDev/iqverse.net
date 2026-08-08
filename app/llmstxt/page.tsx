@@ -6,6 +6,9 @@ import { getToolMetadata } from '@/lib/tools';
 export const metadata: Metadata = getToolMetadata('llmstxt') || {
   title: 'llms.txt Generator & Validator | IQVerse',
   description: 'Create and validate llms.txt standard files for AI crawler site summaries.',
+  alternates: {
+    canonical: 'https://iqverse.net/llmstxt/',
+  },
 };
 
 export default function LlmstxtPage() {
