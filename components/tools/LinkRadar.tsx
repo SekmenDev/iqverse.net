@@ -330,10 +330,16 @@ export default function LinkRadar() {
     <div style={{ maxWidth: 1100 }}>
       <section className={sharedStyles.section}>
         <div className={sharedStyles.sectionLabel}>LinkRadar</div>
-        <div className={sharedStyles.card}>
+        <form
+          className={sharedStyles.card}
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleToggle();
+          }}
+        >
           <div style={{ display: 'flex', gap: 8 }}>
             <input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://example.com" style={{ flex: 1 }} />
-            <button type="button" className={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`} onClick={handleToggle}>{running ? 'Stop' : 'Scan'}</button>
+            <button type="submit" className={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}>{running ? 'Stop' : 'Scan'}</button>
           </div>
 
           <div style={{ marginTop: 12, display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -358,7 +364,7 @@ export default function LinkRadar() {
           <div style={{ marginTop: 14 }}>
             <CapCaptcha />
           </div>
-        </div>
+        </form>
       </section>
 
       <section className={sharedStyles.section}>

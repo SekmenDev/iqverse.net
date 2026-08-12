@@ -451,7 +451,13 @@ export default function AgentScan() {
           Scan any website to discover how compatible it is with AI agents. We evaluate your core signals including llms.txt, robots.txt AI rules, Schema.org JSON-LD, sitemap, Open Graph, canonical metadata and protocol discovery files.
         </p>
 
-        <div className={styles.scannerCard}>
+        <form
+          className={styles.scannerCard}
+          onSubmit={(event) => {
+            event.preventDefault();
+            handleScan();
+          }}
+        >
           <div className={styles.inputRow}>
             <div className={styles.inputWrapper}>
               <span className={styles.inputIcon}>🌐</span>
@@ -463,10 +469,9 @@ export default function AgentScan() {
                 autoCapitalize="none"
                 autoComplete="off"
                 spellCheck={false}
-                onKeyDown={(event) => { if (event.key === 'Enter') handleScan(); }}
               />
             </div>
-            <button className={styles.scanButton} onClick={handleScan} disabled={loading} type="button">
+            <button className={styles.scanButton} disabled={loading} type="submit">
               {loading ? 'Scanning…' : 'Scan Site'}
             </button>
           </div>
@@ -499,7 +504,7 @@ export default function AgentScan() {
               </button>
             ))}
           </div>
-        </div>
+        </form>
       </section>
 
       {loadingMessage && <div className={styles.statusBar}>{loadingMessage}</div>}

@@ -26,7 +26,7 @@ export default function ToolLayout({
   const initial = title.trim().charAt(0).toUpperCase() || 'T';
   const matchedTool = tools.find(t => t.name.toLowerCase() === title.toLowerCase()) || (toolSlug ? tools.find(t => t.url.includes(toolSlug)) : undefined);
   const slug = toolSlug || matchedTool?.url.replace(/\//g, '') || title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-  const jsonLdData = getToolJsonLd(title, description, `/${slug}/`);
+  const jsonLdData = getToolJsonLd(title, description, `/${slug}/`, matchedTool?.cat);
 
   return (
     <main className={styles.page}>
@@ -75,14 +75,6 @@ export default function ToolLayout({
               <Link className={`${styles.btn} ${styles.btnGhost}`} href="/">
                 Back home
               </Link>
-              <a
-                className={`${styles.btn} ${styles.btnGhost}`}
-                href="https://github.com/SekmenDev/iqverse.net"
-                target="_blank"
-                rel="noreferrer"
-              >
-                View source
-              </a>
             </div>
           </div>
         </div>

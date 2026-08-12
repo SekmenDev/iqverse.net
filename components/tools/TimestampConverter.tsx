@@ -3,6 +3,17 @@
 import { useState, useEffect, useMemo } from 'react';
 import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
+function getRelativeTimeString(date: Date, currentTimeSec: number): string {
+  const deltaSec = currentTimeSec - Math.floor(date.getTime() / 1000);
+  if (Math.abs(deltaSec) < 60) return `${deltaSec >= 0 ? deltaSec : -deltaSec} seconds ${deltaSec >= 0 ? 'ago' : 'from now'}`;
+  const min = Math.floor(Math.abs(deltaSec) / 60);
+  if (min < 60) return `${min} minutes ${deltaSec >= 0 ? 'ago' : 'from now'}`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr} hours ${deltaSec >= 0 ? 'ago' : 'from now'}`;
+  const days = Math.floor(hr / 24);
+  return `${days} days ${deltaSec >= 0 ? 'ago' : 'from now'}`;
+}
+
 export default function TimestampConverter() {
   const [nowSec, setNowSec] = useState(() => Math.floor(Date.now() / 1000));
   const [timestampInput, setTimestampInput] = useState(() => Math.floor(Date.now() / 1000).toString());
@@ -45,17 +56,6 @@ export default function TimestampConverter() {
       iso: d.toISOString(),
     };
   }, [dateInput]);
-
-  function getRelativeTimeString(date: Date, currentTimeSec: number): string {
-    const deltaSec = currentTimeSec - Math.floor(date.getTime() / 1000);
-    if (Math.abs(deltaSec) < 60) return `${deltaSec >= 0 ? deltaSec : -deltaSec} seconds ${deltaSec >= 0 ? 'ago' : 'from now'}`;
-    const min = Math.floor(Math.abs(deltaSec) / 60);
-    if (min < 60) return `${min} minutes ${deltaSec >= 0 ? 'ago' : 'from now'}`;
-    const hr = Math.floor(min / 60);
-    if (hr < 24) return `${hr} hours ${deltaSec >= 0 ? 'ago' : 'from now'}`;
-    const days = Math.floor(hr / 24);
-    return `${days} days ${deltaSec >= 0 ? 'ago' : 'from now'}`;
-  }
 
   return (
     <div style={{ maxWidth: 1000 }}>

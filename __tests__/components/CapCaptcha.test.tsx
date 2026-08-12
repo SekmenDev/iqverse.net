@@ -43,4 +43,21 @@ describe('CapCaptcha Component', () => {
     fireEvent.reset(form!);
     expect(onReset).toHaveBeenCalledTimes(1);
   });
+
+  it('resets automatically when parent form is submitted', () => {
+    const onReset = vi.fn();
+    const { container } = render(
+      <form data-testid="test-form">
+        <CapCaptcha onReset={onReset} />
+        <button type="submit">Submit</button>
+      </form>
+    );
+
+    const form = container.querySelector('form');
+    expect(form).not.toBeNull();
+
+    fireEvent.submit(form!);
+    expect(onReset).toHaveBeenCalledTimes(1);
+  });
 });
+

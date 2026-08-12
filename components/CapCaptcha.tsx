@@ -107,6 +107,7 @@ export const CapCaptcha = forwardRef<CapCaptchaRef, CapCaptchaProps>(function Ca
 
     const form = el.closest('form');
     if (form) {
+      form.addEventListener('submit', reset);
       form.addEventListener('reset', reset);
     }
 
@@ -115,6 +116,7 @@ export const CapCaptcha = forwardRef<CapCaptchaRef, CapCaptchaProps>(function Ca
       el.removeEventListener('error', handleError);
       el.removeEventListener('progress', handleProgress);
       if (form) {
+        form.removeEventListener('submit', reset);
         form.removeEventListener('reset', reset);
       }
     };
