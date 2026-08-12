@@ -75,14 +75,6 @@ export default function ToolLayout({
               <Link className={`${styles.btn} ${styles.btnGhost}`} href="/">
                 Back home
               </Link>
-              <a
-                className={`${styles.btn} ${styles.btnGhost}`}
-                href="https://github.com/SekmenDev/iqverse.net"
-                target="_blank"
-                rel="noreferrer"
-              >
-                View source
-              </a>
             </div>
           </div>
         </div>
