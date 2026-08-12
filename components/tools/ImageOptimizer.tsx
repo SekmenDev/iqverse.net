@@ -21,7 +21,7 @@ export default function ImageOptimizer() {
 
     try {
       const imageUrl = URL.createObjectURL(file);
-      const image = new Image();
+      const image = new window.Image();
       image.src = imageUrl;
       image.onload = () => {
         const canvas = document.createElement('canvas');

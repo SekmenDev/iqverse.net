@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
+import JsonLd from '@/components/JsonLd';
 import HomeClient from '@/components/HomeClient';
+import { getToolsCollectionJsonLd } from '@/lib/jsonld';
 
 export const metadata: Metadata = {
   title: 'IQVerse | Free Open-Source Online Developer Tools & Utilities',
@@ -11,5 +13,10 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
-  return <HomeClient />;
+  return (
+    <>
+      <JsonLd data={getToolsCollectionJsonLd()} />
+      <HomeClient />
+    </>
+  );
 }
