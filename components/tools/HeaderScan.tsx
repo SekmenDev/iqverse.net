@@ -368,7 +368,13 @@ export default function HeaderScan() {
           <p>Paste any URL and review a fast report with actionable recommendations.</p>
         </div>
 
-        <div className={styles.inputPanel}>
+        <form
+          className={styles.inputPanel}
+          onSubmit={(event) => {
+            event.preventDefault();
+            void runAnalysis(input);
+          }}
+        >
           <label className={sharedStyles.fieldLabel} htmlFor="headers-url">
             URL to analyze
           </label>
@@ -381,7 +387,7 @@ export default function HeaderScan() {
               placeholder="https://example.com"
               spellCheck={false}
             />
-            <button type="button" className={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`} onClick={() => void runAnalysis(input)}>
+            <button type="submit" className={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}>
               {loading ? 'Analyzing…' : 'Analyze'}
             </button>
           </div>
@@ -395,7 +401,7 @@ export default function HeaderScan() {
           <div style={{ marginTop: 12 }}>
             <CapCaptcha />
           </div>
-        </div>
+        </form>
       </section>
 
       {error && (
