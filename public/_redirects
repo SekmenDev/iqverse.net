@@ -1,0 +1,76 @@
+# Cloudflare Pages Redirects - Security Honeypot Rules
+# Redirect common WordPress, admin, environment, and exploit probes to /hacker/
+
+# WordPress Probes
+/wp-admin/*          /hacker/ 302
+/wp-admin            /hacker/ 302
+/wp-login.php        /hacker/ 302
+/wp-login            /hacker/ 302
+/wp-content/*        /hacker/ 302
+/wp-includes/*       /hacker/ 302
+/wp-config.php       /hacker/ 302
+/xmlrpc.php          /hacker/ 302
+/wp-json/*           /hacker/ 302
+/wordpress/*         /hacker/ 302
+/wordpress           /hacker/ 302
+/wp/*                /hacker/ 302
+/wp                  /hacker/ 302
+
+# Admin Panels & Management Consoles
+/administrator       /hacker/ 302
+/administrator/*     /hacker/ 302
+/admin               /hacker/ 302
+/admin/*             /hacker/ 302
+/admin.php           /hacker/ 302
+/admin-console/*     /hacker/ 302
+/cpanel              /hacker/ 302
+/cpanel/*            /hacker/ 302
+/phpmyadmin*         /hacker/ 302
+/phpMyAdmin*         /hacker/ 302
+/pma                 /hacker/ 302
+/myadmin             /hacker/ 302
+
+# Environment, Configs & Version Control Secrets
+/.env                /hacker/ 302
+/.env.*              /hacker/ 302
+/.git/*              /hacker/ 302
+/.git                /hacker/ 302
+/.gitignore          /hacker/ 302
+/.aws/*              /hacker/ 302
+/.ssh/*              /hacker/ 302
+/config.json         /hacker/ 302
+/config.php          /hacker/ 302
+/configuration.php   /hacker/ 302
+/web.config          /hacker/ 302
+/appsettings.json    /hacker/ 302
+
+# Database Dumps & Backups
+/db.sql              /hacker/ 302
+/database.sql        /hacker/ 302
+/dump.sql            /hacker/ 302
+/backup.sql          /hacker/ 302
+/backup.zip          /hacker/ 302
+/backup.tar.gz       /hacker/ 302
+/site.zip            /hacker/ 302
+
+# Web Shells & Common Exploits
+/shell.php           /hacker/ 302
+/cmd.php             /hacker/ 302
+/eval.php            /hacker/ 302
+/upload.php          /hacker/ 302
+/webshell.php        /hacker/ 302
+/alfa.php            /hacker/ 302
+/c99.php             /hacker/ 302
+/r57.php             /hacker/ 302
+
+# Server Actuators & Installer Scripts
+/console             /hacker/ 302
+/actuator            /hacker/ 302
+/actuator/*          /hacker/ 302
+/api/v1/admin        /hacker/ 302
+/setup.php           /hacker/ 302
+/install.php         /hacker/ 302
+
+# .Net, ABP and Umbraco links
+/umbraco            /hacker/ 302
+
