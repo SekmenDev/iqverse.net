@@ -33,7 +33,7 @@ export default function ToolLayout({
       <JsonLd data={jsonLdData} />
       <nav className={styles.topNav}>
         <Link className={styles.navLogo} href="/">
-          <span className={styles.navLogoDot} />
+          <ThemeToggle />
           <span>IQVerse</span>
         </Link>
 
@@ -44,7 +44,6 @@ export default function ToolLayout({
         </div>
 
         <div className={styles.navRight}>
-          <ThemeToggle />
           <Link href="/">Home</Link>
           <a href="https://github.com/SekmenDev/iqverse.net" target="_blank" rel="noreferrer">
             Source

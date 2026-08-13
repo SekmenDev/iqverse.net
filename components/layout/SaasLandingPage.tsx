@@ -73,7 +73,7 @@ export default function SaasLandingPage({
       <JsonLd data={jsonLdData} />
       <nav className={styles.nav}>
         <a className={styles.brand} href="#top">
-          <span className={styles.brandMark}>{brand.slice(0, 1)}</span>
+          <ThemeToggle />
           <span>{brand}</span>
         </a>
         <div className={styles.navLinks}>
@@ -82,7 +82,6 @@ export default function SaasLandingPage({
           <a href="#contact">Contact</a>
         </div>
         <div className={styles.navRight}>
-          <ThemeToggle />
           <a
             className={styles.navCta}
             href={appUrl || "#contact"}

@@ -200,7 +200,8 @@ export default function HomeClient() {
         </button>
 
         <Link href="/" className={styles.navLogo}>
-          <span className={styles.navLogoDot}></span> IQVerse
+          <ThemeToggle />
+          IQVerse
         </Link>
 
         <div className={styles.navSearchWrap}>
@@ -231,7 +232,6 @@ export default function HomeClient() {
         </div>
 
         <div className={styles.navRight}>
-          <ThemeToggle />
           <a
             href="https://github.com/SekmenDev/iqverse.net"
             target="_blank"
