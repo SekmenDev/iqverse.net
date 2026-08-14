@@ -1,6 +1,6 @@
 {
   "name": "iqverse",
-  "version": "1.0.0",
+  "version": "2.5.0",
   "description": "IQVerse - Free open-source developer tools",
   "private": true,
   "type": "module",
@@ -25,16 +25,16 @@
     "qrcode": "^1.5.4"
   },
   "devDependencies": {
-    "@playwright/test": "^1.62.0",
-    "@types/node": "^26.1.2",
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^26.2.0",
     "@types/qrcode": "^1.5.6",
-    "@vitest/coverage-v8": "^3.2.7",
-    "@vitest/ui": "^3.2.7",
-    "eslint": "^9.7.0",
+    "@vitest/coverage-v8": "^4.1.10",
+    "@vitest/ui": "^4.1.10",
+    "eslint": "^9.39.5",
     "jsdom": "^26.1.0",
     "typescript": "6.0.3",
     "vite": "^6.4.3",
-    "vitest": "^3.2.7"
+    "vitest": "^4.1.10"
   },
   "packageManager": "yarn@4.9.1"
 }
