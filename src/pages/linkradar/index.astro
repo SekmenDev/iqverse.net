@@ -1,5 +1,6 @@
 ---
 import ToolLayout from '@/layouts/ToolLayout.astro';
+import CapCaptcha from '@/components/CapCaptcha.astro';
 import sharedStyles from '@/styles/shared-tool-styles.module.css';
 ---
 
@@ -59,6 +60,10 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
               <input id="opt-crawl" type="checkbox" checked />
               Crawl Internal Subpages (Max Depth: 2)
             </label>
+          </div>
+
+          <div style="margin-top: 14px;">
+            <CapCaptcha />
           </div>
         </form>
 

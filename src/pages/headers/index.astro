@@ -1,5 +1,6 @@
 ---
 import ToolLayout from '@/layouts/ToolLayout.astro';
+import CapCaptcha from '@/components/CapCaptcha.astro';
 import styles from '@/styles/header-scan.module.css';
 import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
@@ -28,6 +29,9 @@ const SAMPLE_URLS = ['https://example.com', 'https://github.com', 'https://googl
           <button type="submit" id="scan-submit-btn" class={styles.scanButton}>
             Scan Headers
           </button>
+        </div>
+        <div style="margin-top: 12px;">
+          <CapCaptcha />
         </div>
       </form>
 
