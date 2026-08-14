@@ -1,0 +1,55 @@
+---
+import { DEFAULT_CAPTCHA_ENDPOINT } from '@/lib/captcha';
+
+export interface Props {
+  endpoint?: string;
+  workerCount?: number | string;
+  disableHaptics?: boolean | string;
+  required?: boolean;
+  class?: string;
+  style?: string;
+  id?: string;
+}
+
+const {
+  endpoint = DEFAULT_CAPTCHA_ENDPOINT,
+  workerCount,
+  disableHaptics,
+  required,
+  class: className = '',
+  style = '',
+  id,
+} = Astro.props;
+---
+
+<div class={`cap-captcha-wrap ${className}`.trim()} style={`display: inline-flex; align-items: center; margin: 8px 0; ${style}`.trim()}>
+  <cap-widget
+    id={id}
+    data-cap-api-endpoint={endpoint}
+    data-cap-worker-count={workerCount}
+    data-cap-disable-haptics={disableHaptics}
+    required={required}
+  ></cap-widget>
+</div>
+
+<script>
+  import { bindCapWidget } from '@/lib/captcha';
+
+  function initCaptchaWidgets() {
+    const widgets = document.querySelectorAll('cap-widget');
+    widgets.forEach((widget) => {
+      if ((widget as any).__cap_bound) return;
+      (widget as any).__cap_bound = true;
+      bindCapWidget(widget as HTMLElement);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCaptchaWidgets);
+  } else {
+    initCaptchaWidgets();
+  }
+
+  document.addEventListener('astro:page-load', initCaptchaWidgets);
+  document.addEventListener('astro:after-swap', initCaptchaWidgets);
+</script>

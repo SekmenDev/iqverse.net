@@ -88,10 +88,10 @@ const jsonLdString = JSON.stringify(finalJsonLd).replace(/</g, '\\u003c');
     </script>
 
     <!-- External Widgets -->
-    <script src="https://cdn.jsdelivr.net/npm/cap-widget@latest" type="module"></script>
+    <script is:inline src="https://cdn.jsdelivr.net/npm/cap-widget@latest" type="module"></script>
 
     <!-- Structured Data JSON-LD -->
-    <script type="application/ld+json" set:html={jsonLdString} />
+    <script is:inline type="application/ld+json" set:html={jsonLdString} />
   </head>
   <body>
     <slot />

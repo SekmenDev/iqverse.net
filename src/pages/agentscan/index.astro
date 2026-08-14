@@ -1,5 +1,6 @@
 ---
 import ToolLayout from '@/layouts/ToolLayout.astro';
+import CapCaptcha from '@/components/CapCaptcha.astro';
 import styles from '@/styles/agentscan.module.css';
 
 const QUICK_EXAMPLES = ['https://cloudflare.com', 'https://github.com', 'https://openai.com', 'https://stripe.com', 'https://anthropic.com'];
@@ -32,6 +33,9 @@ const QUICK_EXAMPLES = ['https://cloudflare.com', 'https://github.com', 'https:/
           <button type="submit" id="btn-run-scan" class={styles.scanButton}>
             Scan Website
           </button>
+        </div>
+        <div style="margin-top: 12px;">
+          <CapCaptcha />
         </div>
       </form>
 
