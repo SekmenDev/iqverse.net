@@ -244,7 +244,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
         const firstName = getRandomItem(FIRST_NAMES);
         const lastName = getRandomItem(LAST_NAMES);
         items.push({
-          id: `usr_${Math.random().toString(36).substr(2, 9)}`,
+          id: `usr_${Math.random().toString(36).slice(2, 11)}`,
           name: `${firstName} ${lastName}`,
           email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${getRandomItem(DOMAINS)}`,
           city: getRandomItem(CITIES),
@@ -254,7 +254,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
         });
       } else if (type === 'products') {
         items.push({
-          id: `prd_${Math.random().toString(36).substr(2, 9)}`,
+          id: `prd_${Math.random().toString(36).slice(2, 11)}`,
           name: `Tech Widget ${getRandomInt(100, 999)}`,
           sku: `SKU-${getRandomInt(1000, 9999)}`,
           price: (getRandomInt(10, 500) + 0.99).toFixed(2),
@@ -264,7 +264,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
         });
       } else {
         items.push({
-          transactionId: `tx_${Math.random().toString(36).substr(2, 10)}`,
+          transactionId: `tx_${Math.random().toString(36).slice(2, 12)}`,
           amount: (getRandomInt(5, 1200) + 0.5).toFixed(2),
           currency: 'USD',
           status: getRandomItem(['COMPLETED', 'PENDING', 'PROCESSING', 'REFUNDED']),

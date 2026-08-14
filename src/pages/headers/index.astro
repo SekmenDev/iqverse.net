@@ -67,25 +67,25 @@ const SAMPLE_URLS = ['https://example.com', 'https://github.com', 'https://googl
 
       <!-- Navigation Tabs -->
       <div class={styles.tabs}>
-        <button type="button" class={`${styles.tabBtn} ${styles.tabBtnActive}`} data-tab="security">
+        <button type="button" class="header-tab-btn" data-tab="security" style="padding: 8px 16px; border-radius: 6px; border: 1px solid var(--accent); background: var(--surface); color: var(--text); cursor: pointer;">
           Security (<span id="count-security">0</span>)
         </button>
-        <button type="button" class={styles.tabBtn} data-tab="performance">
+        <button type="button" class="header-tab-btn" data-tab="performance" style="padding: 8px 16px; border-radius: 6px; border: 1px solid transparent; background: var(--surface); color: var(--text); cursor: pointer;">
           Performance (<span id="count-performance">0</span>)
         </button>
-        <button type="button" class={styles.tabBtn} data-tab="info">
+        <button type="button" class="header-tab-btn" data-tab="info" style="padding: 8px 16px; border-radius: 6px; border: 1px solid transparent; background: var(--surface); color: var(--text); cursor: pointer;">
           Info (<span id="count-info">0</span>)
         </button>
-        <button type="button" class={styles.tabBtn} data-tab="raw">
+        <button type="button" class="header-tab-btn" data-tab="raw" style="padding: 8px 16px; border-radius: 6px; border: 1px solid transparent; background: var(--surface); color: var(--text); cursor: pointer;">
           Raw Headers (<span id="count-raw">0</span>)
         </button>
       </div>
 
       <!-- Tab Contents -->
-      <div id="tab-content-security" class="tab-pane"></div>
-      <div id="tab-content-performance" class="tab-pane" style="display: none;"></div>
-      <div id="tab-content-info" class="tab-pane" style="display: none;"></div>
-      <div id="tab-content-raw" class="tab-pane" style="display: none;">
+      <div id="tab-content-security" class="tab-pane" style="margin-top: 16px;"></div>
+      <div id="tab-content-performance" class="tab-pane" style="margin-top: 16px; display: none;"></div>
+      <div id="tab-content-info" class="tab-pane" style="margin-top: 16px; display: none;"></div>
+      <div id="tab-content-raw" class="tab-pane" style="margin-top: 16px; display: none;">
         <div class={sharedStyles.card}>
           <pre id="raw-headers-output" style="max-height: 400px; overflow: auto; font-family: monospace;"></pre>
         </div>
@@ -95,82 +95,12 @@ const SAMPLE_URLS = ['https://example.com', 'https://github.com', 'https://googl
 </ToolLayout>
 
 <script>
-  type Status = 'pass' | 'warn' | 'fail' | 'info';
-  type AssessmentCategory = 'security' | 'performance' | 'info';
-
-  const HEADER_DEFINITIONS = [
-    {
-      name: 'Content-Security-Policy',
-      short: 'CSP',
-      category: 'security' as AssessmentCategory,
-      description: 'Controls which resources the browser may load.',
-      recommendation: "Add: Content-Security-Policy: default-src 'self'; script-src 'self';",
-      check: (val: string) => {
-        if (!val) return { status: 'fail' as Status, message: 'CSP is missing.' };
-        if (/unsafe-inline/i.test(val)) return { status: 'warn' as Status, message: "'unsafe-inline' weakens CSP." };
-        return { status: 'pass' as Status, message: 'CSP is configured.' };
-      },
-    },
-    {
-      name: 'Strict-Transport-Security',
-      short: 'HSTS',
-      category: 'security' as AssessmentCategory,
-      description: 'Forces HTTPS for all future requests.',
-      recommendation: 'Add: Strict-Transport-Security: max-age=31536000; includeSubDomains; preload',
-      check: (val: string) => {
-        if (!val) return { status: 'fail' as Status, message: 'HSTS is not configured.' };
-        return { status: 'pass' as Status, message: 'HSTS is configured.' };
-      },
-    },
-    {
-      name: 'X-Content-Type-Options',
-      short: 'XCTO',
-      category: 'security' as AssessmentCategory,
-      description: 'Prevents MIME-sniffing.',
-      recommendation: 'Add: X-Content-Type-Options: nosniff',
-      check: (val: string) => {
-        if (!val) return { status: 'fail' as Status, message: 'Missing header.' };
-        return { status: 'pass' as Status, message: 'Correctly set to nosniff.' };
-      },
-    },
-    {
-      name: 'X-Frame-Options',
-      short: 'XFO',
-      category: 'security' as AssessmentCategory,
-      description: 'Prevents clickjacking.',
-      recommendation: 'Add: X-Frame-Options: DENY',
-      check: (val: string) => {
-        if (!val) return { status: 'warn' as Status, message: 'Consider setting DENY or SAMEORIGIN.' };
-        return { status: 'pass' as Status, message: 'Clickjacking protection configured.' };
-      },
-    },
-    {
-      name: 'Cache-Control',
-      short: 'Cache',
-      category: 'performance' as AssessmentCategory,
-      description: 'Defines caching behavior.',
-      recommendation: 'Add: Cache-Control with appropriate max-age directives',
-      check: (val: string) => {
-        if (!val) return { status: 'warn' as Status, message: 'No Cache-Control header found.' };
-        return { status: 'pass' as Status, message: `Configured: ${val}` };
-      },
-    },
-    {
-      name: 'Server',
-      short: 'Server',
-      category: 'info' as AssessmentCategory,
-      description: 'Identifies web server software.',
-      recommendation: 'Mask detailed version numbers to avoid information disclosure.',
-      check: (val: string) => {
-        if (!val) return { status: 'pass' as Status, message: 'Server header is hidden.' };
-        return { status: 'info' as Status, message: `Server: ${val}` };
-      },
-    },
-  ];
+  import { analyzeHeaders, type HeaderAssessment } from '@/lib/headers';
 
   const form = document.getElementById('header-scan-form') as HTMLFormElement;
   const urlInput = document.getElementById('url-input') as HTMLInputElement;
   const sampleBtns = document.querySelectorAll('.sample-btn');
+
   const loadingBox = document.getElementById('scan-loading');
   const errorBox = document.getElementById('scan-error');
   const errorMsg = document.getElementById('scan-error-msg');
@@ -178,7 +108,7 @@ const SAMPLE_URLS = ['https://example.com', 'https://github.com', 'https://googl
   const targetUrlEl = document.getElementById('target-url-display');
   const scoreBadge = document.getElementById('score-badge');
   const rawHeadersOut = document.getElementById('raw-headers-output');
-  const tabBtns = document.querySelectorAll(`.${styles.tabBtn}`);
+  const tabBtns = document.querySelectorAll('.header-tab-btn');
 
   let activeTab = 'security';
 
@@ -193,8 +123,8 @@ const SAMPLE_URLS = ['https://example.com', 'https://github.com', 'https://googl
 
   tabBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
-      tabBtns.forEach((b) => b.classList.remove(styles.tabBtnActive));
-      btn.classList.add(styles.tabBtnActive);
+      tabBtns.forEach((b) => ((b as HTMLElement).style.borderColor = 'transparent'));
+      (btn as HTMLElement).style.borderColor = 'var(--accent)';
       activeTab = (btn as HTMLElement).dataset.tab || 'security';
 
       document.querySelectorAll('.tab-pane').forEach((pane) => {
@@ -215,88 +145,66 @@ const SAMPLE_URLS = ['https://example.com', 'https://github.com', 'https://googl
     if (resultsSection) resultsSection.style.display = 'none';
 
     try {
-      const res = await fetch(`/api/check-url?url=${encodeURIComponent(url)}`);
-      if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
-      const data = await res.json();
+      const result = await analyzeHeaders(url);
 
-      if (data.error) throw new Error(data.error);
-
-      const headers: Record<string, string> = data.headers || {};
-
-      let passCount = 0;
-      let totalSecurity = 0;
-
-      const assessments = HEADER_DEFINITIONS.map((def) => {
-        const val = headers[def.name.toLowerCase()] || '';
-        const chk = def.check(val);
-        if (def.category === 'security') {
-          totalSecurity++;
-          if (chk.status === 'pass') passCount += 1;
-          else if (chk.status === 'warn') passCount += 0.5;
-        }
-        return {
-          ...def,
-          value: val,
-          status: chk.status,
-          message: chk.message,
-        };
-      });
-
-      const score = Math.round((passCount / (totalSecurity || 1)) * 100);
-
-      if (targetUrlEl) targetUrlEl.textContent = url;
+      if (targetUrlEl) targetUrlEl.textContent = result.url;
       if (scoreBadge) {
-        scoreBadge.textContent = `${score}/100`;
-        scoreBadge.style.color = score >= 80 ? '#4caf50' : score >= 50 ? '#faad14' : '#ff4d4f';
+        scoreBadge.textContent = `${result.score}/100 Grade ${result.grade}`;
+        scoreBadge.style.color = result.score >= 80 ? '#4caf50' : result.score >= 50 ? '#faad14' : '#ff4d4f';
       }
 
-      // Render cards into tabs
-      ['security', 'performance', 'info'].forEach((cat) => {
-        const pane = document.getElementById(`tab-content-${cat}`);
-        const items = assessments.filter((a) => a.category === cat);
-        const countBadge = document.getElementById(`count-${cat}`);
-        if (countBadge) countBadge.textContent = String(items.length);
+      // Counts
+      const secItems = result.assessments.filter((a: HeaderAssessment) => a.category === 'security');
+      const perfItems = result.assessments.filter((a: HeaderAssessment) => a.category === 'performance');
+      const infoItems = result.assessments.filter((a: HeaderAssessment) => a.category === 'info');
 
-        if (pane) {
-          pane.innerHTML = items
-            .map(
-              (item) => `
-            <div style="padding: 16px; border-radius: 8px; background: var(--card); border: 1px solid var(--border); margin-bottom: 12px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <strong style="font-family: monospace; font-size: 1rem;">${item.name}</strong>
-                <span style="padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; background: ${
-                  item.status === 'pass'
-                    ? 'rgba(76, 175, 80, 0.2)'
-                    : item.status === 'warn'
-                    ? 'rgba(250, 173, 20, 0.2)'
-                    : item.status === 'fail'
-                    ? 'rgba(255, 77, 79, 0.2)'
-                    : 'rgba(33, 150, 243, 0.2)'
-                }; color: ${
-                item.status === 'pass'
-                  ? '#4caf50'
-                  : item.status === 'warn'
-                  ? '#faad14'
-                  : item.status === 'fail'
-                  ? '#ff4d4f'
-                  : '#2196f3'
-              };">${item.status}</span>
+      const countSec = document.getElementById('count-security');
+      const countPerf = document.getElementById('count-performance');
+      const countInfo = document.getElementById('count-info');
+      const countRaw = document.getElementById('count-raw');
+
+      if (countSec) countSec.textContent = String(secItems.length);
+      if (countPerf) countPerf.textContent = String(perfItems.length);
+      if (countInfo) countInfo.textContent = String(infoItems.length);
+      if (countRaw) countRaw.textContent = String(Object.keys(result.rawHeaders).length);
+
+      // Render cards helper
+      const renderCards = (items: HeaderAssessment[]) => {
+        return items
+          .map((item: HeaderAssessment) => {
+            const statusColor =
+              item.status === 'pass'
+                ? '#4caf50'
+                : item.status === 'warn'
+                ? '#faad14'
+                : item.status === 'fail'
+                ? '#ff4d4f'
+                : '#2196f3';
+            return `
+            <div style="background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 12px; border-left: 4px solid ${statusColor};">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <strong>${item.name}</strong>
+                <span style="text-transform: uppercase; font-size: 0.75rem; font-weight: bold; color: ${statusColor};">${item.status}</span>
               </div>
-              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">${item.description}</p>
-              <div style="font-size: 0.85rem; margin-bottom: 4px;"><strong>Finding:</strong> ${item.message}</div>
-              ${item.value ? `<div style="font-family: monospace; font-size: 0.8rem; background: rgba(0,0,0,0.2); padding: 6px; border-radius: 4px; word-break: break-all;">${item.value}</div>` : ''}
+              <div style="font-size: 0.85rem; margin-bottom: 4px;">${item.message}</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">${item.description}</div>
+              ${item.recommendation ? `<div style="font-size: 0.8rem; color: #faad14; margin-top: 6px;">💡 ${item.recommendation}</div>` : ''}
             </div>
-          `
-            )
-            .join('');
-        }
-      });
+          `;
+          })
+          .join('');
+      };
 
-      // Raw headers
-      const rawCount = document.getElementById('count-raw');
-      if (rawCount) rawCount.textContent = String(Object.keys(headers).length);
+      const paneSec = document.getElementById('tab-content-security');
+      const panePerf = document.getElementById('tab-content-performance');
+      const paneInfo = document.getElementById('tab-content-info');
+
+      if (paneSec) paneSec.innerHTML = renderCards(secItems);
+      if (panePerf) panePerf.innerHTML = renderCards(perfItems);
+      if (paneInfo) paneInfo.innerHTML = renderCards(infoItems);
+
       if (rawHeadersOut) {
-        rawHeadersOut.textContent = Object.entries(headers)
+        rawHeadersOut.textContent = Object.entries(result.rawHeaders)
           .map(([k, v]) => `${k}: ${v}`)
           .join('\n');
       }

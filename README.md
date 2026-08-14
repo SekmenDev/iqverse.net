@@ -6,11 +6,10 @@
 
 *Zero Telemetry. Zero Logins. 100% Browser-Processed.*
 
-[![Next.js](https://img.shields.io/badge/Next.js-16.2.12-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+[![Astro](https://img.shields.io/badge/Astro-7.2.2-BC52EE?style=for-the-badge&logo=astro&logoColor=white)](https://astro.build/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-19.2-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
-[![Vitest](https://img.shields.io/badge/Vitest-3.0-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)](https://vitest.dev/)
-[![Playwright](https://img.shields.io/badge/Playwright-1.50-2EAD33?style=for-the-badge&logo=playwright&logoColor=white)](https://playwright.dev/)
+[![Vitest](https://img.shields.io/badge/Vitest-3.2-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)](https://vitest.dev/)
+[![Playwright](https://img.shields.io/badge/Playwright-1.62-2EAD33?style=for-the-badge&logo=playwright&logoColor=white)](https://playwright.dev/)
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare_Pages-Deployed-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)](https://pages.cloudflare.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-10B981?style=for-the-badge)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-FF6B6B.svg?style=for-the-badge)](https://github.com/SekmenDev/iqverse.net/pulls)
@@ -278,27 +277,27 @@ Ensure you have the following installed on your system:
    yarn dev
    ```
 
-   Open [http://localhost:3000](http://localhost:3000) in your browser to view the application.
+   Open [http://localhost:4321](http://localhost:4321) in your browser to view the application.
 
-4. **Lint code**:
+4. **Typecheck & Astro diagnostics**:
 
    ```bash
-   yarn lint
+   yarn check
    ```
 
 5. **Run tests & view test reports**:
 
-   IQVerse includes unit, component and E2E test suites with automated CLI and HTML reporting:
+   IQVerse includes unit and E2E test suites with automated CLI and HTML reporting:
 
    | Command | Purpose | Output & Report |
    | :--- | :--- | :--- |
-   | `yarn test` | Run Unit & Component Tests | Fast CLI summary table for functions & React components |
-   | `yarn test:ui` | Launch Vitest Browser UI | Opens interactive visual dashboard (`http://localhost:51204`) |
-   | `yarn test:coverage` | Generate Coverage Report | Outputs code coverage across `lib/` and `components/` |
-   | `yarn test:e2e` | Run E2E Page Tests | Headless Playwright runner testing Next.js page routes |
+   | `yarn test` | Run Unit Tests | Fast CLI summary table for functions & algorithms |
+   | `yarn test:ui` | Launch Vitest Browser UI | Opens interactive visual dashboard |
+   | `yarn test:coverage` | Generate Coverage Report | Outputs code coverage across `lib/` |
+   | `yarn test:e2e` | Run E2E Page Tests | Headless Playwright runner testing Astro routes & SEO |
    | `yarn test:e2e:ui` | Launch Playwright UI | Interactive Playwright test inspector & debugger |
    | `yarn test:e2e:report` | View E2E HTML Report | Opens HTML test report with trace logs & screenshot diffs |
-   | `yarn test:all` | Run All Test Suites | Executes both Vitest unit/component tests AND Playwright E2E tests |
+   | `yarn test:all` | Run All Test Suites | Executes both Vitest unit tests AND Playwright E2E tests |
 
 ---
 
@@ -306,7 +305,7 @@ Ensure you have the following installed on your system:
 
 ### Build for Production
 
-Compile the static output folder (`out/`):
+Compile the static output folder (`dist/`):
 
 ```bash
 yarn build

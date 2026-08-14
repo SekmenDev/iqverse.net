@@ -195,7 +195,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
       }
       if (convPlaceholder) convPlaceholder.style.display = 'none';
 
-      if (statsText && successBox) {
+      if (statsText && successBox && selectedFile) {
         statsText.textContent = `Original: ${Math.round(selectedFile.size / 1024)} KB ➔ Converted (${fmt.toUpperCase()}): ${Math.round(sizeInBytes / 1024)} KB`;
         successBox.style.display = 'flex';
       }

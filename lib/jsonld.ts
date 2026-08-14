@@ -1,4 +1,4 @@
-import { tools, Tool } from './tools';
+import { tools, type Tool } from './tools';
 
 // Utility functions
 function normalizeUrl(path?: string): string {

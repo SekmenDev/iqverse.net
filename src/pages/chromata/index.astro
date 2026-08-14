@@ -200,11 +200,11 @@ const COLOR_FORMATS = [
     // Render Export Code
     if (exportArea) {
       if (exportFormat === 'css') exportArea.value = exportCSS(groups, 'color', 'hex');
-      else if (exportFormat === 'tailwind') exportArea.value = exportTailwind(groups);
-      else if (exportFormat === 'figma') exportArea.value = exportFigma(groups);
+      else if (exportFormat === 'tailwind') exportArea.value = exportTailwind(groups, 'color', 'hex');
+      else if (exportFormat === 'figma') exportArea.value = exportFigma(groups, 'color', 'hex');
       else if (exportFormat === 'sass') exportArea.value = exportSass(groups, 'color', 'hex');
-      else if (exportFormat === 'json') exportArea.value = exportJSON(groups);
-      else if (exportFormat === 'swift') exportArea.value = exportSwift(groups);
+      else if (exportFormat === 'json') exportArea.value = exportJSON(groups, 'color', 'hex');
+      else if (exportFormat === 'swift') exportArea.value = exportSwift(groups, 'color');
     }
   }
 
