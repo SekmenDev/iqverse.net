@@ -1,0 +1,140 @@
+.dropZone {
+  border: 1px dashed var(--border-acc);
+  border-radius: 1.25rem;
+  background: rgba(129, 140, 248, 0.08);
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  cursor: pointer;
+  transition: border-color 180ms ease, transform 180ms ease;
+}
+
+.isActive {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.dropZoneEmpty {
+  display: grid;
+  gap: 0.35rem;
+  min-height: 180px;
+  place-items: center;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.dropZonePreview {
+  display: grid;
+  gap: 1rem;
+}
+
+.previewRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.previewSizes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.previewItem {
+  display: grid;
+  gap: 0.25rem;
+  justify-items: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.previewItem canvas {
+  width: 48px;
+  height: 48px;
+  border-radius: 0.65rem;
+  background: #fff;
+}
+
+.previewMeta {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.previewName {
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.previewDims {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.colorRow {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 0.6rem;
+}
+
+.badgeRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.badgeSuccess {
+  background: rgba(52, 211, 153, 0.16);
+  color: var(--green);
+}
+
+.badgeInfo {
+  background: rgba(129, 140, 248, 0.16);
+  color: var(--accent);
+}
+
+.outputCode {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1rem;
+  white-space: pre-wrap;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+  color: var(--text);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.outputActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.btnGhost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.8rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+}
+
+.hiddenCanvas {
+  display: none;
+}
