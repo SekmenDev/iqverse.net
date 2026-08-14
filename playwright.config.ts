@@ -17,4 +17,10 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
+  webServer: {
+    command: 'yarn vite preview --port 4321 --outDir dist',
+    url: 'http://localhost:4321',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120 * 1000,
+  },
 });
