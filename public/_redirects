@@ -72,5 +72,11 @@
 /install.php         /hacker/ 302
 
 # .Net, ABP and Umbraco links
-/umbraco            /hacker/ 302
-
+/umbraco/*           /hacker/ 302
+/umbraco             /hacker/ 302
+/account/*           /hacker/ 302
+/account             /hacker/ 302
+/identity/*          /hacker/ 302
+/identity            /hacker/ 302
+/connect/*           /hacker/ 302
+/connect             /hacker/ 302

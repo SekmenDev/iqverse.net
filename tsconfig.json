@@ -1,63 +1,22 @@
 {
+  "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
-    "target": "ES2020",
-    "useDefineForClassFields": true,
-    "lib": [
-      "ES2020",
-      "DOM",
-      "DOM.Iterable"
-    ],
-    "module": "ESNext",
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx",
-    /* Path aliases */
+    "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./*"
-      ],
-      "@/components/*": [
-        "./components/*"
-      ],
-      "@/lib/*": [
-        "./lib/*"
-      ],
-      "@/styles/*": [
-        "./styles/*"
-      ]
+      "@/*": ["./src/*", "./*"]
     },
-    /* Strict type checking */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "allowJs": true,
-    "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ]
+    "types": ["astro/client", "vitest/globals"]
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "next-env.d.ts",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    "out/types/**/*.ts",
-    "out/dev/types/**/*.ts"
+    "src/**/*",
+    "lib/**/*",
+    "functions/**/*",
+    "__tests__/unit/**/*",
+    "e2e/**/*"
   ],
   "exclude": [
+    "dist",
     "node_modules",
-    "out",
-    ".next"
+    "out"
   ]
 }
