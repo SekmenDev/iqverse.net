@@ -1,0 +1,326 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import styles from '@/styles/agentscan.module.css';
+
+const QUICK_EXAMPLES = ['https://cloudflare.com', 'https://github.com', 'https://openai.com', 'https://stripe.com', 'https://anthropic.com'];
+---
+
+<ToolLayout
+  title="AI Agents Scanner"
+  subtitle="AI Agent Readiness & Discovery Audit"
+  pill="AI & AGENTS"
+  toolSlug="agentscan"
+  description="Scan any website for AI agent readiness. Inspect robots.txt, sitemaps, MCP configuration, OpenAPI specs, and metadata for AI crawler optimization."
+>
+  <div class={styles.page}>
+    <!-- Hero / Scanner Header -->
+    <section class={styles.heroSection}>
+      <p class={styles.heroDesc}>
+        Scan any website to discover how well-prepared it is for AI search agents, web crawlers, Model Context Protocol (MCP), and machine-readable discovery.
+      </p>
+
+      <form id="agent-scan-form" class={styles.form}>
+        <div class={styles.inputGroup}>
+          <input
+            id="agent-url-input"
+            type="text"
+            class={styles.urlInput}
+            placeholder="https://example.com"
+            value="https://iqverse.net"
+            required
+          />
+          <button type="submit" id="btn-run-scan" class={styles.scanButton}>
+            Scan Website
+          </button>
+        </div>
+      </form>
+
+      <div class={styles.samples}>
+        <span>Try an example:</span>
+        {QUICK_EXAMPLES.map((url) => (
+          <button type="button" class="example-btn" data-url={url}>
+            {url.replace('https://', '')}
+          </button>
+        ))}
+      </div>
+    </section>
+
+    <!-- Loading State -->
+    <div id="scan-loading-box" class={styles.loadingBox} style="display: none;">
+      <div class={styles.spinner}></div>
+      <p id="loading-message">Resolving domain and fetching public discovery files…</p>
+    </div>
+
+    <!-- Scan Results -->
+    <div id="scan-results-area" style="display: none;">
+      <!-- Score Overview Header -->
+      <div class={styles.scoreOverviewCard}>
+        <div class={styles.scoreMain}>
+          <div class={styles.scoreCircle}>
+            <span id="score-number" class={styles.scoreNumber}>0</span>
+            <span class={styles.scoreLabel}>Score</span>
+          </div>
+          <div class={styles.scoreMeta}>
+            <h2 id="scanned-target-title" class={styles.scannedTarget}>--</h2>
+            <div class={styles.summaryBadges}>
+              <span class={`${styles.badge} ${styles.badgePass}`}>
+                <span id="count-passed">0</span> Passed
+              </span>
+              <span class={`${styles.badge} ${styles.badgeWarn}`}>
+                <span id="count-warnings">0</span> Warnings
+              </span>
+              <span class={`${styles.badge} ${styles.badgeFail}`}>
+                <span id="count-failed">0</span> Failed
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class={styles.filterBar}>
+        <div id="category-filter-buttons" class={styles.catFilters}>
+          <button type="button" class={`${styles.filterBtn} ${styles.filterBtnActive}`} data-cat="all">
+            All Checks
+          </button>
+          <button type="button" class={styles.filterBtn} data-cat="scored">
+            ⭐ Scored Signals
+          </button>
+          <button type="button" class={styles.filterBtn} data-cat="protocol">
+            🔌 Protocol & MCP
+          </button>
+          <button type="button" class={styles.filterBtn} data-cat="content">
+            📄 Content & Schema
+          </button>
+          <button type="button" class={styles.filterBtn} data-cat="commerce">
+            💳 Commerce
+          </button>
+          <button type="button" class={styles.filterBtn} data-cat="performance">
+            ⚡ Security & HTTP
+          </button>
+        </div>
+      </div>
+
+      <!-- Check Results Grid -->
+      <div id="checks-grid" class={styles.checksGrid}></div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  const CHECK_DEFS = [
+    { id: 'llms_txt', name: 'llms.txt', category: 'scored', desc: 'A markdown file at /llms.txt that gives AI systems a curated map of your site.', weight: 18 },
+    { id: 'robots_ai_bots', name: 'robots.txt AI bots', category: 'scored', desc: 'Rules in /robots.txt applying to AI crawlers (GPTBot, ClaudeBot, PerplexityBot, etc.).', weight: 18 },
+    { id: 'structured_data', name: 'Schema.org JSON-LD', category: 'scored', desc: 'Structured data embedded in the page describing organization, website and entities.', weight: 14 },
+    { id: 'sitemap', name: 'Sitemap', category: 'scored', desc: 'A valid, reachable sitemap.xml — either at root or declared in robots.txt.', weight: 12 },
+    { id: 'title_meta', name: 'Title & meta description', category: 'scored', desc: 'Document title and meta description of the page being scanned.', weight: 10 },
+    { id: 'llms_full_txt', name: 'llms-full.txt', category: 'scored', desc: 'An optional companion to llms.txt carrying extended context and deeper detail.', weight: 8 },
+    { id: 'canonical_url', name: 'Canonical URL', category: 'scored', desc: 'A link rel="canonical" declaring the authoritative URL for the page.', weight: 8 },
+    { id: 'open_graph', name: 'Open Graph', category: 'scored', desc: 'og:title, og:url, og:image metadata for social and AI snippet rendering.', weight: 6 },
+    { id: 'indexable_page', name: 'Indexable page', category: 'scored', desc: 'Verifies the page does not carry an unintended noindex directive.', weight: 6 },
+
+    // Protocol & Informational
+    { id: 'mcp_server_card', name: 'MCP Server Card', category: 'protocol', desc: 'Model Context Protocol server at /.well-known/mcp.json.', weight: 0 },
+    { id: 'a2a_agent_card', name: 'A2A Agent Card', category: 'protocol', desc: 'Agent-to-Agent card at /.well-known/agent.json.', weight: 0 },
+    { id: 'oauth_discovery', name: 'OAuth Discovery', category: 'protocol', desc: 'OAuth 2.0 server metadata at /.well-known/oauth-authorization-server.', weight: 0 },
+    { id: 'api_catalog', name: 'API Catalog / OpenAPI', category: 'protocol', desc: 'OpenAPI spec at /openapi.json, /swagger.json or /api-docs.', weight: 0 },
+    { id: 'markdown_negotiation', name: 'Markdown Negotiation', category: 'content', desc: 'Content negotiation support for text/markdown via Accept headers.', weight: 0 },
+    { id: 'x402', name: 'x402 Payment Protocol', category: 'commerce', desc: 'HTTP 402 responses or x402 headers enabling AI agent micropayments.', weight: 0 },
+    { id: 'ucp', name: 'Universal Commerce Protocol (UCP)', category: 'commerce', desc: 'UCP discovery at /.well-known/ucp.json.', weight: 0 },
+    { id: 'https', name: 'HTTPS', category: 'performance', desc: 'Confirms the site is served over secure HTTPS.', weight: 0 },
+  ];
+
+  const form = document.getElementById('agent-scan-form') as HTMLFormElement;
+  const urlInput = document.getElementById('agent-url-input') as HTMLInputElement;
+  const exampleBtns = document.querySelectorAll('.example-btn');
+  const loadingBox = document.getElementById('scan-loading-box');
+  const loadingMsg = document.getElementById('loading-message');
+  const resultsArea = document.getElementById('scan-results-area');
+  const scoreNum = document.getElementById('score-number');
+  const targetTitle = document.getElementById('scanned-target-title');
+  const countPassed = document.getElementById('count-passed');
+  const countWarnings = document.getElementById('count-warnings');
+  const countFailed = document.getElementById('count-failed');
+  const checksGrid = document.getElementById('checks-grid');
+  const catFilterBtns = document.querySelectorAll('#category-filter-buttons button');
+
+  let currentCategory = 'all';
+  let allScanResults: any[] = [];
+
+  exampleBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (urlInput) {
+        urlInput.value = (btn as HTMLElement).dataset.url || '';
+        form?.dispatchEvent(new Event('submit'));
+      }
+    });
+  });
+
+  catFilterBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      catFilterBtns.forEach((b) => b.classList.remove('styles_filterBtnActive', 'active'));
+      btn.classList.add('styles_filterBtnActive', 'active');
+      currentCategory = (btn as HTMLElement).dataset.cat || 'all';
+      renderChecks();
+    });
+  });
+
+  async function proxyFetch(targetUrl: string) {
+    try {
+      const res = await fetch(`/api/check-url?url=${encodeURIComponent(targetUrl)}`);
+      const json = await res.json();
+      return {
+        ok: json.status >= 200 && json.status < 400,
+        status: json.status || 0,
+        body: json.body || json.html || '',
+        headers: json.headers || {},
+      };
+    } catch {
+      return { ok: false, status: 0, body: '', headers: {} };
+    }
+  }
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const raw = urlInput?.value.trim();
+    if (!raw) return;
+
+    const normalized = raw.startsWith('http://') || raw.startsWith('https://') ? raw : `https://${raw}`;
+    const origin = new URL(normalized).origin;
+
+    if (loadingBox) loadingBox.style.display = 'block';
+    if (resultsArea) resultsArea.style.display = 'none';
+
+    try {
+      const [homeRes, robotsRes, sitemapRes, llmsRes, llmsFullRes, mcpRes, ucpRes, x402Res] = await Promise.all([
+        proxyFetch(origin),
+        proxyFetch(`${origin}/robots.txt`),
+        proxyFetch(`${origin}/sitemap.xml`),
+        proxyFetch(`${origin}/llms.txt`),
+        proxyFetch(`${origin}/llms-full.txt`),
+        proxyFetch(`${origin}/.well-known/mcp.json`),
+        proxyFetch(`${origin}/.well-known/ucp.json`),
+        proxyFetch(`${origin}/.well-known/x402.json`),
+      ]);
+
+      const robots = robotsRes.body || '';
+      const html = homeRes.body || '';
+
+      const hasLlms = llmsRes.ok && llmsRes.body.trim().length > 10;
+      const hasRobotsAi = /gptbot|claudebot|perplexitybot|ccbot/i.test(robots);
+      const hasSchema = /application\/ld\+json/i.test(html);
+      const hasSitemap = sitemapRes.ok || /sitemap:\s*http/i.test(robots);
+      const hasTitle = /<title[^>]*>(.*?)<\/title>/i.test(html);
+      const hasMetaDesc = /name=["']description["']/i.test(html);
+      const hasCanonical = /rel=["']canonical["']/i.test(html);
+      const hasOg = /property=["']og:/i.test(html);
+      const isIndexable = !/content=["'][^"']*noindex/i.test(html);
+
+      const hasMcp = mcpRes.ok && mcpRes.body.includes('{');
+      const hasUcp = ucpRes.ok;
+      const hasX402 = x402Res.ok;
+      const isHttps = origin.startsWith('https://');
+
+      allScanResults = [
+        { id: 'llms_txt', status: hasLlms ? 'pass' : 'fail', detail: hasLlms ? '/llms.txt found and valid.' : 'Missing /llms.txt' },
+        { id: 'robots_ai_bots', status: hasRobotsAi ? 'pass' : 'warn', detail: hasRobotsAi ? 'AI agent rules declared in robots.txt.' : 'No AI bot rules found in robots.txt.' },
+        { id: 'structured_data', status: hasSchema ? 'pass' : 'warn', detail: hasSchema ? 'Schema.org JSON-LD found on page.' : 'No JSON-LD structured data detected.' },
+        { id: 'sitemap', status: hasSitemap ? 'pass' : 'fail', detail: hasSitemap ? 'Valid sitemap.xml reachable.' : 'No sitemap discovered.' },
+        { id: 'title_meta', status: hasTitle && hasMetaDesc ? 'pass' : 'warn', detail: 'Title and meta description tags verified.' },
+        { id: 'llms_full_txt', status: llmsFullRes.ok ? 'pass' : 'info', detail: llmsFullRes.ok ? '/llms-full.txt available.' : 'Optional /llms-full.txt not published.' },
+        { id: 'canonical_url', status: hasCanonical ? 'pass' : 'warn', detail: hasCanonical ? 'Canonical tag present.' : 'Missing canonical link.' },
+        { id: 'open_graph', status: hasOg ? 'pass' : 'warn', detail: hasOg ? 'Open Graph tags present.' : 'No Open Graph metadata.' },
+        { id: 'indexable_page', status: isIndexable ? 'pass' : 'fail', detail: isIndexable ? 'Page is indexable.' : 'noindex tag detected.' },
+        { id: 'mcp_server_card', status: hasMcp ? 'pass' : 'info', detail: hasMcp ? 'MCP server card discovered.' : 'No MCP endpoint at /.well-known/mcp.json.' },
+        { id: 'a2a_agent_card', status: 'info', detail: 'Agent-to-Agent discovery (Optional).' },
+        { id: 'oauth_discovery', status: 'info', detail: 'OAuth metadata check.' },
+        { id: 'api_catalog', status: 'info', detail: 'OpenAPI catalog check.' },
+        { id: 'markdown_negotiation', status: 'info', detail: 'Markdown Accept header check.' },
+        { id: 'x402', status: hasX402 ? 'pass' : 'info', detail: hasX402 ? 'x402 enabled.' : 'No x402 payment headers.' },
+        { id: 'ucp', status: hasUcp ? 'pass' : 'info', detail: hasUcp ? 'UCP discovery card active.' : 'No UCP endpoint found.' },
+        { id: 'https', status: isHttps ? 'pass' : 'fail', detail: isHttps ? 'Served over HTTPS.' : 'Insecure HTTP.' },
+      ];
+
+      // Calculate Score
+      let totalMax = 0;
+      let totalEarned = 0;
+      let pCount = 0;
+      let wCount = 0;
+      let fCount = 0;
+
+      CHECK_DEFS.forEach((def) => {
+        const res = allScanResults.find((r) => r.id === def.id);
+        if (res) {
+          if (res.status === 'pass') pCount++;
+          else if (res.status === 'warn') wCount++;
+          else if (res.status === 'fail') fCount++;
+
+          if (def.weight > 0) {
+            totalMax += def.weight;
+            if (res.status === 'pass') totalEarned += def.weight;
+            else if (res.status === 'warn') totalEarned += def.weight * 0.5;
+          }
+        }
+      });
+
+      const score = Math.round((totalEarned / (totalMax || 1)) * 100);
+
+      if (targetTitle) targetTitle.textContent = origin;
+      if (scoreNum) {
+        scoreNum.textContent = String(score);
+        scoreNum.style.color = score >= 80 ? '#4caf50' : score >= 50 ? '#faad14' : '#ff4d4f';
+      }
+      if (countPassed) countPassed.textContent = String(pCount);
+      if (countWarnings) countWarnings.textContent = String(wCount);
+      if (countFailed) countFailed.textContent = String(fCount);
+
+      renderChecks();
+      if (resultsArea) resultsArea.style.display = 'block';
+    } catch (err) {
+      console.error(err);
+    } finally {
+      if (loadingBox) loadingBox.style.display = 'none';
+    }
+  });
+
+  function renderChecks() {
+    if (!checksGrid) return;
+    const filtered = allScanResults.filter((r) => {
+      const def = CHECK_DEFS.find((d) => d.id === r.id);
+      if (currentCategory !== 'all' && def?.category !== currentCategory) return false;
+      return true;
+    });
+
+    checksGrid.innerHTML = filtered
+      .map((r) => {
+        const def = CHECK_DEFS.find((d) => d.id === r.id);
+        return `
+        <div style="padding: 16px; border-radius: 8px; background: var(--card); border: 1px solid var(--border); margin-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <strong style="font-size: 1.05rem;">${def?.name || r.id}</strong>
+            <span style="padding: 2px 10px; border-radius: 12px; font-weight: bold; font-size: 0.75rem; text-transform: uppercase; background: ${
+              r.status === 'pass'
+                ? 'rgba(76, 175, 80, 0.2)'
+                : r.status === 'warn'
+                ? 'rgba(250, 173, 20, 0.2)'
+                : r.status === 'fail'
+                ? 'rgba(255, 77, 79, 0.2)'
+                : 'rgba(33, 150, 243, 0.2)'
+            }; color: ${
+          r.status === 'pass'
+            ? '#4caf50'
+            : r.status === 'warn'
+            ? '#faad14'
+            : r.status === 'fail'
+            ? '#ff4d4f'
+            : '#2196f3'
+        };">${r.status}</span>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">${def?.desc || ''}</p>
+          <div style="font-size: 0.85rem;"><strong>Result:</strong> ${r.detail}</div>
+        </div>
+      `;
+      })
+      .join('');
+  }
+</script>

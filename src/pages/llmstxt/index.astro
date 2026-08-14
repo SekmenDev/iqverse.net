@@ -1,0 +1,361 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+---
+
+<ToolLayout
+  title="llms.txt Generator & Validator"
+  subtitle="Standard AI & LLM Site Specification Builder"
+  pill="AI & AGENTS"
+  toolSlug="llmstxt"
+  description="Generate and validate llms.txt and llms-full.txt standard files to provide structured markdown site summaries for AI agents and LLM web crawlers."
+>
+  <div style="max-width: 1050px;">
+    <section class={sharedStyles.section}>
+      <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+        <button
+          type="button"
+          id="btn-tab-gen"
+          class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
+        >
+          Generator
+        </button>
+        <button
+          type="button"
+          id="btn-tab-val"
+          class={sharedStyles.button}
+        >
+          Validator
+        </button>
+      </div>
+
+      <!-- Generator Pane -->
+      <div id="pane-generator" class={sharedStyles.card}>
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="siteTitle">
+            Project / Site Title (H1)
+          </label>
+          <input
+            id="siteTitle"
+            type="text"
+            value="IQVerse Tools"
+            class={sharedStyles.input}
+          />
+        </div>
+
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="siteSummary">
+            Summary Blockquote (&gt;)
+          </label>
+          <input
+            id="siteSummary"
+            type="text"
+            value="Free open-source developer and AI agent tools operating entirely client-side."
+            class={sharedStyles.input}
+          />
+        </div>
+
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="siteDetails">
+            Detailed Information / Context
+          </label>
+          <textarea
+            id="siteDetails"
+            class={sharedStyles.textarea}
+            rows="3"
+          >IQVerse provides fast, secure, browser-native tools for web developers, AI agent engineers and security researchers.</textarea>
+        </div>
+
+        <!-- Section Builder -->
+        <div id="sections-container" style="margin-top: 20px;"></div>
+
+        <button
+          type="button"
+          id="btn-add-section"
+          class={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`}
+          style="margin-top: 12px;"
+        >
+          + Add Section
+        </button>
+
+        <!-- Output Preview -->
+        <div style="margin-top: 28px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <label class={sharedStyles.fieldLabel} for="llmsOutput">
+              Generated llms.txt Output
+            </label>
+            <button type="button" id="btn-copy-llms" class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}>
+              Copy llms.txt
+            </button>
+          </div>
+          <textarea
+            id="llmsOutput"
+            readonly
+            class={sharedStyles.outputArea}
+            rows="10"
+            style="font-family: monospace;"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Validator Pane -->
+      <div id="pane-validator" class={sharedStyles.card} style="display: none;">
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="valInput">
+            Paste llms.txt Content to Validate
+          </label>
+          <textarea
+            id="valInput"
+            class={sharedStyles.textarea}
+            rows="10"
+            placeholder="# Title&#10;&#10;> Summary blockquote&#10;&#10;## Section&#10;- [Link](https://example.com): Description"
+            style="font-family: monospace;"
+          ></textarea>
+        </div>
+
+        <button
+          type="button"
+          id="btn-validate-llms"
+          class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
+        >
+          Validate llms.txt
+        </button>
+
+        <div id="val-results" style="margin-top: 20px; display: none;"></div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  interface LinkItem {
+    title: string;
+    url: string;
+    desc: string;
+  }
+
+  interface Section {
+    title: string;
+    links: LinkItem[];
+  }
+
+  let sections: Section[] = [
+    {
+      title: 'Core Tools',
+      links: [
+        { title: 'AI Agents Scanner', url: 'https://iqverse.net/agentscan/', desc: 'Check website AI agent readiness including robots.txt, sitemaps and MCP' },
+        { title: 'Favicon Generator', url: 'https://iqverse.net/favicongen/', desc: 'Generate multi-resolution web favicons and manifest.json' },
+      ],
+    },
+    {
+      title: 'Optional Resources',
+      links: [
+        { title: 'Full Documentation', url: 'https://iqverse.net/llms-full.txt', desc: 'Comprehensive documentation index for LLMs and AI agents' },
+      ],
+    },
+  ];
+
+  const btnTabGen = document.getElementById('btn-tab-gen');
+  const btnTabVal = document.getElementById('btn-tab-val');
+  const paneGen = document.getElementById('pane-generator');
+  const paneVal = document.getElementById('pane-validator');
+
+  const siteTitleInput = document.getElementById('siteTitle') as HTMLInputElement;
+  const siteSummaryInput = document.getElementById('siteSummary') as HTMLInputElement;
+  const siteDetailsInput = document.getElementById('siteDetails') as HTMLTextAreaElement;
+  const sectionsContainer = document.getElementById('sections-container');
+  const btnAddSection = document.getElementById('btn-add-section');
+  const llmsOutput = document.getElementById('llmsOutput') as HTMLTextAreaElement;
+  const btnCopyLlms = document.getElementById('btn-copy-llms');
+
+  const valInput = document.getElementById('valInput') as HTMLTextAreaElement;
+  const btnValidate = document.getElementById('btn-validate-llms');
+  const valResults = document.getElementById('val-results');
+
+  if (btnTabGen && btnTabVal && paneGen && paneVal) {
+    btnTabGen.onclick = () => {
+      btnTabGen.className = 'sharedStyles_button sharedStyles_buttonPrimary button-primary';
+      btnTabVal.className = 'sharedStyles_button';
+      paneGen.style.display = 'block';
+      paneVal.style.display = 'none';
+    };
+
+    btnTabVal.onclick = () => {
+      btnTabVal.className = 'sharedStyles_button sharedStyles_buttonPrimary button-primary';
+      btnTabGen.className = 'sharedStyles_button';
+      paneVal.style.display = 'block';
+      paneGen.style.display = 'none';
+    };
+  }
+
+  function renderSections() {
+    if (!sectionsContainer) return;
+    sectionsContainer.innerHTML = sections
+      .map(
+        (sec, sIdx) => `
+      <div style="padding: 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); margin-bottom: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <input
+            type="text"
+            class="sec-title-input"
+            data-sidx="${sIdx}"
+            value="${sec.title}"
+            style="font-weight: bold; font-size: 1rem; width: 60%; background: transparent; border: 1px solid var(--border); padding: 4px 8px; border-radius: 4px; color: var(--text);"
+          />
+          <button type="button" class="btn-remove-sec" data-sidx="${sIdx}" style="background: transparent; color: #ff4d4f; border: 1px solid #ff4d4f; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">
+            Remove Section
+          </button>
+        </div>
+
+        <div>
+          ${sec.links
+            .map(
+              (l, lIdx) => `
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1.5fr auto; gap: 8px; align-items: center; margin-bottom: 8px;">
+              <input type="text" class="link-field" data-sidx="${sIdx}" data-lidx="${lIdx}" data-field="title" placeholder="Title" value="${l.title}" style="padding: 6px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.85rem;" />
+              <input type="url" class="link-field" data-sidx="${sIdx}" data-lidx="${lIdx}" data-field="url" placeholder="https://..." value="${l.url}" style="padding: 6px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.85rem;" />
+              <input type="text" class="link-field" data-sidx="${sIdx}" data-lidx="${lIdx}" data-field="desc" placeholder="Description (optional)" value="${l.desc}" style="padding: 6px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.85rem;" />
+              <button type="button" class="btn-remove-link" data-sidx="${sIdx}" data-lidx="${lIdx}" style="background: transparent; color: #888; border: none; font-size: 1rem; cursor: pointer;">✕</button>
+            </div>
+          `
+            )
+            .join('')}
+        </div>
+
+        <button type="button" class="btn-add-link" data-sidx="${sIdx}" style="background: transparent; border: 1px dashed var(--border); color: var(--accent); padding: 4px 12px; border-radius: 4px; font-size: 0.8rem; margin-top: 6px; cursor: pointer;">
+          + Add Link
+        </button>
+      </div>
+    `
+      )
+      .join('');
+
+    // Attach event listeners
+    document.querySelectorAll('.sec-title-input').forEach((input) => {
+      input.addEventListener('input', (e) => {
+        const sIdx = Number((e.target as HTMLElement).dataset.sidx);
+        sections[sIdx].title = (e.target as HTMLInputElement).value;
+        updateMarkdown();
+      });
+    });
+
+    document.querySelectorAll('.btn-remove-sec').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const sIdx = Number((e.target as HTMLElement).dataset.sidx);
+        sections = sections.filter((_, i) => i !== sIdx);
+        renderSections();
+        updateMarkdown();
+      });
+    });
+
+    document.querySelectorAll('.link-field').forEach((input) => {
+      input.addEventListener('input', (e) => {
+        const sIdx = Number((e.target as HTMLElement).dataset.sidx);
+        const lIdx = Number((e.target as HTMLElement).dataset.lidx);
+        const field = (e.target as HTMLElement).dataset.field as keyof LinkItem;
+        sections[sIdx].links[lIdx][field] = (e.target as HTMLInputElement).value;
+        updateMarkdown();
+      });
+    });
+
+    document.querySelectorAll('.btn-add-link').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const sIdx = Number((e.target as HTMLElement).dataset.sidx);
+        sections[sIdx].links.push({ title: '', url: '', desc: '' });
+        renderSections();
+        updateMarkdown();
+      });
+    });
+
+    document.querySelectorAll('.btn-remove-link').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const sIdx = Number((e.target as HTMLElement).dataset.sidx);
+        const lIdx = Number((e.target as HTMLElement).dataset.lidx);
+        sections[sIdx].links = sections[sIdx].links.filter((_, i) => i !== lIdx);
+        renderSections();
+        updateMarkdown();
+      });
+    });
+  }
+
+  function updateMarkdown() {
+    let md = `# ${siteTitleInput?.value.trim() || ''}\n\n`;
+    if (siteSummaryInput?.value.trim()) {
+      md += `> ${siteSummaryInput.value.trim()}\n\n`;
+    }
+    if (siteDetailsInput?.value.trim()) {
+      md += `${siteDetailsInput.value.trim()}\n\n`;
+    }
+
+    sections.forEach((sec) => {
+      if (sec.title.trim()) {
+        md += `## ${sec.title.trim()}\n\n`;
+      }
+      sec.links.forEach((l) => {
+        if (l.title.trim() && l.url.trim()) {
+          md += `- [${l.title.trim()}](${l.url.trim()})${l.desc.trim() ? `: ${l.desc.trim()}` : ''}\n`;
+        }
+      });
+      md += '\n';
+    });
+
+    if (llmsOutput) llmsOutput.value = md.trim();
+  }
+
+  siteTitleInput?.addEventListener('input', updateMarkdown);
+  siteSummaryInput?.addEventListener('input', updateMarkdown);
+  siteDetailsInput?.addEventListener('input', updateMarkdown);
+  btnAddSection?.addEventListener('click', () => {
+    sections.push({ title: 'New Section', links: [{ title: '', url: '', desc: '' }] });
+    renderSections();
+    updateMarkdown();
+  });
+
+  btnCopyLlms?.addEventListener('click', async () => {
+    if (llmsOutput?.value && btnCopyLlms) {
+      await navigator.clipboard.writeText(llmsOutput.value);
+      const prev = btnCopyLlms.textContent;
+      btnCopyLlms.textContent = 'Copied!';
+      setTimeout(() => {
+        btnCopyLlms.textContent = prev;
+      }, 1500);
+    }
+  });
+
+  btnValidate?.addEventListener('click', () => {
+    const text = valInput?.value.trim() || '';
+    if (!valResults) return;
+
+    if (!text) {
+      valResults.style.display = 'block';
+      valResults.innerHTML = '<div style="color: #ff4d4f;">Please paste some llms.txt content to validate.</div>';
+      return;
+    }
+
+    const hasH1 = /^#\s+.+/m.test(text);
+    const hasSummary = /^>\s+.+/m.test(text);
+    const links = text.match(/- \[[^\]]+\]\([^)]+\)/g) || [];
+
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    if (!hasH1) errors.push('Missing H1 heading (# Title).');
+    if (!hasSummary) warnings.push('Missing recommended blockquote summary (> Summary).');
+    if (links.length === 0) warnings.push('No standard markdown bullet links found (- [Title](url)).');
+
+    valResults.style.display = 'block';
+    valResults.innerHTML = `
+      <div style="padding: 16px; border-radius: 8px; background: ${errors.length === 0 ? 'rgba(76, 175, 80, 0.1)' : 'rgba(255, 77, 79, 0.1)'}; border: 1px solid ${errors.length === 0 ? '#4caf50' : '#ff4d4f'};">
+        <h4 style="color: ${errors.length === 0 ? '#4caf50' : '#ff4d4f'}; margin-bottom: 8px;">
+          ${errors.length === 0 ? '✓ Valid llms.txt Specification' : '✕ Specification Issues Found'}
+        </h4>
+        <div style="font-size: 0.9rem; margin-bottom: 6px;">Total Structured Links Found: <strong>${links.length}</strong></div>
+        ${errors.length > 0 ? `<div style="color: #ff4d4f; font-size: 0.85rem;"><strong>Errors:</strong> ${errors.join(', ')}</div>` : ''}
+        ${warnings.length > 0 ? `<div style="color: #faad14; font-size: 0.85rem; margin-top: 4px;"><strong>Warnings:</strong> ${warnings.join(', ')}</div>` : ''}
+      </div>
+    `;
+  });
+
+  renderSections();
+  updateMarkdown();
+</script>

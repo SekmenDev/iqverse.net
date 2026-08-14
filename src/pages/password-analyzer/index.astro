@@ -1,0 +1,229 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+---
+
+<ToolLayout
+  title="Password Strength & Entropy Analyzer"
+  subtitle="Offline Password Security & Crack Time Evaluator"
+  pill="SECURITY"
+  toolSlug="password-analyzer"
+  description="Evaluate password security strength, bit entropy score, pattern detection, and estimated crack time entirely offline."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div class={sharedStyles.field}>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <label class={sharedStyles.fieldLabel} for="pwdInput" id="pwdInputLabel">
+              Password Input (13 characters)
+            </label>
+            <button
+              type="button"
+              id="btn-toggle-pwd"
+              class={sharedStyles.button}
+              style="font-size: 0.8rem; padding: 2px 8px;"
+            >
+              Hide Password
+            </button>
+          </div>
+          <input
+            id="pwdInput"
+            type="text"
+            value="P@ssw0rd2026!"
+            class={sharedStyles.input}
+            style="font-family: monospace; font-size: 1.2rem;"
+            placeholder="Enter a password to test..."
+          />
+        </div>
+
+        <!-- Score Indicator -->
+        <div
+          id="score-box"
+          style="padding: 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid #4caf50; margin-top: 20px; margin-bottom: 20px;"
+        >
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div>
+              <span style="font-size: 0.85rem; opacity: 0.8;">Bit Entropy:</span>
+              <span id="entropy-value" style="font-size: 1.8rem; font-weight: bold; margin-left: 12px; color: #4caf50; font-family: monospace;">
+                0 <span style="font-size: 1rem;">bits</span>
+              </span>
+            </div>
+            <span
+              id="rating-badge"
+              style="padding: 6px 16px; border-radius: 16px; font-weight: bold; background: rgba(76, 175, 80, 0.15); color: #4caf50; border: 1px solid #4caf50;"
+            >
+              Strong
+            </span>
+          </div>
+
+          <!-- Character pool check -->
+          <div style="display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.85rem;">
+            <div id="check-lower" style="color: #4caf50;">✓ Lowercase (a-z)</div>
+            <div id="check-upper" style="color: #4caf50;">✓ Uppercase (A-Z)</div>
+            <div id="check-digit" style="color: #4caf50;">✓ Digits (0-9)</div>
+            <div id="check-symbol" style="color: #4caf50;">✓ Symbols (!@#$)</div>
+          </div>
+        </div>
+
+        <!-- Crack Time Estimates -->
+        <div>
+          <h4 style="margin-bottom: 12px;">Estimated Time to Crack (Brute Force)</h4>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+            <div style="padding: 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+              <div style="font-size: 0.75rem; opacity: 0.7;">Offline Fast GPU Hash (100B/sec)</div>
+              <div id="offline-time" style="font-size: 1.1rem; font-weight: bold; margin-top: 4px; color: #4caf50;">
+                Instant
+              </div>
+            </div>
+
+            <div style="padding: 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+              <div style="font-size: 0.75rem; opacity: 0.7;">Online Fast API (1,000 req/sec)</div>
+              <div id="online-fast-time" style="font-size: 1.1rem; font-weight: bold; margin-top: 4px;">
+                Instant
+              </div>
+            </div>
+
+            <div style="padding: 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+              <div style="font-size: 0.75rem; opacity: 0.7;">Online Throttled API (10 req/sec)</div>
+              <div id="online-slow-time" style="font-size: 1.1rem; font-weight: bold; margin-top: 4px;">
+                Instant
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  function calculateEntropy(pwd: string) {
+    let charsetSize = 0;
+    const hasLower = /[a-z]/.test(pwd);
+    const hasUpper = /[A-Z]/.test(pwd);
+    const hasDigit = /[0-9]/.test(pwd);
+    const hasSymbol = /[^a-zA-Z0-9]/.test(pwd);
+
+    if (hasLower) charsetSize += 26;
+    if (hasUpper) charsetSize += 26;
+    if (hasDigit) charsetSize += 10;
+    if (hasSymbol) charsetSize += 32;
+
+    if (pwd.length === 0 || charsetSize === 0) {
+      return { entropy: 0, charsetSize: 0, hasLower, hasUpper, hasDigit, hasSymbol };
+    }
+
+    const entropy = Math.round(pwd.length * Math.log2(charsetSize) * 10) / 10;
+    return { entropy, charsetSize, hasLower, hasUpper, hasDigit, hasSymbol };
+  }
+
+  function formatCrackTime(seconds: number): string {
+    if (seconds < 1) return 'Instant';
+    if (seconds < 60) return `${Math.round(seconds)} seconds`;
+    const mins = Math.round(seconds / 60);
+    if (mins < 60) return `${mins} minutes`;
+    const hours = Math.round(mins / 60);
+    if (hours < 24) return `${hours} hours`;
+    const days = Math.round(hours / 24);
+    if (days < 365) return `${days} days`;
+    const years = Math.round(days / 365);
+    if (years < 1000) return `${years} years`;
+    if (years < 1000000) return `${Math.round(years / 1000)} thousand years`;
+    return `${Math.round(years / 1000000)} million years`;
+  }
+
+  const pwdInput = document.getElementById('pwdInput') as HTMLInputElement;
+  const pwdInputLabel = document.getElementById('pwdInputLabel');
+  const btnToggle = document.getElementById('btn-toggle-pwd');
+  const scoreBox = document.getElementById('score-box');
+  const entropyVal = document.getElementById('entropy-value');
+  const ratingBadge = document.getElementById('rating-badge');
+  const checkLower = document.getElementById('check-lower');
+  const checkUpper = document.getElementById('check-upper');
+  const checkDigit = document.getElementById('check-digit');
+  const checkSymbol = document.getElementById('check-symbol');
+  const offlineTime = document.getElementById('offline-time');
+  const onlineFastTime = document.getElementById('online-fast-time');
+  const onlineSlowTime = document.getElementById('online-slow-time');
+
+  let showPwd = true;
+  if (btnToggle && pwdInput) {
+    btnToggle.addEventListener('click', () => {
+      showPwd = !showPwd;
+      pwdInput.type = showPwd ? 'text' : 'password';
+      btnToggle.textContent = showPwd ? 'Hide Password' : 'Show Password';
+    });
+  }
+
+  function analyze() {
+    const password = pwdInput?.value || '';
+    if (pwdInputLabel) pwdInputLabel.textContent = `Password Input (${password.length} characters)`;
+
+    const stats = calculateEntropy(password);
+    const combinations = Math.pow(stats.charsetSize, password.length);
+
+    const offlineSec = combinations / 1e11;
+    const onlineFastSec = combinations / 1000;
+    const onlineSlowSec = combinations / 10;
+
+    let rating = 'Weak';
+    let color = '#ff4d4f';
+
+    if (stats.entropy >= 80) {
+      rating = 'Very Strong';
+      color = '#4caf50';
+    } else if (stats.entropy >= 60) {
+      rating = 'Strong';
+      color = '#8bc34a';
+    } else if (stats.entropy >= 40) {
+      rating = 'Medium';
+      color = '#faad14';
+    } else if (stats.entropy >= 20) {
+      rating = 'Weak';
+      color = '#ff9800';
+    } else {
+      rating = 'Very Weak';
+      color = '#ff4d4f';
+    }
+
+    if (scoreBox) scoreBox.style.borderColor = color;
+    if (entropyVal) {
+      entropyVal.innerHTML = `${stats.entropy} <span style="font-size: 1rem;">bits</span>`;
+      entropyVal.style.color = color;
+    }
+    if (ratingBadge) {
+      ratingBadge.textContent = rating;
+      ratingBadge.style.color = color;
+      ratingBadge.style.borderColor = color;
+      ratingBadge.style.background = `${color}22`;
+    }
+
+    if (checkLower) {
+      checkLower.textContent = `${stats.hasLower ? '✓' : '✕'} Lowercase (a-z)`;
+      checkLower.style.color = stats.hasLower ? '#4caf50' : '#888';
+    }
+    if (checkUpper) {
+      checkUpper.textContent = `${stats.hasUpper ? '✓' : '✕'} Uppercase (A-Z)`;
+      checkUpper.style.color = stats.hasUpper ? '#4caf50' : '#888';
+    }
+    if (checkDigit) {
+      checkDigit.textContent = `${stats.hasDigit ? '✓' : '✕'} Digits (0-9)`;
+      checkDigit.style.color = stats.hasDigit ? '#4caf50' : '#888';
+    }
+    if (checkSymbol) {
+      checkSymbol.textContent = `${stats.hasSymbol ? '✓' : '✕'} Symbols (!@#$)`;
+      checkSymbol.style.color = stats.hasSymbol ? '#4caf50' : '#888';
+    }
+
+    if (offlineTime) {
+      offlineTime.textContent = formatCrackTime(offlineSec);
+      offlineTime.style.color = color;
+    }
+    if (onlineFastTime) onlineFastTime.textContent = formatCrackTime(onlineFastSec);
+    if (onlineSlowTime) onlineSlowTime.textContent = formatCrackTime(onlineSlowSec);
+  }
+
+  pwdInput?.addEventListener('input', analyze);
+  analyze();
+</script>

@@ -1,0 +1,210 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+
+const SAMPLE_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjE5OTk5OTk5OTl9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+---
+
+<ToolLayout
+  title="JWT Debugger & Verifier"
+  subtitle="Decode, Inspect & Verify JSON Web Tokens"
+  pill="SECURITY"
+  toolSlug="jwt-debugger"
+  description="Decode, inspect, and verify JSON Web Tokens (JWT) headers and payload claims locally using Web Crypto API."
+>
+  <div style="max-width: 1050px;">
+    <section class={sharedStyles.section}>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+        <!-- Input JWT -->
+        <div class={sharedStyles.card}>
+          <div class={sharedStyles.field}>
+            <label class={sharedStyles.fieldLabel} for="jwtInput">
+              Encoded JWT Token
+            </label>
+            <textarea
+              id="jwtInput"
+              class={sharedStyles.textarea}
+              rows="8"
+              style="font-family: monospace; font-size: 0.85rem;"
+              placeholder="Paste JWT string..."
+            >{SAMPLE_JWT}</textarea>
+          </div>
+
+          <!-- Secret Verifier -->
+          <div style="margin-top: 20px;">
+            <label class={sharedStyles.fieldLabel} for="secretInput">
+              HMAC SHA-256 Secret Key
+            </label>
+            <div style="display: flex; gap: 10px;">
+              <input
+                id="secretInput"
+                type="text"
+                value="your-256-bit-secret"
+                class={sharedStyles.input}
+                style="font-family: monospace;"
+              />
+              <button
+                type="button"
+                id="btn-verify-jwt"
+                class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
+              >
+                Verify
+              </button>
+            </div>
+
+            <div
+              id="sig-status-box"
+              style="margin-top: 12px; padding: 8px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; display: none;"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Decoded Claims -->
+        <div class={sharedStyles.card}>
+          <div id="decoded-container">
+            <div class={sharedStyles.field}>
+              <label class={sharedStyles.fieldLabel} for="jwtHeaderOut" style="color: #ff4d4f;">
+                Header: Algorithm & Token Type
+              </label>
+              <textarea
+                id="jwtHeaderOut"
+                readonly
+                class={sharedStyles.outputArea}
+                rows="4"
+                style="font-family: monospace; color: #ff7b72;"
+              ></textarea>
+            </div>
+
+            <div class={sharedStyles.field}>
+              <label class={sharedStyles.fieldLabel} for="jwtPayloadOut" style="color: #9c27b0;">
+                Payload: Data Claims
+              </label>
+              <textarea
+                id="jwtPayloadOut"
+                readonly
+                class={sharedStyles.outputArea}
+                rows="8"
+                style="font-family: monospace; color: #d2a8ff;"
+              ></textarea>
+            </div>
+
+            <div id="jwt-exp-status" style="font-size: 0.85rem; padding: 8px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+              Token Expiry Status: <strong>Checking...</strong>
+            </div>
+          </div>
+
+          <div id="jwt-error-box" class={sharedStyles.errorCard} style="display: none;">
+            <div id="jwt-error-msg" class={sharedStyles.errorMessage}></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  function base64UrlDecode(str: string): string {
+    let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+    while (base64.length % 4) {
+      base64 += '=';
+    }
+    return atob(base64);
+  }
+
+  const jwtInput = document.getElementById('jwtInput') as HTMLTextAreaElement;
+  const secretInput = document.getElementById('secretInput') as HTMLInputElement;
+  const btnVerify = document.getElementById('btn-verify-jwt');
+  const sigStatusBox = document.getElementById('sig-status-box');
+
+  const decodedContainer = document.getElementById('decoded-container');
+  const headerOut = document.getElementById('jwtHeaderOut') as HTMLTextAreaElement;
+  const payloadOut = document.getElementById('jwtPayloadOut') as HTMLTextAreaElement;
+  const expStatusEl = document.getElementById('jwt-exp-status');
+  const errorBox = document.getElementById('jwt-error-box');
+  const errorMsg = document.getElementById('jwt-error-msg');
+
+  function decodeJWT() {
+    const token = jwtInput?.value.trim() || '';
+    const parts = token.split('.');
+
+    if (parts.length !== 3) {
+      if (decodedContainer) decodedContainer.style.display = 'none';
+      if (errorBox && errorMsg) {
+        errorBox.style.display = 'block';
+        errorMsg.textContent = 'Invalid JWT format. Must contain 3 dot-separated parts (Header.Payload.Signature)';
+      }
+      return;
+    }
+
+    try {
+      const headerObj = JSON.parse(base64UrlDecode(parts[0]));
+      const payloadObj = JSON.parse(base64UrlDecode(parts[1]));
+
+      const nowSec = Math.floor(Date.now() / 1000);
+      let expStatus = 'No expiration claim (exp)';
+      if (payloadObj.exp) {
+        expStatus = payloadObj.exp > nowSec ? `Valid (Expires: ${new Date(payloadObj.exp * 1000).toISOString()})` : `Expired on ${new Date(payloadObj.exp * 1000).toISOString()}`;
+      }
+
+      if (headerOut) headerOut.value = JSON.stringify(headerObj, null, 2);
+      if (payloadOut) payloadOut.value = JSON.stringify(payloadObj, null, 2);
+      if (expStatusEl) expStatusEl.innerHTML = `Token Expiry Status: <strong>${expStatus}</strong>`;
+
+      if (decodedContainer) decodedContainer.style.display = 'block';
+      if (errorBox) errorBox.style.display = 'none';
+    } catch (err: any) {
+      if (decodedContainer) decodedContainer.style.display = 'none';
+      if (errorBox && errorMsg) {
+        errorBox.style.display = 'block';
+        errorMsg.textContent = `Base64 / JSON Decoding Error: ${err.message}`;
+      }
+    }
+  }
+
+  async function verifySignature() {
+    const token = jwtInput?.value.trim() || '';
+    const parts = token.split('.');
+    if (parts.length !== 3 || !sigStatusBox) return;
+
+    try {
+      const encoder = new TextEncoder();
+      const secret = secretInput?.value || '';
+      const keyData = encoder.encode(secret);
+      const cryptoKey = await crypto.subtle.importKey(
+        'raw',
+        keyData,
+        { name: 'HMAC', hash: 'SHA-256' },
+        false,
+        ['sign']
+      );
+
+      const dataToSign = encoder.encode(`${parts[0]}.${parts[1]}`);
+      const computedBuffer = await crypto.subtle.sign('HMAC', cryptoKey, dataToSign);
+
+      const computedBase64Url = btoa(String.fromCharCode(...new Uint8Array(computedBuffer)))
+        .replace(/=/g, '')
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_');
+
+      sigStatusBox.style.display = 'block';
+      if (computedBase64Url === parts[2]) {
+        sigStatusBox.style.background = 'rgba(76, 175, 80, 0.2)';
+        sigStatusBox.style.color = '#4caf50';
+        sigStatusBox.textContent = '✓ Signature Verified Successfully!';
+      } else {
+        sigStatusBox.style.background = 'rgba(255, 77, 79, 0.2)';
+        sigStatusBox.style.color = '#ff4d4f';
+        sigStatusBox.textContent = '✕ Signature Mismatch (Invalid Secret or Modified Payload)';
+      }
+    } catch (err: any) {
+      sigStatusBox.style.display = 'block';
+      sigStatusBox.style.background = 'rgba(255, 77, 79, 0.2)';
+      sigStatusBox.style.color = '#ff4d4f';
+      sigStatusBox.textContent = `Verification Failure: ${err.message}`;
+    }
+  }
+
+  jwtInput?.addEventListener('input', decodeJWT);
+  btnVerify?.addEventListener('click', verifySignature);
+  decodeJWT();
+</script>

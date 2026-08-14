@@ -1,0 +1,327 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+
+const AMBIGUOUS = '{}[]()/\\\'"`~,;:.<>?';
+---
+
+<ToolLayout
+  title="Password Generator"
+  subtitle="Cryptographic Password Generator"
+  pill="SECURITY"
+  toolSlug="password"
+  description="Generate cryptographically secure passwords, API keys, and secret tokens locally with entropy evaluation and zero network calls."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.sectionLabel}>Password Generator</div>
+      <div class={sharedStyles.card}>
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="pwdLength" id="pwdLengthLabel">Length: 20</label>
+          <input
+            id="pwdLength"
+            type="range"
+            min="4"
+            max="128"
+            value="20"
+            style="width: 100%;"
+          />
+        </div>
+
+        <div class={sharedStyles.field}>
+          <div class={sharedStyles.fieldLabel}>Character sets</div>
+          <div style="display: grid; gap: 0.75rem;">
+            <label for="useUpper">
+              <input id="useUpper" type="checkbox" checked /> Uppercase (A-Z)
+            </label>
+            <label for="useLower">
+              <input id="useLower" type="checkbox" checked /> Lowercase (a-z)
+            </label>
+            <label for="useDigits">
+              <input id="useDigits" type="checkbox" checked /> Digits (0-9)
+            </label>
+            <label for="useSymbols">
+              <input id="useSymbols" type="checkbox" checked /> Symbols
+            </label>
+          </div>
+        </div>
+
+        <div class={sharedStyles.field}>
+          <div class={sharedStyles.fieldLabel}>Filters</div>
+          <div style="display: grid; gap: 0.75rem;">
+            <label for="excludeSimilar">
+              <input id="excludeSimilar" type="checkbox" /> Exclude similar characters (0Oo1IlL)
+            </label>
+            <label for="excludeAmbiguous">
+              <input id="excludeAmbiguous" type="checkbox" /> Exclude ambiguous characters ({AMBIGUOUS})
+            </label>
+          </div>
+        </div>
+
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="customSymbols">Custom symbols</label>
+          <input
+            id="customSymbols"
+            type="text"
+            placeholder="Leave blank for default symbols"
+            class={sharedStyles.textarea}
+          />
+        </div>
+
+        <div class={sharedStyles.field}>
+          <div class={sharedStyles.fieldLabel}>Prefix / Suffix</div>
+          <div style="display: grid; gap: 0.75rem;">
+            <label for="pwdPrefix" class={sharedStyles.fieldLabel}>Prefix</label>
+            <input
+              id="pwdPrefix"
+              type="text"
+              placeholder="Prefix"
+              class={sharedStyles.textarea}
+            />
+            <label for="pwdSuffix" class={sharedStyles.fieldLabel}>Suffix</label>
+            <input
+              id="pwdSuffix"
+              type="text"
+              placeholder="Suffix"
+              class={sharedStyles.textarea}
+            />
+          </div>
+        </div>
+
+        <div class={sharedStyles.field}>
+          <div class={sharedStyles.fieldLabel}>Minimum counts</div>
+          <div style="display: grid; gap: 0.75rem;">
+            <label for="minUpper" class={sharedStyles.fieldLabel}>Uppercase min</label>
+            <input
+              id="minUpper"
+              type="number"
+              min="0"
+              max="128"
+              value="1"
+              class={sharedStyles.textarea}
+            />
+            <label for="minLower" class={sharedStyles.fieldLabel}>Lowercase min</label>
+            <input
+              id="minLower"
+              type="number"
+              min="0"
+              max="128"
+              value="1"
+              class={sharedStyles.textarea}
+            />
+            <label for="minDigits" class={sharedStyles.fieldLabel}>Digits min</label>
+            <input
+              id="minDigits"
+              type="number"
+              min="0"
+              max="128"
+              value="1"
+              class={sharedStyles.textarea}
+            />
+            <label for="minSymbols" class={sharedStyles.fieldLabel}>Symbols min</label>
+            <input
+              id="minSymbols"
+              type="number"
+              min="0"
+              max="128"
+              value="1"
+              class={sharedStyles.textarea}
+            />
+          </div>
+        </div>
+
+        <div class={sharedStyles.buttonGroup}>
+          <button type="button" id="btn-generate" class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}>
+            Generate Password
+          </button>
+          <button type="button" id="btn-clear" class={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`}>
+            Clear
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="error-section" class={sharedStyles.section} style="display: none;">
+      <div class={sharedStyles.sectionLabel}>Error</div>
+      <div class={sharedStyles.errorCard}>
+        <div id="error-message" class={sharedStyles.errorMessage}></div>
+      </div>
+    </section>
+
+    <section id="output-section" class={sharedStyles.section} style="display: none;">
+      <div class={sharedStyles.sectionLabel}>Generated Password</div>
+      <div class={sharedStyles.card}>
+        <textarea id="pwdOutput" readonly class={sharedStyles.outputArea} rows="4"></textarea>
+        <button type="button" id="btn-copy" class={`${sharedStyles.button} ${sharedStyles.buttonSmall}`}>
+          Copy
+        </button>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  import { pickRandom, shuffle } from '@/lib/random';
+
+  const DEFAULT_SYMBOLS = '!@#$%^&*()-_=+[]{}|;:,.<>?';
+  const UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const LOWER = 'abcdefghijklmnopqrstuvwxyz';
+  const DIGITS = '0123456789';
+  const SIMILAR = '0Oo1IlL';
+  const AMBIGUOUS = '{}[]()/\\\'"`~,;:.<>?';
+
+  const lengthInput = document.getElementById('pwdLength') as HTMLInputElement;
+  const lengthLabel = document.getElementById('pwdLengthLabel');
+  const upperCb = document.getElementById('useUpper') as HTMLInputElement;
+  const lowerCb = document.getElementById('useLower') as HTMLInputElement;
+  const digitsCb = document.getElementById('useDigits') as HTMLInputElement;
+  const symbolsCb = document.getElementById('useSymbols') as HTMLInputElement;
+  const simCb = document.getElementById('excludeSimilar') as HTMLInputElement;
+  const ambCb = document.getElementById('excludeAmbiguous') as HTMLInputElement;
+  const customSymInput = document.getElementById('customSymbols') as HTMLInputElement;
+  const prefixInput = document.getElementById('pwdPrefix') as HTMLInputElement;
+  const suffixInput = document.getElementById('pwdSuffix') as HTMLInputElement;
+  const minUpperInput = document.getElementById('minUpper') as HTMLInputElement;
+  const minLowerInput = document.getElementById('minLower') as HTMLInputElement;
+  const minDigitsInput = document.getElementById('minDigits') as HTMLInputElement;
+  const minSymbolsInput = document.getElementById('minSymbols') as HTMLInputElement;
+
+  const btnGenerate = document.getElementById('btn-generate');
+  const btnClear = document.getElementById('btn-clear');
+  const btnCopy = document.getElementById('btn-copy');
+  const errorSection = document.getElementById('error-section');
+  const errorMsg = document.getElementById('error-message');
+  const outputSection = document.getElementById('output-section');
+  const pwdOutput = document.getElementById('pwdOutput') as HTMLTextAreaElement;
+
+  if (lengthInput && lengthLabel) {
+    lengthInput.addEventListener('input', () => {
+      lengthLabel.textContent = `Length: ${lengthInput.value}`;
+    });
+  }
+
+  function buildPool() {
+    let pool = '';
+    if (upperCb?.checked) pool += UPPER;
+    if (lowerCb?.checked) pool += LOWER;
+    if (digitsCb?.checked) pool += DIGITS;
+    if (symbolsCb?.checked) pool += customSymInput?.value.trim() || DEFAULT_SYMBOLS;
+
+    if (simCb?.checked) {
+      pool = [...pool].filter((char) => !SIMILAR.includes(char)).join('');
+    }
+    if (ambCb?.checked) {
+      pool = [...pool].filter((char) => !AMBIGUOUS.includes(char)).join('');
+    }
+    return pool;
+  }
+
+  function showError(msg: string) {
+    if (errorSection && errorMsg && outputSection) {
+      errorMsg.textContent = msg;
+      errorSection.style.display = 'block';
+      outputSection.style.display = 'none';
+    }
+  }
+
+  function hideError() {
+    if (errorSection) {
+      errorSection.style.display = 'none';
+    }
+  }
+
+  function generatePassword() {
+    hideError();
+    const length = Number(lengthInput?.value || 20);
+    const prefix = prefixInput?.value || '';
+    const suffix = suffixInput?.value || '';
+    const minUpper = Number(minUpperInput?.value || 0);
+    const minLower = Number(minLowerInput?.value || 0);
+    const minDigits = Number(minDigitsInput?.value || 0);
+    const minSymbols = Number(minSymbolsInput?.value || 0);
+
+    const pool = buildPool();
+
+    if (!upperCb?.checked && !lowerCb?.checked && !digitsCb?.checked && !symbolsCb?.checked) {
+      showError('Select at least one character set.');
+      return;
+    }
+
+    if (!pool.length) {
+      showError('Character pool is empty after filters.');
+      return;
+    }
+
+    const coreLength = length - prefix.length - suffix.length;
+    if (coreLength < 1) {
+      showError('Length is too short for the selected prefix and suffix.');
+      return;
+    }
+
+    const required: string[] = [];
+    if (upperCb?.checked) {
+      for (let i = 0; i < minUpper; i += 1) {
+        const chars = [...UPPER].filter((char) => pool.includes(char));
+        if (chars.length) required.push(pickRandom(chars));
+      }
+    }
+    if (lowerCb?.checked) {
+      for (let i = 0; i < minLower; i += 1) {
+        const chars = [...LOWER].filter((char) => pool.includes(char));
+        if (chars.length) required.push(pickRandom(chars));
+      }
+    }
+    if (digitsCb?.checked) {
+      for (let i = 0; i < minDigits; i += 1) {
+        const chars = [...DIGITS].filter((char) => pool.includes(char));
+        if (chars.length) required.push(pickRandom(chars));
+      }
+    }
+    if (symbolsCb?.checked) {
+      const symbols = customSymInput?.value.trim() || DEFAULT_SYMBOLS;
+      for (let i = 0; i < minSymbols; i += 1) {
+        const chars = [...symbols].filter((char) => pool.includes(char));
+        if (chars.length) required.push(pickRandom(chars));
+      }
+    }
+
+    const remaining = coreLength - required.length;
+    if (remaining < 0) {
+      showError('Minimum counts exceed password length.');
+      return;
+    }
+
+    const passwordChars = [...required];
+    const poolChars = [...pool];
+    for (let i = 0; i < remaining; i += 1) {
+      passwordChars.push(pickRandom(poolChars));
+    }
+
+    const result = prefix + shuffle(passwordChars).join('') + suffix;
+    if (pwdOutput && outputSection) {
+      pwdOutput.value = result;
+      outputSection.style.display = 'block';
+    }
+  }
+
+  btnGenerate?.addEventListener('click', generatePassword);
+
+  btnClear?.addEventListener('click', () => {
+    hideError();
+    if (outputSection && pwdOutput) {
+      outputSection.style.display = 'none';
+      pwdOutput.value = '';
+    }
+  });
+
+  btnCopy?.addEventListener('click', async () => {
+    if (pwdOutput?.value && btnCopy) {
+      await navigator.clipboard.writeText(pwdOutput.value);
+      const prev = btnCopy.textContent;
+      btnCopy.textContent = 'Copied!';
+      setTimeout(() => {
+        btnCopy.textContent = prev;
+      }, 1500);
+    }
+  });
+</script>

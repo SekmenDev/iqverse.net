@@ -1,0 +1,178 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+
+const SAMPLE_LOG = `192.168.1.10 - - [15/Jan/2026:10:14:32 +0000] "GET /robots.txt HTTP/1.1" 200 412 "-" "Mozilla/5.0 (compatible; GPTBot/1.2; +https://openai.com/gptbot)"
+192.168.1.11 - - [15/Jan/2026:10:15:01 +0000] "GET /llms.txt HTTP/1.1" 200 1024 "-" "Mozilla/5.0 (compatible; ClaudeBot/1.0; +https://anthropic.com/claudebot)"
+192.168.1.12 - - [15/Jan/2026:10:16:45 +0000] "GET /blog/ai-trends HTTP/1.1" 200 4520 "-" "PerplexityBot/1.0 (+https://perplexity.ai/perplexitybot)"
+192.168.1.13 - - [15/Jan/2026:10:17:10 +0000] "GET /docs/api HTTP/1.1" 404 210 "-" "Mozilla/5.0 (compatible; Bytespider; spider-feedback@bytedance.com)"
+192.168.1.14 - - [15/Jan/2026:10:18:22 +0000] "GET /agentscan/ HTTP/1.1" 200 8920 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+192.168.1.15 - - [15/Jan/2026:10:19:00 +0000] "GET /sitemap.xml HTTP/1.1" 200 1540 "-" "Google-Extended/1.0"
+192.168.1.10 - - [15/Jan/2026:10:20:15 +0000] "GET /blog/ai-trends HTTP/1.1" 200 4520 "-" "Mozilla/5.0 (compatible; GPTBot/1.2; +https://openai.com/gptbot)"`;
+---
+
+<ToolLayout
+  title="AI Crawler Log Analyzer"
+  subtitle="Detect & Inspect AI Crawler Visits"
+  pill="AI & AGENTS"
+  toolSlug="ai-log-analyzer"
+  description="Parse server access logs in your browser to analyze visits from AI crawlers like GPTBot, ClaudeBot, and PerplexityBot with zero data upload."
+>
+  <div style="max-width: 1050px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="logInput">
+            Paste Nginx / Apache / Cloudflare Server Access Logs (Processed 100% Client-Side)
+          </label>
+          <textarea
+            id="logInput"
+            class={sharedStyles.textarea}
+            rows="8"
+            style="font-family: monospace; font-size: 0.8rem;"
+          >{SAMPLE_LOG}</textarea>
+        </div>
+
+        <div style="margin-top: 12px; display: flex; gap: 10px;">
+          <button
+            type="button"
+            id="btn-parse-logs"
+            class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
+          >
+            Analyze AI Bot Visits
+          </button>
+        </div>
+
+        <div id="log-results-container" style="margin-top: 24px; display: none;"></div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const AI_BOT_PATTERNS = [
+    { name: 'GPTBot', regex: /GPTBot/i, vendor: 'OpenAI' },
+    { name: 'ChatGPT-User', regex: /ChatGPT-User/i, vendor: 'OpenAI' },
+    { name: 'ClaudeBot', regex: /ClaudeBot|Claude-Web/i, vendor: 'Anthropic' },
+    { name: 'PerplexityBot', regex: /PerplexityBot/i, vendor: 'Perplexity' },
+    { name: 'Bytespider', regex: /Bytespider/i, vendor: 'ByteDance' },
+    { name: 'CCBot', regex: /CCBot/i, vendor: 'Common Crawl' },
+    { name: 'Google-Extended', regex: /Google-Extended|GoogleOther/i, vendor: 'Google' },
+    { name: 'Amazonbot', regex: /Amazonbot/i, vendor: 'Amazon' },
+    { name: 'Cohere-ai', regex: /Cohere-ai/i, vendor: 'Cohere' },
+    { name: 'Applebot-Extended', regex: /Applebot-Extended/i, vendor: 'Apple' },
+  ];
+
+  const logInput = document.getElementById('logInput') as HTMLTextAreaElement;
+  const btnParse = document.getElementById('btn-parse-logs');
+  const resultsContainer = document.getElementById('log-results-container');
+
+  const logRegex = /^(\S+)\s+-\s+-\s+\[([^\]]+)\]\s+"(\S+)\s+(\S+)\s+[^"]*"\s+(\d{3})\s+(\d+|-)\s*(?:"[^"]*"\s*"([^"]*)")?/;
+
+  function parseLogs() {
+    if (!logInput || !resultsContainer) return;
+    const content = logInput.value;
+    const lines = content.split('\n').filter((l) => l.trim().length > 0);
+
+    const botCounts: Record<string, { count: number; vendor: string }> = {};
+    const pathCounts: Record<string, number> = {};
+    let aiHitsCount = 0;
+    const hits: any[] = [];
+
+    lines.forEach((line) => {
+      let path = '/';
+      let status = '200';
+      let userAgent = line;
+
+      const match = line.match(logRegex);
+      if (match) {
+        path = match[4];
+        status = match[5];
+        userAgent = match[7] || line;
+      }
+
+      let botMatch: { name: string; vendor: string } | null = null;
+      for (const b of AI_BOT_PATTERNS) {
+        if (b.regex.test(userAgent)) {
+          botMatch = { name: b.name, vendor: b.vendor };
+          break;
+        }
+      }
+
+      if (botMatch) {
+        aiHitsCount++;
+        botCounts[botMatch.name] = botCounts[botMatch.name] || { count: 0, vendor: botMatch.vendor };
+        botCounts[botMatch.name].count++;
+
+        pathCounts[path] = (pathCounts[path] || 0) + 1;
+        hits.push({ path, status, botMatch, userAgent });
+      }
+    });
+
+    resultsContainer.style.display = 'block';
+
+    const topPaths = Object.entries(pathCounts)
+      .map(([path, count]) => ({ path, count }))
+      .sort((a, b) => b.count - a.count);
+
+    resultsContainer.innerHTML = `
+      <!-- Stats Overview -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <div style="padding: 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+          <div style="font-size: 0.8rem; color: var(--text-muted);">Total Log Lines</div>
+          <div style="font-size: 1.8rem; font-weight: bold; margin-top: 4px;">${lines.length}</div>
+        </div>
+
+        <div style="padding: 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+          <div style="font-size: 0.8rem; color: var(--text-muted);">AI Crawler Hits</div>
+          <div style="font-size: 1.8rem; font-weight: bold; margin-top: 4px; color: #2196f3;">${aiHitsCount}</div>
+        </div>
+
+        <div style="padding: 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+          <div style="font-size: 0.8rem; color: var(--text-muted);">Unique AI Bots</div>
+          <div style="font-size: 1.8rem; font-weight: bold; margin-top: 4px; color: #4caf50;">${Object.keys(botCounts).length}</div>
+        </div>
+      </div>
+
+      <!-- Bots Breakdown -->
+      <div style="margin-bottom: 24px;">
+        <h4 style="margin-bottom: 12px;">Detected AI Crawlers</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+          ${Object.entries(botCounts)
+            .map(
+              ([name, data]) => `
+            <div style="padding: 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong>${name}</strong>
+                <span style="padding: 2px 8px; border-radius: 10px; background: rgba(33, 150, 243, 0.2); color: #2196f3; font-size: 0.75rem; font-weight: bold;">${data.count} hits</span>
+              </div>
+              <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Vendor: ${data.vendor}</div>
+            </div>
+          `
+            )
+            .join('')}
+        </div>
+      </div>
+
+      <!-- Top Crawled Paths -->
+      <div>
+        <h4 style="margin-bottom: 12px;">Top AI Crawled Paths</h4>
+        <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;">
+          ${topPaths
+            .map(
+              (p) => `
+            <div style="padding: 10px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-family: monospace; font-size: 0.85rem;">
+              <span>${p.path}</span>
+              <span style="font-weight: bold;">${p.count} requests</span>
+            </div>
+          `
+            )
+            .join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  btnParse?.addEventListener('click', parseLogs);
+  parseLogs();
+</script>
