@@ -1,0 +1,104 @@
+---
+import '@/styles/globals.css';
+import { getOrganizationJsonLd, getWebSiteJsonLd, getSoftwareSourceCodeJsonLd } from '@/lib/jsonld';
+
+export interface Props {
+  title?: string;
+  description?: string;
+  canonicalUrl?: string;
+  ogImage?: string;
+  jsonLd?: Record<string, any> | Array<Record<string, any>>;
+  hideDefaultFooter?: boolean;
+}
+
+const {
+  title = 'IQVerse | Free Open-Source Online Developer Tools & Utilities',
+  description = 'IQVerse offers free, open-source browser-based developer tools for AI agent scanning, QR generation, link checking, favicon creation, JSON validation, CSS conversion, image optimization and more. All running locally in your browser with no login, no telemetry and no cost.',
+  canonicalUrl = 'https://iqverse.net/',
+  ogImage = '/og-image-1200x630.png',
+  jsonLd,
+  hideDefaultFooter = false,
+} = Astro.props;
+
+// Ensure title always has IQVerse suffix if not present
+const formattedTitle = title.includes('IQVerse') ? title : `${title} | IQVerse`;
+
+// Ensure canonical URL ends with a trailing slash
+const formattedCanonical = canonicalUrl.endsWith('/') ? canonicalUrl : `${canonicalUrl}/`;
+
+const defaultJsonLd = [getWebSiteJsonLd(), getOrganizationJsonLd(), getSoftwareSourceCodeJsonLd()];
+const finalJsonLd = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : defaultJsonLd;
+const jsonLdString = JSON.stringify(finalJsonLd).replace(/</g, '\\u003c');
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0C0E14" />
+    <meta name="msapplication-TileColor" content="#ffffff" />
+    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
+    <meta name="robots" content="index, follow" />
+
+    <title>{formattedTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={formattedCanonical} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content={formattedCanonical} />
+    <meta property="og:site_name" content="IQVerse" />
+    <meta property="og:title" content={formattedTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage.startsWith('http') ? ogImage : `https://iqverse.net${ogImage}`} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={formattedTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage.startsWith('http') ? ogImage : `https://iqverse.net${ogImage}`} />
+
+    <!-- Icons & Manifest -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Theme Initialization Script (Instant, Zero-FOUC) -->
+    <script is:inline>
+      (function() {
+        try {
+          var saved = localStorage.getItem('iqverse-theme');
+          if (saved === 'light' || saved === 'dark') {
+            document.documentElement.setAttribute('data-theme', saved);
+          } else {
+            document.documentElement.setAttribute('data-theme', 'dark');
+          }
+        } catch(e) {}
+      })();
+    </script>
+
+    <!-- External Widgets -->
+    <script src="https://cdn.jsdelivr.net/npm/cap-widget@latest" type="module"></script>
+
+    <!-- Structured Data JSON-LD -->
+    <script type="application/ld+json" set:html={jsonLdString} />
+  </head>
+  <body>
+    <slot />
+
+    {!hideDefaultFooter && (
+      <footer class="pageFooter">
+        <span class="footerNote">
+          Made with ❤️ by <a href="https://sekmen.dev" target="_blank" rel="noopener">Sekmen.Dev</a> and published on <a href="https://github.com/SekmenDev/iqverse.net" target="_blank" rel="noopener">Github</a>
+        </span>
+        <span class="footerNote">
+          Open source. MIT License. No servers. No tracking. No cost.
+        </span>
+      </footer>
+    )}
+  </body>
+</html>

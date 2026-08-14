@@ -1,0 +1,61 @@
+---
+import styles from '@/styles/theme-toggle.module.css';
+---
+
+<button
+  type="button"
+  id="theme-toggle-btn"
+  class={styles.toggleBtn}
+  aria-label="Toggle light/dark theme"
+  title="Toggle light/dark theme"
+>
+  <span id="theme-icon-light" class={styles.iconOption} aria-hidden="true" style="display: none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+      <circle cx="12" cy="12" r="4"></circle>
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+    </svg>
+  </span>
+  <span id="theme-icon-dark" class={styles.iconOption} aria-hidden="true" style="display: none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+      <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+    </svg>
+  </span>
+</button>
+
+<script>
+  function updateThemeUI() {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    const lightIcon = document.getElementById('theme-icon-light');
+    const darkIcon = document.getElementById('theme-icon-dark');
+    if (lightIcon && darkIcon) {
+      if (currentTheme === 'light') {
+        lightIcon.style.display = 'inline-flex';
+        darkIcon.style.display = 'none';
+      } else {
+        lightIcon.style.display = 'none';
+        darkIcon.style.display = 'inline-flex';
+      }
+    }
+  }
+
+  function setupThemeToggle() {
+    updateThemeUI();
+    const btn = document.getElementById('theme-toggle-btn');
+    if (btn) {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+        const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', nextTheme);
+        try {
+          localStorage.setItem('iqverse-theme', nextTheme);
+        } catch {}
+        updateThemeUI();
+      };
+    }
+  }
+
+  setupThemeToggle();
+  document.addEventListener('astro:after-swap', setupThemeToggle);
+</script>
