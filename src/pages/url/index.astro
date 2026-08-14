@@ -1,0 +1,224 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+---
+
+<ToolLayout
+  title="URL Tools"
+  subtitle="Parse, Inspect, Encode & Build URLs"
+  pill="BROWSER TOOLS"
+  toolSlug="url"
+  description="Parse, inspect, encode, decode, and build web URLs. Manage query string parameters visually right inside your browser."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.sectionLabel}>URL Tools</div>
+      <div class={sharedStyles.card}>
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="urlInput">
+            URL Input
+          </label>
+          <textarea
+            id="urlInput"
+            class={sharedStyles.textarea}
+            rows="4"
+          >https://example.com/path?foo=1&bar=two#section</textarea>
+        </div>
+
+        <div class={sharedStyles.buttonGroup}>
+          <button type="button" id="btn-parse-url" class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}>
+            Parse URL
+          </button>
+          <button type="button" id="btn-build-url" class={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`}>
+            Build URL
+          </button>
+          <button type="button" id="btn-encode-url" class={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`}>
+            Encode URL
+          </button>
+          <button type="button" id="btn-decode-url" class={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`}>
+            Decode URL
+          </button>
+        </div>
+
+        <div class={sharedStyles.sectionLabel} style="margin-top: 24px;">
+          Parsed URL Parts
+        </div>
+
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="urlProtocol">Protocol</label>
+          <input
+            id="urlProtocol"
+            type="text"
+            value="https:"
+            class={sharedStyles.textarea}
+            style="min-height: auto;"
+          />
+        </div>
+
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="urlHost">Hostname</label>
+          <input
+            id="urlHost"
+            type="text"
+            value="example.com"
+            class={sharedStyles.textarea}
+            style="min-height: auto;"
+          />
+        </div>
+
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="urlPort">Port</label>
+          <input
+            id="urlPort"
+            type="text"
+            class={sharedStyles.textarea}
+            style="min-height: auto;"
+          />
+        </div>
+
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="urlPathname">Pathname</label>
+          <input
+            id="urlPathname"
+            type="text"
+            value="/path"
+            class={sharedStyles.textarea}
+            style="min-height: auto;"
+          />
+        </div>
+
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="urlHash">Hash</label>
+          <input
+            id="urlHash"
+            type="text"
+            value="#section"
+            class={sharedStyles.textarea}
+            style="min-height: auto;"
+          />
+        </div>
+
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="urlQueryParams">Query Parameters (one per line)</label>
+          <textarea
+            id="urlQueryParams"
+            class={sharedStyles.textarea}
+            rows="5"
+            placeholder="key=value&#10;foo=bar"
+          >foo=1&#10;bar=two</textarea>
+        </div>
+
+        <div style="margin-top: 18px;" class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="urlOutput">Output URL</label>
+          <textarea id="urlOutput" readonly class={sharedStyles.outputArea} rows="4"></textarea>
+        </div>
+
+        <div id="url-error-box" class={sharedStyles.errorCard} style="margin-top: 12px; display: none;">
+          <div id="url-error-msg" class={sharedStyles.errorMessage}></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const urlInput = document.getElementById('urlInput') as HTMLTextAreaElement;
+  const protocolInput = document.getElementById('urlProtocol') as HTMLInputElement;
+  const hostInput = document.getElementById('urlHost') as HTMLInputElement;
+  const portInput = document.getElementById('urlPort') as HTMLInputElement;
+  const pathnameInput = document.getElementById('urlPathname') as HTMLInputElement;
+  const hashInput = document.getElementById('urlHash') as HTMLInputElement;
+  const queryParamsInput = document.getElementById('urlQueryParams') as HTMLTextAreaElement;
+  const urlOutput = document.getElementById('urlOutput') as HTMLTextAreaElement;
+  const errorBox = document.getElementById('url-error-box');
+  const errorMsg = document.getElementById('url-error-msg');
+
+  const btnParse = document.getElementById('btn-parse-url');
+  const btnBuild = document.getElementById('btn-build-url');
+  const btnEncode = document.getElementById('btn-encode-url');
+  const btnDecode = document.getElementById('btn-decode-url');
+
+  function showError(msg: string) {
+    if (errorBox && errorMsg) {
+      errorMsg.textContent = msg;
+      errorBox.style.display = 'block';
+    }
+  }
+
+  function hideError() {
+    if (errorBox) errorBox.style.display = 'none';
+  }
+
+  function parseUrl() {
+    hideError();
+    try {
+      const candidate = urlInput?.value.trim() || 'https://example.com';
+      const url = new URL(candidate.startsWith('http') ? candidate : `https://${candidate}`);
+      if (protocolInput) protocolInput.value = url.protocol;
+      if (hostInput) hostInput.value = url.hostname;
+      if (portInput) portInput.value = url.port;
+      if (pathnameInput) pathnameInput.value = url.pathname;
+      if (hashInput) hashInput.value = url.hash;
+
+      const q = Array.from(url.searchParams.entries())
+        .map(([k, v]) => `${k}=${v}`)
+        .join('\n');
+      if (queryParamsInput) queryParamsInput.value = q;
+      if (urlOutput) urlOutput.value = url.href;
+    } catch (err: any) {
+      showError(err.message || 'Invalid URL.');
+      if (urlOutput) urlOutput.value = '';
+    }
+  }
+
+  function buildUrl() {
+    hideError();
+    try {
+      const protocol = protocolInput?.value || 'https:';
+      const host = hostInput?.value || 'example.com';
+      const port = portInput?.value ? `:${portInput.value}` : '';
+      const base = `${protocol}//${host}${port}`;
+      const url = new URL(pathnameInput?.value || '/', base);
+      const hash = hashInput?.value || '';
+      url.hash = hash.startsWith('#') || hash === '' ? hash : `#${hash}`;
+
+      const params = new URLSearchParams();
+      (queryParamsInput?.value || '')
+        .split(/\r?\n/)
+        .map((l) => l.trim())
+        .filter(Boolean)
+        .forEach((line) => {
+          const [k, ...rest] = line.split('=');
+          if (k) params.append(k.trim(), rest.join('=').trim());
+        });
+      url.search = params.toString();
+
+      if (urlOutput) urlOutput.value = url.href;
+      if (urlInput) urlInput.value = url.href;
+    } catch (err: any) {
+      showError(err.message || 'Unable to build URL.');
+      if (urlOutput) urlOutput.value = '';
+    }
+  }
+
+  btnParse?.addEventListener('click', parseUrl);
+  btnBuild?.addEventListener('click', buildUrl);
+  btnEncode?.addEventListener('click', () => {
+    hideError();
+    try {
+      if (urlOutput && urlInput) urlOutput.value = encodeURI(urlInput.value.trim());
+    } catch {
+      showError('Unable to encode the URL.');
+    }
+  });
+  btnDecode?.addEventListener('click', () => {
+    hideError();
+    try {
+      if (urlOutput && urlInput) urlOutput.value = decodeURI(urlInput.value.trim());
+    } catch {
+      showError('Unable to decode the URL.');
+    }
+  });
+
+  parseUrl();
+</script>

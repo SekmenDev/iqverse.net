@@ -1,0 +1,159 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+---
+
+<ToolLayout
+  title="File Hash Verifier"
+  subtitle="Client-Side Checksum & Integrity Tool"
+  pill="SECURITY"
+  toolSlug="file-hash"
+  description="Verify file integrity by calculating MD5, SHA-1, SHA-256, and SHA-512 checksums locally without uploading files."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="fileInput">
+            Select Local File (Processed 100% Client-Side)
+          </label>
+          <input
+            id="fileInput"
+            type="file"
+            class={sharedStyles.input}
+            style="cursor: pointer;"
+          />
+        </div>
+
+        <div id="loading-msg" style="margin-top: 12px; opacity: 0.8; display: none;">Computing cryptographic hashes...</div>
+
+        <div id="hash-results" style="margin-top: 24px; display: none;">
+          <div id="file-info" style="margin-bottom: 16px; font-size: 0.9rem;"></div>
+
+          <!-- Compare Hash Input -->
+          <div class={sharedStyles.field} style="margin-bottom: 20px;">
+            <label class={sharedStyles.fieldLabel} for="expHash">
+              Expected Checksum Hash (Verify Integrity)
+            </label>
+            <input
+              id="expHash"
+              type="text"
+              class={sharedStyles.input}
+              placeholder="Paste SHA-256 or SHA-512 checksum string to verify..."
+              style="font-family: monospace;"
+            />
+
+            <div
+              id="match-banner"
+              style="margin-top: 8px; padding: 10px; border-radius: 6px; font-size: 0.9rem; font-weight: bold; display: none;"
+            ></div>
+          </div>
+
+          <!-- Hashes List -->
+          <div style="display: flex; flexDirection: column; gap: 12px;">
+            <div style="padding: 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+              <div style="font-size: 0.8rem; opacity: 0.7; margin-bottom: 4px;">SHA-256 Checksum</div>
+              <code id="sha256-val" style="font-family: monospace; font-size: 0.85rem; word-break: break-all; color: #2196f3;"></code>
+            </div>
+
+            <div style="padding: 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+              <div style="font-size: 0.8rem; opacity: 0.7; margin-bottom: 4px;">SHA-512 Checksum</div>
+              <code id="sha512-val" style="font-family: monospace; font-size: 0.85rem; word-break: break-all;"></code>
+            </div>
+
+            <div style="padding: 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+              <div style="font-size: 0.8rem; opacity: 0.7; margin-bottom: 4px;">SHA-1 Checksum</div>
+              <code id="sha1-val" style="font-family: monospace; font-size: 0.85rem; word-break: break-all;"></code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+  const loadingMsg = document.getElementById('loading-msg');
+  const hashResults = document.getElementById('hash-results');
+  const fileInfo = document.getElementById('file-info');
+  const expHashInput = document.getElementById('expHash') as HTMLInputElement;
+  const matchBanner = document.getElementById('match-banner');
+  const sha256Val = document.getElementById('sha256-val');
+  const sha512Val = document.getElementById('sha512-val');
+  const sha1Val = document.getElementById('sha1-val');
+
+  let currentSha1 = '';
+  let currentSha256 = '';
+  let currentSha512 = '';
+
+  const bufferToHex = (buf: ArrayBuffer) =>
+    Array.from(new Uint8Array(buf))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+
+  fileInput?.addEventListener('change', async () => {
+    const file = fileInput.files?.[0];
+    if (!file) return;
+
+    if (loadingMsg) loadingMsg.style.display = 'block';
+    if (hashResults) hashResults.style.display = 'none';
+
+    try {
+      const buffer = await file.arrayBuffer();
+
+      const [sha1Buffer, sha256Buffer, sha512Buffer] = await Promise.all([
+        crypto.subtle.digest('SHA-1', buffer),
+        crypto.subtle.digest('SHA-256', buffer),
+        crypto.subtle.digest('SHA-512', buffer),
+      ]);
+
+      currentSha1 = bufferToHex(sha1Buffer);
+      currentSha256 = bufferToHex(sha256Buffer);
+      currentSha512 = bufferToHex(sha512Buffer);
+
+      if (fileInfo) fileInfo.innerHTML = `File: <strong>${file.name}</strong> (${Math.round(file.size / 1024)} KB)`;
+      if (sha256Val) sha256Val.textContent = currentSha256;
+      if (sha512Val) sha512Val.textContent = currentSha512;
+      if (sha1Val) sha1Val.textContent = currentSha1;
+
+      if (hashResults) hashResults.style.display = 'block';
+      checkMatch();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      if (loadingMsg) loadingMsg.style.display = 'none';
+    }
+  });
+
+  function checkMatch() {
+    const cleanExpected = expHashInput?.value.trim().toLowerCase() || '';
+    if (!matchBanner) return;
+
+    if (!cleanExpected || !currentSha256) {
+      matchBanner.style.display = 'none';
+      return;
+    }
+
+    matchBanner.style.display = 'block';
+    if (currentSha256.toLowerCase() === cleanExpected) {
+      matchBanner.style.background = 'rgba(76, 175, 80, 0.2)';
+      matchBanner.style.color = '#4caf50';
+      matchBanner.textContent = '✓ Match Verified! Checksum matches SHA-256 hash.';
+    } else if (currentSha512.toLowerCase() === cleanExpected) {
+      matchBanner.style.background = 'rgba(76, 175, 80, 0.2)';
+      matchBanner.style.color = '#4caf50';
+      matchBanner.textContent = '✓ Match Verified! Checksum matches SHA-512 hash.';
+    } else if (currentSha1.toLowerCase() === cleanExpected) {
+      matchBanner.style.background = 'rgba(76, 175, 80, 0.2)';
+      matchBanner.style.color = '#4caf50';
+      matchBanner.textContent = '✓ Match Verified! Checksum matches SHA-1 hash.';
+    } else {
+      matchBanner.style.background = 'rgba(255, 77, 79, 0.2)';
+      matchBanner.style.color = '#ff4d4f';
+      matchBanner.textContent = '✕ Hash Mismatch! Checksum does not match file.';
+    }
+  }
+
+  expHashInput?.addEventListener('input', checkMatch);
+</script>

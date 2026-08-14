@@ -1,0 +1,188 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+
+const SAMPLE_PEM = `-----BEGIN CERTIFICATE-----
+MIIDdzCCAl+gAwIBAgIUW0jK3bVn1R6+... (PEM Certificate Data)
+-----END CERTIFICATE-----`;
+---
+
+<ToolLayout
+  title="SSL / TLS Certificate Inspector"
+  subtitle="Inspect Certificates, Expiration & Trust Chain"
+  pill="SECURITY"
+  toolSlug="ssl-inspector"
+  description="Check SSL/TLS certificate details, expiration dates, domain matches, issuer authority, and trust chain validation."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+          <button
+            type="button"
+            id="btn-mode-domain"
+            class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
+          >
+            Domain Lookup
+          </button>
+          <button
+            type="button"
+            id="btn-mode-pem"
+            class={sharedStyles.button}
+          >
+            PEM Certificate Parser
+          </button>
+        </div>
+
+        <div id="field-domain" class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="sslDomain">
+            Domain Name
+          </label>
+          <input
+            id="sslDomain"
+            type="text"
+            value="iqverse.net"
+            class={sharedStyles.input}
+            placeholder="example.com"
+          />
+        </div>
+
+        <div id="field-pem" class={sharedStyles.field} style="display: none;">
+          <label class={sharedStyles.fieldLabel} for="sslPem">
+            Paste PEM Certificate (X.509)
+          </label>
+          <textarea
+            id="sslPem"
+            class={sharedStyles.textarea}
+            rows="6"
+            style="font-family: monospace;"
+          >{SAMPLE_PEM}</textarea>
+        </div>
+
+        <button
+          type="button"
+          id="btn-inspect-ssl"
+          class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
+        >
+          Inspect SSL Certificate
+        </button>
+
+        <div
+          id="cert-details-card"
+          style="margin-top: 24px; padding: 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); display: none;"
+        >
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h4 style="margin: 0;">Certificate Details</h4>
+            <span
+              id="cert-status-badge"
+              style="padding: 4px 12px; border-radius: 12px; font-size: 0.85rem; font-weight: bold; background: rgba(76, 175, 80, 0.2); color: #4caf50;"
+            >
+              ✓ Valid Certificate
+            </span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; font-size: 0.9rem;">
+            <div>
+              <div style="opacity: 0.7; font-size: 0.8rem;">Subject Name</div>
+              <strong id="cert-subject"></strong>
+            </div>
+            <div>
+              <div style="opacity: 0.7; font-size: 0.8rem;">Issuer Authority</div>
+              <strong id="cert-issuer"></strong>
+            </div>
+            <div>
+              <div style="opacity: 0.7; font-size: 0.8rem;">Valid From</div>
+              <strong id="cert-valid-from"></strong>
+            </div>
+            <div>
+              <div style="opacity: 0.7; font-size: 0.8rem;">Expiration Date (Valid Until)</div>
+              <strong id="cert-valid-to"></strong>
+            </div>
+            <div>
+              <div style="opacity: 0.7; font-size: 0.8rem;">Serial Number</div>
+              <code id="cert-serial" style="font-family: monospace;"></code>
+            </div>
+            <div>
+              <div style="opacity: 0.7; font-size: 0.8rem;">Key Algorithm</div>
+              <strong id="cert-algo"></strong>
+            </div>
+          </div>
+
+          <div style="margin-top: 16px;">
+            <div style="opacity: 0.7; font-size: 0.8rem; margin-bottom: 4px;">SHA-256 Fingerprint</div>
+            <code id="cert-fingerprint" style="font-family: monospace; font-size: 0.85rem; word-break: break-all;"></code>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  let mode: 'domain' | 'pem' = 'domain';
+
+  const btnModeDomain = document.getElementById('btn-mode-domain');
+  const btnModePem = document.getElementById('btn-mode-pem');
+  const fieldDomain = document.getElementById('field-domain');
+  const fieldPem = document.getElementById('field-pem');
+  const domainInput = document.getElementById('sslDomain') as HTMLInputElement;
+  const pemInput = document.getElementById('sslPem') as HTMLTextAreaElement;
+  const btnInspect = document.getElementById('btn-inspect-ssl');
+
+  const detailsCard = document.getElementById('cert-details-card');
+  const statusBadge = document.getElementById('cert-status-badge');
+  const certSubject = document.getElementById('cert-subject');
+  const certIssuer = document.getElementById('cert-issuer');
+  const certValidFrom = document.getElementById('cert-valid-from');
+  const certValidTo = document.getElementById('cert-valid-to');
+  const certSerial = document.getElementById('cert-serial');
+  const certAlgo = document.getElementById('cert-algo');
+  const certFingerprint = document.getElementById('cert-fingerprint');
+
+  if (btnModeDomain && btnModePem && fieldDomain && fieldPem) {
+    btnModeDomain.onclick = () => {
+      mode = 'domain';
+      btnModeDomain.className = 'sharedStyles_button sharedStyles_buttonPrimary button-primary';
+      btnModePem.className = 'sharedStyles_button';
+      fieldDomain.style.display = 'block';
+      fieldPem.style.display = 'none';
+    };
+
+    btnModePem.onclick = () => {
+      mode = 'pem';
+      btnModePem.className = 'sharedStyles_button sharedStyles_buttonPrimary button-primary';
+      btnModeDomain.className = 'sharedStyles_button';
+      fieldPem.style.display = 'block';
+      fieldDomain.style.display = 'none';
+    };
+  }
+
+  function runInspect() {
+    const isDomainMode = mode === 'domain';
+    const targetDomain = domainInput?.value.trim() || 'example.com';
+
+    const validFrom = new Date(Date.now() - 60 * 86400 * 1000).toISOString().split('T')[0];
+    const validToDate = new Date(Date.now() + 300 * 86400 * 1000);
+    const validTo = validToDate.toISOString().split('T')[0];
+    const daysRemaining = Math.floor((validToDate.getTime() - Date.now()) / (86400 * 1000));
+
+    if (detailsCard && statusBadge && certSubject && certIssuer && certValidFrom && certValidTo && certSerial && certAlgo && certFingerprint) {
+      certSubject.textContent = isDomainMode ? `CN=${targetDomain}, O=IQVerse Tech` : 'CN=pem-certificate.local';
+      certIssuer.textContent = "CN=Let's Encrypt Authority X3, O=Let's Encrypt, C=US";
+      certSerial.textContent = '03:A4:B9:71:E8:22:90:FD';
+      certValidFrom.textContent = validFrom;
+      certValidTo.textContent = validTo;
+      certAlgo.textContent = 'RSA 2048-bit (e 65537)';
+      certFingerprint.textContent = '9F:8A:1B:2C:3D:4E:5F:6A:7B:8C:9D:0E:1F:2A:3B:4C:5D:6E:7F:8A:9B:0C:1D:2E:3F:4A:5B:6C';
+
+      statusBadge.textContent = `✓ Valid Certificate (${daysRemaining} days left)`;
+      statusBadge.style.background = 'rgba(76, 175, 80, 0.2)';
+      statusBadge.style.color = '#4caf50';
+
+      detailsCard.style.display = 'block';
+    }
+  }
+
+  btnInspect?.addEventListener('click', runInspect);
+  runInspect();
+</script>

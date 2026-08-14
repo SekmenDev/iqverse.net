@@ -1,0 +1,143 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+---
+
+<ToolLayout
+  title="Base64 & URL Encoder"
+  subtitle="EncodeLab Conversion Utility"
+  pill="BROWSER TOOLS"
+  toolSlug="encodelab"
+  description="Encode and decode Base64 strings, URL parameters, JWT tokens, and Data URIs instantly with client-side privacy."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.sectionLabel}>EncodeLab</div>
+      <div class={sharedStyles.card}>
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="encode-input">Input</label>
+          <textarea id="encode-input" class={sharedStyles.textarea} rows="6"></textarea>
+        </div>
+
+        <div class={sharedStyles.buttonGroup}>
+          <button type="button" id="btn-b64-encode" class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}>Base64 Encode</button>
+          <button type="button" id="btn-b64-url-encode" class={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`}>Base64 URL Safe</button>
+          <button type="button" id="btn-b64-decode" class={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`}>Base64 Decode</button>
+          <button type="button" id="btn-b64-url-decode" class={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`}>Base64 URL Decode</button>
+        </div>
+
+        <div style="margin-top: 12px;" class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="b64-output">Base64 Output</label>
+          <textarea id="b64-output" readonly class={sharedStyles.outputArea} rows="4"></textarea>
+        </div>
+
+        <hr style="margin: 18px 0; border: none; border-top: 1px solid var(--border);" />
+
+        <div class={sharedStyles.buttonGroup}>
+          <button type="button" id="btn-url-encode" class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}>encodeURIComponent</button>
+          <button type="button" id="btn-url-encode-full" class={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`}>encodeURI (full)</button>
+          <button type="button" id="btn-url-decode" class={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`}>Decode</button>
+        </div>
+
+        <div style="margin-top: 12px;" class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="url-output">URL Output</label>
+          <textarea id="url-output" readonly class={sharedStyles.outputArea} rows="3"></textarea>
+        </div>
+
+        <hr style="margin: 18px 0; border: none; border-top: 1px solid var(--border);" />
+
+        <div class={sharedStyles.buttonGroup}>
+          <button type="button" id="btn-inspect-jwt" class={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`}>Inspect JWT</button>
+        </div>
+
+        <div id="jwt-display-box" style="margin-top: 12px; display: none;">
+          <div class={sharedStyles.sectionLabel}>JWT Header</div>
+          <pre id="jwt-header-display" class={sharedStyles.outputArea} style="white-space: pre-wrap; margin-bottom: 12px;"></pre>
+          <div class={sharedStyles.sectionLabel}>JWT Payload</div>
+          <pre id="jwt-payload-display" class={sharedStyles.outputArea} style="white-space: pre-wrap;"></pre>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  import { b64Encode, b64Decode } from '@/lib/encoding';
+
+  const textInput = document.getElementById('encode-input') as HTMLTextAreaElement;
+  const b64Out = document.getElementById('b64-output') as HTMLTextAreaElement;
+  const urlOut = document.getElementById('url-output') as HTMLTextAreaElement;
+
+  const btnB64Enc = document.getElementById('btn-b64-encode');
+  const btnB64UrlEnc = document.getElementById('btn-b64-url-encode');
+  const btnB64Dec = document.getElementById('btn-b64-decode');
+  const btnB64UrlDec = document.getElementById('btn-b64-url-decode');
+
+  const btnUrlEnc = document.getElementById('btn-url-encode');
+  const btnUrlEncFull = document.getElementById('btn-url-encode-full');
+  const btnUrlDec = document.getElementById('btn-url-decode');
+
+  const btnJwt = document.getElementById('btn-inspect-jwt');
+  const jwtBox = document.getElementById('jwt-display-box');
+  const jwtHdr = document.getElementById('jwt-header-display');
+  const jwtPld = document.getElementById('jwt-payload-display');
+
+  btnB64Enc?.addEventListener('click', () => {
+    if (b64Out && textInput) b64Out.value = b64Encode(textInput.value, false);
+  });
+  btnB64UrlEnc?.addEventListener('click', () => {
+    if (b64Out && textInput) b64Out.value = b64Encode(textInput.value, true);
+  });
+  btnB64Dec?.addEventListener('click', () => {
+    if (b64Out && textInput) b64Out.value = b64Decode(textInput.value, false);
+  });
+  btnB64UrlDec?.addEventListener('click', () => {
+    if (b64Out && textInput) b64Out.value = b64Decode(textInput.value, true);
+  });
+
+  btnUrlEnc?.addEventListener('click', () => {
+    if (urlOut && textInput) {
+      try {
+        urlOut.value = encodeURIComponent(textInput.value);
+      } catch {
+        urlOut.value = 'Error';
+      }
+    }
+  });
+  btnUrlEncFull?.addEventListener('click', () => {
+    if (urlOut && textInput) {
+      try {
+        urlOut.value = encodeURI(textInput.value);
+      } catch {
+        urlOut.value = 'Error';
+      }
+    }
+  });
+  btnUrlDec?.addEventListener('click', () => {
+    if (urlOut && textInput) {
+      try {
+        urlOut.value = decodeURIComponent(textInput.value);
+      } catch {
+        urlOut.value = 'Error';
+      }
+    }
+  });
+
+  btnJwt?.addEventListener('click', () => {
+    if (!textInput || !jwtBox || !jwtHdr || !jwtPld) return;
+    try {
+      const parts = textInput.value.trim().split('.');
+      if (parts.length < 2) {
+        jwtBox.style.display = 'none';
+        return;
+      }
+      const hdr = b64Decode(parts[0].replace(/-/g, '+').replace(/_/g, '/'), false);
+      const pld = b64Decode(parts[1].replace(/-/g, '+').replace(/_/g, '/'), false);
+      jwtHdr.textContent = hdr;
+      jwtPld.textContent = pld;
+      jwtBox.style.display = 'block';
+    } catch {
+      jwtBox.style.display = 'none';
+    }
+  });
+</script>

@@ -1,0 +1,181 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import ThemeToggle from '@/components/ThemeToggle.astro';
+import { tools } from '@/lib/tools';
+import styles from '@/styles/not-found.module.css';
+
+const initialTools = tools.slice(0, 6);
+---
+
+<Layout
+  title="404 - Page Not Found | IQVerse"
+  description="The page you were looking for has wandered off but the developer tools you need are still here on IQVerse."
+  canonicalUrl="https://iqverse.net/404/"
+>
+  <div class={styles.pageShell}>
+    <nav class={styles.topNav}>
+      <a href="/" class={styles.navLogo}>
+        <span class={styles.navLogoDot}></span> IQVerse
+      </a>
+      <div class={styles.navRight}>
+        <ThemeToggle />
+      </div>
+    </nav>
+
+    <div class={styles.notFoundPage}>
+      <section class={styles.heroBanner}>
+        <div class={styles.heroCopy}>
+          <span class={styles.heroEyebrow}>Page not found</span>
+          <h1 class={styles.heroTitle}>
+            Lost in the matrix? <span class={styles.titleAccent}>Let’s reroute it.</span>
+          </h1>
+          <p class={styles.heroText}>
+            The page you were looking for has wandered off but the tools you need are still here.
+            Search IQVerse for the right utility or jump straight to a useful shortcut below.
+          </p>
+
+          <div class={styles.heroActions}>
+            <div class={styles.searchPanel}>
+              <label for="404-search" class="sr-only">
+                Search tools
+              </label>
+              <div class={styles.searchBox}>
+                <span class={styles.searchIcon} aria-hidden="true">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                    <circle cx="6.5" cy="6.5" r="4.5" />
+                    <path d="M10.5 10.5l3 3" />
+                  </svg>
+                </span>
+                <input
+                  id="404-search"
+                  type="search"
+                  placeholder="Search tools, scanners, generators…"
+                  class={styles.searchInput}
+                  autocomplete="off"
+                />
+              </div>
+              <div class={styles.searchHint}>
+                <span>Try “link radar”, “QR forge” or “JSON formatter”.</span>
+                <span>Press Esc to clear</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class={styles.heroVisual}>
+          <div class={styles.visualContent}>
+            <div class={styles.visualCard}>
+              <div class={styles.visualBadge}>Navigation assist</div>
+              <div class={styles.visualNumber}>404</div>
+              <p class={styles.visualNote}>
+                While this page is gone, IQVerse still has lots of fast, browser-native tools for devs,
+                designers and engineering teams.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class={styles.sectionBlock}>
+        <div class={styles.sectionHead}>
+          <h2>Quick access links</h2>
+          <span class={styles.linkRow}>Need a shortcut? →</span>
+        </div>
+
+        <div class={styles.quickLinks}>
+          <a href="/linkradar/" class={styles.linkCard}>
+            <h3 class={styles.linkCardTitle}>Link Radar</h3>
+            <p class={styles.linkCardDesc}>
+              Scan pages for broken links and 404s fast. Ideal when a missing page interrupts your review.
+            </p>
+          </a>
+          <a href="/json/" class={styles.linkCard}>
+            <h3 class={styles.linkCardTitle}>JSON Formatter</h3>
+            <p class={styles.linkCardDesc}>
+              Validate and clean up JSON instantly with one click, no uploads required.
+            </p>
+          </a>
+          <a href="/qrforge/" class={styles.linkCard}>
+            <h3 class={styles.linkCardTitle}>QR Forge</h3>
+            <p class={styles.linkCardDesc}>
+              Generate QR codes for links, credentials or quick sharing while you stay on track.
+            </p>
+          </a>
+          <a href="/agentscan/" class={styles.linkCard}>
+            <h3 class={styles.linkCardTitle}>AI Agents Scanner</h3>
+            <p class={styles.linkCardDesc}>
+              Check your site for agent-friendly metadata, robots, sitemaps and AI-ready headers.
+            </p>
+          </a>
+        </div>
+      </section>
+
+      <section class={styles.sectionBlock}>
+        <div class={styles.sectionHead}>
+          <h2>Suggested tools</h2>
+          <span class={styles.linkRow} id="results-label">Popular picks</span>
+        </div>
+
+        <div class={styles.resultsGrid} id="results-grid">
+          {initialTools.map((tool) => {
+            const href = tool.url || '/';
+            const isExternalLink = /^(https?:\/\/|mailto:)/i.test(href);
+
+            return (
+              <a
+                href={href}
+                class={styles.resultCard}
+                {...(isExternalLink ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+              >
+                <h3 class={styles.resultTitle}>{tool.name}</h3>
+                <p class={styles.resultDesc}>{tool.desc}</p>
+                <div class={styles.resultMeta}>
+                  <span>Open</span>
+                  <span aria-hidden="true">→</span>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </section>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { filterTools } from '@/lib/tools';
+
+  const input = document.getElementById('404-search') as HTMLInputElement | null;
+  const grid = document.getElementById('results-grid');
+  const label = document.getElementById('results-label');
+
+  if (input && grid && label) {
+    input.addEventListener('input', () => {
+      const q = input.value;
+      label.textContent = q ? 'Search results' : 'Popular picks';
+      const results = filterTools(q, 'all', 'all').slice(0, 6);
+
+      grid.innerHTML = results.map(t => {
+        const href = t.url || '/';
+        const isExt = /^(https?:\/\/|mailto:)/i.test(href);
+        return `
+          <a href="${href}" class="resultCard" ${isExt ? 'target="_blank" rel="noopener noreferrer"' : ''}>
+            <h3 class="resultTitle">${t.name}</h3>
+            <p class="resultDesc">${t.desc}</p>
+            <div class="resultMeta">
+              <span>Open</span>
+              <span aria-hidden="true">→</span>
+            </div>
+          </a>
+        `;
+      }).join('');
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        input.value = '';
+        input.dispatchEvent(new Event('input'));
+      }
+    });
+  }
+</script>

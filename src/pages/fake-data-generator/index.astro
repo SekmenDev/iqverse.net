@@ -1,0 +1,305 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+---
+
+<ToolLayout
+  title="Fake Data & Lorem Generator"
+  subtitle="Generate Mock JSON & Lorem Ipsum Data"
+  pill="BROWSER TOOLS"
+  toolSlug="fake-data-generator"
+  description="Generate mock JSON datasets (users, products, transactions) and custom Lorem Ipsum placeholder text for testing and prototyping."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+        <button
+          type="button"
+          id="tab-lorem-btn"
+          class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
+        >
+          Lorem Ipsum Text
+        </button>
+        <button
+          type="button"
+          id="tab-json-btn"
+          class={sharedStyles.button}
+        >
+          JSON Mock Data Batch
+        </button>
+      </div>
+
+      <!-- Lorem Tab Pane -->
+      <div id="pane-lorem" class={sharedStyles.card}>
+        <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;">
+          <div class={sharedStyles.buttonGroup} style="margin: 0;">
+            <label for="loremType">Unit:</label>
+            <select id="loremType" style="margin-left: 8px;">
+              <option value="paragraphs">Paragraphs</option>
+              <option value="sentences">Sentences</option>
+              <option value="words">Words</option>
+            </select>
+          </div>
+
+          <div class={sharedStyles.buttonGroup} style="margin: 0;">
+            <label for="loremCount">Count:</label>
+            <input
+              id="loremCount"
+              type="number"
+              min="1"
+              max="100"
+              value="3"
+              class={sharedStyles.input}
+              style="width: 80px; margin-left: 8px;"
+            />
+          </div>
+
+          <button
+            type="button"
+            id="btn-gen-lorem"
+            class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
+          >
+            Generate Text
+          </button>
+        </div>
+
+        <div id="lorem-out-field" class={sharedStyles.field} style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <label class={sharedStyles.fieldLabel} for="loremOutArea">
+              Generated Lorem Ipsum Text
+            </label>
+            <button type="button" id="btn-copy-lorem" class={sharedStyles.button}>
+              Copy Text
+            </button>
+          </div>
+          <textarea
+            id="loremOutArea"
+            readonly
+            class={sharedStyles.outputArea}
+            rows="10"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- JSON Mock Pane -->
+      <div id="pane-json" class={sharedStyles.card} style="display: none;">
+        <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;">
+          <div class={sharedStyles.buttonGroup} style="margin: 0;">
+            <label for="schemaType">Schema:</label>
+            <select id="schemaType" style="margin-left: 8px;">
+              <option value="users">Users Array</option>
+              <option value="products">Products Inventory</option>
+              <option value="transactions">Financial Transactions</option>
+            </select>
+          </div>
+
+          <div class={sharedStyles.buttonGroup} style="margin: 0;">
+            <label for="batchSize">Batch Size:</label>
+            <input
+              id="batchSize"
+              type="number"
+              min="1"
+              max="50"
+              value="5"
+              class={sharedStyles.input}
+              style="width: 80px; margin-left: 8px;"
+            />
+          </div>
+
+          <button
+            type="button"
+            id="btn-gen-json"
+            class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
+          >
+            Generate JSON Batch
+          </button>
+        </div>
+
+        <div id="json-out-field" class={sharedStyles.field} style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <label class={sharedStyles.fieldLabel} for="jsonOutArea">
+              Generated Mock JSON
+            </label>
+            <button type="button" id="btn-copy-mock-json" class={sharedStyles.button}>
+              Copy JSON
+            </button>
+          </div>
+          <textarea
+            id="jsonOutArea"
+            readonly
+            class={sharedStyles.outputArea}
+            rows="12"
+          ></textarea>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const FIRST_NAMES = ['Alex', 'Jordan', 'Taylor', 'Morgan', 'Sam', 'Chris', 'Casey', 'Riley', 'Avery', 'Dakota'];
+  const LAST_NAMES = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez'];
+  const DOMAINS = ['gmail.com', 'yahoo.com', 'outlook.com', 'iqverse.net', 'techcorp.io'];
+  const CITIES = ['San Francisco', 'New York', 'London', 'Berlin', 'Tokyo', 'Sydney', 'Toronto', 'Paris'];
+  const ROLES = ['Admin', 'Developer', 'Designer', 'Product Owner', 'QA Engineer', 'Analyst'];
+
+  const LOREM_WORDS = [
+    'lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit', 'sed', 'do',
+    'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore', 'magna', 'aliqua', 'enim',
+    'ad', 'minim', 'veniam', 'quis', 'nostrud', 'exercitation', 'ullamco', 'laboris', 'nisi', 'aliquip',
+  ];
+
+  function getRandomItem<T>(arr: T[]): T {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function getRandomInt(min: number, max: number): number {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  const tabLoremBtn = document.getElementById('tab-lorem-btn');
+  const tabJsonBtn = document.getElementById('tab-json-btn');
+  const paneLorem = document.getElementById('pane-lorem');
+  const paneJson = document.getElementById('pane-json');
+
+  const loremType = document.getElementById('loremType') as HTMLSelectElement;
+  const loremCount = document.getElementById('loremCount') as HTMLInputElement;
+  const btnGenLorem = document.getElementById('btn-gen-lorem');
+  const loremOutField = document.getElementById('lorem-out-field');
+  const loremOutArea = document.getElementById('loremOutArea') as HTMLTextAreaElement;
+  const btnCopyLorem = document.getElementById('btn-copy-lorem');
+
+  const schemaType = document.getElementById('schemaType') as HTMLSelectElement;
+  const batchSize = document.getElementById('batchSize') as HTMLInputElement;
+  const btnGenJson = document.getElementById('btn-gen-json');
+  const jsonOutField = document.getElementById('json-out-field');
+  const jsonOutArea = document.getElementById('jsonOutArea') as HTMLTextAreaElement;
+  const btnCopyMockJson = document.getElementById('btn-copy-mock-json');
+
+  if (tabLoremBtn && tabJsonBtn && paneLorem && paneJson) {
+    tabLoremBtn.onclick = () => {
+      tabLoremBtn.className = 'sharedStyles_button sharedStyles_buttonPrimary button-primary';
+      tabJsonBtn.className = 'sharedStyles_button';
+      paneLorem.style.display = 'block';
+      paneJson.style.display = 'none';
+    };
+
+    tabJsonBtn.onclick = () => {
+      tabJsonBtn.className = 'sharedStyles_button sharedStyles_buttonPrimary button-primary';
+      tabLoremBtn.className = 'sharedStyles_button';
+      paneJson.style.display = 'block';
+      paneLorem.style.display = 'none';
+    };
+  }
+
+  function generateLorem() {
+    const type = loremType?.value || 'paragraphs';
+    const count = Math.max(1, parseInt(loremCount?.value || '3', 10));
+    let result = '';
+
+    if (type === 'words') {
+      const wordsArr = [];
+      for (let i = 0; i < count; i++) wordsArr.push(getRandomItem(LOREM_WORDS));
+      result = wordsArr.join(' ');
+    } else if (type === 'sentences') {
+      const sentencesArr = [];
+      for (let i = 0; i < count; i++) {
+        const len = getRandomInt(8, 15);
+        const words = [];
+        for (let j = 0; j < len; j++) words.push(getRandomItem(LOREM_WORDS));
+        const s = words.join(' ');
+        sentencesArr.push(s.charAt(0).toUpperCase() + s.slice(1) + '.');
+      }
+      result = sentencesArr.join(' ');
+    } else {
+      const paragraphsArr = [];
+      for (let i = 0; i < count; i++) {
+        const numSentences = getRandomInt(4, 7);
+        const sentences = [];
+        for (let s = 0; s < numSentences; s++) {
+          const len = getRandomInt(8, 15);
+          const words = [];
+          for (let j = 0; j < len; j++) words.push(getRandomItem(LOREM_WORDS));
+          const str = words.join(' ');
+          sentences.push(str.charAt(0).toUpperCase() + str.slice(1) + '.');
+        }
+        paragraphsArr.push(sentences.join(' '));
+      }
+      result = paragraphsArr.join('\n\n');
+    }
+
+    if (loremOutArea && loremOutField) {
+      loremOutArea.value = result;
+      loremOutField.style.display = 'block';
+    }
+  }
+
+  function generateJsonMock() {
+    const type = schemaType?.value || 'users';
+    const count = Math.max(1, parseInt(batchSize?.value || '5', 10));
+    const items: any[] = [];
+
+    for (let i = 1; i <= count; i++) {
+      if (type === 'users') {
+        const firstName = getRandomItem(FIRST_NAMES);
+        const lastName = getRandomItem(LAST_NAMES);
+        items.push({
+          id: `usr_${Math.random().toString(36).slice(2, 11)}`,
+          name: `${firstName} ${lastName}`,
+          email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${getRandomItem(DOMAINS)}`,
+          city: getRandomItem(CITIES),
+          role: getRandomItem(ROLES),
+          active: Math.random() > 0.2,
+          createdAt: new Date(Date.now() - getRandomInt(0, 10000000000)).toISOString(),
+        });
+      } else if (type === 'products') {
+        items.push({
+          id: `prd_${Math.random().toString(36).slice(2, 11)}`,
+          name: `Tech Widget ${getRandomInt(100, 999)}`,
+          sku: `SKU-${getRandomInt(1000, 9999)}`,
+          price: (getRandomInt(10, 500) + 0.99).toFixed(2),
+          stock: getRandomInt(0, 250),
+          category: getRandomItem(['Electronics', 'Developer Tools', 'Office', 'Software']),
+          inStock: Math.random() > 0.15,
+        });
+      } else {
+        items.push({
+          transactionId: `tx_${Math.random().toString(36).slice(2, 12)}`,
+          amount: (getRandomInt(5, 1200) + 0.5).toFixed(2),
+          currency: 'USD',
+          status: getRandomItem(['COMPLETED', 'PENDING', 'PROCESSING', 'REFUNDED']),
+          customerEmail: `${getRandomItem(FIRST_NAMES).toLowerCase()}@${getRandomItem(DOMAINS)}`,
+          timestamp: new Date(Date.now() - getRandomInt(0, 500000000)).toISOString(),
+        });
+      }
+    }
+
+    if (jsonOutArea && jsonOutField) {
+      jsonOutArea.value = JSON.stringify(items, null, 2);
+      jsonOutField.style.display = 'block';
+    }
+  }
+
+  btnGenLorem?.addEventListener('click', generateLorem);
+  btnGenJson?.addEventListener('click', generateJsonMock);
+
+  btnCopyLorem?.addEventListener('click', async () => {
+    if (loremOutArea?.value && btnCopyLorem) {
+      await navigator.clipboard.writeText(loremOutArea.value);
+      const prev = btnCopyLorem.textContent;
+      btnCopyLorem.textContent = 'Copied!';
+      setTimeout(() => (btnCopyLorem.textContent = prev), 1500);
+    }
+  });
+
+  btnCopyMockJson?.addEventListener('click', async () => {
+    if (jsonOutArea?.value && btnCopyMockJson) {
+      await navigator.clipboard.writeText(jsonOutArea.value);
+      const prev = btnCopyMockJson.textContent;
+      btnCopyMockJson.textContent = 'Copied!';
+      setTimeout(() => (btnCopyMockJson.textContent = prev), 1500);
+    }
+  });
+
+  generateLorem();
+</script>

@@ -1,0 +1,195 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+
+const DEFAULT_COOKIES = `Set-Cookie: session_id=xyz12345; Path=/; Domain=iqverse.net; Secure; HttpOnly; SameSite=Lax; Max-Age=3600\nSet-Cookie: tracking_id=abc987; Path=/; SameSite=None`;
+---
+
+<ToolLayout
+  title="Cookie & Set-Cookie Header Inspector"
+  subtitle="Inspect Flags, SameSite, Secure & HttpOnly Directives"
+  pill="BROWSER TOOLS"
+  toolSlug="cookie-inspector"
+  description="Inspect and parse HTTP Set-Cookie headers to verify security attributes like Secure, HttpOnly, SameSite, and Partitioned flags."
+>
+  <div style="max-width: 1050px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="cookieInput">
+            Paste Raw Set-Cookie Header(s)
+          </label>
+          <textarea
+            id="cookieInput"
+            class={sharedStyles.textarea}
+            rows="4"
+            placeholder="Set-Cookie: name=value; Path=/; Secure; HttpOnly..."
+          >{DEFAULT_COOKIES}</textarea>
+        </div>
+
+        <div style="margin-top: 24px;">
+          <h3 style="margin: 0 0 16px 0; font-size: 1.1rem;">
+            Parsed Cookie Directives
+          </h3>
+
+          <div id="cookies-list" style="display: flex; flex-direction: column; gap: 16px;"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  interface ParsedCookie {
+    name: string;
+    value: string;
+    domain?: string;
+    path?: string;
+    expires?: string;
+    maxAge?: string;
+    sameSite?: string;
+    secure: boolean;
+    httpOnly: boolean;
+    partitioned: boolean;
+    warnings: string[];
+  }
+
+  function parseSetCookieHeader(input: string): ParsedCookie[] {
+    const lines = input.split('\n').filter((l) => l.trim().length > 0);
+    const cookies: ParsedCookie[] = [];
+
+    lines.forEach((line) => {
+      let clean = line.trim();
+      if (clean.toLowerCase().startsWith('set-cookie:')) {
+        clean = clean.slice(11).trim();
+      }
+
+      const parts = clean.split(';').map((p) => p.trim());
+      if (parts.length === 0 || !parts[0].includes('=')) return;
+
+      const firstEq = parts[0].indexOf('=');
+      const name = parts[0].slice(0, firstEq).trim();
+      const value = parts[0].slice(firstEq + 1).trim();
+
+      let domain: string | undefined;
+      let path: string | undefined;
+      let expires: string | undefined;
+      let maxAge: string | undefined;
+      let sameSite: string | undefined;
+      let secure = false;
+      let httpOnly = false;
+      let partitioned = false;
+      const warnings: string[] = [];
+
+      for (let i = 1; i < parts.length; i++) {
+        const part = parts[i];
+        const lower = part.toLowerCase();
+        if (lower.startsWith('domain=')) domain = part.slice(7).trim();
+        else if (lower.startsWith('path=')) path = part.slice(5).trim();
+        else if (lower.startsWith('expires=')) expires = part.slice(8).trim();
+        else if (lower.startsWith('max-age=')) maxAge = part.slice(8).trim();
+        else if (lower.startsWith('samesite=')) sameSite = part.slice(9).trim();
+        else if (lower === 'secure') secure = true;
+        else if (lower === 'httponly') httpOnly = true;
+        else if (lower === 'partitioned') partitioned = true;
+      }
+
+      if (sameSite?.toLowerCase() === 'none' && !secure) {
+        warnings.push('SameSite=None requires Secure flag to prevent browser rejection.');
+      }
+      if (!httpOnly && (name.toLowerCase().includes('session') || name.toLowerCase().includes('token') || name.toLowerCase().includes('auth'))) {
+        warnings.push('Sensitive session token missing HttpOnly flag (vulnerable to XSS theft).');
+      }
+      if (!secure) {
+        warnings.push('Cookie missing Secure flag (transmitted over insecure HTTP connection).');
+      }
+
+      cookies.push({
+        name,
+        value,
+        domain,
+        path,
+        expires,
+        maxAge,
+        sameSite,
+        secure,
+        httpOnly,
+        partitioned,
+        warnings,
+      });
+    });
+
+    return cookies;
+  }
+
+  const cookieInput = document.getElementById('cookieInput') as HTMLTextAreaElement;
+  const cookiesList = document.getElementById('cookies-list');
+
+  function render() {
+    if (!cookieInput || !cookiesList) return;
+    const cookies = parseSetCookieHeader(cookieInput.value);
+
+    if (cookies.length === 0) {
+      cookiesList.innerHTML = '<div style="opacity: 0.6;">No valid Set-Cookie headers found.</div>';
+      return;
+    }
+
+    cookiesList.innerHTML = cookies
+      .map(
+        (cookie) => `
+      <div
+        style="padding: 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid ${
+          cookie.warnings.length === 0 ? 'var(--border)' : '#faad14'
+        };"
+      >
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <strong style="font-size: 1.1rem; color: #2196f3;">${cookie.name}</strong> ={' '}
+            <code style="font-family: monospace;">${cookie.value}</code>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <span
+              style="padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; background: ${
+                cookie.httpOnly ? 'rgba(76, 175, 80, 0.2)' : 'rgba(255, 255, 255, 0.1)'
+              }; color: ${cookie.httpOnly ? '#4caf50' : '#888'};"
+            >
+              HttpOnly: ${cookie.httpOnly ? 'Yes' : 'No'}
+            </span>
+            <span
+              style="padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; background: ${
+                cookie.secure ? 'rgba(76, 175, 80, 0.2)' : 'rgba(255, 255, 255, 0.1)'
+              }; color: ${cookie.secure ? '#4caf50' : '#888'};"
+            >
+              Secure: ${cookie.secure ? 'Yes' : 'No'}
+            </span>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; font-size: 0.85rem;">
+          <div>Domain: <strong>${cookie.domain || 'Unspecified'}</strong></div>
+          <div>Path: <strong>${cookie.path || '/'}</strong></div>
+          <div>SameSite: <strong>${cookie.sameSite || 'Default (Lax)'}</strong></div>
+          <div>Max-Age: <strong>${cookie.maxAge || 'Session'}</strong></div>
+        </div>
+
+        ${
+          cookie.warnings.length > 0
+            ? `
+          <div style="margin-top: 12px; padding: 8px 12px; border-radius: 4px; background: rgba(250, 173, 20, 0.1); border: 1px solid rgba(250, 173, 20, 0.3); color: #faad14; font-size: 0.85rem;">
+            <strong>Security Warnings:</strong>
+            <ul style="margin: 4px 0 0 16px; padding: 0;">
+              ${cookie.warnings.map((w) => `<li>${w}</li>`).join('')}
+            </ul>
+          </div>
+        `
+            : ''
+        }
+      </div>
+    `
+      )
+      .join('');
+  }
+
+  cookieInput?.addEventListener('input', render);
+  render();
+</script>

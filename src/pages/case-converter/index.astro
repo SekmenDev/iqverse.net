@@ -1,0 +1,121 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+---
+
+<ToolLayout
+  title="Text Case Converter"
+  subtitle="Convert camelCase, PascalCase, snake_case, kebab-case & More"
+  pill="BROWSER TOOLS"
+  toolSlug="case-converter"
+  description="Convert strings between camelCase, PascalCase, snake_case, kebab-case, CONSTANT_CASE, Title Case, and alternating case."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="caseInput">
+            Input Text
+          </label>
+          <textarea
+            id="caseInput"
+            class={sharedStyles.textarea}
+            rows="4"
+            placeholder="Type or paste text to convert..."
+          >Hello world! IQVerse developer tools</textarea>
+        </div>
+
+        <div style="margin-top: 24px;">
+          <h3 style="margin: 0 0 16px 0; font-size: 1.1rem;">Conversions</h3>
+          <div id="conversions-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  function toWords(input: string): string[] {
+    return input
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replace(/([A-Z])([A-Z][a-z])/g, '$1 $2')
+      .replace(/[^a-zA-Z0-9]+/g, ' ')
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+  }
+
+  const caseInput = document.getElementById('caseInput') as HTMLTextAreaElement;
+  const grid = document.getElementById('conversions-grid');
+
+  function renderConversions() {
+    if (!caseInput || !grid) return;
+    const input = caseInput.value;
+    const words = toWords(input);
+
+    const camelCase = words.map((w, i) => (i === 0 ? w.toLowerCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())).join('');
+    const PascalCase = words.map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join('');
+    const snake_case = words.map((w) => w.toLowerCase()).join('_');
+    const kebabCase = words.map((w) => w.toLowerCase()).join('-');
+    const CONSTANT_CASE = words.map((w) => w.toUpperCase()).join('_');
+    const TitleCase = words.map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+    const UPPERCASE = input.toUpperCase();
+    const lowercase = input.toLowerCase();
+    const dotCase = words.map((w) => w.toLowerCase()).join('.');
+    const alternatingCase = input
+      .split('')
+      .map((c, i) => (i % 2 === 0 ? c.toLowerCase() : c.toUpperCase()))
+      .join('');
+
+    const list = [
+      { label: 'camelCase', value: camelCase },
+      { label: 'PascalCase', value: PascalCase },
+      { label: 'snake_case', value: snake_case },
+      { label: 'kebab-case', value: kebabCase },
+      { label: 'CONSTANT_CASE', value: CONSTANT_CASE },
+      { label: 'Title Case', value: TitleCase },
+      { label: 'UPPERCASE', value: UPPERCASE },
+      { label: 'lowercase', value: lowercase },
+      { label: 'dot.case', value: dotCase },
+      { label: 'aLtErNaTiNg cAsE', value: alternatingCase },
+    ];
+
+    grid.innerHTML = list
+      .map(
+        (item) => `
+      <div
+        style="padding: 14px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between;"
+      >
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <span style="font-size: 0.8rem; opacity: 0.7; font-weight: 600;">${item.label}</span>
+          <button
+            type="button"
+            class="copy-case-btn"
+            data-val="${item.value.replace(/"/g, '&quot;')}"
+            style="font-size: 0.75rem; padding: 3px 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer;"
+          >
+            Copy
+          </button>
+        </div>
+        <div style="font-family: monospace; font-size: 0.9rem; word-break: break-all; color: var(--foreground, #fff);">
+          ${item.value || '<span style="opacity: 0.4;">—</span>'}
+        </div>
+      </div>
+    `
+      )
+      .join('');
+
+    document.querySelectorAll('.copy-case-btn').forEach((btn) => {
+      btn.addEventListener('click', async (e) => {
+        const val = (e.target as HTMLElement).dataset.val || '';
+        await navigator.clipboard.writeText(val);
+        const originalText = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = originalText), 1500);
+      });
+    });
+  }
+
+  caseInput?.addEventListener('input', renderConversions);
+  renderConversions();
+</script>

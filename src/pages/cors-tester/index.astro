@@ -1,0 +1,176 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+---
+
+<ToolLayout
+  title="CORS Header & Preflight Tester"
+  subtitle="Test Cross-Origin Resource Sharing Rules"
+  pill="BROWSER TOOLS"
+  toolSlug="cors-tester"
+  description="Test CORS response headers and simulate preflight OPTIONS requests to debug cross-origin API permissions."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="targetUrl">
+            Target API Endpoint URL
+          </label>
+          <input
+            id="targetUrl"
+            type="text"
+            value="https://api.github.com/zen"
+            class={sharedStyles.input}
+            placeholder="https://api.example.com/v1/resource"
+          />
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+          <div class={sharedStyles.field}>
+            <label class={sharedStyles.fieldLabel} for="reqMethod">
+              HTTP Method
+            </label>
+            <select id="reqMethod" class={sharedStyles.input}>
+              <option value="GET">GET</option>
+              <option value="POST">POST</option>
+              <option value="OPTIONS">OPTIONS (Preflight)</option>
+              <option value="PUT">PUT</option>
+              <option value="DELETE">DELETE</option>
+            </select>
+          </div>
+
+          <div class={sharedStyles.field}>
+            <label class={sharedStyles.fieldLabel} for="originHeader">
+              Simulated Origin Header
+            </label>
+            <input
+              id="originHeader"
+              type="text"
+              value="https://iqverse.net"
+              class={sharedStyles.input}
+              placeholder="https://myapp.com"
+            />
+          </div>
+        </div>
+
+        <button
+          type="button"
+          id="btn-run-cors-test"
+          class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
+        >
+          Test CORS Preflight & Headers
+        </button>
+
+        <div id="cors-error-card" class={sharedStyles.errorCard} style="margin-top: 16px; display: none;">
+          <div id="cors-error-msg" class={sharedStyles.errorMessage}></div>
+        </div>
+
+        <div id="cors-result-box" style="margin-top: 24px; padding: 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); display: none;"></div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const urlInput = document.getElementById('targetUrl') as HTMLInputElement;
+  const methodSelect = document.getElementById('reqMethod') as HTMLSelectElement;
+  const originInput = document.getElementById('originHeader') as HTMLInputElement;
+  const btnRun = document.getElementById('btn-run-cors-test');
+  const errorCard = document.getElementById('cors-error-card');
+  const errorMsg = document.getElementById('cors-error-msg');
+  const resultBox = document.getElementById('cors-result-box');
+
+  btnRun?.addEventListener('click', async () => {
+    const targetUrl = urlInput?.value.trim();
+    if (!targetUrl) return;
+
+    const requestMethod = methodSelect?.value || 'GET';
+    const originHeader = originInput?.value.trim() || 'https://iqverse.net';
+
+    if (errorCard) errorCard.style.display = 'none';
+    if (resultBox) resultBox.style.display = 'none';
+    if (btnRun) btnRun.textContent = 'Testing CORS Response...';
+
+    const notes: string[] = [];
+    let isCorsAllowed = false;
+
+    try {
+      const response = await fetch(targetUrl, {
+        method: requestMethod,
+        headers: {
+          Origin: originHeader,
+        },
+        mode: 'cors',
+      });
+
+      const allHeaders: Record<string, string> = {};
+      response.headers.forEach((val, key) => {
+        allHeaders[key.toLowerCase()] = val;
+      });
+
+      const allowedOrigin = allHeaders['access-control-allow-origin'];
+      const allowedCredentials = allHeaders['access-control-allow-credentials'];
+
+      if (allowedOrigin === '*' || allowedOrigin === originHeader) {
+        isCorsAllowed = true;
+        notes.push(`✓ Origin allowed: ${allowedOrigin}`);
+      } else if (allowedOrigin) {
+        notes.push(`✕ Origin mismatch: Server returned Access-Control-Allow-Origin: ${allowedOrigin}`);
+      } else {
+        notes.push('✕ Missing Access-Control-Allow-Origin header in response.');
+      }
+
+      if (allowedCredentials === 'true') {
+        notes.push('ℹ Access-Control-Allow-Credentials is enabled.');
+        if (allowedOrigin === '*') {
+          notes.push('⚠️ Security Warning: Wildcard (*) origin cannot be used with Credentials=true.');
+          isCorsAllowed = false;
+        }
+      }
+
+      if (resultBox) {
+        resultBox.style.border = `1px solid ${isCorsAllowed ? '#4caf50' : '#ff4d4f'}`;
+        resultBox.innerHTML = `
+          <h4 style="margin: 0 0 12px 0; color: ${isCorsAllowed ? '#4caf50' : '#ff4d4f'};">
+            ${isCorsAllowed ? '✓ CORS Allowed for Endpoint' : '✕ CORS Request Blocked or Invalid'}
+          </h4>
+
+          <div style="margin-bottom: 12px; font-size: 0.9rem;">
+            HTTP Status: <strong>${response.status} ${response.statusText}</strong>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <strong>CORS Analysis Notes:</strong>
+            <ul style="margin: 4px 0 0 18px; padding: 0;">
+              ${notes.map((n) => `<li>${n}</li>`).join('')}
+            </ul>
+          </div>
+
+          <div>
+            <h5 style="margin: 0 0 8px 0;">Received Response Headers</h5>
+            <div style="font-family: monospace; font-size: 0.85rem; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 6px;">
+              ${Object.entries(allHeaders)
+                .map(
+                  ([k, v]) => `
+                <div>
+                  <strong style="color: ${k.startsWith('access-control') ? '#4caf50' : 'inherit'};">${k}:</strong> ${v}
+                </div>
+              `
+                )
+                .join('')}
+            </div>
+          </div>
+        `;
+        resultBox.style.display = 'block';
+      }
+    } catch (err: any) {
+      if (errorCard && errorMsg) {
+        errorCard.style.display = 'block';
+        errorMsg.textContent = `CORS Request Failed: ${err.message || 'Browser blocked cross-origin fetch.'}`;
+      }
+    } finally {
+      if (btnRun) btnRun.textContent = 'Test CORS Preflight & Headers';
+    }
+  });
+</script>

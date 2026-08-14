@@ -1,0 +1,234 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+
+const INITIAL_DIRECTIVES = [
+  { name: 'default-src', self: true, unsafeInline: false, unsafeEval: false, https: false, data: false, custom: '' },
+  { name: 'script-src', self: true, unsafeInline: false, unsafeEval: false, https: false, data: false, custom: 'https://cdn.jsdelivr.net' },
+  { name: 'style-src', self: true, unsafeInline: true, unsafeEval: false, https: false, data: false, custom: 'https://fonts.googleapis.com' },
+  { name: 'img-src', self: true, unsafeInline: false, unsafeEval: false, https: true, data: true, custom: '' },
+  { name: 'connect-src', self: true, unsafeInline: false, unsafeEval: false, https: true, data: false, custom: 'https://api.iqverse.net' },
+  { name: 'font-src', self: true, unsafeInline: false, unsafeEval: false, https: false, data: true, custom: 'https://fonts.gstatic.com' },
+  { name: 'object-src', self: false, unsafeInline: false, unsafeEval: false, https: false, data: false, custom: "'none'" },
+  { name: 'base-uri', self: true, unsafeInline: false, unsafeEval: false, https: false, data: false, custom: '' },
+  { name: 'form-action', self: true, unsafeInline: false, unsafeEval: false, https: false, data: false, custom: '' },
+];
+---
+
+<ToolLayout
+  title="CSP Header Builder"
+  subtitle="Visual Content Security Policy Generator"
+  pill="SECURITY"
+  toolSlug="csp-builder"
+  description="Build and validate custom Content Security Policy (CSP) headers to defend web applications against XSS and injection attacks."
+>
+  <div style="max-width: 1100px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div style="margin-bottom: 16px;">
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 0.95rem; cursor: pointer;">
+            <input
+              id="upgrade-insecure-cb"
+              type="checkbox"
+              checked
+            />
+            <strong>Include <code>upgrade-insecure-requests</code> directive</strong>
+          </label>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-bottom: 24px;">
+          {INITIAL_DIRECTIVES.map((d) => (
+            <div
+              class="directive-card"
+              data-directive={d.name}
+              style="padding: 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);"
+            >
+              <div style="font-weight: bold; margin-bottom: 8px; color: #2196f3; font-family: monospace;">
+                {d.name}
+              </div>
+
+              <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; font-size: 0.8rem;">
+                <label style="cursor: pointer;">
+                  <input
+                    type="checkbox"
+                    class="dir-self"
+                    checked={d.self}
+                  />{' '}
+                  'self'
+                </label>
+                <label style="cursor: pointer;">
+                  <input
+                    type="checkbox"
+                    class="dir-inline"
+                    checked={d.unsafeInline}
+                  />{' '}
+                  'unsafe-inline'
+                </label>
+                <label style="cursor: pointer;">
+                  <input
+                    type="checkbox"
+                    class="dir-https"
+                    checked={d.https}
+                  />{' '}
+                  https:
+                </label>
+                <label style="cursor: pointer;">
+                  <input
+                    type="checkbox"
+                    class="dir-data"
+                    checked={d.data}
+                  />{' '}
+                  data:
+                </label>
+              </div>
+
+              <input
+                type="text"
+                class={`dir-custom ${sharedStyles.input}`}
+                value={d.custom}
+                placeholder="Custom domains or 'none'"
+                style="font-size: 0.8rem; font-family: monospace;"
+              />
+            </div>
+          ))}
+        </div>
+
+        <div id="csp-warnings-box" style="margin-bottom: 20px; padding: 12px; border-radius: 6px; background: rgba(250, 173, 20, 0.1); border: 1px solid rgba(250, 173, 20, 0.3); color: #faad14; font-size: 0.85rem;">
+          <strong>Policy Security Analysis:</strong>
+          <ul id="csp-warnings-list" style="margin: 4px 0 0 16px; padding: 0;"></ul>
+        </div>
+
+        <!-- Generated Header Output -->
+        <div class={sharedStyles.field} style="margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label class={sharedStyles.fieldLabel} for="cspHeaderOut">
+              Content-Security-Policy Header Value
+            </label>
+            <button type="button" id="btn-copy-csp-header" class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}>
+              Copy Policy Header
+            </button>
+          </div>
+          <textarea
+            id="cspHeaderOut"
+            readonly
+            class={sharedStyles.outputArea}
+            rows="4"
+            style="font-family: monospace;"
+          ></textarea>
+        </div>
+
+        <!-- HTML Meta Tag -->
+        <div class={sharedStyles.field}>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label class={sharedStyles.fieldLabel} for="cspMetaOut">
+              HTML &lt;meta&gt; Tag Snippet
+            </label>
+            <button type="button" id="btn-copy-csp-meta" class={sharedStyles.button}>
+              Copy Meta Tag
+            </button>
+          </div>
+          <textarea
+            id="cspMetaOut"
+            readonly
+            class={sharedStyles.outputArea}
+            rows="3"
+            style="font-family: monospace;"
+          ></textarea>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const upgradeCb = document.getElementById('upgrade-insecure-cb') as HTMLInputElement;
+  const cards = Array.from(document.querySelectorAll<HTMLElement>('.directive-card'));
+  const headerOut = document.getElementById('cspHeaderOut') as HTMLTextAreaElement;
+  const metaOut = document.getElementById('cspMetaOut') as HTMLTextAreaElement;
+  const warningsBox = document.getElementById('csp-warnings-box');
+  const warningsList = document.getElementById('csp-warnings-list');
+  const btnCopyHeader = document.getElementById('btn-copy-csp-header');
+  const btnCopyMeta = document.getElementById('btn-copy-csp-meta');
+
+  function updateCsp() {
+    const parts: string[] = [];
+
+    if (upgradeCb?.checked) {
+      parts.push('upgrade-insecure-requests');
+    }
+
+    const warnings: string[] = [];
+
+    cards.forEach((card) => {
+      const name = card.dataset.directive || '';
+      const selfCb = card.querySelector<HTMLInputElement>('.dir-self');
+      const inlineCb = card.querySelector<HTMLInputElement>('.dir-inline');
+      const httpsCb = card.querySelector<HTMLInputElement>('.dir-https');
+      const dataCb = card.querySelector<HTMLInputElement>('.dir-data');
+      const customInput = card.querySelector<HTMLInputElement>('.dir-custom');
+
+      const tokens: string[] = [];
+      if (selfCb?.checked) tokens.push("'self'");
+      if (inlineCb?.checked) tokens.push("'unsafe-inline'");
+      if (httpsCb?.checked) tokens.push('https:');
+      if (dataCb?.checked) tokens.push('data:');
+      if (customInput?.value.trim()) tokens.push(customInput.value.trim());
+
+      if (tokens.length > 0) {
+        parts.push(`${name} ${tokens.join(' ')}`);
+      }
+
+      if (name === 'script-src' && inlineCb?.checked) {
+        warnings.push("⚠️ 'unsafe-inline' in script-src allows inline scripts (increases vulnerability to XSS attacks).");
+      }
+      if (name === 'object-src' && customInput?.value.trim() !== "'none'") {
+        warnings.push("💡 Recommended: Set object-src to 'none' to block legacy Flash/Java plugins.");
+      }
+    });
+
+    const generated = parts.join('; ');
+    if (headerOut) headerOut.value = generated;
+    if (metaOut) metaOut.value = `<meta http-equiv="Content-Security-Policy" content="${generated}">`;
+
+    if (warningsBox && warningsList) {
+      if (warnings.length > 0) {
+        warningsBox.style.display = 'block';
+        warningsList.innerHTML = warnings.map((w) => `<li>${w}</li>`).join('');
+      } else {
+        warningsBox.style.display = 'none';
+      }
+    }
+  }
+
+  upgradeCb?.addEventListener('change', updateCsp);
+  cards.forEach((card) => {
+    card.querySelectorAll('input').forEach((input) => {
+      input.addEventListener('input', updateCsp);
+      input.addEventListener('change', updateCsp);
+    });
+  });
+
+  btnCopyHeader?.addEventListener('click', async () => {
+    if (headerOut?.value && btnCopyHeader) {
+      await navigator.clipboard.writeText(headerOut.value);
+      const prev = btnCopyHeader.textContent;
+      btnCopyHeader.textContent = 'Copied Header!';
+      setTimeout(() => {
+        btnCopyHeader.textContent = prev;
+      }, 2000);
+    }
+  });
+
+  btnCopyMeta?.addEventListener('click', async () => {
+    if (metaOut?.value && btnCopyMeta) {
+      await navigator.clipboard.writeText(metaOut.value);
+      const prev = btnCopyMeta.textContent;
+      btnCopyMeta.textContent = 'Copied Meta Tag!';
+      setTimeout(() => {
+        btnCopyMeta.textContent = prev;
+      }, 2000);
+    }
+  });
+
+  updateCsp();
+</script>

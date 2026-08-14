@@ -1,0 +1,239 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import styles from '@/styles/hacker.module.css';
+---
+
+<Layout
+  title="403 Access Denied • Intrusion Detected | Sekmen.Dev Security"
+  description="Unauthorized access probe detected. Intrusion detection active. Request logged and audited by Sekmen.Dev Security."
+  canonicalUrl="https://iqverse.net/hacker/"
+  hideDefaultFooter={true}
+>
+  <main class={styles.pageShell}>
+    <!-- CRT Display Overlay Effects -->
+    <div class={styles.crtScanline} aria-hidden="true"></div>
+    <div class={styles.crtVignette} aria-hidden="true"></div>
+
+    <!-- Accessible Heading for Screen Readers & SEO -->
+    <h1 class="sr-only">403 Access Denied • Intrusion Detected • Sekmen.Dev Security</h1>
+
+    <!-- Interactive CRT Security Terminal -->
+    <div class={styles.terminalContainer}>
+      <div class={styles.terminalHeader}>
+        <div class={styles.terminalTitle}>
+          <span class={styles.statusDot}></span>
+          SEC_AUDIT_V3.9 // INTRUSION_DETECTION_ACTIVE
+        </div>
+        <div class={styles.brandLabel}>SEKMEN.DEV SECURITY</div>
+      </div>
+
+      <div class={styles.terminalBody}>
+        <pre class={styles.asciiArt} aria-hidden="true">
+    __ __  ____ _____    ___                           ____             _          __
+   / // / / __ \__  /   /   | ______________  _____   / __ \___  ____  (_)__  ____/ /
+  / // /_/ / / //_ <   / /| |/ ___/ ___/ _ \/ ___/  / / / / _ \/ __ \/ / _ \/ __  / 
+ /__  __/ /_/ /__/ /  / ___ / /__/ /__/  __(__  )  / /_/ /  __/ / / / /  __/ /_/ /  
+   /_/  \____/____/  /_/  |_\___/\___/\___/____/  /_____/\___/_/ /_/_/\___/\__,_/   
+			  </pre>
+
+        <div class={styles.logLine}>
+          <span class={styles.prefix}>[SYSTEM]</span>
+          <span>
+            <span class={styles.alertTag}>SECURITY ALERT:</span> Unauthorized WordPress probe / hack vector detected.
+          </span>
+        </div>
+
+        <div class={styles.logLine}>
+          <span class={styles.prefix}>[TRACE]</span>
+          <span>
+            Requested Target: <span class={styles.targetPath} id="target-path">/wp-admin / wp-login.php</span>
+          </span>
+        </div>
+
+        <div class={styles.logLine}>
+          <span class={styles.prefix}>[STATUS]</span>
+          <span>
+            <span class={styles.warnTag}>HTTP 403 ACCESS DENIED.</span> Nice try, hacker! 😉
+          </span>
+        </div>
+
+        <div class={styles.logLine} style="margin-top: 8px;">
+          <span class={styles.prefix}>[ANALYSIS]</span>
+          <span>Looking for vulnerable, unpatched WordPress plugins, admin backdoors, or open secrets?</span>
+        </div>
+
+        <div class={styles.logLine}>
+          <span class={styles.prefix}>[FACT]</span>
+          <span>
+            Sekmen.Dev & IQVerse build custom, secure web applications & tools from scratch to production — with zero PHP bloat, full change tracking, automated backups, and 100% reversibility.
+          </span>
+        </div>
+
+        <div class={styles.metaInfo} id="meta-session">
+          <span id="session-ref">Session Ref: SEC-AUDIT-3.9-LOGGED</span> • <span id="logged-at">Logged At: </span>
+        </div>
+
+        <div class={styles.commandPrompt}>
+          <div class={styles.promptText}>
+            <span class={styles.prefix}>sekmen@studio:~$</span> Choose your next command:<span class={styles.cursor}></span>
+          </div>
+
+          <div class={styles.actionsGrid}>
+            <a
+              href="https://sekmen.dev/wordpress/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class={`${styles.actionBtn} ${styles.primary}`}
+            >
+              <span>[1] View WordPress Services</span>
+              <span aria-hidden="true">→</span>
+            </a>
+            <a
+              href="https://sekmen.dev/contact/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class={styles.actionBtn}
+            >
+              <span>[2] Contact Security Team</span>
+              <span aria-hidden="true">→</span>
+            </a>
+            <a href="/" class={styles.actionBtn}>
+              <span>[3] Explore IQVerse Tools</span>
+              <span aria-hidden="true">→</span>
+            </a>
+            <a href="/headers/" class={styles.actionBtn}>
+              <span>[4] Scan Site Headers</span>
+              <span aria-hidden="true">→</span>
+            </a>
+          </div>
+
+          <!-- Interactive Shell Input -->
+          <form id="terminal-form" class={styles.cliContainer}>
+            <span class={styles.cliPrompt}>sekmen@iqverse:~$</span>
+            <input
+              id="cli-input"
+              type="text"
+              placeholder="Type 'help', 'scan', 'whoami', 'tools'..."
+              class={styles.cliInput}
+              aria-label="Terminal command input"
+              autocomplete="off"
+            />
+          </form>
+
+          <div id="cli-output" class={styles.cliOutput}></div>
+        </div>
+      </div>
+    </div>
+
+    <footer class={styles.footerNote}>
+      © Sekmen.Dev Security Operations • Session Logged &amp; Audited •{' '}
+      <a href="https://sekmen.dev/" target="_blank" rel="noopener noreferrer">
+        Sekmen.Dev
+      </a>
+    </footer>
+  </main>
+</Layout>
+
+<script>
+  let targetPath = '/wp-admin / wp-login.php';
+  const randomHex = Math.random().toString(36).substring(2, 8).toUpperCase();
+  const sessionId = `SEC-ID-${randomHex}`;
+  const timestamp = new Date().toUTCString();
+
+  const targetPathEl = document.getElementById('target-path');
+  const sessionRefEl = document.getElementById('session-ref');
+  const loggedAtEl = document.getElementById('logged-at');
+  const form = document.getElementById('terminal-form') as HTMLFormElement | null;
+  const input = document.getElementById('cli-input') as HTMLInputElement | null;
+  const output = document.getElementById('cli-output');
+
+  if (targetPathEl) {
+    const params = new URLSearchParams(window.location.search);
+    const targetParam = params.get('target') || params.get('path') || params.get('url');
+    if (targetParam) {
+      targetPath = targetParam;
+    } else if (window.location.pathname && window.location.pathname !== '/hacker/' && window.location.pathname !== '/hacker') {
+      targetPath = window.location.pathname;
+    } else if (document.referrer) {
+      try {
+        const refUrl = new URL(document.referrer);
+        targetPath = refUrl.pathname;
+      } catch {}
+    }
+    targetPathEl.textContent = targetPath;
+  }
+
+  if (sessionRefEl) sessionRefEl.textContent = `Session Ref: ${sessionId}`;
+  if (loggedAtEl) loggedAtEl.textContent = `Logged At: ${timestamp}`;
+
+  if (form && input && output) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const cmd = input.value.trim().toLowerCase();
+      if (!cmd) return;
+
+      let response = '';
+      switch (cmd) {
+        case 'help':
+          response = `Available commands:
+• scan     - Run simulated client vulnerability scan
+• whoami   - Display client browser & session details
+• tools    - List free IQVerse developer & security tools
+• matrix   - Stream cyber matrix rain ASCII
+• clear    - Clear terminal output buffer
+• home     - Navigate back to home page`;
+          break;
+        case 'whoami':
+          response = `[IDENTITY] User-Agent: ${navigator.userAgent}
+[SESSION] Token: ${sessionId}
+[STATUS] Flagged as Security Probe • Action Logged`;
+          break;
+        case 'scan':
+          response = `[SCANNING...]
+[✓] Checking target ${targetPath}
+[✓] Checking WordPress admin backdoors... None found (Serverless static runtime)
+[✓] Checking SQL injection vulnerability... Protected (No database backend)
+[✓] Security score: 100/100 • Zero surface area.`;
+          break;
+        case 'tools':
+          response = `[IQVERSE DEV & SECURITY TOOLS]
+• HeaderScan      - /headers/
+• Link Radar      - /linkradar/
+• AI Agent Scan   - /agentscan/
+• SSL Inspector   - /ssl-inspector/
+• Password Gen    - /password/`;
+          break;
+        case 'matrix':
+          response = `01001001 01010001 01010110 01000101 01010010 01010011 01000101
+███████████████████████████████████████████████████████
+WAKE UP HACKER... THE MATRIX HAS YOU...
+NO BACKDOORS HERE. ONLY SERIOUS PERFORMANCE & SECURITY.`;
+          break;
+        case 'clear':
+          output.innerHTML = '';
+          input.value = '';
+          return;
+        case 'home':
+        case 'exit':
+          window.location.href = '/';
+          return;
+        default:
+          response = `Command not recognized: '${cmd}'. Type 'help' for command list.`;
+      }
+
+      const lineUser = document.createElement('div');
+      lineUser.textContent = `sekmen@iqverse:~$ ${input.value}`;
+      lineUser.style.color = '#38bdf8';
+
+      const lineResp = document.createElement('pre');
+      lineResp.textContent = response;
+      lineResp.style.whiteSpace = 'pre-wrap';
+      lineResp.style.marginTop = '4px';
+      lineResp.style.marginBottom = '8px';
+
+      output.appendChild(lineUser);
+      output.appendChild(lineResp);
+      input.value = '';
+    });
+  }
+</script>

@@ -1,4 +1,4 @@
-import { tools, Tool } from './tools';
+import { tools, type Tool } from './tools';
 
 // Utility functions
 function normalizeUrl(path?: string): string {
@@ -69,7 +69,7 @@ export function getSoftwareSourceCodeJsonLd() {
     '@type': 'SoftwareSourceCode',
     name: 'IQVerse',
     codeRepository: 'https://github.com/SekmenDev/iqverse.net',
-    programmingLanguage: ['TypeScript', 'Next.js', 'React', 'HTML5', 'CSS3'],
+    programmingLanguage: ['TypeScript', 'Astro', 'HTML5', 'CSS3'],
     license: 'https://github.com/SekmenDev/iqverse.net/blob/main/LICENSE',
     author: {
       '@type': 'Organization',

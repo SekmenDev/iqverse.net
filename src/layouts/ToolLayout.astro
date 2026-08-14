@@ -1,0 +1,91 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import ThemeToggle from '@/components/ThemeToggle.astro';
+import { getToolJsonLd } from '@/lib/jsonld';
+import { tools } from '@/lib/tools';
+import styles from '@/styles/tool-layout.module.css';
+
+export interface Props {
+  title: string;
+  subtitle?: string;
+  description?: string;
+  pill?: string;
+  toolSlug?: string;
+}
+
+const {
+  title,
+  subtitle,
+  description = '',
+  pill = 'TOOL',
+  toolSlug,
+} = Astro.props;
+
+const initial = title.trim().charAt(0).toUpperCase() || 'T';
+const matchedTool = tools.find(t => t.name.toLowerCase() === title.toLowerCase()) || (toolSlug ? tools.find(t => t.url.includes(toolSlug)) : undefined);
+const slug = toolSlug || matchedTool?.url.replace(/\//g, '') || title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+const jsonLdData = getToolJsonLd(title, description, `/${slug}/`, matchedTool?.cat);
+const canonicalUrl = `https://iqverse.net/${slug}/`;
+const pageTitle = subtitle ? `${title} • ${subtitle} | IQVerse` : `${title} | IQVerse`;
+---
+
+<Layout
+  title={pageTitle}
+  description={description}
+  canonicalUrl={canonicalUrl}
+  jsonLd={jsonLdData}
+>
+  <main class={styles.page}>
+    <nav class={styles.topNav}>
+      <a class={styles.navLogo} href="/">
+        <ThemeToggle />
+        <span>IQVerse</span>
+      </a>
+
+      <div class={styles.navBreadcrumb}>
+        <span>Tools</span>
+        <span class={styles.sep}>/</span>
+        <span class={styles.current}>{title}</span>
+      </div>
+
+      <div class={styles.navRight}>
+        <a href="/">Home</a>
+        <a href="https://github.com/SekmenDev/iqverse.net" target="_blank" rel="noreferrer">
+          Source
+        </a>
+      </div>
+    </nav>
+
+    <section class={styles.header}>
+      <div class={styles.headerInner}>
+        <div class={styles.headerIcon} aria-hidden="true">
+          {initial}
+        </div>
+
+        <div class={styles.headerText}>
+          <div class={styles.headerMeta}>
+            {pill && <span class={styles.pill}>{pill}</span>}
+            <span class={`${styles.badge} ${styles.badgeLive}`}>Open source</span>
+          </div>
+
+          <h1 class={styles.title}>
+            {title}
+            {subtitle && <span class={styles.titleEm}> {subtitle}</span>}
+          </h1>
+
+          {description && <p class={styles.description}>{description}</p>}
+
+          <div class={styles.headerActions}>
+            <a class={`${styles.btn} ${styles.btnGhost}`} href="/">
+              Back home
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class={styles.content}>
+      <slot />
+    </section>
+  </main>
+</Layout>

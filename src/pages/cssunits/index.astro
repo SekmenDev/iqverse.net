@@ -1,0 +1,118 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+
+const units = ['px', 'rem', 'em', 'vh', 'vw', '%'];
+---
+
+<ToolLayout
+  title="CSS Units Converter"
+  subtitle="Convert Pixels (px), rem, em, vh, vw & %"
+  pill="DESIGN"
+  toolSlug="cssunits"
+  description="Convert CSS units between pixels (px), rem, em, viewports (vw/vh), and percentages with live responsive preview."
+>
+  <div style="max-width: 900px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.sectionLabel}>Converter</div>
+      <div class={sharedStyles.card}>
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="cssValue">Value</label>
+          <input
+            id="cssValue"
+            type="number"
+            value="16"
+            class={sharedStyles.input}
+          />
+        </div>
+
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="cssFrom">From Unit</label>
+          <select id="cssFrom">
+            {units.map((unit) => (
+              <option value={unit} selected={unit === 'px'}>
+                {unit}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="cssTo">To Unit</label>
+          <select id="cssTo">
+            {units.map((unit) => (
+              <option value={unit} selected={unit === 'rem'}>
+                {unit}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="cssRoot">Root Font Size (px)</label>
+          <input
+            id="cssRoot"
+            type="number"
+            value="16"
+            class={sharedStyles.input}
+          />
+        </div>
+
+        <div class={sharedStyles.sectionLabel} style="margin-top: 24px;">Result</div>
+        <div class={sharedStyles.successCard}>
+          <div id="css-unit-result" class={sharedStyles.successMessage}>1.000rem</div>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  type Unit = 'px' | 'rem' | 'em' | 'vh' | 'vw' | '%';
+
+  function convertValue(value: number, from: Unit, to: Unit, rootFontSize: number): number {
+    const viewportWidth = window.innerWidth || 1000;
+    const viewportHeight = window.innerHeight || 800;
+
+    let toPx = value;
+    if (from === 'rem' || from === 'em') toPx = value * rootFontSize;
+    else if (from === 'vh') toPx = value * (viewportHeight / 100);
+    else if (from === 'vw') toPx = value * (viewportWidth / 100);
+    else if (from === '%') toPx = value * 0.01 * viewportWidth;
+
+    if (to === 'rem' || to === 'em') return toPx / rootFontSize;
+    if (to === 'vh') return (toPx / viewportHeight) * 100;
+    if (to === 'vw') return (toPx / viewportWidth) * 100;
+    if (to === '%') return (toPx / viewportWidth) * 100;
+    return toPx;
+  }
+
+  const valInput = document.getElementById('cssValue') as HTMLInputElement;
+  const fromSelect = document.getElementById('cssFrom') as HTMLSelectElement;
+  const toSelect = document.getElementById('cssTo') as HTMLSelectElement;
+  const rootInput = document.getElementById('cssRoot') as HTMLInputElement;
+  const resultEl = document.getElementById('css-unit-result');
+
+  function update() {
+    if (!resultEl) return;
+    const val = Number(valInput?.value || 0);
+    const root = Number(rootInput?.value || 16);
+    const fromUnit = (fromSelect?.value || 'px') as Unit;
+    const toUnit = (toSelect?.value || 'rem') as Unit;
+
+    if (isNaN(val)) {
+      resultEl.textContent = 'Please enter a valid number.';
+      return;
+    }
+    if (isNaN(root) || root <= 0) {
+      resultEl.textContent = 'Root font size must be positive.';
+      return;
+    }
+
+    const converted = convertValue(val, fromUnit, toUnit, root);
+    resultEl.textContent = `${converted.toFixed(3)}${toUnit}`;
+  }
+
+  [valInput, fromSelect, toSelect, rootInput].forEach((el) => el?.addEventListener('input', update));
+  update();
+</script>

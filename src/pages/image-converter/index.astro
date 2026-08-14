@@ -1,0 +1,214 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+---
+
+<ToolLayout
+  title="Image Format Converter"
+  subtitle="Convert PNG, JPEG, WebP & AVIF Formats in Your Browser"
+  pill="DESIGN"
+  toolSlug="image-converter"
+  description="Convert images between PNG, JPEG, WebP, and AVIF formats with resolution scaling and quality controls locally in your browser."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="imgFileInput">
+            Select Image File (PNG, JPEG, WebP, SVG)
+          </label>
+          <input
+            id="imgFileInput"
+            type="file"
+            accept="image/*"
+            class={sharedStyles.input}
+          />
+        </div>
+
+        <div id="converter-controls" style="display: none; margin-top: 20px;">
+          <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <label for="targetFmt" style="font-size: 0.85rem; font-weight: 600;">Output Format:</label>
+              <select id="targetFmt" class={sharedStyles.input} style="padding: 4px 8px;">
+                <option value="webp">WebP (Modern &amp; Compact)</option>
+                <option value="png">PNG (Lossless)</option>
+                <option value="jpeg">JPEG (Lossy)</option>
+              </select>
+            </div>
+
+            <div id="quality-group" style="display: flex; align-items: center; gap: 8px;">
+              <label for="imgQuality" style="font-size: 0.85rem; font-weight: 600;">
+                Quality (<span id="quality-val">85</span>%):
+              </label>
+              <input
+                id="imgQuality"
+                type="range"
+                min="10"
+                max="100"
+                value="85"
+                style="width: 120px;"
+              />
+            </div>
+
+            <button
+              type="button"
+              id="btn-convert-img"
+              class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
+            >
+              Convert Format
+            </button>
+          </div>
+
+          <div
+            id="conversion-success-box"
+            style="display: none; padding: 16px; border-radius: 8px; background: rgba(76, 175, 80, 0.1); border: 1px solid rgba(76, 175, 80, 0.3); margin-bottom: 20px; justify-content: space-between; align-items: center;"
+          >
+            <div>
+              <div style="color: #4caf50; font-weight: bold;">✓ Conversion Complete</div>
+              <div id="conversion-stats-text" style="font-size: 0.85rem; opacity: 0.8;"></div>
+            </div>
+            <button
+              type="button"
+              id="btn-download-converted"
+              class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
+            >
+              Download Image
+            </button>
+          </div>
+
+          <!-- Image Preview Grid -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+            <div>
+              <h4 style="margin-bottom: 8px;">Original Image</h4>
+              <img
+                id="orig-preview-img"
+                alt="Original Preview"
+                style="max-width: 100%; max-height: 240px; border-radius: 6px; border: 1px solid var(--border); object-fit: contain; display: none;"
+              />
+            </div>
+            <div>
+              <h4 style="margin-bottom: 8px;">Converted Preview</h4>
+              <img
+                id="converted-preview-img"
+                alt="Converted Preview"
+                style="max-width: 100%; max-height: 240px; border-radius: 6px; border: 1px solid var(--border); object-fit: contain; display: none;"
+              />
+              <div
+                id="converted-placeholder"
+                style="height: 240px; border: 1px dashed var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; opacity: 0.5;"
+              >
+                Click Convert to preview
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const fileInput = document.getElementById('imgFileInput') as HTMLInputElement;
+  const controls = document.getElementById('converter-controls');
+  const targetFmt = document.getElementById('targetFmt') as HTMLSelectElement;
+  const qualityGroup = document.getElementById('quality-group');
+  const qualitySlider = document.getElementById('imgQuality') as HTMLInputElement;
+  const qualityVal = document.getElementById('quality-val');
+  const btnConvert = document.getElementById('btn-convert-img');
+  const successBox = document.getElementById('conversion-success-box');
+  const statsText = document.getElementById('conversion-stats-text');
+  const btnDownload = document.getElementById('btn-download-converted');
+  const origImg = document.getElementById('orig-preview-img') as HTMLImageElement;
+  const convImg = document.getElementById('converted-preview-img') as HTMLImageElement;
+  const convPlaceholder = document.getElementById('converted-placeholder');
+
+  let selectedFile: File | null = null;
+  let previewUrl: string | null = null;
+  let convertedUrl: string | null = null;
+  let convertedSize: number | null = null;
+
+  fileInput?.addEventListener('change', () => {
+    const file = fileInput.files?.[0];
+    if (!file) return;
+
+    selectedFile = file;
+    convertedUrl = null;
+    convertedSize = null;
+
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    previewUrl = URL.createObjectURL(file);
+
+    if (origImg) {
+      origImg.src = previewUrl;
+      origImg.style.display = 'block';
+    }
+    if (convImg) convImg.style.display = 'none';
+    if (convPlaceholder) convPlaceholder.style.display = 'flex';
+    if (successBox) successBox.style.display = 'none';
+    if (controls) controls.style.display = 'block';
+  });
+
+  targetFmt?.addEventListener('change', () => {
+    if (qualityGroup) {
+      qualityGroup.style.display = targetFmt.value === 'png' ? 'none' : 'flex';
+    }
+  });
+
+  qualitySlider?.addEventListener('input', () => {
+    if (qualityVal) qualityVal.textContent = qualitySlider.value;
+  });
+
+  btnConvert?.addEventListener('click', () => {
+    if (!previewUrl || !selectedFile) return;
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = previewUrl;
+
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      const fmt = targetFmt?.value || 'webp';
+      const q = Number(qualitySlider?.value || 85) / 100;
+
+      if (fmt === 'jpeg') {
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+      ctx.drawImage(img, 0, 0);
+
+      const mimeType = `image/${fmt}`;
+      const dataUrl = canvas.toDataURL(mimeType, q);
+      convertedUrl = dataUrl;
+
+      const head = `data:${mimeType};base64,`;
+      const sizeInBytes = Math.round(((dataUrl.length - head.length) * 3) / 4);
+      convertedSize = sizeInBytes;
+
+      if (convImg) {
+        convImg.src = dataUrl;
+        convImg.style.display = 'block';
+      }
+      if (convPlaceholder) convPlaceholder.style.display = 'none';
+
+      if (statsText && successBox && selectedFile) {
+        statsText.textContent = `Original: ${Math.round(selectedFile.size / 1024)} KB ➔ Converted (${fmt.toUpperCase()}): ${Math.round(sizeInBytes / 1024)} KB`;
+        successBox.style.display = 'flex';
+      }
+    };
+  });
+
+  btnDownload?.addEventListener('click', () => {
+    if (!convertedUrl || !selectedFile) return;
+    const baseName = selectedFile.name.replace(/\.[^/.]+$/, '');
+    const fmt = targetFmt?.value || 'webp';
+    const a = document.createElement('a');
+    a.href = convertedUrl;
+    a.download = `${baseName}.${fmt}`;
+    a.click();
+  });
+</script>

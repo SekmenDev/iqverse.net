@@ -1,0 +1,162 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+
+const options = [
+  { value: 'g', label: 'Global' },
+  { value: 'i', label: 'Ignore Case' },
+  { value: 'm', label: 'Multiline' },
+  { value: 's', label: 'Dot All' },
+  { value: 'u', label: 'Unicode' },
+  { value: 'y', label: 'Sticky' },
+];
+---
+
+<ToolLayout
+  title="RegEx Forge"
+  subtitle="Regular Expression Tester & Builder"
+  pill="BROWSER TOOLS"
+  toolSlug="regex"
+  description="Build, test, and debug regular expressions online with real-time string matching, group syntax highlighting, and pattern explanations."
+>
+  <div class="tool-panel">
+    <div class="tool-grid">
+      <section class="tool-form card">
+        <div class="section-header">
+          <h2>Regex Tester</h2>
+          <p>Write a pattern, pick flags and test it against sample text.</p>
+        </div>
+
+        <div class="field-group">
+          <label for="regex-pattern">Pattern</label>
+          <input
+            id="regex-pattern"
+            value="https?://[^\s]+"
+            placeholder="Enter regular expression pattern"
+          />
+        </div>
+
+        <div class="field-group">
+          <label for="flag-g">Flags</label>
+          <div class="select-group wrap">
+            {options.map((option) => (
+              <label for={`flag-${option.value}`} class="checkbox-pill">
+                <input
+                  id={`flag-${option.value}`}
+                  type="checkbox"
+                  class="flag-checkbox"
+                  value={option.value}
+                  checked={option.value === 'g'}
+                />
+                {option.label}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="regex-input">Test text</label>
+          <textarea
+            id="regex-input"
+            rows="6"
+          >https://example.com&#10;http://test.dev</textarea>
+        </div>
+
+        <div class="field-group">
+          <label for="regex-replacement">Replacement</label>
+          <input
+            id="regex-replacement"
+            value="[$&]"
+            placeholder="Replacement text"
+          />
+        </div>
+      </section>
+
+      <section class="tool-preview card">
+        <div class="section-header">
+          <h2>Results</h2>
+          <p>Matches, details and replacement output.</p>
+        </div>
+
+        <div class="match-summary">
+          <p>
+            <strong>Valid pattern:</strong>{' '}
+            <span id="regex-valid-status">Yes</span>
+          </p>
+          <p>
+            <strong>Matches found:</strong> <span id="regex-matches-count">0</span>
+          </p>
+        </div>
+
+        <div class="result-block">
+          <div>
+            <h3>Matches</h3>
+            <pre id="regex-matches-output"></pre>
+          </div>
+          <div>
+            <h3>Replacement</h3>
+            <pre id="regex-replacement-output"></pre>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  import { safeRegExp } from '@/lib/utils';
+
+  const patternInput = document.getElementById('regex-pattern') as HTMLInputElement;
+  const flagCheckboxes = document.querySelectorAll<HTMLInputElement>('.flag-checkbox');
+  const textInput = document.getElementById('regex-input') as HTMLTextAreaElement;
+  const replacementInput = document.getElementById('regex-replacement') as HTMLInputElement;
+
+  const validStatus = document.getElementById('regex-valid-status');
+  const countEl = document.getElementById('regex-matches-count');
+  const matchesOut = document.getElementById('regex-matches-output');
+  const replacementOut = document.getElementById('regex-replacement-output');
+
+  function updateRegex() {
+    const pattern = patternInput?.value || '';
+    let flags = '';
+    flagCheckboxes.forEach((cb) => {
+      if (cb.checked) flags += cb.value;
+    });
+
+    const input = textInput?.value || '';
+    const replacement = replacementInput?.value || '';
+
+    const regex = safeRegExp(pattern, flags);
+
+    if (validStatus) validStatus.textContent = regex ? 'Yes' : 'No';
+
+    if (!regex) {
+      if (countEl) countEl.textContent = '0';
+      if (matchesOut) matchesOut.textContent = 'Invalid regex pattern';
+      if (replacementOut) replacementOut.textContent = 'Invalid regex pattern';
+      return;
+    }
+
+    try {
+      const matches = Array.from(input.matchAll(regex));
+      if (countEl) countEl.textContent = String(matches.length);
+      if (matchesOut) {
+        matchesOut.textContent = matches.length > 0
+          ? matches.map((m, idx) => `${idx + 1}. ${JSON.stringify(m[0])} (Index: ${m.index})`).join('\n')
+          : 'No matches found.';
+      }
+      if (replacementOut) {
+        replacementOut.textContent = input.replace(regex, replacement);
+      }
+    } catch (err: any) {
+      if (matchesOut) matchesOut.textContent = err.message;
+      if (replacementOut) replacementOut.textContent = err.message;
+    }
+  }
+
+  patternInput?.addEventListener('input', updateRegex);
+  flagCheckboxes.forEach((cb) => cb.addEventListener('change', updateRegex));
+  textInput?.addEventListener('input', updateRegex);
+  replacementInput?.addEventListener('input', updateRegex);
+
+  updateRegex();
+</script>

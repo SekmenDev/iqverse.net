@@ -1,0 +1,275 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+
+const DEFAULT_MARKDOWN = `# Welcome to Markdown Previewer
+
+IQVerse tools run **100% locally** in your browser.
+
+## Features
+
+- **Live HTML Preview**: Real-time rendering as you type.
+- *Full Markdown Support*: Headings, lists, code blocks, tables, blockquotes.
+- Statistics: Live word count, character count and reading time.
+
+### Code Example
+
+\`\`\`typescript
+const hello = (name: string): string => {
+  return \`Hello, \${name}!\`;
+};
+\`\`\`
+
+> "Simplicity is prerequisite for reliability." — Edsger W. Dijkstra
+
+| Feature | Support |
+| :--- | :--- |
+| Privacy | 100% Client-side |
+| Speed | Instant |
+
+- [x] Fast rendering
+- [x] Clean UI
+`;
+---
+
+<ToolLayout
+  title="Markdown Previewer"
+  subtitle="Live Markdown Editor & HTML Converter"
+  pill="BROWSER TOOLS"
+  toolSlug="markdown-preview"
+  description="Write and preview Markdown with real-time HTML rendering, syntax highlighting, GitHub Flavored Markdown support, and file export."
+>
+  <div style="max-width: 1100px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;">
+          <div style="display: flex; gap: 8px;">
+            <button
+              type="button"
+              id="btn-mode-split"
+              class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
+            >
+              Split Mode
+            </button>
+            <button
+              type="button"
+              id="btn-mode-preview"
+              class={sharedStyles.button}
+            >
+              Preview Only
+            </button>
+            <button
+              type="button"
+              id="btn-mode-html"
+              class={sharedStyles.button}
+            >
+              Raw HTML
+            </button>
+          </div>
+
+          <div style="margin-left: auto; display: flex; gap: 12px; font-size: 0.85rem; opacity: 0.8;">
+            <span>Words: <strong id="md-words-count">0</strong></span>
+            <span>Characters: <strong id="md-chars-count">0</strong></span>
+            <span>Reading Time: <strong id="md-read-time">~1 min</strong></span>
+          </div>
+        </div>
+
+        <div
+          id="md-editor-layout"
+          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;"
+        >
+          <!-- Markdown Editor Source -->
+          <div id="col-editor" class={sharedStyles.field}>
+            <label class={sharedStyles.fieldLabel} for="mdEditor">
+              Markdown Source
+            </label>
+            <textarea
+              id="mdEditor"
+              class={sharedStyles.textarea}
+              rows="16"
+              style="font-family: monospace; font-size: 0.9rem;"
+            >{DEFAULT_MARKDOWN}</textarea>
+          </div>
+
+          <!-- HTML Code View -->
+          <div id="col-html" class={sharedStyles.field} style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <label class={sharedStyles.fieldLabel} for="htmlOutput">
+                Generated HTML Code
+              </label>
+              <button type="button" id="btn-copy-html-code" class={sharedStyles.button}>
+                Copy HTML
+              </button>
+            </div>
+            <textarea
+              id="htmlOutput"
+              readonly
+              class={sharedStyles.outputArea}
+              rows="16"
+            ></textarea>
+          </div>
+
+          <!-- Live Rendered Preview -->
+          <div id="col-preview" class={sharedStyles.field}>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <label class={sharedStyles.fieldLabel}>Rendered Live Preview</label>
+              <button type="button" id="btn-download-md" class={sharedStyles.button}>
+                Download .md
+              </button>
+            </div>
+            <div
+              id="rendered-preview-box"
+              class={sharedStyles.outputArea}
+              style="min-height: 320px; max-height: 500px; overflow-y: auto; background: rgba(0, 0, 0, 0.2); padding: 16px;"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  function markdownToHtml(md: string): string {
+    let html = md;
+    html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    // Fenced Code Blocks
+    html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
+      return `<pre style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px; overflow-x: auto; margin: 12px 0;"><code class="language-${lang}">${code.trim()}</code></pre>`;
+    });
+
+    // Inline Code
+    html = html.replace(/`([^`]+)`/g, '<code style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">$1</code>');
+
+    // Headings
+    html = html.replace(/^### (.*$)/gim, '<h3 style="margin-top: 16px; margin-bottom: 8px;">$1</h3>');
+    html = html.replace(/^## (.*$)/gim, '<h2 style="margin-top: 20px; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px;">$1</h2>');
+    html = html.replace(/^# (.*$)/gim, '<h1 style="margin-top: 24px; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 6px;">$1</h1>');
+
+    // Blockquotes
+    html = html.replace(/^&gt;\s?(.*$)/gim, '<blockquote style="border-left: 4px solid var(--accent); margin: 12px 0; padding-left: 12px; opacity: 0.9;">$1</blockquote>');
+
+    // Bold & Italic
+    html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+
+    // Task lists & unordered lists
+    html = html.replace(/^-\s*\[x\]\s*(.*$)/gim, '<li style="list-style: none;">☑ $1</li>');
+    html = html.replace(/^-\s*\[\s*\]\s*(.*$)/gim, '<li style="list-style: none;">☐ $1</li>');
+    html = html.replace(/^-\s*(.*$)/gim, '<li>$1</li>');
+
+    // Paragraphs
+    html = html
+      .split(/\n\n+/)
+      .map((p) => {
+        const trimmed = p.trim();
+        if (
+          trimmed.startsWith('<h') ||
+          trimmed.startsWith('<pre') ||
+          trimmed.startsWith('<blockquote') ||
+          trimmed.startsWith('<li')
+        ) {
+          return trimmed;
+        }
+        return `<p style="margin-bottom: 12px; line-height: 1.6;">${trimmed.replace(/\n/g, '<br/>')}</p>`;
+      })
+      .join('\n');
+
+    return html;
+  }
+
+  const editor = document.getElementById('mdEditor') as HTMLTextAreaElement;
+  const htmlOut = document.getElementById('htmlOutput') as HTMLTextAreaElement;
+  const previewBox = document.getElementById('rendered-preview-box');
+  const wordsEl = document.getElementById('md-words-count');
+  const charsEl = document.getElementById('md-chars-count');
+  const readTimeEl = document.getElementById('md-read-time');
+
+  const btnSplit = document.getElementById('btn-mode-split');
+  const btnPreview = document.getElementById('btn-mode-preview');
+  const btnHtml = document.getElementById('btn-mode-html');
+  const btnCopyHtml = document.getElementById('btn-copy-html-code');
+  const btnDownloadMd = document.getElementById('btn-download-md');
+
+  const colEditor = document.getElementById('col-editor');
+  const colHtml = document.getElementById('col-html');
+  const colPreview = document.getElementById('col-preview');
+
+  let mode: 'split' | 'preview' | 'html' = 'split';
+
+  if (btnSplit && btnPreview && btnHtml) {
+    btnSplit.onclick = () => {
+      mode = 'split';
+      btnSplit.className = 'sharedStyles_button sharedStyles_buttonPrimary button-primary';
+      btnPreview.className = 'sharedStyles_button';
+      btnHtml.className = 'sharedStyles_button';
+      if (colEditor) colEditor.style.display = 'block';
+      if (colHtml) colHtml.style.display = 'none';
+      if (colPreview) colPreview.style.display = 'block';
+    };
+
+    btnPreview.onclick = () => {
+      mode = 'preview';
+      btnPreview.className = 'sharedStyles_button sharedStyles_buttonPrimary button-primary';
+      btnSplit.className = 'sharedStyles_button';
+      btnHtml.className = 'sharedStyles_button';
+      if (colEditor) colEditor.style.display = 'none';
+      if (colHtml) colHtml.style.display = 'none';
+      if (colPreview) colPreview.style.display = 'block';
+    };
+
+    btnHtml.onclick = () => {
+      mode = 'html';
+      btnHtml.className = 'sharedStyles_button sharedStyles_buttonPrimary button-primary';
+      btnSplit.className = 'sharedStyles_button';
+      btnPreview.className = 'sharedStyles_button';
+      if (colEditor) colEditor.style.display = 'none';
+      if (colHtml) colHtml.style.display = 'block';
+      if (colPreview) colPreview.style.display = 'none';
+    };
+  }
+
+  function update() {
+    if (!editor) return;
+    const text = editor.value;
+    const html = markdownToHtml(text);
+
+    if (htmlOut) htmlOut.value = html;
+    if (previewBox) previewBox.innerHTML = html;
+
+    const chars = text.length;
+    const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+    const readTime = Math.max(1, Math.ceil(words / 200));
+
+    if (charsEl) charsEl.textContent = String(chars);
+    if (wordsEl) wordsEl.textContent = String(words);
+    if (readTimeEl) readTimeEl.textContent = `~${readTime} min`;
+  }
+
+  editor?.addEventListener('input', update);
+
+  btnCopyHtml?.addEventListener('click', async () => {
+    if (htmlOut?.value && btnCopyHtml) {
+      await navigator.clipboard.writeText(htmlOut.value);
+      const prev = btnCopyHtml.textContent;
+      btnCopyHtml.textContent = 'Copied!';
+      setTimeout(() => {
+        btnCopyHtml.textContent = prev;
+      }, 1500);
+    }
+  });
+
+  btnDownloadMd?.addEventListener('click', () => {
+    if (!editor) return;
+    const blob = new Blob([editor.value], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'document.md';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  update();
+</script>

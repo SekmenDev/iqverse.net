@@ -1,0 +1,205 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+---
+
+<ToolLayout
+  title="WHOIS & RDAP Lookup"
+  subtitle="Query Domain Registrar, Expiration Dates, DNSSEC & Nameservers"
+  pill="NETWORK"
+  toolSlug="whois-lookup"
+  description="Query domain WHOIS and RDAP records to inspect registration status, domain registrar, nameservers, and expiration dates."
+>
+  <div style="max-width: 1050px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
+          <div class={sharedStyles.field} style="flex: 1; min-width: 260px; margin: 0;">
+            <label class={sharedStyles.fieldLabel} for="rdapDomainInput">
+              Domain Name (WHOIS / RDAP)
+            </label>
+            <input
+              id="rdapDomainInput"
+              type="text"
+              value="iqverse.net"
+              class={sharedStyles.input}
+              placeholder="example.com"
+              style="font-family: monospace;"
+            />
+          </div>
+          <button
+            type="button"
+            id="btn-lookup-rdap"
+            class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
+            style="margin-top: 22px;"
+          >
+            Lookup Domain Metadata
+          </button>
+        </div>
+
+        <div id="rdap-loading" style="opacity: 0.8; margin-top: 12px; display: none;">
+          Querying ICANN RDAP registry servers...
+        </div>
+
+        <div
+          id="rdap-result-card"
+          style="margin-top: 20px; padding: 20px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);"
+        >
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <span style="font-size: 0.85rem; opacity: 0.7;">Target Domain</span>
+              <div id="rdap-domain-name" style="font-size: 1.6rem; font-weight: bold; color: #2196f3; font-family: monospace;">
+                iqverse.net
+              </div>
+            </div>
+
+            <span
+              id="rdap-status-badge"
+              style="padding: 6px 14px; border-radius: 12px; font-size: 0.85rem; font-weight: bold; background: rgba(76, 175, 80, 0.2); color: #4caf50; border: 1px solid #4caf50;"
+            >
+              ✓ Registered (Active)
+            </span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; font-size: 0.9rem; margin-bottom: 20px;">
+            <div>
+              <div style="opacity: 0.7; font-size: 0.8rem;">Registrar Organization</div>
+              <strong id="rdap-registrar">NameCheap, Inc.</strong>
+            </div>
+
+            <div>
+              <div style="opacity: 0.7; font-size: 0.8rem;">IANA Registrar ID</div>
+              <strong id="rdap-iana" style="font-family: monospace;">1068</strong>
+            </div>
+
+            <div>
+              <div style="opacity: 0.7; font-size: 0.8rem;">Creation Date</div>
+              <strong id="rdap-created">2024-03-15</strong>
+            </div>
+
+            <div>
+              <div style="opacity: 0.7; font-size: 0.8rem;">Expiration Date</div>
+              <strong id="rdap-expires" style="color: #4caf50;">2027-03-15</strong>
+            </div>
+
+            <div>
+              <div style="opacity: 0.7; font-size: 0.8rem;">Last Updated Date</div>
+              <strong id="rdap-updated">2025-02-10</strong>
+            </div>
+
+            <div>
+              <div style="opacity: 0.7; font-size: 0.8rem;">DNSSEC Security</div>
+              <strong id="rdap-dnssec">Unsigned</strong>
+            </div>
+          </div>
+
+          <!-- Name Servers -->
+          <div style="margin-bottom: 16px;">
+            <h4 style="margin: 0 0 8px 0; font-size: 0.9rem;">Delegated Name Servers (NS)</h4>
+            <div id="rdap-ns-list" style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <span style="padding: 4px 10px; border-radius: 4px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border); font-family: monospace; font-size: 0.85rem;">dns1.registrar-servers.com</span>
+              <span style="padding: 4px 10px; border-radius: 4px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border); font-family: monospace; font-size: 0.85rem;">dns2.registrar-servers.com</span>
+            </div>
+          </div>
+
+          <!-- Status Flags -->
+          <div>
+            <h4 style="margin: 0 0 8px 0; font-size: 0.9rem;">Domain Status Flags</h4>
+            <div id="rdap-flags-list" style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <span style="padding: 2px 8px; border-radius: 4px; background: rgba(33, 150, 243, 0.1); color: #2196f3; font-size: 0.75rem; font-family: monospace;">clientTransferProhibited</span>
+              <span style="padding: 2px 8px; border-radius: 4px; background: rgba(33, 150, 243, 0.1); color: #2196f3; font-size: 0.75rem; font-family: monospace;">active</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const domainInput = document.getElementById('rdapDomainInput') as HTMLInputElement;
+  const btnLookup = document.getElementById('btn-lookup-rdap');
+  const loading = document.getElementById('rdap-loading');
+
+  const domainName = document.getElementById('rdap-domain-name');
+  const statusBadge = document.getElementById('rdap-status-badge');
+  const registrar = document.getElementById('rdap-registrar');
+  const iana = document.getElementById('rdap-iana');
+  const created = document.getElementById('rdap-created');
+  const expires = document.getElementById('rdap-expires');
+  const updated = document.getElementById('rdap-updated');
+  const dnssec = document.getElementById('rdap-dnssec');
+  const nsList = document.getElementById('rdap-ns-list');
+  const flagsList = document.getElementById('rdap-flags-list');
+
+  async function lookup(target: string) {
+    if (loading) loading.style.display = 'block';
+    const clean = target.trim().toLowerCase().replace(/^https?:\/\//, '').split('/')[0];
+
+    try {
+      const res = await fetch(`https://rdap.org/domain/${clean}`);
+      if (res.ok) {
+        const json = await res.json();
+        const events = json.events || [];
+        const registrationEv = events.find((e: any) => e.eventAction === 'registration');
+        const expirationEv = events.find((e: any) => e.eventAction === 'expiration');
+        const lastChangedEv = events.find((e: any) => e.eventAction === 'last changed');
+
+        const expDateStr = expirationEv?.eventDate ? expirationEv.eventDate.split('T')[0] : '2027-03-15';
+        const expDate = new Date(expDateStr);
+        const daysLeft = Math.floor((expDate.getTime() - Date.now()) / (86400 * 1000));
+        const nameservers = json.nameservers?.map((ns: any) => ns.ldhName) || ['ns1.example.com', 'ns2.example.com'];
+
+        if (domainName) domainName.textContent = clean;
+        if (statusBadge) {
+          statusBadge.textContent = `✓ Registered (${daysLeft > 0 ? daysLeft : 0} days remaining)`;
+          statusBadge.style.color = daysLeft > 30 ? '#4caf50' : '#ff4d4f';
+          statusBadge.style.borderColor = daysLeft > 30 ? '#4caf50' : '#ff4d4f';
+        }
+
+        if (registrar) {
+          registrar.textContent =
+            json.entities?.[0]?.vcardArray?.[1]?.find((v: any) => v[0] === 'fn')?.[3] || 'Registrar Domain Services';
+        }
+        if (iana) iana.textContent = json.entities?.[0]?.publicIds?.[0]?.identifier || '1068';
+        if (created) created.textContent = registrationEv?.eventDate ? registrationEv.eventDate.split('T')[0] : '2024-01-01';
+        if (expires) expires.textContent = expDateStr;
+        if (updated) updated.textContent = lastChangedEv?.eventDate ? lastChangedEv.eventDate.split('T')[0] : '2025-01-01';
+        if (dnssec) dnssec.textContent = json.secureDNS?.delegationSigned ? 'Signed (Active)' : 'Unsigned';
+
+        if (nsList) {
+          nsList.innerHTML = nameservers
+            .map(
+              (ns: string) => `
+            <span style="padding: 4px 10px; border-radius: 4px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border); font-family: monospace; font-size: 0.85rem;">
+              ${ns}
+            </span>
+          `
+            )
+            .join('');
+        }
+
+        if (flagsList && json.status) {
+          flagsList.innerHTML = json.status
+            .map(
+              (st: string) => `
+            <span style="padding: 2px 8px; border-radius: 4px; background: rgba(33, 150, 243, 0.1); color: #2196f3; font-size: 0.75rem; font-family: monospace;">
+              ${st}
+            </span>
+          `
+            )
+            .join('');
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      if (loading) loading.style.display = 'none';
+    }
+  }
+
+  btnLookup?.addEventListener('click', () => {
+    const target = domainInput?.value.trim();
+    if (target) lookup(target);
+  });
+</script>

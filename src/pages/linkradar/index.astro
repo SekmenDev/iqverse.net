@@ -1,0 +1,309 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+---
+
+<ToolLayout
+  title="LinkRadar"
+  subtitle="Broken Link Checker & Web Crawler"
+  pill="BROWSER TOOLS"
+  toolSlug="linkradar"
+  description="Scan websites for broken links, dead URLs, HTTP redirect loops, and 404 response errors in real time."
+>
+  <div style="max-width: 1100px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <form id="linkradar-form">
+          <div class={sharedStyles.field}>
+            <label class={sharedStyles.fieldLabel} for="targetUrl">
+              Website URL to Crawl & Scan
+            </label>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <input
+                id="targetUrl"
+                type="url"
+                value="https://iqverse.net"
+                class={sharedStyles.input}
+                style="flex: 1; min-width: 260px;"
+                placeholder="https://example.com"
+                required
+              />
+              <button
+                type="submit"
+                id="btn-start-scan"
+                class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
+              >
+                Start Scan
+              </button>
+              <button
+                type="button"
+                id="btn-stop-scan"
+                class={sharedStyles.button}
+                style="display: none; color: #ff4d4f;"
+              >
+                Stop Scan
+              </button>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 16px; margin-top: 12px; flex-wrap: wrap; font-size: 0.85rem;">
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+              <input id="opt-external" type="checkbox" checked />
+              Check External Links
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+              <input id="opt-images" type="checkbox" checked />
+              Check Image Sources (&lt;img&gt;)
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+              <input id="opt-crawl" type="checkbox" checked />
+              Crawl Internal Subpages (Max Depth: 2)
+            </label>
+          </div>
+        </form>
+
+        <!-- Live Scan Status Overview -->
+        <div
+          id="scan-stats-card"
+          style="display: none; margin-top: 24px; padding: 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);"
+        >
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
+            <div>
+              <div style="font-size: 0.75rem; opacity: 0.7;">Total Checked</div>
+              <div id="stat-total" style="font-size: 1.5rem; font-weight: bold;">0</div>
+            </div>
+            <div>
+              <div style="font-size: 0.75rem; color: #4caf50;">2xx Successful</div>
+              <div id="stat-2xx" style="font-size: 1.5rem; font-weight: bold; color: #4caf50;">0</div>
+            </div>
+            <div>
+              <div style="font-size: 0.75rem; color: #2196f3;">3xx Redirects</div>
+              <div id="stat-3xx" style="font-size: 1.5rem; font-weight: bold; color: #2196f3;">0</div>
+            </div>
+            <div>
+              <div style="font-size: 0.75rem; color: #ff4d4f;">Broken / Errors</div>
+              <div id="stat-broken" style="font-size: 1.5rem; font-weight: bold; color: #ff4d4f;">0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter and Search Bar -->
+        <div id="table-controls" style="display: none; margin-top: 20px; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+          <div style="display: flex; gap: 6px;">
+            <button type="button" class="filter-status-btn sharedStyles_button sharedStyles_buttonPrimary button-primary" data-filter="all">All</button>
+            <button type="button" class="filter-status-btn sharedStyles_button" data-filter="2xx">2xx OK</button>
+            <button type="button" class="filter-status-btn sharedStyles_button" data-filter="3xx">3xx Redirect</button>
+            <button type="button" class="filter-status-btn sharedStyles_button" data-filter="broken" style="color: #ff4d4f;">Broken</button>
+          </div>
+
+          <input
+            id="table-search"
+            type="text"
+            placeholder="Search links..."
+            style="padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.85rem;"
+          />
+        </div>
+
+        <!-- Results Table -->
+        <div id="results-table-container" style="display: none; margin-top: 16px; overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+            <thead>
+              <tr style="border-bottom: 1px solid var(--border); color: var(--text-muted); text-align: left;">
+                <th style="padding: 8px;">Status</th>
+                <th style="padding: 8px;">URL</th>
+                <th style="padding: 8px;">Source</th>
+                <th style="padding: 8px;">Type</th>
+                <th style="padding: 8px;">Latency</th>
+              </tr>
+            </thead>
+            <tbody id="results-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  interface ResultItem {
+    url: string;
+    sourceUrl?: string;
+    tag?: string;
+    status: number;
+    time?: number;
+  }
+
+  const form = document.getElementById('linkradar-form') as HTMLFormElement;
+  const urlInput = document.getElementById('targetUrl') as HTMLInputElement;
+  const btnStart = document.getElementById('btn-start-scan');
+  const btnStop = document.getElementById('btn-stop-scan');
+  const optExternal = document.getElementById('opt-external') as HTMLInputElement;
+  const optImages = document.getElementById('opt-images') as HTMLInputElement;
+  const optCrawl = document.getElementById('opt-crawl') as HTMLInputElement;
+
+  const statsCard = document.getElementById('scan-stats-card');
+  const statTotal = document.getElementById('stat-total');
+  const stat2xx = document.getElementById('stat-2xx');
+  const stat3xx = document.getElementById('stat-3xx');
+  const statBroken = document.getElementById('stat-broken');
+
+  const tableControls = document.getElementById('table-controls');
+  const tableContainer = document.getElementById('results-table-container');
+  const tbody = document.getElementById('results-tbody');
+  const searchInput = document.getElementById('table-search') as HTMLInputElement;
+  const filterBtns = document.querySelectorAll('.filter-status-btn');
+
+  let activeFilter = 'all';
+  let isScanning = false;
+  let abortCtrl: AbortController | null = null;
+  let allResults: ResultItem[] = [];
+
+  filterBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach((b) => b.classList.remove('sharedStyles_buttonPrimary', 'button-primary'));
+      btn.classList.add('sharedStyles_buttonPrimary', 'button-primary');
+      activeFilter = (btn as HTMLElement).dataset.filter || 'all';
+      renderTable();
+    });
+  });
+
+  searchInput?.addEventListener('input', renderTable);
+
+  function renderTable() {
+    if (!tbody) return;
+    const query = (searchInput?.value || '').toLowerCase().trim();
+
+    const filtered = allResults.filter((item) => {
+      if (activeFilter === '2xx' && (item.status < 200 || item.status >= 300)) return false;
+      if (activeFilter === '3xx' && (item.status < 300 || item.status >= 400)) return false;
+      if (activeFilter === 'broken' && item.status >= 200 && item.status < 400) return false;
+
+      if (query && !item.url.toLowerCase().includes(query) && !(item.sourceUrl || '').toLowerCase().includes(query)) {
+        return false;
+      }
+      return true;
+    });
+
+    tbody.innerHTML = filtered
+      .map((item) => {
+        const isOk = item.status >= 200 && item.status < 300;
+        const isRedirect = item.status >= 300 && item.status < 400;
+        const color = isOk ? '#4caf50' : isRedirect ? '#2196f3' : '#ff4d4f';
+
+        return `
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 8px;">
+            <span style="padding: 2px 8px; border-radius: 4px; font-weight: bold; background: ${color}20; color: ${color};">
+              ${item.status || 'ERR'}
+            </span>
+          </td>
+          <td style="padding: 8px; font-family: monospace; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+            <a href="${item.url}" target="_blank" rel="noopener noreferrer" style="color: var(--accent);">${item.url}</a>
+          </td>
+          <td style="padding: 8px; font-family: monospace; opacity: 0.7; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+            ${item.sourceUrl || 'Root'}
+          </td>
+          <td style="padding: 8px; text-transform: uppercase; font-size: 0.75rem;">${item.tag || 'LINK'}</td>
+          <td style="padding: 8px; opacity: 0.7;">${item.time ? `${item.time}ms` : '—'}</td>
+        </tr>
+      `;
+      })
+      .join('');
+  }
+
+  function updateStats() {
+    let s200 = 0;
+    let s300 = 0;
+    let sBroken = 0;
+
+    allResults.forEach((r) => {
+      if (r.status >= 200 && r.status < 300) s200++;
+      else if (r.status >= 300 && r.status < 400) s300++;
+      else sBroken++;
+    });
+
+    if (statTotal) statTotal.textContent = String(allResults.length);
+    if (stat2xx) stat2xx.textContent = String(s200);
+    if (stat3xx) stat3xx.textContent = String(s300);
+    if (statBroken) statBroken.textContent = String(sBroken);
+  }
+
+  async function checkUrl(url: string, sourceUrl?: string, tag?: string) {
+    try {
+      const res = await fetch(`/api/check-url?url=${encodeURIComponent(url)}`, { signal: abortCtrl?.signal });
+      const json = await res.json();
+      return {
+        url,
+        sourceUrl,
+        tag,
+        status: json.status || (res.ok ? 200 : 500),
+        time: json.time,
+        html: json.html || json.body || '',
+      };
+    } catch {
+      return {
+        url,
+        sourceUrl,
+        tag,
+        status: 0,
+      };
+    }
+  }
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const raw = urlInput?.value.trim();
+    if (!raw) return;
+
+    isScanning = true;
+    allResults = [];
+    abortCtrl = new AbortController();
+
+    if (btnStart) btnStart.style.display = 'none';
+    if (btnStop) btnStop.style.display = 'inline-block';
+    if (statsCard) statsCard.style.display = 'block';
+    if (tableControls) tableControls.style.display = 'flex';
+    if (tableContainer) tableContainer.style.display = 'block';
+
+    const origin = raw.startsWith('http') ? raw : `https://${raw}`;
+    const visited = new Set<string>();
+    const queue = [{ url: origin, depth: 0, sourceUrl: 'Entry', tag: 'A' }];
+
+    while (queue.length > 0 && isScanning) {
+      const item = queue.shift();
+      if (!item || visited.has(item.url)) continue;
+      visited.add(item.url);
+
+      const res = await checkUrl(item.url, item.sourceUrl, item.tag);
+      allResults.push(res);
+      updateStats();
+      renderTable();
+
+      // If internal page and depth < 2, parse links
+      if (optCrawl?.checked && item.depth < 2 && res.html && res.url.startsWith(new URL(origin).origin)) {
+        const matches = res.html.matchAll(/href=["']([^"']+)["']/g);
+        for (const m of matches) {
+          let foundUrl = m[1];
+          if (foundUrl.startsWith('#') || foundUrl.startsWith('javascript:') || foundUrl.startsWith('mailto:')) continue;
+          try {
+            const absolute = new URL(foundUrl, res.url).href;
+            if (!visited.has(absolute)) {
+              queue.push({ url: absolute, depth: item.depth + 1, sourceUrl: res.url, tag: 'A' });
+            }
+          } catch {}
+        }
+      }
+    }
+
+    isScanning = false;
+    if (btnStart) btnStart.style.display = 'inline-block';
+    if (btnStop) btnStop.style.display = 'none';
+  });
+
+  btnStop?.addEventListener('click', () => {
+    isScanning = false;
+    abortCtrl?.abort();
+    if (btnStart) btnStart.style.display = 'inline-block';
+    if (btnStop) btnStop.style.display = 'none';
+  });
+</script>

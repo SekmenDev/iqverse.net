@@ -1,0 +1,287 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+---
+
+<ToolLayout
+  title="WCAG Color Contrast Checker"
+  subtitle="Test Text & UI Element Contrast Ratios for WCAG 2.1 AA / AAA Compliance"
+  pill="DESIGN"
+  toolSlug="wcag-contrast"
+  description="Test web color contrast ratios against WCAG 2.1 AA and AAA accessibility standards for text and UI components."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; margin-bottom: 24px;">
+          <div class={sharedStyles.field}>
+            <label class={sharedStyles.fieldLabel} for="fgPicker">
+              Foreground (Text) Color
+            </label>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <input
+                id="fgPicker"
+                type="color"
+                value="#ffffff"
+                style="width: 45px; height: 38px; border: none; background: none; cursor: pointer;"
+              />
+              <input
+                id="fgHex"
+                type="text"
+                value="#ffffff"
+                class={sharedStyles.input}
+                style="font-family: monospace;"
+              />
+            </div>
+          </div>
+
+          <button type="button" id="btn-swap-colors" class={sharedStyles.button} style="margin-top: 22px;">
+            ⇄ Swap
+          </button>
+
+          <div class={sharedStyles.field}>
+            <label class={sharedStyles.fieldLabel} for="bgPicker">
+              Background Color
+            </label>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <input
+                id="bgPicker"
+                type="color"
+                value="#121212"
+                style="width: 45px; height: 38px; border: none; background: none; cursor: pointer;"
+              />
+              <input
+                id="bgHex"
+                type="text"
+                value="#121212"
+                class={sharedStyles.input}
+                style="font-family: monospace;"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Contrast Ratio Result Card -->
+        <div
+          style="padding: 20px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;"
+        >
+          <div>
+            <div style="font-size: 0.85rem; opacity: 0.8;">Contrast Ratio</div>
+            <div id="ratio-display" style="font-size: 2.2rem; font-weight: bold; font-family: monospace; color: #4caf50;">
+              21.00 : 1
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <div
+              id="badge-wcag-aa"
+              style="padding: 8px 16px; border-radius: 6px; text-align: center; background: rgba(76, 175, 80, 0.2); color: #4caf50; border: 1px solid #4caf50;"
+            >
+              <div style="font-size: 0.75rem;">WCAG AA</div>
+              <strong id="badge-wcag-aa-text">PASS</strong>
+            </div>
+
+            <div
+              id="badge-wcag-aaa"
+              style="padding: 8px 16px; border-radius: 6px; text-align: center; background: rgba(76, 175, 80, 0.2); color: #4caf50; border: 1px solid #4caf50;"
+            >
+              <div style="font-size: 0.75rem;">WCAG AAA</div>
+              <strong id="badge-wcag-aaa-text">PASS</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Compliance Breakdown Table -->
+        <div style="margin-bottom: 24px;">
+          <h4 style="margin-bottom: 12px;">Detailed Compliance Breakdown</h4>
+          <div style="border: 1px solid var(--border); border-radius: 6px; overflow: hidden;">
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 10px 14px; background: rgba(255,255,255,0.03); font-weight: bold; font-size: 0.85rem;">
+              <div>Requirement Category</div>
+              <div>Min Ratio</div>
+              <div>Status</div>
+            </div>
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 10px 14px; border-top: 1px solid var(--border); font-size: 0.9rem;">
+              <div>AA Normal Text (&lt; 18pt)</div>
+              <div>4.5:1</div>
+              <strong id="status-aa-normal" style="color: #4caf50;">Pass</strong>
+            </div>
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 10px 14px; border-top: 1px solid var(--border); font-size: 0.9rem;">
+              <div>AA Large Text (≥ 18pt or 14pt bold)</div>
+              <div>3.0:1</div>
+              <strong id="status-aa-large" style="color: #4caf50;">Pass</strong>
+            </div>
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 10px 14px; border-top: 1px solid var(--border); font-size: 0.9rem;">
+              <div>AAA Normal Text (&lt; 18pt)</div>
+              <div>7.0:1</div>
+              <strong id="status-aaa-normal" style="color: #4caf50;">Pass</strong>
+            </div>
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 10px 14px; border-top: 1px solid var(--border); font-size: 0.9rem;">
+              <div>AAA Large Text (≥ 18pt or 14pt bold)</div>
+              <div>4.5:1</div>
+              <strong id="status-aaa-large" style="color: #4caf50;">Pass</strong>
+            </div>
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 10px 14px; border-top: 1px solid var(--border); font-size: 0.9rem;">
+              <div>UI Components &amp; Graphical Icons</div>
+              <div>3.0:1</div>
+              <strong id="status-ui-component" style="color: #4caf50;">Pass</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Preview Box -->
+        <div>
+          <h4 style="margin-bottom: 12px;">Typography Preview</h4>
+          <div
+            id="typography-preview-box"
+            style="padding: 24px; border-radius: 8px; color: #ffffff; background-color: #121212; border: 1px solid var(--border);"
+          >
+            <h3 style="margin: 0 0 8px 0; font-size: 1.4rem;">Large Headline Text Sample</h3>
+            <p style="margin: 0; font-size: 0.95rem; line-height: 1.5;">
+              Normal body text preview. Good contrast ensures users with visual impairments or screen glare can comfortably read page content.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+    const clean = hex.replace('#', '').trim();
+    if (clean.length === 3) {
+      const r = parseInt(clean[0] + clean[0], 16);
+      const g = parseInt(clean[1] + clean[1], 16);
+      const b = parseInt(clean[2] + clean[2], 16);
+      return { r, g, b };
+    } else if (clean.length === 6) {
+      const r = parseInt(clean.slice(0, 2), 16);
+      const g = parseInt(clean.slice(2, 4), 16);
+      const b = parseInt(clean.slice(4, 6), 16);
+      return { r, g, b };
+    }
+    return null;
+  }
+
+  function relativeLuminance(rgb: { r: number; g: number; b: number }): number {
+    const normalize = (c: number) => {
+      const s = c / 255;
+      return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+    };
+    const r = normalize(rgb.r);
+    const g = normalize(rgb.g);
+    const b = normalize(rgb.b);
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  }
+
+  function calculateContrastRatio(hex1: string, hex2: string): number {
+    const rgb1 = hexToRgb(hex1);
+    const rgb2 = hexToRgb(hex2);
+    if (!rgb1 || !rgb2) return 1;
+
+    const lum1 = relativeLuminance(rgb1);
+    const lum2 = relativeLuminance(rgb2);
+
+    const lighter = Math.max(lum1, lum2);
+    const darker = Math.min(lum1, lum2);
+
+    return (lighter + 0.05) / (darker + 0.05);
+  }
+
+  const fgPicker = document.getElementById('fgPicker') as HTMLInputElement;
+  const fgHex = document.getElementById('fgHex') as HTMLInputElement;
+  const bgPicker = document.getElementById('bgPicker') as HTMLInputElement;
+  const bgHex = document.getElementById('bgHex') as HTMLInputElement;
+  const btnSwap = document.getElementById('btn-swap-colors');
+
+  const ratioDisplay = document.getElementById('ratio-display');
+  const badgeAa = document.getElementById('badge-wcag-aa');
+  const badgeAaText = document.getElementById('badge-wcag-aa-text');
+  const badgeAaa = document.getElementById('badge-wcag-aaa');
+  const badgeAaaText = document.getElementById('badge-wcag-aaa-text');
+
+  const statusAaNormal = document.getElementById('status-aa-normal');
+  const statusAaLarge = document.getElementById('status-aa-large');
+  const statusAaaNormal = document.getElementById('status-aaa-normal');
+  const statusAaaLarge = document.getElementById('status-aaa-large');
+  const statusUiComponent = document.getElementById('status-ui-component');
+  const previewBox = document.getElementById('typography-preview-box');
+
+  function update() {
+    const fg = fgHex?.value || '#ffffff';
+    const bg = bgHex?.value || '#121212';
+
+    const ratio = Math.round(calculateContrastRatio(fg, bg) * 100) / 100;
+
+    if (ratioDisplay) {
+      ratioDisplay.textContent = `${ratio} : 1`;
+      ratioDisplay.style.color = ratio >= 4.5 ? '#4caf50' : '#ff4d4f';
+    }
+
+    const aaNormal = ratio >= 4.5;
+    const aaLarge = ratio >= 3.0;
+    const aaaNormal = ratio >= 7.0;
+    const aaaLarge = ratio >= 4.5;
+    const uiComp = ratio >= 3.0;
+
+    if (badgeAa && badgeAaText) {
+      badgeAaText.textContent = aaNormal ? 'PASS' : 'FAIL';
+      badgeAa.style.color = aaNormal ? '#4caf50' : '#ff4d4f';
+      badgeAa.style.borderColor = aaNormal ? '#4caf50' : '#ff4d4f';
+      badgeAa.style.background = aaNormal ? 'rgba(76, 175, 80, 0.2)' : 'rgba(255, 77, 79, 0.2)';
+    }
+
+    if (badgeAaa && badgeAaaText) {
+      badgeAaaText.textContent = aaaNormal ? 'PASS' : 'FAIL';
+      badgeAaa.style.color = aaaNormal ? '#4caf50' : '#ff4d4f';
+      badgeAaa.style.borderColor = aaaNormal ? '#4caf50' : '#ff4d4f';
+      badgeAaa.style.background = aaaNormal ? 'rgba(76, 175, 80, 0.2)' : 'rgba(255, 77, 79, 0.2)';
+    }
+
+    const setStatus = (el: HTMLElement | null, pass: boolean) => {
+      if (!el) return;
+      el.textContent = pass ? 'Pass' : 'Fail';
+      el.style.color = pass ? '#4caf50' : '#ff4d4f';
+    };
+
+    setStatus(statusAaNormal, aaNormal);
+    setStatus(statusAaLarge, aaLarge);
+    setStatus(statusAaaNormal, aaaNormal);
+    setStatus(statusAaaLarge, aaaLarge);
+    setStatus(statusUiComponent, uiComp);
+
+    if (previewBox) {
+      previewBox.style.color = fg;
+      previewBox.style.backgroundColor = bg;
+    }
+  }
+
+  fgPicker?.addEventListener('input', () => {
+    if (fgHex) fgHex.value = fgPicker.value;
+    update();
+  });
+  fgHex?.addEventListener('input', () => {
+    if (fgPicker) fgPicker.value = fgHex.value;
+    update();
+  });
+
+  bgPicker?.addEventListener('input', () => {
+    if (bgHex) bgHex.value = bgPicker.value;
+    update();
+  });
+  bgHex?.addEventListener('input', () => {
+    if (bgPicker) bgPicker.value = bgHex.value;
+    update();
+  });
+
+  btnSwap?.addEventListener('click', () => {
+    const temp = fgHex.value;
+    fgHex.value = bgHex.value;
+    fgPicker.value = bgHex.value;
+    bgHex.value = temp;
+    bgPicker.value = temp;
+    update();
+  });
+
+  update();
+</script>

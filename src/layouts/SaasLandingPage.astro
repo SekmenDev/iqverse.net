@@ -1,0 +1,234 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import ThemeToggle from '@/components/ThemeToggle.astro';
+import { getSaasJsonLd } from '@/lib/jsonld';
+import styles from '@/styles/saas-landing.module.css';
+
+export interface LandingCard {
+  title: string;
+  description: string;
+  icon: string;
+}
+
+export interface LandingBullet {
+  title: string;
+  description: string;
+}
+
+export interface LandingStat {
+  label: string;
+  value: string;
+  tone?: 'accent' | 'green' | 'amber';
+}
+
+export interface Props {
+  brand: string;
+  eyebrow: string;
+  heroTitle: string;
+  heroAccent: string;
+  heroSubtitle: string;
+  heroHighlights: string[];
+  heroStats: LandingStat[];
+  trustLogos: string[];
+  challengeTitle: string;
+  challengeSubtitle: string;
+  challengeCards: LandingCard[];
+  solutionTitle: string;
+  solutionSubtitle: string;
+  solutionBullets: LandingBullet[];
+  featuresTitle: string;
+  featuresSubtitle: string;
+  featureCards: LandingCard[];
+  footerText: string;
+  appUrl?: string;
+  slug?: string;
+}
+
+const {
+  brand,
+  eyebrow,
+  heroTitle,
+  heroAccent,
+  heroSubtitle,
+  heroHighlights,
+  heroStats,
+  trustLogos,
+  challengeTitle,
+  challengeSubtitle,
+  challengeCards,
+  solutionTitle,
+  solutionSubtitle,
+  solutionBullets,
+  featuresTitle,
+  featuresSubtitle,
+  featureCards,
+  footerText,
+  appUrl,
+  slug,
+} = Astro.props;
+
+const saasSlug = slug || brand.toLowerCase();
+const jsonLdData = getSaasJsonLd(brand, heroSubtitle, appUrl, `/${saasSlug}/`);
+const canonicalUrl = `https://iqverse.net/${saasSlug}/`;
+const pageTitle = `${brand} | ${heroTitle} ${heroAccent} | IQVerse`;
+---
+
+<Layout
+  title={pageTitle}
+  description={heroSubtitle}
+  canonicalUrl={canonicalUrl}
+  jsonLd={jsonLdData}
+  hideDefaultFooter={true}
+>
+  <div class={styles.page}>
+    <nav class={styles.nav}>
+      <a class={styles.brand} href="#top">
+        <ThemeToggle />
+        <span>{brand}</span>
+      </a>
+      <div class={styles.navLinks}>
+        <a href="#features">Features</a>
+        <a href="#solution">Benefits</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <div class={styles.navRight}>
+        <a
+          class={styles.navCta}
+          href={appUrl || "#contact"}
+          {...(appUrl ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+        >
+          Request a Demo ↗
+        </a>
+      </div>
+    </nav>
+
+    <main id="top">
+      <section class={styles.hero}>
+        <div class={styles.heroCopy}>
+          <span class={styles.tag}>{eyebrow}</span>
+          <h1>
+            {heroTitle}
+            <span class={styles.heroAccent}> {heroAccent}</span>
+          </h1>
+          <p>{heroSubtitle}</p>
+          <div class={styles.heroActions}>
+            <a
+              class={styles.btnPrimary}
+              href={appUrl || "#contact"}
+              {...(appUrl ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+            >
+              Get Started ↗
+            </a>
+            <a class={styles.btnSecondary} href="#features">
+              Explore Features
+            </a>
+          </div>
+          <div class={styles.highlightList}>
+            {heroHighlights.map((item) => (
+              <span>{item}</span>
+            ))}
+          </div>
+        </div>
+
+        <div class={styles.heroPreview}>
+          <div class={styles.previewBar}>
+            <span>{brand} Workspace</span>
+            <span>Live Overview</span>
+          </div>
+          <div class={styles.previewBody}>
+            <div class={styles.statGrid}>
+              {heroStats.map((stat) => (
+                <div class={`${styles.statCard} ${styles[stat.tone ?? 'accent']}`}>
+                  <span class={styles.statValue}>{stat.value}</span>
+                  <span class={styles.statLabel}>{stat.label}</span>
+                </div>
+              ))}
+            </div>
+            <div class={styles.previewList}>
+              {heroHighlights.map((item) => (
+                <div class={styles.previewRow}>
+                  <span>•</span>
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class={styles.trustSection}>
+        <p>Trusted by modern teams and growing organizations</p>
+        <div class={styles.logoRow}>
+          {trustLogos.map((logo) => (
+            <span>{logo}</span>
+          ))}
+        </div>
+      </section>
+
+      <section class={styles.section} id="challenge">
+        <div class={styles.sectionHeader}>
+          <span class={styles.subtleLabel}>The Challenge</span>
+          <h2>{challengeTitle}</h2>
+          <p>{challengeSubtitle}</p>
+        </div>
+        <div class={styles.cardGrid}>
+          {challengeCards.map((card) => (
+            <article class={styles.card}>
+              <div class={styles.cardIcon}>{card.icon}</div>
+              <h3>{card.title}</h3>
+              <p>{card.description}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section class={styles.sectionAlt} id="solution">
+        <div class={styles.sectionHeader}>
+          <span class={styles.subtleLabel}>The Solution</span>
+          <h2>{solutionTitle}</h2>
+          <p>{solutionSubtitle}</p>
+        </div>
+        <div class={styles.solutionBox}>
+          {solutionBullets.map((bullet) => (
+            <div class={styles.bulletRow}>
+              <span class={styles.bulletCheck}>✓</span>
+              <div>
+                <h3>{bullet.title}</h3>
+                <p>{bullet.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section class={styles.section} id="features">
+        <div class={styles.sectionHeader}>
+          <span class={styles.subtleLabel}>Features</span>
+          <h2>{featuresTitle}</h2>
+          <p>{featuresSubtitle}</p>
+        </div>
+        <div class={styles.cardGrid}>
+          {featureCards.map((card) => (
+            <article class={styles.card}>
+              <div class={styles.cardIcon}>{card.icon}</div>
+              <h3>{card.title}</h3>
+              <p>{card.description}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+    </main>
+
+    <footer class={styles.footer} id="contact">
+      <h2>{brand}</h2>
+      <p>{footerText}</p>
+      <a
+        class={styles.btnPrimary}
+        href={appUrl || "mailto:hello@iqverse.net"}
+        {...(appUrl ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+      >
+        {appUrl ? "Visit App ↗" : "hello@iqverse.net"}
+      </a>
+    </footer>
+  </div>
+</Layout>

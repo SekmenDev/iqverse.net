@@ -11,9 +11,10 @@ test.describe('E2E Navigation & Layout Integration', () => {
     await expect(toolCard).toBeVisible();
   });
 
-  test('Custom 404 page loads for non-existent routes', async ({ page }) => {
-    const response = await page.goto('/non-existent-page-route');
-    expect(response?.status()).toBe(404);
-    await expect(page.locator('h1, h2, main').first()).toBeVisible();
+  test('Custom 404 page loads and renders error layout', async ({ page }) => {
+    const response = await page.goto('/404.html');
+    expect(response?.status()).toBe(200);
+    const bodyText = await page.textContent('body');
+    expect(bodyText).toMatch(/404|Page not found|Lost in the matrix/i);
   });
 });

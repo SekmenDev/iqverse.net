@@ -1,0 +1,259 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+
+const SAMPLE_LEFT = `{\n  "name": "IQVerse",\n  "version": "1.0.0",\n  "status": "active"\n}`;
+const SAMPLE_RIGHT = `{\n  "name": "IQVerse",\n  "version": "1.1.0",\n  "status": "active",\n  "tools": 32\n}`;
+---
+
+<ToolLayout
+  title="Diff Checker"
+  subtitle="Side-by-Side Code & Text Comparison"
+  pill="BROWSER TOOLS"
+  toolSlug="diff-checker"
+  description="Compare text, JSON, and code snippets side-by-side with live line-by-line diff highlighting and inline comparison."
+>
+  <div style="max-width: 1100px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-bottom: 16px;">
+          <div class={sharedStyles.field}>
+            <label class={sharedStyles.fieldLabel} for="leftText">
+              Original Text (Left)
+            </label>
+            <textarea
+              id="leftText"
+              class={sharedStyles.textarea}
+              rows="8"
+              placeholder="Paste original text here..."
+            >{SAMPLE_LEFT}</textarea>
+          </div>
+          <div class={sharedStyles.field}>
+            <label class={sharedStyles.fieldLabel} for="rightText">
+              Modified Text (Right)
+            </label>
+            <textarea
+              id="rightText"
+              class={sharedStyles.textarea}
+              rows="8"
+              placeholder="Paste modified text here..."
+            >{SAMPLE_RIGHT}</textarea>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
+          <div style="display: flex; gap: 8px;">
+            <button
+              type="button"
+              id="btn-view-split"
+              class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
+            >
+              Split View
+            </button>
+            <button
+              type="button"
+              id="btn-view-unified"
+              class={sharedStyles.button}
+            >
+              Unified View
+            </button>
+          </div>
+
+          <label style="display: flex; align-items: center; gap: 6px; font-size: 0.875rem; cursor: pointer;">
+            <input
+              id="cb-ignore-whitespace"
+              type="checkbox"
+            />
+            Ignore Whitespace
+          </label>
+
+          <div style="margin-left: auto; display: flex; gap: 12px; font-size: 0.9rem;">
+            <span style="color: #4caf50; font-weight: bold;"><span id="stat-added">+0</span> additions</span>
+            <span style="color: #ff4d4f; font-weight: bold;"><span id="stat-removed">-0</span> deletions</span>
+          </div>
+        </div>
+
+        <!-- Diff Result View -->
+        <div
+          id="diff-container"
+          style="font-family: monospace; font-size: 0.85rem; background: #0d1117; border: 1px solid var(--border); border-radius: 8px; overflow: hidden;"
+        ></div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  interface DiffLine {
+    type: 'added' | 'removed' | 'unchanged';
+    leftLineNum?: number;
+    rightLineNum?: number;
+    content: string;
+  }
+
+  function computeDiff(leftText: string, rightText: string, ignoreWhitespace: boolean): DiffLine[] {
+    const leftLines = leftText.split('\n');
+    const rightLines = rightText.split('\n');
+    const result: DiffLine[] = [];
+
+    let i = 0;
+    let j = 0;
+    let leftNum = 1;
+    let rightNum = 1;
+
+    while (i < leftLines.length || j < rightLines.length) {
+      const lStr = i < leftLines.length ? leftLines[i] : null;
+      const rStr = j < rightLines.length ? rightLines[j] : null;
+
+      const lNorm = lStr !== null ? (ignoreWhitespace ? lStr.trim() : lStr) : null;
+      const rNorm = rStr !== null ? (ignoreWhitespace ? rStr.trim() : rStr) : null;
+
+      if (lNorm === rNorm && lNorm !== null) {
+        result.push({
+          type: 'unchanged',
+          leftLineNum: leftNum++,
+          rightLineNum: rightNum++,
+          content: lStr!,
+        });
+        i++;
+        j++;
+      } else {
+        const nextLInR = rNorm !== null ? leftLines.slice(i).findIndex((line) => (ignoreWhitespace ? line.trim() : line) === rNorm) : -1;
+        const nextRInL = lNorm !== null ? rightLines.slice(j).findIndex((line) => (ignoreWhitespace ? line.trim() : line) === lNorm) : -1;
+
+        if (nextLInR !== -1 && (nextRInL === -1 || nextLInR <= nextRInL)) {
+          result.push({
+            type: 'removed',
+            leftLineNum: leftNum++,
+            content: lStr!,
+          });
+          i++;
+        } else if (nextRInL !== -1) {
+          result.push({
+            type: 'added',
+            rightLineNum: rightNum++,
+            content: rStr!,
+          });
+          j++;
+        } else {
+          if (lStr !== null) {
+            result.push({
+              type: 'removed',
+              leftLineNum: leftNum++,
+              content: lStr,
+            });
+            i++;
+          }
+          if (rStr !== null) {
+            result.push({
+              type: 'added',
+              rightLineNum: rightNum++,
+              content: rStr,
+            });
+            j++;
+          }
+        }
+      }
+    }
+    return result;
+  }
+
+  const leftInput = document.getElementById('leftText') as HTMLTextAreaElement;
+  const rightInput = document.getElementById('rightText') as HTMLTextAreaElement;
+  const btnSplit = document.getElementById('btn-view-split');
+  const btnUnified = document.getElementById('btn-view-unified');
+  const cbWhitespace = document.getElementById('cb-ignore-whitespace') as HTMLInputElement;
+  const statAdded = document.getElementById('stat-added');
+  const statRemoved = document.getElementById('stat-removed');
+  const diffContainer = document.getElementById('diff-container');
+
+  let viewMode: 'split' | 'unified' = 'split';
+
+  if (btnSplit && btnUnified) {
+    btnSplit.onclick = () => {
+      viewMode = 'split';
+      btnSplit.className = 'sharedStyles_button sharedStyles_buttonPrimary button-primary';
+      btnUnified.className = 'sharedStyles_button';
+      renderDiff();
+    };
+    btnUnified.onclick = () => {
+      viewMode = 'unified';
+      btnUnified.className = 'sharedStyles_button sharedStyles_buttonPrimary button-primary';
+      btnSplit.className = 'sharedStyles_button';
+      renderDiff();
+    };
+  }
+
+  function renderDiff() {
+    if (!leftInput || !rightInput || !diffContainer) return;
+    const diff = computeDiff(leftInput.value, rightInput.value, cbWhitespace?.checked || false);
+
+    const added = diff.filter((l) => l.type === 'added').length;
+    const removed = diff.filter((l) => l.type === 'removed').length;
+
+    if (statAdded) statAdded.textContent = `+${added}`;
+    if (statRemoved) statRemoved.textContent = `-${removed}`;
+
+    if (viewMode === 'unified') {
+      diffContainer.innerHTML = `
+        <div style="overflow-x: auto;">
+          ${diff
+            .map(
+              (l) => `
+            <div style="display: grid; grid-template-columns: 40px 40px 20px 1fr; padding: 2px 8px; background: ${
+              l.type === 'added' ? 'rgba(46, 160, 67, 0.15)' : l.type === 'removed' ? 'rgba(248, 81, 73, 0.15)' : 'transparent'
+            }; color: ${l.type === 'added' ? '#7ee787' : l.type === 'removed' ? '#ff7b72' : '#c9d1d9'};">
+              <span style="opacity: 0.4; user-select: none;">${l.leftLineNum || ''}</span>
+              <span style="opacity: 0.4; user-select: none;">${l.rightLineNum || ''}</span>
+              <span style="opacity: 0.6; user-select: none;">${l.type === 'added' ? '+' : l.type === 'removed' ? '-' : ' '}</span>
+              <pre style="margin: 0; font-family: inherit; white-space: pre-wrap;">${l.content}</pre>
+            </div>
+          `
+            )
+            .join('')}
+        </div>
+      `;
+    } else {
+      diffContainer.innerHTML = `
+        <div style="display: grid; grid-template-columns: 1fr 1fr;">
+          <div style="border-right: 1px solid var(--border); overflow-x: auto;">
+            ${diff
+              .filter((l) => l.type !== 'added')
+              .map(
+                (l) => `
+              <div style="display: grid; grid-template-columns: 40px 1fr; padding: 2px 8px; background: ${
+                l.type === 'removed' ? 'rgba(248, 81, 73, 0.15)' : 'transparent'
+              }; color: ${l.type === 'removed' ? '#ff7b72' : '#c9d1d9'};">
+                <span style="opacity: 0.4; user-select: none;">${l.leftLineNum || ''}</span>
+                <pre style="margin: 0; font-family: inherit; white-space: pre-wrap;">${l.content}</pre>
+              </div>
+            `
+              )
+              .join('')}
+          </div>
+          <div style="overflow-x: auto;">
+            ${diff
+              .filter((l) => l.type !== 'removed')
+              .map(
+                (l) => `
+              <div style="display: grid; grid-template-columns: 40px 1fr; padding: 2px 8px; background: ${
+                l.type === 'added' ? 'rgba(46, 160, 67, 0.15)' : 'transparent'
+              }; color: ${l.type === 'added' ? '#7ee787' : '#c9d1d9'};">
+                <span style="opacity: 0.4; user-select: none;">${l.rightLineNum || ''}</span>
+                <pre style="margin: 0; font-family: inherit; white-space: pre-wrap;">${l.content}</pre>
+              </div>
+            `
+              )
+              .join('')}
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  leftInput?.addEventListener('input', renderDiff);
+  rightInput?.addEventListener('input', renderDiff);
+  cbWhitespace?.addEventListener('change', renderDiff);
+
+  renderDiff();
+</script>

@@ -1,0 +1,174 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+
+const algorithms = [
+  { value: 'SHA-1', label: 'SHA-1' },
+  { value: 'SHA-256', label: 'SHA-256' },
+  { value: 'SHA-384', label: 'SHA-384' },
+  { value: 'SHA-512', label: 'SHA-512' },
+  { value: 'HMAC-SHA-1', label: 'HMAC-SHA-1' },
+  { value: 'HMAC-SHA-256', label: 'HMAC-SHA-256' },
+  { value: 'HMAC-SHA-384', label: 'HMAC-SHA-384' },
+  { value: 'HMAC-SHA-512', label: 'HMAC-SHA-512' },
+];
+
+const outputFormats = [
+  { value: 'hex', label: 'Hex' },
+  { value: 'base64', label: 'Base64' },
+];
+---
+
+<ToolLayout
+  title="Hashing"
+  subtitle="Cryptographic Hashing & HMAC"
+  pill="SECURITY"
+  toolSlug="hashing"
+  description="Calculate cryptographic SHA-256, SHA-512, MD5, and HMAC hashes locally in your browser with hex or Base64 encoding."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.sectionLabel}>Hashing</div>
+      <div class={sharedStyles.card}>
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="hashInput">
+            Input
+          </label>
+          <textarea
+            id="hashInput"
+            class={sharedStyles.textarea}
+            rows="6"
+          >Hello, IQVerse!</textarea>
+        </div>
+
+        <div class={sharedStyles.buttonGroup} style="align-items: center;">
+          <label for="algorithm-select">Algorithm</label>
+          <select id="algorithm-select" style="margin-left: 8px;">
+            {algorithms.map((option) => (
+              <option value={option.value} selected={option.value === 'SHA-256'}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+
+          <label for="output-format">Output</label>
+          <select id="output-format" style="margin-left: 8px;">
+            {outputFormats.map((option) => (
+              <option value={option.value} selected={option.value === 'hex'}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+
+          <button type="button" id="btn-compute-hash" class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}>
+            Compute
+          </button>
+        </div>
+
+        <div id="hmac-key-container" class={sharedStyles.field} style="margin-top: 12px; display: none;">
+          <label class={sharedStyles.fieldLabel} for="hashKey">
+            HMAC Key
+          </label>
+          <input
+            id="hashKey"
+            type="password"
+            class={sharedStyles.textarea}
+            style="min-height: auto;"
+            placeholder="Enter a secret key for HMAC"
+          />
+        </div>
+
+        <div style="margin-top: 18px;" class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="hash-output">Output</label>
+          <textarea id="hash-output" readonly class={sharedStyles.outputArea} rows="6"></textarea>
+        </div>
+
+        <div id="hash-error-box" class={sharedStyles.errorCard} style="margin-top: 12px; display: none;">
+          <div id="hash-error-msg" class={sharedStyles.errorMessage}></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  function arrayBufferToHex(buffer: ArrayBuffer): string {
+    return Array.from(new Uint8Array(buffer))
+      .map((byte) => byte.toString(16).padStart(2, '0'))
+      .join('');
+  }
+
+  function arrayBufferToBase64(buffer: ArrayBuffer): string {
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    for (const byte of bytes) {
+      binary += String.fromCodePoint(byte);
+    }
+    return btoa(binary);
+  }
+
+  async function computeDigest(algorithm: string, text: string, key: string | null): Promise<ArrayBuffer> {
+    const data = new TextEncoder().encode(text);
+
+    if (algorithm.startsWith('HMAC-')) {
+      const hashAlgo = algorithm.slice(5);
+      if (!key) {
+        throw new TypeError('A key is required for HMAC algorithms.');
+      }
+
+      const cryptoKey = await crypto.subtle.importKey(
+        'raw',
+        new TextEncoder().encode(key),
+        { name: 'HMAC', hash: { name: hashAlgo } },
+        false,
+        ['sign']
+      );
+      return crypto.subtle.sign('HMAC', cryptoKey, data);
+    }
+
+    return crypto.subtle.digest(algorithm, data);
+  }
+
+  const inputEl = document.getElementById('hashInput') as HTMLTextAreaElement;
+  const algoSelect = document.getElementById('algorithm-select') as HTMLSelectElement;
+  const formatSelect = document.getElementById('output-format') as HTMLSelectElement;
+  const keyContainer = document.getElementById('hmac-key-container');
+  const keyInput = document.getElementById('hashKey') as HTMLInputElement;
+  const btnCompute = document.getElementById('btn-compute-hash');
+  const outputEl = document.getElementById('hash-output') as HTMLTextAreaElement;
+  const errorBox = document.getElementById('hash-error-box');
+  const errorMsg = document.getElementById('hash-error-msg');
+
+  if (algoSelect && keyContainer) {
+    algoSelect.addEventListener('change', () => {
+      keyContainer.style.display = algoSelect.value.startsWith('HMAC-') ? 'block' : 'none';
+    });
+  }
+
+  async function runCompute() {
+    if (errorBox && errorMsg && outputEl) {
+      errorBox.style.display = 'none';
+      errorMsg.textContent = '';
+      outputEl.value = '';
+    }
+
+    try {
+      const algo = algoSelect?.value || 'SHA-256';
+      const format = formatSelect?.value || 'hex';
+      const text = inputEl?.value || '';
+      const key = algo.startsWith('HMAC-') ? keyInput?.value : null;
+
+      const result = await computeDigest(algo, text, key);
+      const formatted = format === 'base64' ? arrayBufferToBase64(result) : arrayBufferToHex(result);
+      if (outputEl) outputEl.value = formatted;
+    } catch (err: any) {
+      if (errorBox && errorMsg) {
+        errorBox.style.display = 'block';
+        errorMsg.textContent = err.message || 'Unable to compute digest.';
+      }
+    }
+  }
+
+  btnCompute?.addEventListener('click', runCompute);
+  runCompute();
+</script>

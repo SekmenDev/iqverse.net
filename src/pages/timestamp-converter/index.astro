@@ -1,0 +1,183 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+---
+
+<ToolLayout
+  title="Unix Timestamp & Epoch Converter"
+  subtitle="Convert Epoch Seconds/Milliseconds to ISO & UTC"
+  pill="BROWSER TOOLS"
+  toolSlug="timestamp-converter"
+  description="Convert Unix timestamps in seconds or milliseconds to human-readable ISO 8601 and UTC dates, with live clock display."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <!-- Live Clock Card -->
+      <div class={sharedStyles.card} style="margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <div style="font-size: 0.85rem; opacity: 0.8;">Current Unix Epoch Time</div>
+            <div style="font-size: 1.8rem; font-weight: bold; color: #2196f3; fontFamily: monospace;">
+              <span id="live-epoch-clock">0</span> <span style="font-size: 0.9rem; opacity: 0.7;">seconds</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            id="btn-use-current-time"
+            class={sharedStyles.button}
+          >
+            Use Current Time
+          </button>
+        </div>
+      </div>
+
+      <div class={sharedStyles.card}>
+        <!-- Timestamp to Date -->
+        <div style="margin-bottom: 28px;">
+          <h3 style="margin: 0 0 12px 0; font-size: 1.1rem;">Unix Timestamp → Date & Time</h3>
+          <div class={sharedStyles.field}>
+            <label class={sharedStyles.fieldLabel} for="tsInput">
+              Enter Timestamp (Seconds or Milliseconds)
+            </label>
+            <input
+              id="tsInput"
+              type="text"
+              class={sharedStyles.input}
+              style="font-family: monospace;"
+            />
+          </div>
+
+          <div id="ts-parsed-results" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 16px;">
+            <div style="padding: 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+              <div style="font-size: 0.75rem; opacity: 0.7;">ISO 8601</div>
+              <div id="ts-res-iso" style="font-size: 0.9rem; font-weight: bold; font-family: monospace;"></div>
+            </div>
+            <div style="padding: 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+              <div style="font-size: 0.75rem; opacity: 0.7;">UTC Time</div>
+              <div id="ts-res-utc" style="font-size: 0.9rem; font-weight: bold;"></div>
+            </div>
+            <div style="padding: 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+              <div style="font-size: 0.75rem; opacity: 0.7;">Relative Time</div>
+              <div id="ts-res-rel" style="font-size: 0.9rem; font-weight: bold; color: #4caf50;"></div>
+            </div>
+          </div>
+
+          <div id="ts-invalid-msg" style="color: #ff4d4f; font-size: 0.875rem; margin-top: 8px; display: none;">
+            Invalid numeric timestamp.
+          </div>
+        </div>
+
+        <!-- Date to Timestamp -->
+        <div style="padding-top: 20px; border-top: 1px solid var(--border);">
+          <h3 style="margin: 0 0 12px 0; font-size: 1.1rem;">Human Date → Unix Timestamp</h3>
+          <div class={sharedStyles.field}>
+            <label class={sharedStyles.fieldLabel} for="dtInput">
+              Select Date & Time
+            </label>
+            <input
+              id="dtInput"
+              type="datetime-local"
+              class={sharedStyles.input}
+            />
+          </div>
+
+          <div id="date-parsed-results" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 16px;">
+            <div style="padding: 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+              <div style="font-size: 0.75rem; opacity: 0.7;">Epoch Seconds</div>
+              <div id="date-res-sec" style="font-size: 1.1rem; font-weight: bold; font-family: monospace; color: #2196f3;"></div>
+            </div>
+            <div style="padding: 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+              <div style="font-size: 0.75rem; opacity: 0.7;">Epoch Milliseconds</div>
+              <div id="date-res-ms" style="font-size: 1.1rem; font-weight: bold; font-family: monospace;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  function getRelativeTimeString(date: Date, currentTimeSec: number): string {
+    const deltaSec = currentTimeSec - Math.floor(date.getTime() / 1000);
+    if (Math.abs(deltaSec) < 60) return `${deltaSec >= 0 ? deltaSec : -deltaSec} seconds ${deltaSec >= 0 ? 'ago' : 'from now'}`;
+    const min = Math.floor(Math.abs(deltaSec) / 60);
+    if (min < 60) return `${min} minutes ${deltaSec >= 0 ? 'ago' : 'from now'}`;
+    const hr = Math.floor(min / 60);
+    if (hr < 24) return `${hr} hours ${deltaSec >= 0 ? 'ago' : 'from now'}`;
+    const days = Math.floor(hr / 24);
+    return `${days} days ${deltaSec >= 0 ? 'ago' : 'from now'}`;
+  }
+
+  const liveClock = document.getElementById('live-epoch-clock');
+  const btnUseCurrent = document.getElementById('btn-use-current-time');
+  const tsInput = document.getElementById('tsInput') as HTMLInputElement;
+  const tsResults = document.getElementById('ts-parsed-results');
+  const tsIso = document.getElementById('ts-res-iso');
+  const tsUtc = document.getElementById('ts-res-utc');
+  const tsRel = document.getElementById('ts-res-rel');
+  const tsInvalid = document.getElementById('ts-invalid-msg');
+
+  const dtInput = document.getElementById('dtInput') as HTMLInputElement;
+  const dateSec = document.getElementById('date-res-sec');
+  const dateMs = document.getElementById('date-res-ms');
+
+  let currentNowSec = Math.floor(Date.now() / 1000);
+
+  function tick() {
+    currentNowSec = Math.floor(Date.now() / 1000);
+    if (liveClock) liveClock.textContent = String(currentNowSec);
+  }
+  setInterval(tick, 1000);
+  tick();
+
+  if (tsInput) tsInput.value = String(currentNowSec);
+  if (dtInput) dtInput.value = new Date().toISOString().slice(0, 16);
+
+  function updateFromTimestamp() {
+    const raw = tsInput?.value.trim() || '';
+    const num = Number(raw);
+    if (isNaN(num) || raw === '') {
+      if (tsResults) tsResults.style.display = 'none';
+      if (tsInvalid) tsInvalid.style.display = 'block';
+      return;
+    }
+
+    const isMs = num > 30000000000;
+    const dateObj = new Date(isMs ? num : num * 1000);
+
+    if (isNaN(dateObj.getTime())) {
+      if (tsResults) tsResults.style.display = 'none';
+      if (tsInvalid) tsInvalid.style.display = 'block';
+      return;
+    }
+
+    if (tsResults) tsResults.style.display = 'grid';
+    if (tsInvalid) tsInvalid.style.display = 'none';
+
+    if (tsIso) tsIso.textContent = dateObj.toISOString();
+    if (tsUtc) tsUtc.textContent = dateObj.toUTCString();
+    if (tsRel) tsRel.textContent = getRelativeTimeString(dateObj, currentNowSec);
+  }
+
+  function updateFromDate() {
+    const val = dtInput?.value;
+    if (!val) return;
+    const d = new Date(val);
+    if (isNaN(d.getTime())) return;
+
+    if (dateSec) dateSec.textContent = String(Math.floor(d.getTime() / 1000));
+    if (dateMs) dateMs.textContent = String(d.getTime());
+  }
+
+  btnUseCurrent?.addEventListener('click', () => {
+    if (tsInput) tsInput.value = String(currentNowSec);
+    updateFromTimestamp();
+  });
+
+  tsInput?.addEventListener('input', updateFromTimestamp);
+  dtInput?.addEventListener('input', updateFromDate);
+
+  updateFromTimestamp();
+  updateFromDate();
+</script>

@@ -1,0 +1,152 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+---
+
+<ToolLayout
+  title="IP Info & Geolocation Lookup"
+  subtitle="Inspect IP Address Geolocation, ISP Organization & ASN Network Info"
+  pill="NETWORK"
+  toolSlug="ip-lookup"
+  description="Lookup IP address details including country geolocation, ISP organization, ASN routing data, and network hostnames."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
+          <div class={sharedStyles.field} style="flex: 1; min-width: 260px; margin: 0;">
+            <label class={sharedStyles.fieldLabel} for="ipSearchInput">
+              Enter IPv4 or IPv6 Address
+            </label>
+            <input
+              id="ipSearchInput"
+              type="text"
+              value="8.8.8.8"
+              class={sharedStyles.input}
+              placeholder="e.g., 8.8.8.8 or 2001:4860:4860::8888"
+              style="font-family: monospace;"
+            />
+          </div>
+          <button
+            type="button"
+            id="btn-lookup-ip"
+            class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
+            style="margin-top: 22px;"
+          >
+            Lookup IP
+          </button>
+          <button
+            type="button"
+            id="btn-my-ip"
+            class={sharedStyles.button}
+            style="margin-top: 22px;"
+          >
+            My Current IP
+          </button>
+        </div>
+
+        <div id="ip-loading" style="opacity: 0.8; margin-top: 12px; display: none;">
+          Fetching IP geolocation metadata...
+        </div>
+
+        <div
+          id="ip-result-card"
+          style="margin-top: 20px; padding: 20px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);"
+        >
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <span style="font-size: 0.85rem; opacity: 0.7;">Query Address</span>
+              <div id="res-ip" style="font-size: 1.6rem; font-weight: bold; font-family: monospace; color: #2196f3;">
+                8.8.8.8
+              </div>
+            </div>
+            <span
+              id="res-country-badge"
+              style="padding: 4px 12px; border-radius: 12px; font-size: 0.85rem; background: rgba(33, 150, 243, 0.1); color: #2196f3; border: 1px solid rgba(33, 150, 243, 0.3);"
+            >
+              US - United States
+            </span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; font-size: 0.9rem;">
+            <div>
+              <div style="opacity: 0.7; font-size: 0.8rem;">City / Region</div>
+              <strong id="res-city-region">Mountain View, California</strong>
+            </div>
+            <div>
+              <div style="opacity: 0.7; font-size: 0.8rem;">ISP / Provider</div>
+              <strong id="res-isp">Google LLC</strong>
+            </div>
+            <div>
+              <div style="opacity: 0.7; font-size: 0.8rem;">Autonomous System (ASN)</div>
+              <strong id="res-asn" style="font-family: monospace;">AS15169</strong>
+            </div>
+            <div>
+              <div style="opacity: 0.7; font-size: 0.8rem;">Coordinates (Lat, Lon)</div>
+              <strong id="res-coords" style="font-family: monospace;">37.4056, -122.0775</strong>
+            </div>
+            <div>
+              <div style="opacity: 0.7; font-size: 0.8rem;">Timezone</div>
+              <strong id="res-tz">America/Los_Angeles</strong>
+            </div>
+            <div>
+              <div style="opacity: 0.7; font-size: 0.8rem;">Postal Code</div>
+              <strong id="res-postal">94043</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const ipInput = document.getElementById('ipSearchInput') as HTMLInputElement;
+  const btnLookup = document.getElementById('btn-lookup-ip');
+  const btnMyIp = document.getElementById('btn-my-ip');
+  const loading = document.getElementById('ip-loading');
+  const resultCard = document.getElementById('ip-result-card');
+
+  const resIp = document.getElementById('res-ip');
+  const resCountry = document.getElementById('res-country-badge');
+  const resCityRegion = document.getElementById('res-city-region');
+  const resIsp = document.getElementById('res-isp');
+  const resAsn = document.getElementById('res-asn');
+  const resCoords = document.getElementById('res-coords');
+  const resTz = document.getElementById('res-tz');
+  const resPostal = document.getElementById('res-postal');
+
+  async function fetchIp(targetIp?: string) {
+    if (loading) loading.style.display = 'block';
+    const url = targetIp ? `https://ipapi.co/${targetIp}/json/` : 'https://ipapi.co/json/';
+
+    try {
+      const res = await fetch(url);
+      if (res.ok) {
+        const json = await res.json();
+        if (resIp) resIp.textContent = json.ip || targetIp || '8.8.8.8';
+        if (resCountry) resCountry.textContent = `${json.country_code || 'US'} - ${json.country_name || 'Unknown'}`;
+        if (resCityRegion) resCityRegion.textContent = `${json.city || 'Unknown'}, ${json.region || 'Unknown'}`;
+        if (resIsp) resIsp.textContent = json.org || json.asn || 'Google LLC';
+        if (resAsn) resAsn.textContent = json.asn || 'AS15169';
+        if (resCoords) resCoords.textContent = `${json.latitude || 37.4056}, ${json.longitude || -122.0775}`;
+        if (resTz) resTz.textContent = json.timezone || 'UTC';
+        if (resPostal) resPostal.textContent = json.postal || '—';
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      if (loading) loading.style.display = 'none';
+    }
+  }
+
+  btnLookup?.addEventListener('click', () => {
+    const q = ipInput?.value.trim();
+    if (q) fetchIp(q);
+  });
+
+  btnMyIp?.addEventListener('click', () => {
+    if (ipInput) ipInput.value = '';
+    fetchIp();
+  });
+</script>
