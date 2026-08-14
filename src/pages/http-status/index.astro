@@ -1,0 +1,157 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+
+const HTTP_STATUS_CODES = [
+  // 1xx
+  { code: 100, phrase: 'Continue', category: '1xx', spec: 'RFC 9110 §15.2.1', summary: 'Interim response indicating client should continue request or ignore if finished.', details: 'Used with Expect: 100-continue request header.' },
+  { code: 101, phrase: 'Switching Protocols', category: '1xx', spec: 'RFC 9110 §15.2.2', summary: 'Server agrees to switch protocols specified in Upgrade header (e.g. WebSocket).', details: 'Sent in response to an Upgrade request header from the client.' },
+  { code: 103, phrase: 'Early Hints', category: '1xx', spec: 'RFC 8297', summary: 'Allows server to return response headers before final HTTP message for preload optimization.', details: 'Mainly used for Link header preload hints.' },
+
+  // 2xx
+  { code: 200, phrase: 'OK', category: '2xx', spec: 'RFC 9110 §15.3.1', summary: 'Standard successful HTTP response for GET, POST, PUT, DELETE requests.', details: 'The payload contains the requested resource representation.' },
+  { code: 201, phrase: 'Created', category: '2xx', spec: 'RFC 9110 §15.3.2', summary: 'Request succeeded and a new resource was created.', details: 'Typically includes a Location header pointing to the new resource.' },
+  { code: 202, phrase: 'Accepted', category: '2xx', spec: 'RFC 9110 §15.3.3', summary: 'Request accepted for background asynchronous processing but not yet completed.', details: 'Useful for queue jobs and batch tasks.' },
+  { code: 204, phrase: 'No Content', category: '2xx', spec: 'RFC 9110 §15.3.5', summary: 'Request succeeded but response body is intentionally empty.', details: 'Commonly returned after DELETE or preflight OPTIONS requests.' },
+
+  // 3xx
+  { code: 301, phrase: 'Moved Permanently', category: '3xx', spec: 'RFC 9110 §15.4.2', summary: 'Resource permanently moved to a new URI given in Location header.', details: 'Search engines transfer SEO rank to the target URL.' },
+  { code: 302, phrase: 'Found (Temporary Redirect)', category: '3xx', spec: 'RFC 9110 §15.4.3', summary: 'Resource temporarily resides under a different URI.', details: 'Client should keep using the original URI for future requests.' },
+  { code: 304, phrase: 'Not Modified', category: '3xx', spec: 'RFC 9110 §15.4.5', summary: 'Resource unchanged since last fetch based on If-Modified-Since or If-None-Match headers.', details: 'Client should load representation from local browser cache.' },
+  { code: 307, phrase: 'Temporary Redirect', category: '3xx', spec: 'RFC 9110 §15.4.8', summary: 'Temporary redirect preserving original HTTP method and body.', details: 'Unlike 302, guarantees POST requests will not be converted to GET.' },
+  { code: 308, phrase: 'Permanent Redirect', category: '3xx', spec: 'RFC 9110 §15.4.9', summary: 'Permanent redirect preserving original HTTP method and body.', details: 'Guarantees POST method is preserved during permanent redirection.' },
+
+  // 4xx
+  { code: 400, phrase: 'Bad Request', category: '4xx', spec: 'RFC 9110 §15.5.1', summary: 'Server cannot process request due to malformed syntax or invalid payload.', details: 'Client must fix invalid body, parameters or headers before retrying.' },
+  { code: 401, phrase: 'Unauthorized', category: '4xx', spec: 'RFC 9110 §15.5.2', summary: 'Authentication is required and has failed or not been provided.', details: 'Response includes WWW-Authenticate header with auth scheme.' },
+  { code: 403, phrase: 'Forbidden', category: '4xx', spec: 'RFC 9110 §15.5.4', summary: 'Server understands request but refuses to authorize access regardless of credentials.', details: 'Indicates insufficient permissions (e.g. role-based access control).' },
+  { code: 404, phrase: 'Not Found', category: '4xx', spec: 'RFC 9110 §15.5.5', summary: 'Target resource does not exist on the server.', details: 'Can be returned to hide confidential resources from unauthorized users.' },
+  { code: 405, phrase: 'Method Not Allowed', category: '4xx', spec: 'RFC 9110 §15.5.6', summary: 'HTTP method used is not supported for target resource.', details: 'Response must include Allow header specifying valid methods.' },
+  { code: 409, phrase: 'Conflict', category: '4xx', spec: 'RFC 9110 §15.5.10', summary: 'Request conflicts with current state of server resource (e.g. duplicate key).', details: 'Common in version control conflicts or unique constraint violations.' },
+  { code: 429, phrase: 'Too Many Requests', category: '4xx', spec: 'RFC 6585 §4', summary: 'User sent too many requests in a given time window (Rate Limited).', details: 'Response often includes Retry-After header indicating wait duration.' },
+
+  // 5xx
+  { code: 500, phrase: 'Internal Server Error', category: '5xx', spec: 'RFC 9110 §15.6.1', summary: 'Server encountered an unexpected condition that prevented request completion.', details: 'Generic error code indicating unhandled server-side exceptions.' },
+  { code: 502, phrase: 'Bad Gateway', category: '5xx', spec: 'RFC 9110 §15.6.3', summary: 'Server acting as gateway/proxy received invalid response from upstream server.', details: 'Common with reverse proxies like Nginx or Cloudflare when backend fails.' },
+  { code: 503, phrase: 'Service Unavailable', category: '5xx', spec: 'RFC 9110 §15.6.4', summary: 'Server temporarily unable to handle request due to overload or maintenance.', details: 'Includes optional Retry-After header indicating backoff estimate.' },
+  { code: 504, phrase: 'Gateway Timeout', category: '5xx', spec: 'RFC 9110 §15.6.5', summary: 'Server acting as gateway did not receive timely response from upstream server.', details: 'Occurs when backend application takes longer to execute than proxy timeout.' },
+];
+---
+
+<ToolLayout
+  title="HTTP Status Code Reference"
+  subtitle="Comprehensive Guide to HTTP 1xx, 2xx, 3xx, 4xx & 5xx Codes"
+  pill="BROWSER TOOLS"
+  toolSlug="http-status"
+  description="Search and inspect all standard HTTP status codes, error messages, and RFC specifications with live keyword search."
+>
+  <div style="max-width: 1050px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
+          <div class={sharedStyles.field} style="margin: 0; flex: 1; min-width: 260px;">
+            <label class={sharedStyles.fieldLabel} for="httpSearch">
+              Search Status Codes, Phrases or Keywords
+            </label>
+            <input
+              id="httpSearch"
+              type="text"
+              class={sharedStyles.input}
+              placeholder="e.g. 404 or Unauthorized or Redirect..."
+            />
+          </div>
+
+          <div style="display: flex; gap: 8px; margin-top: 22px; flex-wrap: wrap;">
+            {(['all', '1xx', '2xx', '3xx', '4xx', '5xx'] as const).map((cat) => (
+              <button
+                type="button"
+                class={`http-cat-btn ${sharedStyles.button} ${cat === 'all' ? sharedStyles.buttonPrimary : ''}`}
+                data-cat={cat}
+                style="text-transform: uppercase;"
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div id="http-codes-list" style="display: flex; flexDirection: column; gap: 12px;"></div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script define:vars={{ HTTP_STATUS_CODES }}>
+  const searchInput = document.getElementById('httpSearch');
+  const catBtns = document.querySelectorAll('.http-cat-btn');
+  const listContainer = document.getElementById('http-codes-list');
+
+  let activeCat = 'all';
+
+  catBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      catBtns.forEach((b) => b.classList.remove('sharedStyles_buttonPrimary', 'button-primary'));
+      btn.classList.add('sharedStyles_buttonPrimary', 'button-primary');
+      activeCat = btn.dataset.cat || 'all';
+      render();
+    });
+  });
+
+  function render() {
+    if (!listContainer) return;
+    const query = (searchInput?.value || '').toLowerCase().trim();
+
+    const filtered = HTTP_STATUS_CODES.filter((item) => {
+      const matchCat = activeCat === 'all' || item.category === activeCat;
+      const matchQuery =
+        !query ||
+        item.code.toString().includes(query) ||
+        item.phrase.toLowerCase().includes(query) ||
+        item.summary.toLowerCase().includes(query) ||
+        item.details.toLowerCase().includes(query);
+      return matchCat && matchQuery;
+    });
+
+    if (filtered.length === 0) {
+      listContainer.innerHTML = '<div style="text-align: center; padding: 32px; opacity: 0.6;">No HTTP status codes match your search filter.</div>';
+      return;
+    }
+
+    listContainer.innerHTML = filtered
+      .map((item) => {
+        const catColor =
+          item.category === '2xx'
+            ? '#4caf50'
+            : item.category === '3xx'
+            ? '#2196f3'
+            : item.category === '4xx'
+            ? '#faad14'
+            : item.category === '5xx'
+            ? '#ff4d4f'
+            : '#9c27b0';
+
+        return `
+        <div
+          style="padding: 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-left: 4px solid ${catColor};"
+        >
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span style="font-size: 1.4rem; font-weight: bold; font-family: monospace; color: ${catColor};">
+                ${item.code}
+              </span>
+              <span style="font-size: 1.1rem; font-weight: bold;">${item.phrase}</span>
+            </div>
+            <span style="font-size: 0.75rem; opacity: 0.6; font-family: monospace;">${item.spec}</span>
+          </div>
+
+          <div style="font-size: 0.95rem; margin-bottom: 6px; font-weight: 500;">${item.summary}</div>
+          <div style="font-size: 0.85rem; opacity: 0.8; line-height: 1.4;">${item.details}</div>
+        </div>
+      `;
+      })
+      .join('');
+  }
+
+  searchInput?.addEventListener('input', render);
+  render();
+</script>

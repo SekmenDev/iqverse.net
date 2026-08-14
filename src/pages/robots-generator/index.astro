@@ -1,0 +1,365 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+---
+
+<ToolLayout
+  title="robots.txt Generator & Tester"
+  subtitle="Build & Validate Crawler Directives for Search Engines & AI Bots"
+  pill="BROWSER TOOLS"
+  toolSlug="robots-generator"
+  description="Generate and test robots.txt directives for Googlebot, Bingbot, GPTBot, and web crawlers with live path testing."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="sitemapInput">
+            Sitemap URL Reference
+          </label>
+          <input
+            id="sitemapInput"
+            type="text"
+            value="https://iqverse.net/sitemap.xml"
+            class={sharedStyles.input}
+            placeholder="https://example.com/sitemap.xml"
+          />
+        </div>
+
+        <div style="margin-top: 24px; margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h3 style="margin: 0; font-size: 1.1rem;">User-Agent Directive Groups</h3>
+            <button type="button" id="btn-add-robots-group" class={sharedStyles.button}>
+              + Add User-Agent Group
+            </button>
+          </div>
+
+          <div id="robots-groups-container"></div>
+        </div>
+
+        <!-- Interactive Path Tester -->
+        <div
+          style="padding: 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); margin-bottom: 24px;"
+        >
+          <h4 style="margin: 0 0 12px 0;">Path Rule Tester</h4>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+            <input
+              id="testAgent"
+              type="text"
+              class={sharedStyles.input}
+              placeholder="User-Agent (*)"
+              value="*"
+              style="width: 140px;"
+            />
+            <input
+              id="testPath"
+              type="text"
+              class={sharedStyles.input}
+              placeholder="Path to test (/admin/dashboard)"
+              value="/admin/dashboard"
+              style="flex: 1; min-width: 200px;"
+            />
+            <button type="button" id="btn-test-directive" class={sharedStyles.button}>
+              Test Path Access
+            </button>
+          </div>
+          <div id="test-directive-result" style="margin-top: 10px; font-size: 0.9rem; display: none;"></div>
+        </div>
+
+        <!-- Output -->
+        <div class={sharedStyles.field}>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+            <label class={sharedStyles.fieldLabel} for="robotsOutput">
+              Generated robots.txt Output
+            </label>
+            <div style="display: flex; gap: 8px;">
+              <button type="button" id="btn-copy-robots-txt" class={sharedStyles.button}>
+                Copy robots.txt
+              </button>
+              <button type="button" id="btn-download-robots-txt" class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}>
+                Download File
+              </button>
+            </div>
+          </div>
+          <textarea
+            id="robotsOutput"
+            readonly
+            class={sharedStyles.outputArea}
+            rows="12"
+            style="font-family: monospace;"
+          ></textarea>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  interface RuleGroup {
+    userAgent: string;
+    disallows: string[];
+    allows: string[];
+  }
+
+  let groups: RuleGroup[] = [
+    {
+      userAgent: '*',
+      disallows: ['/admin/', '/private/'],
+      allows: ['/public/'],
+    },
+    {
+      userAgent: 'GPTBot',
+      disallows: ['/private-data/'],
+      allows: ['/'],
+    },
+  ];
+
+  const sitemapInput = document.getElementById('sitemapInput') as HTMLInputElement;
+  const btnAddGroup = document.getElementById('btn-add-robots-group');
+  const groupsContainer = document.getElementById('robots-groups-container');
+  const robotsOutput = document.getElementById('robotsOutput') as HTMLTextAreaElement;
+  const btnCopy = document.getElementById('btn-copy-robots-txt');
+  const btnDownload = document.getElementById('btn-download-robots-txt');
+
+  const testAgentInput = document.getElementById('testAgent') as HTMLInputElement;
+  const testPathInput = document.getElementById('testPath') as HTMLInputElement;
+  const btnTest = document.getElementById('btn-test-directive');
+  const testResult = document.getElementById('test-directive-result');
+
+  function renderGroups() {
+    if (!groupsContainer) return;
+    groupsContainer.innerHTML = groups
+      .map(
+        (group, gIdx) => `
+      <div
+        style="border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; background: rgba(255, 255, 255, 0.02);"
+      >
+        <div style="display: flex; gap: 12px; margin-bottom: 12px; align-items: center;">
+          <label style="font-size: 0.85rem; font-weight: 600;">User-agent:</label>
+          <input
+            type="text"
+            class="ua-input"
+            data-gidx="${gIdx}"
+            value="${group.userAgent}"
+            style="flex: 1; font-family: monospace; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text);"
+            placeholder="* or Googlebot or GPTBot"
+          />
+          <button
+            type="button"
+            class="btn-remove-group"
+            data-gidx="${gIdx}"
+            style="background: transparent; border: 1px solid #ff4d4f; color: #ff4d4f; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;"
+          >
+            Delete Group
+          </button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div>
+            <label style="font-size: 0.8rem; opacity: 0.8; display: block; margin-bottom: 6px;">Disallow Paths</label>
+            ${group.disallows
+              .map(
+                (d, dIdx) => `
+              <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+                <input
+                  type="text"
+                  class="disallow-input"
+                  data-gidx="${gIdx}"
+                  data-didx="${dIdx}"
+                  value="${d}"
+                  style="flex: 1; padding: 6px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.85rem;"
+                  placeholder="/path/"
+                />
+                <button type="button" class="btn-remove-disallow" data-gidx="${gIdx}" data-didx="${dIdx}" style="background: transparent; border: none; color: #ff4d4f; cursor: pointer;">✕</button>
+              </div>
+            `
+              )
+              .join('')}
+            <button type="button" class="btn-add-disallow" data-gidx="${gIdx}" style="background: transparent; border: 1px dashed var(--border); color: var(--accent); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer;">
+              + Disallow
+            </button>
+          </div>
+
+          <div>
+            <label style="font-size: 0.8rem; opacity: 0.8; display: block; margin-bottom: 6px;">Allow Paths</label>
+            ${group.allows
+              .map(
+                (a, aIdx) => `
+              <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+                <input
+                  type="text"
+                  class="allow-input"
+                  data-gidx="${gIdx}"
+                  data-aidx="${aIdx}"
+                  value="${a}"
+                  style="flex: 1; padding: 6px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.85rem;"
+                  placeholder="/path/"
+                />
+                <button type="button" class="btn-remove-allow" data-gidx="${gIdx}" data-aidx="${aIdx}" style="background: transparent; border: none; color: #ff4d4f; cursor: pointer;">✕</button>
+              </div>
+            `
+              )
+              .join('')}
+            <button type="button" class="btn-add-allow" data-gidx="${gIdx}" style="background: transparent; border: 1px dashed var(--border); color: var(--accent); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer;">
+              + Allow
+            </button>
+          </div>
+        </div>
+      </div>
+    `
+      )
+      .join('');
+
+    // Events
+    document.querySelectorAll('.ua-input').forEach((el) => {
+      el.addEventListener('input', (e) => {
+        const gIdx = Number((e.target as HTMLElement).dataset.gidx);
+        groups[gIdx].userAgent = (e.target as HTMLInputElement).value;
+        updateRobots();
+      });
+    });
+
+    document.querySelectorAll('.btn-remove-group').forEach((el) => {
+      el.addEventListener('click', (e) => {
+        const gIdx = Number((e.target as HTMLElement).dataset.gidx);
+        groups = groups.filter((_, idx) => idx !== gIdx);
+        renderGroups();
+        updateRobots();
+      });
+    });
+
+    document.querySelectorAll('.disallow-input').forEach((el) => {
+      el.addEventListener('input', (e) => {
+        const gIdx = Number((e.target as HTMLElement).dataset.gidx);
+        const dIdx = Number((e.target as HTMLElement).dataset.didx);
+        groups[gIdx].disallows[dIdx] = (e.target as HTMLInputElement).value;
+        updateRobots();
+      });
+    });
+
+    document.querySelectorAll('.btn-remove-disallow').forEach((el) => {
+      el.addEventListener('click', (e) => {
+        const gIdx = Number((e.target as HTMLElement).dataset.gidx);
+        const dIdx = Number((e.target as HTMLElement).dataset.didx);
+        groups[gIdx].disallows = groups[gIdx].disallows.filter((_, i) => i !== dIdx);
+        renderGroups();
+        updateRobots();
+      });
+    });
+
+    document.querySelectorAll('.btn-add-disallow').forEach((el) => {
+      el.addEventListener('click', (e) => {
+        const gIdx = Number((e.target as HTMLElement).dataset.gidx);
+        groups[gIdx].disallows.push('/secret/');
+        renderGroups();
+        updateRobots();
+      });
+    });
+
+    document.querySelectorAll('.allow-input').forEach((el) => {
+      el.addEventListener('input', (e) => {
+        const gIdx = Number((e.target as HTMLElement).dataset.gidx);
+        const aIdx = Number((e.target as HTMLElement).dataset.aidx);
+        groups[gIdx].allows[aIdx] = (e.target as HTMLInputElement).value;
+        updateRobots();
+      });
+    });
+
+    document.querySelectorAll('.btn-remove-allow').forEach((el) => {
+      el.addEventListener('click', (e) => {
+        const gIdx = Number((e.target as HTMLElement).dataset.gidx);
+        const aIdx = Number((e.target as HTMLElement).dataset.aidx);
+        groups[gIdx].allows = groups[gIdx].allows.filter((_, i) => i !== aIdx);
+        renderGroups();
+        updateRobots();
+      });
+    });
+
+    document.querySelectorAll('.btn-add-allow').forEach((el) => {
+      el.addEventListener('click', (e) => {
+        const gIdx = Number((e.target as HTMLElement).dataset.gidx);
+        groups[gIdx].allows.push('/');
+        renderGroups();
+        updateRobots();
+      });
+    });
+  }
+
+  function generateRobots(): string {
+    let txt = '';
+    groups.forEach((g) => {
+      txt += `User-agent: ${g.userAgent.trim() || '*'}\n`;
+      g.disallows.forEach((d) => {
+        if (d.trim()) txt += `Disallow: ${d.trim()}\n`;
+      });
+      g.allows.forEach((a) => {
+        if (a.trim()) txt += `Allow: ${a.trim()}\n`;
+      });
+      txt += '\n';
+    });
+
+    const sitemap = sitemapInput?.value.trim() || '';
+    if (sitemap) {
+      txt += `Sitemap: ${sitemap}\n`;
+    }
+
+    return txt.trim();
+  }
+
+  function updateRobots() {
+    if (robotsOutput) robotsOutput.value = generateRobots();
+  }
+
+  btnAddGroup?.addEventListener('click', () => {
+    groups.push({ userAgent: 'Googlebot', disallows: ['/tmp/'], allows: ['/'] });
+    renderGroups();
+    updateRobots();
+  });
+
+  sitemapInput?.addEventListener('input', updateRobots);
+
+  btnCopy?.addEventListener('click', async () => {
+    if (robotsOutput?.value && btnCopy) {
+      await navigator.clipboard.writeText(robotsOutput.value);
+      const prev = btnCopy.textContent;
+      btnCopy.textContent = 'Copied!';
+      setTimeout(() => (btnCopy.textContent = prev), 1500);
+    }
+  });
+
+  btnDownload?.addEventListener('click', () => {
+    const blob = new Blob([generateRobots()], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'robots.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  btnTest?.addEventListener('click', () => {
+    if (!testResult) return;
+    const testAgent = testAgentInput?.value.trim() || '*';
+    const testPath = testPathInput?.value.trim() || '/';
+
+    const targetGroup = groups.find((g) => g.userAgent.toLowerCase() === testAgent.toLowerCase()) || groups.find((g) => g.userAgent === '*');
+    testResult.style.display = 'block';
+
+    if (!targetGroup) {
+      testResult.innerHTML = '<strong style="color: #4caf50;">Allowed (No matching directives)</strong>';
+      return;
+    }
+
+    const disallowedMatch = targetGroup.disallows.find((d) => d.trim() && testPath.startsWith(d.trim()));
+    const allowedMatch = targetGroup.allows.find((a) => a.trim() && testPath.startsWith(a.trim()));
+
+    if (disallowedMatch && (!allowedMatch || disallowedMatch.length >= allowedMatch.length)) {
+      testResult.innerHTML = `<strong style="color: #ff4d4f;">Blocked (Disallow: ${disallowedMatch})</strong>`;
+    } else {
+      testResult.innerHTML = '<strong style="color: #4caf50;">Allowed (Access granted)</strong>';
+    }
+  });
+
+  renderGroups();
+  updateRobots();
+</script>

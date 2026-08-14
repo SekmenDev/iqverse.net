@@ -1,0 +1,641 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import styles from '@/styles/qrforge.module.css';
+
+const typeOptions = [
+  { value: 'url', label: 'URL' },
+  { value: 'text', label: 'Text' },
+  { value: 'email', label: 'Email' },
+  { value: 'wifi', label: 'Wi-Fi' },
+  { value: 'vcard', label: 'vCard' },
+];
+
+const errorLevels = [
+  { value: 'L', label: 'Low (7%)' },
+  { value: 'M', label: 'Medium (15%)' },
+  { value: 'Q', label: 'Quartile (25%)' },
+  { value: 'H', label: 'High (30%)' },
+];
+
+const presets = [
+  { name: 'Classic', dots: '#000000', bg: '#ffffff', corner: '#000000', style: 'background: #000; color: #fff;' },
+  { name: 'Ocean', dots: '#1a1a2e', bg: '#e8f4f8', corner: '#0077b6', style: 'background: #1a1a2e; color: #e8f4f8;' },
+  { name: 'Forest', dots: '#2d6a4f', bg: '#d8f3dc', corner: '#1b4332', style: 'background: #2d6a4f; color: #d8f3dc;' },
+  { name: 'Grape', dots: '#7b2d8b', bg: '#fce4ec', corner: '#4a0072', style: 'background: #7b2d8b; color: #fce4ec;' },
+  { name: 'Ember', dots: '#b5451b', bg: '#fff8f0', corner: '#7c2d12', style: 'background: #b5451b; color: #fff8f0;' },
+  { name: 'Night', dots: '#ffffff', bg: '#0f0f0f', corner: '#ffffff', style: 'background: #0f0f0f; color: #fff; border: 1px solid #333;' },
+];
+---
+
+<ToolLayout
+  title="QRForge"
+  subtitle="Custom QR Code Generator & Designer"
+  pill="BROWSER TOOLS"
+  toolSlug="qrforge"
+  description="Generate custom styled QR codes with logos, custom dot shapes, corner eye markers, gradient colors, and high-res vector SVG/PNG export."
+>
+  <div class={styles.layout}>
+    <aside class={styles.panel}>
+      <!-- Step Navigation -->
+      <div class={styles.steps}>
+        <div style="display: contents;">
+          <button class={`${styles.step} ${styles.stepActive}`} data-step="content">
+            <span class={styles.stepNum}>01</span>
+            <span class={styles.stepLabel}>content</span>
+          </button>
+          <div class={styles.stepLine}></div>
+        </div>
+        <div style="display: contents;">
+          <button class={styles.step} data-step="style">
+            <span class={styles.stepNum}>02</span>
+            <span class={styles.stepLabel}>style</span>
+          </button>
+          <div class={styles.stepLine}></div>
+        </div>
+        <div style="display: contents;">
+          <button class={styles.step} data-step="logo">
+            <span class={styles.stepNum}>03</span>
+            <span class={styles.stepLabel}>logo</span>
+          </button>
+          <div class={styles.stepLine}></div>
+        </div>
+        <div style="display: contents;">
+          <button class={styles.step} data-step="export">
+            <span class={styles.stepNum}>04</span>
+            <span class={styles.stepLabel}>export</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 1: CONTENT -->
+      <div id="tab-pane-content" class={styles.tabPanel}>
+        <div class={styles.sectionTitle}>What to encode</div>
+
+        <div class={styles.typePicker}>
+          {typeOptions.map((opt) => (
+            <button
+              type="button"
+              class={`qr-type-btn ${styles.typeBtn} ${opt.value === 'url' ? styles.typeBtnActive : ''}`}
+              data-type={opt.value}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+
+        <div id="field-type-url" class={styles.inputGroup}>
+          <label for="input-url">URL</label>
+          <input
+            id="input-url"
+            type="url"
+            class={styles.inputField}
+            value="https://iqverse.net"
+            placeholder="https://example.com"
+          />
+        </div>
+
+        <div id="field-type-text" class={styles.inputGroup} style="display: none;">
+          <label for="input-text">Plain text</label>
+          <textarea
+            id="input-text"
+            class={styles.textareaField}
+            placeholder="Enter your message…"
+            rows="4"
+          ></textarea>
+        </div>
+
+        <div id="field-type-email" style="display: none;">
+          <div class={styles.inputGroup}>
+            <label for="input-email">Email address</label>
+            <input id="input-email" type="email" class={styles.inputField} placeholder="hello@example.com" />
+          </div>
+          <div class={styles.inputGroup}>
+            <label for="input-email-subject">Subject</label>
+            <input id="input-email-subject" type="text" class={styles.inputField} placeholder="Subject line" />
+          </div>
+          <div class={styles.inputGroup}>
+            <label for="input-email-body">Body</label>
+            <textarea id="input-email-body" class={styles.textareaField} rows="3" placeholder="Email body…"></textarea>
+          </div>
+        </div>
+
+        <div id="field-type-wifi" style="display: none;">
+          <div class={styles.inputGroup}>
+            <label for="input-wifi-ssid">Network name (SSID)</label>
+            <input id="input-wifi-ssid" type="text" class={styles.inputField} placeholder="MyNetwork" />
+          </div>
+          <div class={styles.inputGroup}>
+            <label for="input-wifi-pass">Password</label>
+            <input id="input-wifi-pass" type="text" class={styles.inputField} placeholder="password123" />
+          </div>
+          <div class={styles.inputGroup}>
+            <label for="input-wifi-sec">Security</label>
+            <select id="input-wifi-sec" class={styles.selectField}>
+              <option value="WPA">WPA/WPA2</option>
+              <option value="WEP">WEP</option>
+              <option value="">None</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="field-type-vcard" style="display: none;">
+          <div class={styles.inputGroup}>
+            <label for="input-vcard-name">Full name</label>
+            <input id="input-vcard-name" type="text" class={styles.inputField} placeholder="Jane Smith" />
+          </div>
+          <div class={styles.inputGroup}>
+            <label for="input-vcard-phone">Phone</label>
+            <input id="input-vcard-phone" type="tel" class={styles.inputField} placeholder="+1 555 000 0000" />
+          </div>
+          <div class={styles.inputGroup}>
+            <label for="input-vcard-email">Email</label>
+            <input id="input-vcard-email" type="email" class={styles.inputField} placeholder="jane@example.com" />
+          </div>
+        </div>
+
+        <div class={styles.fieldRow} style="margin-top: 20px;">
+          <label class={styles.fieldLabel} for="error-level">
+            Error correction
+          </label>
+          <select id="error-level" class={`${styles.selectField} ${styles.selectInline}`}>
+            {errorLevels.map((lvl) => (
+              <option value={lvl.value} selected={lvl.value === 'M'}>
+                {lvl.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <button type="button" class={`btn-next-step ${styles.btnNext}`} data-next="style">
+          Next: Style <span>→</span>
+        </button>
+      </div>
+
+      <!-- TAB 2: STYLE -->
+      <div id="tab-pane-style" class={styles.tabPanel} style="display: none;">
+        <div class={styles.sectionTitle}>Appearance</div>
+
+        <span class={styles.fieldLabel}>Dot style</span>
+        <div class={styles.shapePicker}>
+          <button type="button" class={`btn-dot-style ${styles.shapeBtn} ${styles.shapeBtnActive}`} data-dot="square" title="Square">
+            <svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" rx="0" fill="currentColor"></rect></svg>
+          </button>
+          <button type="button" class={`btn-dot-style ${styles.shapeBtn}`} data-dot="rounded" title="Rounded">
+            <svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" rx="4" fill="currentColor"></rect></svg>
+          </button>
+          <button type="button" class={`btn-dot-style ${styles.shapeBtn}`} data-dot="dots" title="Dots">
+            <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7" fill="currentColor"></circle></svg>
+          </button>
+          <button type="button" class={`btn-dot-style ${styles.shapeBtn}`} data-dot="classy" title="Classy">
+            <svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" rx="2" fill="currentColor"></rect></svg>
+          </button>
+          <button type="button" class={`btn-dot-style ${styles.shapeBtn}`} data-dot="extra-rounded" title="Extra rounded">
+            <svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" rx="7" fill="currentColor"></rect></svg>
+          </button>
+        </div>
+
+        <span class={styles.fieldLabel} style="margin-top: 18px;">
+          Corner square style
+        </span>
+        <div class={styles.shapePicker}>
+          <button type="button" class={`btn-corner-style ${styles.shapeBtn} ${styles.shapeBtnActive}`} data-corner="square" title="Square">
+            <svg viewBox="0 0 20 20"><rect x="2" y="2" width="16" height="16" rx="0" fill="none" stroke="currentColor" stroke-width="3"></rect></svg>
+          </button>
+          <button type="button" class={`btn-corner-style ${styles.shapeBtn}`} data-corner="extra-rounded" title="Rounded">
+            <svg viewBox="0 0 20 20"><rect x="2" y="2" width="16" height="16" rx="6" fill="none" stroke="currentColor" stroke-width="3"></rect></svg>
+          </button>
+          <button type="button" class={`btn-corner-style ${styles.shapeBtn}`} data-corner="dot" title="Dot">
+            <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="3"></circle></svg>
+          </button>
+        </div>
+
+        <div class={styles.colorRow}>
+          <div class={styles.colorItem}>
+            <label for="color-dots">Dot color</label>
+            <div class={styles.colorSwatchWrap}>
+              <input type="color" id="color-dots" class={styles.colorInput} value="#000000" />
+              <span id="hex-dots" class={styles.colorHex}>#000000</span>
+            </div>
+          </div>
+
+          <div class={styles.colorItem}>
+            <label for="color-bg">Background</label>
+            <div class={styles.colorSwatchWrap}>
+              <input type="color" id="color-bg" class={styles.colorInput} value="#ffffff" />
+              <span id="hex-bg" class={styles.colorHex}>#ffffff</span>
+            </div>
+          </div>
+
+          <div class={styles.colorItem}>
+            <label for="color-corner">Corner color</label>
+            <div class={styles.colorSwatchWrap}>
+              <input type="color" id="color-corner" class={styles.colorInput} value="#000000" />
+              <span id="hex-corner" class={styles.colorHex}>#000000</span>
+            </div>
+          </div>
+        </div>
+
+        <div class={styles.presetLabel}>Presets</div>
+        <div class={styles.presetRow}>
+          {presets.map((preset) => (
+            <button
+              type="button"
+              class={`btn-preset-chip ${styles.presetChip}`}
+              style={preset.style}
+              data-dots={preset.dots}
+              data-bg={preset.bg}
+              data-corner={preset.corner}
+            >
+              {preset.name}
+            </button>
+          ))}
+        </div>
+
+        <button type="button" class={`btn-next-step ${styles.btnNext}`} data-next="logo">
+          Next: Logo <span>→</span>
+        </button>
+      </div>
+
+      <!-- TAB 3: LOGO -->
+      <div id="tab-pane-logo" class={styles.tabPanel} style="display: none;">
+        <div class={styles.sectionTitle}>Center image</div>
+
+        <input type="file" id="logo-file-input" accept="image/*" style="display: none;" />
+
+        <div id="logo-upload-dropzone" class={styles.uploadZone}>
+          <div class={styles.uploadIcon}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="12" x2="12" y2="3"></line>
+            </svg>
+          </div>
+          <div class={styles.uploadText}>
+            Drop image or <span class={styles.uploadLink}>browse</span>
+          </div>
+          <div class={styles.uploadSub}>PNG, SVG, JPEG. Transparent PNG recommended</div>
+        </div>
+
+        <div id="logo-preview-row" class={styles.logoPreviewRow} style="display: none;">
+          <img id="logo-preview-thumb" alt="logo preview" width="48" height="48" style="object-fit: contain;" />
+          <div>
+            <div id="logo-preview-filename" class={styles.logoFilename}></div>
+            <button type="button" id="btn-remove-logo" class={styles.removeBtn}>
+              Remove
+            </button>
+          </div>
+        </div>
+
+        <div class={styles.tipBox} style="margin-top: 20px;">
+          <strong>Tip:</strong> Use Error Correction <em>H (30%)</em> in the Content tab when adding a logo. It ensures the QR remains scannable.
+        </div>
+
+        <button type="button" class={`btn-next-step ${styles.btnNext}`} data-next="export">
+          Next: Export <span>→</span>
+        </button>
+      </div>
+
+      <!-- TAB 4: EXPORT -->
+      <div id="tab-pane-export" class={styles.tabPanel} style="display: none;">
+        <div class={styles.sectionTitle}>Download</div>
+
+        <div class={styles.exportOptions}>
+          <button type="button" class={`btn-export-fmt ${styles.exportBtn} ${styles.exportBtnActive}`} data-fmt="png">
+            <span class={styles.fmtBadge}>PNG</span>
+            <span class={styles.fmtDesc}>Raster: for web & print</span>
+          </button>
+          <button type="button" class={`btn-export-fmt ${styles.exportBtn}`} data-fmt="svg">
+            <span class={styles.fmtBadge}>SVG</span>
+            <span class={styles.fmtDesc}>Vector: infinitely scalable</span>
+          </button>
+          <button type="button" class={`btn-export-fmt ${styles.exportBtn}`} data-fmt="jpeg">
+            <span class={styles.fmtBadge}>JPEG</span>
+            <span class={styles.fmtDesc}>Small file size</span>
+          </button>
+          <button type="button" class={`btn-export-fmt ${styles.exportBtn}`} data-fmt="webp">
+            <span class={styles.fmtBadge}>WEBP</span>
+            <span class={styles.fmtDesc}>Modern, compressed</span>
+          </button>
+        </div>
+
+        <div class={styles.inputGroup} style="margin-top: 20px;">
+          <label for="export-filename">File name</label>
+          <div class={styles.filenameRow}>
+            <input type="text" id="export-filename" class={styles.inputField} value="my-qr-code" />
+            <span id="export-ext-label" class={styles.filenameExt}>.png</span>
+          </div>
+        </div>
+
+        <button type="button" id="btn-download-qr" class={styles.btnDownload}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Download QR Code
+        </button>
+
+        <div class={styles.shareRow}>
+          <button type="button" id="btn-copy-qr-canvas" class={styles.shareBtn}>
+            Copy to clipboard
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <section class={styles.previewArea}>
+      <div class={styles.previewLabel}>Live preview</div>
+      <div class={styles.canvasWrap}>
+        <div id="qr-container" class={styles.qrContainer}></div>
+      </div>
+      <div class={styles.scanNote}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        Scan with your phone camera to test
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  import { buildQRPayload } from '@/lib/utils';
+
+  let currentStep = 'content';
+  let qrType = 'url';
+  let dotStyle = 'square';
+  let cornerStyle = 'square';
+  let dotColor = '#000000';
+  let bgColor = '#ffffff';
+  let cornerColor = '#000000';
+  let errorLevel = 'M';
+  let logoData: string | null = null;
+  let exportFmt = 'png';
+
+  let qrStylingInstance: any = null;
+
+  const container = document.getElementById('qr-container');
+
+  async function getQrInstance() {
+    if (!qrStylingInstance) {
+      const { default: QRCodeStyling } = await import('qr-code-styling');
+      qrStylingInstance = new QRCodeStyling({
+        width: 320,
+        height: 320,
+        type: 'canvas',
+        data: 'https://iqverse.net',
+        dotsOptions: { type: 'square', color: '#000000' },
+        cornersSquareOptions: { type: 'square', color: '#000000' },
+        backgroundOptions: { color: '#ffffff' },
+        margin: 20,
+        qrOptions: { errorCorrectionLevel: 'M' },
+      });
+      if (container) {
+        container.innerHTML = '';
+        qrStylingInstance.append(container);
+      }
+    }
+    return qrStylingInstance;
+  }
+
+  function getValues() {
+    return {
+      url: (document.getElementById('input-url') as HTMLInputElement)?.value || 'https://iqverse.net',
+      text: (document.getElementById('input-text') as HTMLTextAreaElement)?.value || '',
+      email: (document.getElementById('input-email') as HTMLInputElement)?.value || '',
+      subject: (document.getElementById('input-email-subject') as HTMLInputElement)?.value || '',
+      body: (document.getElementById('input-email-body') as HTMLTextAreaElement)?.value || '',
+      ssid: (document.getElementById('input-wifi-ssid') as HTMLInputElement)?.value || '',
+      password: (document.getElementById('input-wifi-pass') as HTMLInputElement)?.value || '',
+      security: (document.getElementById('input-wifi-sec') as HTMLSelectElement)?.value || 'WPA',
+      name: (document.getElementById('input-vcard-name') as HTMLInputElement)?.value || '',
+      phone: (document.getElementById('input-vcard-phone') as HTMLInputElement)?.value || '',
+      company: '',
+      urlv: '',
+    };
+  }
+
+  async function updateQr() {
+    const instance = await getQrInstance();
+    const payload = buildQRPayload(qrType, getValues());
+
+    instance.update({
+      data: payload || 'https://iqverse.net',
+      image: logoData || '',
+      dotsOptions: { type: dotStyle as any, color: dotColor },
+      cornersSquareOptions: { type: cornerStyle as any, color: cornerColor },
+      backgroundOptions: { color: bgColor },
+      qrOptions: { errorCorrectionLevel: errorLevel as any },
+    });
+  }
+
+  // Step Switching
+  const stepBtns = document.querySelectorAll('.steps button, [data-step]');
+  const nextBtns = document.querySelectorAll('.btn-next-step');
+
+  function setStep(step: string) {
+    currentStep = step;
+    ['content', 'style', 'logo', 'export'].forEach((s) => {
+      const p = document.getElementById(`tab-pane-${s}`);
+      if (p) p.style.display = s === step ? 'block' : 'none';
+    });
+
+    document.querySelectorAll('[data-step]').forEach((b) => {
+      const btnStep = (b as HTMLElement).dataset.step;
+      if (btnStep === step) {
+        b.className = 'styles_step styles_stepActive active';
+      } else {
+        b.className = 'styles_step';
+      }
+    });
+  }
+
+  stepBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const s = (btn as HTMLElement).dataset.step;
+      if (s) setStep(s);
+    });
+  });
+
+  nextBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const next = (btn as HTMLElement).dataset.next;
+      if (next) setStep(next);
+    });
+  });
+
+  // Type switching
+  const typeBtns = document.querySelectorAll('.qr-type-btn');
+  typeBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      typeBtns.forEach((b) => b.classList.remove('styles_typeBtnActive', 'active'));
+      btn.classList.add('styles_typeBtnActive', 'active');
+      qrType = (btn as HTMLElement).dataset.type || 'url';
+
+      ['url', 'text', 'email', 'wifi', 'vcard'].forEach((t) => {
+        const el = document.getElementById(`field-type-${t}`);
+        if (el) el.style.display = t === qrType ? 'block' : 'none';
+      });
+      updateQr();
+    });
+  });
+
+  // Content inputs
+  document.querySelectorAll('#tab-pane-content input, #tab-pane-content textarea, #tab-pane-content select').forEach((el) => {
+    el.addEventListener('input', updateQr);
+  });
+
+  // Dot styles
+  const dotBtns = document.querySelectorAll('.btn-dot-style');
+  dotBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      dotBtns.forEach((b) => b.classList.remove('styles_shapeBtnActive', 'active'));
+      btn.classList.add('styles_shapeBtnActive', 'active');
+      dotStyle = (btn as HTMLElement).dataset.dot || 'square';
+      updateQr();
+    });
+  });
+
+  // Corner styles
+  const cornerBtns = document.querySelectorAll('.btn-corner-style');
+  cornerBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      cornerBtns.forEach((b) => b.classList.remove('styles_shapeBtnActive', 'active'));
+      btn.classList.add('styles_shapeBtnActive', 'active');
+      cornerStyle = (btn as HTMLElement).dataset.corner || 'square';
+      updateQr();
+    });
+  });
+
+  // Colors
+  const colorDots = document.getElementById('color-dots') as HTMLInputElement;
+  const colorBg = document.getElementById('color-bg') as HTMLInputElement;
+  const colorCorner = document.getElementById('color-corner') as HTMLInputElement;
+
+  colorDots?.addEventListener('input', () => {
+    dotColor = colorDots.value;
+    const hex = document.getElementById('hex-dots');
+    if (hex) hex.textContent = dotColor;
+    updateQr();
+  });
+  colorBg?.addEventListener('input', () => {
+    bgColor = colorBg.value;
+    const hex = document.getElementById('hex-bg');
+    if (hex) hex.textContent = bgColor;
+    updateQr();
+  });
+  colorCorner?.addEventListener('input', () => {
+    cornerColor = colorCorner.value;
+    const hex = document.getElementById('hex-corner');
+    if (hex) hex.textContent = cornerColor;
+    updateQr();
+  });
+
+  // Presets
+  const presetChips = document.querySelectorAll('.btn-preset-chip');
+  presetChips.forEach((chip) => {
+    chip.addEventListener('click', () => {
+      dotColor = (chip as HTMLElement).dataset.dots || '#000000';
+      bgColor = (chip as HTMLElement).dataset.bg || '#ffffff';
+      cornerColor = (chip as HTMLElement).dataset.corner || '#000000';
+
+      if (colorDots) colorDots.value = dotColor;
+      if (colorBg) colorBg.value = bgColor;
+      if (colorCorner) colorCorner.value = cornerColor;
+
+      const hexDots = document.getElementById('hex-dots');
+      const hexBg = document.getElementById('hex-bg');
+      const hexCorner = document.getElementById('hex-corner');
+      if (hexDots) hexDots.textContent = dotColor;
+      if (hexBg) hexBg.textContent = bgColor;
+      if (hexCorner) hexCorner.textContent = cornerColor;
+
+      updateQr();
+    });
+  });
+
+  // Logo upload
+  const dropzone = document.getElementById('logo-upload-dropzone');
+  const fileInput = document.getElementById('logo-file-input') as HTMLInputElement;
+  const logoPreview = document.getElementById('logo-preview-row');
+  const logoThumb = document.getElementById('logo-preview-thumb') as HTMLImageElement;
+  const logoFilename = document.getElementById('logo-preview-filename');
+  const btnRemoveLogo = document.getElementById('btn-remove-logo');
+
+  dropzone?.addEventListener('click', () => fileInput?.click());
+  fileInput?.addEventListener('change', () => {
+    const file = fileInput.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        logoData = e.target?.result as string;
+        if (logoThumb) logoThumb.src = logoData;
+        if (logoFilename) logoFilename.textContent = file.name;
+        if (dropzone) dropzone.style.display = 'none';
+        if (logoPreview) logoPreview.style.display = 'flex';
+        updateQr();
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  btnRemoveLogo?.addEventListener('click', () => {
+    logoData = null;
+    if (fileInput) fileInput.value = '';
+    if (dropzone) dropzone.style.display = 'block';
+    if (logoPreview) logoPreview.style.display = 'none';
+    updateQr();
+  });
+
+  // Export
+  const exportBtns = document.querySelectorAll('.btn-export-fmt');
+  const exportExtLabel = document.getElementById('export-ext-label');
+  const filenameInput = document.getElementById('export-filename') as HTMLInputElement;
+  const btnDownload = document.getElementById('btn-download-qr');
+  const btnCopyCanvas = document.getElementById('btn-copy-qr-canvas');
+
+  exportBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      exportBtns.forEach((b) => b.classList.remove('styles_exportBtnActive', 'active'));
+      btn.classList.add('styles_exportBtnActive', 'active');
+      exportFmt = (btn as HTMLElement).dataset.fmt || 'png';
+      if (exportExtLabel) exportExtLabel.textContent = `.${exportFmt}`;
+    });
+  });
+
+  btnDownload?.addEventListener('click', async () => {
+    const { default: QRCodeStyling } = await import('qr-code-styling');
+    const payload = buildQRPayload(qrType, getValues());
+    const exportQr = new QRCodeStyling({
+      width: 1024,
+      height: 1024,
+      type: 'canvas',
+      data: payload || 'https://iqverse.net',
+      image: logoData || '',
+      dotsOptions: { type: dotStyle as any, color: dotColor },
+      cornersSquareOptions: { type: cornerStyle as any, color: cornerColor },
+      backgroundOptions: { color: bgColor },
+      margin: 20,
+      qrOptions: { errorCorrectionLevel: errorLevel as any },
+    });
+    exportQr.download({ name: filenameInput?.value || 'my-qr-code', extension: exportFmt as any });
+  });
+
+  btnCopyCanvas?.addEventListener('click', async () => {
+    const canvas = container?.querySelector('canvas');
+    if (canvas && btnCopyCanvas) {
+      canvas.toBlob(async (blob) => {
+        if (blob) {
+          await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+          const prev = btnCopyCanvas.textContent;
+          btnCopyCanvas.textContent = 'Copied!';
+          setTimeout(() => (btnCopyCanvas.textContent = prev), 1500);
+        }
+      });
+    }
+  });
+
+  updateQr();
+</script>

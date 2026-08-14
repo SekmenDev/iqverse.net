@@ -1,0 +1,159 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+---
+
+<ToolLayout
+  title="CSV Viewer & Converter"
+  subtitle="Interactive Table & Export to JSON/SQL/MD"
+  pill="BROWSER TOOLS"
+  toolSlug="csvviewer"
+  description="Inspect and parse CSV files in an interactive data table. Convert CSV to JSON, Markdown, or SQL insert statements effortlessly."
+>
+  <div style="max-width: 1100px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.sectionLabel}>CSV Input</div>
+      <div class={sharedStyles.card}>
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="csvInput">Paste CSV</label>
+          <textarea
+            id="csvInput"
+            class={sharedStyles.textarea}
+            rows="6"
+          >name,age,city&#10;Ada,36,London&#10;Linus,54,New York</textarea>
+        </div>
+
+        <div class={sharedStyles.buttonGroup}>
+          <button type="button" id="btn-export-json" class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}>Export JSON</button>
+          <button type="button" id="btn-export-md" class={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`}>Export Markdown</button>
+          <button type="button" id="btn-export-sql" class={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`}>Export SQL</button>
+        </div>
+      </div>
+    </section>
+
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.sectionLabel}>Interactive Table Preview</div>
+      <div class={sharedStyles.card}>
+        <div style="overflow-x: auto;">
+          <table id="csv-table" style="width: 100%; border-collapse: collapse;">
+            <thead id="csv-thead"></thead>
+            <tbody id="csv-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="csv-export-section" class={sharedStyles.section} style="display: none;">
+      <div class={sharedStyles.sectionLabel}>Export Output</div>
+      <div class={sharedStyles.card}>
+        <textarea id="csvExportOutput" readonly class={sharedStyles.outputArea} rows="8"></textarea>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const csvInput = document.getElementById('csvInput') as HTMLTextAreaElement;
+  const csvThead = document.getElementById('csv-thead');
+  const csvTbody = document.getElementById('csv-tbody');
+  const exportSection = document.getElementById('csv-export-section');
+  const exportOutput = document.getElementById('csvExportOutput') as HTMLTextAreaElement;
+
+  const btnJson = document.getElementById('btn-export-json');
+  const btnMd = document.getElementById('btn-export-md');
+  const btnSql = document.getElementById('btn-export-sql');
+
+  function parseCSV(text: string) {
+    const rows = text.split(/\r?\n/).filter((row) => row.trim().length > 0);
+    if (rows.length === 0) return { headers: [], rows: [] };
+
+    const [headerRow, ...dataRows] = rows;
+    const headers = headerRow.split(',').map((value) => value.trim());
+
+    const parsedRows = dataRows.map((row) => {
+      const values = row.split(',').map((value) => value.trim());
+      return headers.reduce<Record<string, string>>((acc, header, index) => {
+        acc[header] = values[index] ?? '';
+        return acc;
+      }, {});
+    });
+
+    return { headers, rows: parsedRows };
+  }
+
+  function renderTable() {
+    if (!csvInput || !csvThead || !csvTbody) return;
+    const { headers, rows } = parseCSV(csvInput.value);
+
+    if (headers.length === 0) {
+      csvThead.innerHTML = '';
+      csvTbody.innerHTML = '<tr><td style="padding: 1rem; color: var(--text-muted);">No data</td></tr>';
+      return;
+    }
+
+    csvThead.innerHTML = `
+      <tr>
+        ${headers.map((h) => `<th style="text-align: left; padding: 0.75rem; border-bottom: 1px solid var(--border); color: var(--text-muted); font-size: 0.85rem;">${h}</th>`).join('')}
+      </tr>
+    `;
+
+    csvTbody.innerHTML = rows
+      .map(
+        (r) => `
+      <tr>
+        ${headers.map((h) => `<td style="padding: 0.75rem; border-bottom: 1px solid var(--border); font-size: 0.9rem;">${r[h] || ''}</td>`).join('')}
+      </tr>
+    `
+      )
+      .join('');
+  }
+
+  btnJson?.addEventListener('click', () => {
+    const { rows } = parseCSV(csvInput?.value || '');
+    if (exportOutput && exportSection) {
+      exportOutput.value = JSON.stringify(rows, null, 2);
+      exportSection.style.display = 'block';
+    }
+  });
+
+  btnMd?.addEventListener('click', () => {
+    const { headers, rows } = parseCSV(csvInput?.value || '');
+    if (exportOutput && exportSection) {
+      if (rows.length === 0) {
+        exportOutput.value = '';
+      } else {
+        const lines = [
+          `| ${headers.join(' | ')} |`,
+          `| ${headers.map(() => '---').join(' | ')} |`,
+          ...rows.map((row) => `| ${headers.map((h) => row[h]).join(' | ')} |`),
+        ];
+        exportOutput.value = lines.join('\n');
+      }
+      exportSection.style.display = 'block';
+    }
+  });
+
+  btnSql?.addEventListener('click', () => {
+    const { headers, rows } = parseCSV(csvInput?.value || '');
+    if (exportOutput && exportSection) {
+      if (rows.length === 0) {
+        exportOutput.value = '';
+      } else {
+        const inserts = rows.map((row) => {
+          const values = headers
+            .map((h) => {
+              const escaped = String(row[h]).split("'").join("''");
+              return `'${escaped}'`;
+            })
+            .join(', ');
+          return `INSERT INTO table_name (${headers.join(', ')}) VALUES (${values});`;
+        });
+        exportOutput.value = inserts.join('\n');
+      }
+      exportSection.style.display = 'block';
+    }
+  });
+
+  csvInput?.addEventListener('input', renderTable);
+  renderTable();
+</script>

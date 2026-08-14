@@ -1,0 +1,145 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+---
+
+<ToolLayout
+  title="Image Optimizer"
+  subtitle="In-Browser Image Compression & Resizing"
+  pill="BROWSER TOOLS"
+  toolSlug="imageoptimizer"
+  description="Compress and optimize PNG, JPEG, and WebP images directly in your browser without quality loss or uploading files."
+>
+  <div style="max-width: 900px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.sectionLabel}>Local image compression</div>
+      <div class={sharedStyles.card}>
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="imageFile">Upload image</label>
+          <input id="imageFile" type="file" accept="image/*" />
+        </div>
+
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="imageQuality">Quality: <span id="quality-display">0.8</span></label>
+          <input
+            id="imageQuality"
+            type="range"
+            min="0.1"
+            max="1"
+            step="0.1"
+            value="0.8"
+          />
+        </div>
+
+        <div id="img-success-card" class={sharedStyles.successCard} style="margin-top: 12px; display: none;">
+          <div id="img-success-msg" class={sharedStyles.successMessage}></div>
+        </div>
+
+        <div id="img-error-card" class={sharedStyles.errorCard} style="margin-top: 12px; display: none;">
+          <div id="img-error-msg" class={sharedStyles.errorMessage}></div>
+        </div>
+
+        <div id="preview-container" style="margin-top: 24px; display: none;">
+          <img
+            id="optimized-preview-img"
+            alt="Optimized preview"
+            style="max-width: 100%; height: auto; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-bottom: 12px;"
+          />
+          <div>
+            <a id="download-optimized-btn" href="#" class={sharedStyles.buttonSmall}>
+              Download optimized preview
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const fileInput = document.getElementById('imageFile') as HTMLInputElement;
+  const qualityInput = document.getElementById('imageQuality') as HTMLInputElement;
+  const qualityDisplay = document.getElementById('quality-display');
+  const previewContainer = document.getElementById('preview-container');
+  const previewImg = document.getElementById('optimized-preview-img') as HTMLImageElement;
+  const downloadBtn = document.getElementById('download-optimized-btn') as HTMLAnchorElement;
+  const successCard = document.getElementById('img-success-card');
+  const successMsg = document.getElementById('img-success-msg');
+  const errorCard = document.getElementById('img-error-card');
+  const errorMsg = document.getElementById('img-error-msg');
+
+  let currentFile: File | null = null;
+
+  if (qualityInput && qualityDisplay) {
+    qualityInput.addEventListener('input', () => {
+      qualityDisplay.textContent = qualityInput.value;
+      if (currentFile) processImage();
+    });
+  }
+
+  fileInput?.addEventListener('change', () => {
+    const file = fileInput.files?.[0];
+    if (!file) return;
+    currentFile = file;
+    processImage();
+  });
+
+  function processImage() {
+    if (!currentFile) return;
+    if (errorCard) errorCard.style.display = 'none';
+    if (successCard) successCard.style.display = 'none';
+
+    try {
+      const imageUrl = URL.createObjectURL(currentFile);
+      const img = new Image();
+      img.src = imageUrl;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          if (errorCard && errorMsg) {
+            errorCard.style.display = 'block';
+            errorMsg.textContent = 'Canvas is unavailable in this browser.';
+          }
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, img.width, img.height);
+        const quality = Number(qualityInput?.value || 0.8);
+
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              if (errorCard && errorMsg) {
+                errorCard.style.display = 'block';
+                errorMsg.textContent = 'Unable to create compressed image.';
+              }
+              return;
+            }
+
+            const optimizedUrl = URL.createObjectURL(blob);
+            if (previewImg) previewImg.src = optimizedUrl;
+            if (downloadBtn) {
+              downloadBtn.href = optimizedUrl;
+              downloadBtn.download = currentFile!.name.replace(/\.[^.]+$/, '') + '.webp';
+            }
+            if (previewContainer) previewContainer.style.display = 'block';
+            if (successCard && successMsg) {
+              successCard.style.display = 'block';
+              successMsg.textContent = `Optimized ${currentFile!.name} (${Math.round(blob.size / 1024)} KB).`;
+            }
+          },
+          'image/webp',
+          quality
+        );
+      };
+    } catch (err: any) {
+      if (errorCard && errorMsg) {
+        errorCard.style.display = 'block';
+        errorMsg.textContent = err.message || 'Failed to process image.';
+      }
+    }
+  }
+</script>

@@ -1,0 +1,151 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+
+const formats = [
+  { value: 'json', label: 'JSON' },
+  { value: 'csv', label: 'CSV' },
+  { value: 'hex', label: 'Hex' },
+  { value: 'base64', label: 'Base64' },
+];
+---
+
+<ToolLayout
+  title="Data Converter"
+  subtitle="Transform JSON, CSV, Hex & Base64"
+  pill="BROWSER TOOLS"
+  toolSlug="dataconverter"
+  description="Convert between JSON, CSV, Hex, and Base64 data formats locally. Fast client-side data transformer with zero file uploads."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.sectionLabel}>Data Converter</div>
+      <div class={sharedStyles.card}>
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="inputFormat">
+            Input Format
+          </label>
+          <select id="inputFormat">
+            {formats.map((option) => (
+              <option value={option.value} selected={option.value === 'json'}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="outputFormat">
+            Output Format
+          </label>
+          <select id="outputFormat">
+            {formats.map((option) => (
+              <option value={option.value} selected={option.value === 'csv'}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="converterInput">
+            Input
+          </label>
+          <textarea
+            id="converterInput"
+            class={sharedStyles.textarea}
+            rows="8"
+            placeholder='[{"id": 1, "name": "Alice"}, {"id": 2, "name": "Bob"}]'
+          ></textarea>
+        </div>
+
+        <div class={sharedStyles.buttonGroup}>
+          <button type="button" id="btn-convert" class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}>
+            Convert
+          </button>
+        </div>
+
+        <div class={sharedStyles.sectionLabel} style="margin-top: 18px;">
+          Output
+        </div>
+
+        <div class={sharedStyles.field}>
+          <textarea id="converterOutput" readonly class={sharedStyles.outputArea} rows="8"></textarea>
+        </div>
+
+        <div id="converter-error-box" class={sharedStyles.errorCard} style="margin-top: 12px; display: none;">
+          <div id="converter-error-msg" class={sharedStyles.errorMessage}></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  import { hexDecode, hexEncode } from '@/lib/encoding';
+
+  const inFmtSelect = document.getElementById('inputFormat') as HTMLSelectElement;
+  const outFmtSelect = document.getElementById('outputFormat') as HTMLSelectElement;
+  const inputEl = document.getElementById('converterInput') as HTMLTextAreaElement;
+  const outputEl = document.getElementById('converterOutput') as HTMLTextAreaElement;
+  const btnConvert = document.getElementById('btn-convert');
+  const errorBox = document.getElementById('converter-error-box');
+  const errorMsg = document.getElementById('converter-error-msg');
+
+  function convert() {
+    if (errorBox) errorBox.style.display = 'none';
+    if (outputEl) outputEl.value = '';
+
+    try {
+      const input = inputEl?.value || '';
+      const inFmt = inFmtSelect?.value || 'json';
+      const outFmt = outFmtSelect?.value || 'csv';
+
+      let parsed: any = input;
+
+      if (inFmt === 'json') {
+        parsed = JSON.parse(input);
+      } else if (inFmt === 'csv') {
+        const lines = input.split(/\r?\n/).filter(Boolean);
+        const [header, ...rows] = lines;
+        const columns = header.split(',').map((v) => v.trim());
+        parsed = rows.map((row) => {
+          const values = row.split(',').map((v) => v.trim());
+          return columns.reduce((obj: any, col, idx) => ({ ...obj, [col]: values[idx] ?? '' }), {});
+        });
+      } else if (inFmt === 'hex') {
+        parsed = hexDecode(input);
+      } else if (inFmt === 'base64') {
+        parsed = atob(input);
+      }
+
+      if (outFmt === 'json') {
+        outputEl.value = JSON.stringify(parsed, null, 2);
+      } else if (outFmt === 'csv') {
+        if (!Array.isArray(parsed) || parsed.length === 0 || typeof parsed[0] !== 'object' || parsed[0] === null) {
+          throw new TypeError('CSV output requires an array of objects.');
+        }
+        const rows = parsed as Record<string, unknown>[];
+        const headers = Array.from(new Set(rows.flatMap((row) => Object.keys(row))));
+        const csv = [headers.join(',')];
+        rows.forEach((row) => {
+          csv.push(headers.map((h) => String(row[h] ?? '')).join(','));
+        });
+        outputEl.value = csv.join('\n');
+      } else if (outFmt === 'hex') {
+        const text = typeof parsed === 'string' ? parsed : JSON.stringify(parsed);
+        outputEl.value = hexEncode(text);
+      } else if (outFmt === 'base64') {
+        const text = typeof parsed === 'string' ? parsed : JSON.stringify(parsed);
+        outputEl.value = btoa(text);
+      }
+    } catch (err: any) {
+      if (errorBox && errorMsg) {
+        errorBox.style.display = 'block';
+        errorMsg.textContent = err.message || 'Conversion failed.';
+      }
+    }
+  }
+
+  btnConvert?.addEventListener('click', convert);
+</script>

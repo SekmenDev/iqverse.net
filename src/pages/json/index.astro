@@ -1,0 +1,161 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+---
+
+<ToolLayout
+  title="JSON Formatter"
+  subtitle="Format, Validate, Minify & Prettify JSON"
+  pill="BROWSER TOOLS"
+  toolSlug="json"
+  description="Format, validate, minify, and sort JSON data online. Fast, browser-native JSON beautifier and linter with zero server tracking."
+>
+  <div style="max-width: 1000px;">
+    <!-- Input Section -->
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.sectionLabel}>Input</div>
+      <div class={sharedStyles.card}>
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="jsonInput">JSON Input</label>
+          <textarea
+            id="jsonInput"
+            placeholder={'{"name": "John", "age": 30}'}
+            class={sharedStyles.textarea}
+            rows="8"
+          ></textarea>
+        </div>
+        <div class={sharedStyles.buttonGroup}>
+          <button
+            type="button"
+            id="btn-format"
+            class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
+          >
+            Format (Pretty Print)
+          </button>
+          <button
+            type="button"
+            id="btn-minify"
+            class={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`}
+          >
+            Minify
+          </button>
+          <button
+            type="button"
+            id="btn-validate"
+            class={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`}
+          >
+            Validate
+          </button>
+          <button
+            type="button"
+            id="btn-clear"
+            class={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`}
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Output Section -->
+    <section id="output-section" class={sharedStyles.section} style="display: none;">
+      <div class={sharedStyles.sectionLabel}>Output</div>
+      <div class={sharedStyles.card}>
+        <textarea
+          id="jsonOutput"
+          readonly
+          class={sharedStyles.outputArea}
+          rows="10"
+        ></textarea>
+        <button
+          type="button"
+          id="btn-copy-json"
+          class={`${sharedStyles.button} ${sharedStyles.buttonSmall}`}
+        >
+          Copy
+        </button>
+      </div>
+    </section>
+
+    <!-- Error Section -->
+    <section id="error-section" class={sharedStyles.section} style="display: none;">
+      <div class={sharedStyles.sectionLabel}>Error</div>
+      <div class={sharedStyles.errorCard}>
+        <div id="error-message" class={sharedStyles.errorMessage}></div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const jsonInput = document.getElementById('jsonInput') as HTMLTextAreaElement;
+  const jsonOutput = document.getElementById('jsonOutput') as HTMLTextAreaElement;
+  const btnFormat = document.getElementById('btn-format');
+  const btnMinify = document.getElementById('btn-minify');
+  const btnValidate = document.getElementById('btn-validate');
+  const btnClear = document.getElementById('btn-clear');
+  const btnCopy = document.getElementById('btn-copy-json');
+  const outputSection = document.getElementById('output-section');
+  const errorSection = document.getElementById('error-section');
+  const errorMsg = document.getElementById('error-message');
+
+  function showResult(val: string) {
+    if (errorSection) errorSection.style.display = 'none';
+    if (outputSection && jsonOutput) {
+      jsonOutput.value = val;
+      outputSection.style.display = 'block';
+    }
+  }
+
+  function showError(err: string) {
+    if (outputSection) outputSection.style.display = 'none';
+    if (errorSection && errorMsg) {
+      errorMsg.textContent = err;
+      errorSection.style.display = 'block';
+    }
+  }
+
+  btnFormat?.addEventListener('click', () => {
+    try {
+      const parsed = JSON.parse(jsonInput?.value || '');
+      showResult(JSON.stringify(parsed, null, 2));
+    } catch (err: any) {
+      showError(`Error: ${err.message || 'Invalid JSON'}`);
+    }
+  });
+
+  btnMinify?.addEventListener('click', () => {
+    try {
+      const parsed = JSON.parse(jsonInput?.value || '');
+      showResult(JSON.stringify(parsed));
+    } catch (err: any) {
+      showError(`Error: ${err.message || 'Invalid JSON'}`);
+    }
+  });
+
+  btnValidate?.addEventListener('click', () => {
+    try {
+      JSON.parse(jsonInput?.value || '');
+      showResult('✓ Valid JSON');
+    } catch (err: any) {
+      showError(`Error: ${err.message || 'Invalid JSON'}`);
+    }
+  });
+
+  btnClear?.addEventListener('click', () => {
+    if (jsonInput) jsonInput.value = '';
+    if (outputSection) outputSection.style.display = 'none';
+    if (errorSection) errorSection.style.display = 'none';
+  });
+
+  btnCopy?.addEventListener('click', async () => {
+    if (jsonOutput?.value && btnCopy) {
+      await navigator.clipboard.writeText(jsonOutput.value);
+      const prev = btnCopy.textContent;
+      btnCopy.textContent = 'Copied!';
+      setTimeout(() => {
+        btnCopy.textContent = prev;
+      }, 1500);
+    }
+  });
+</script>

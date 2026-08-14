@@ -1,0 +1,248 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+
+const PRESETS = [
+  { label: 'Every minute', expr: '* * * * *' },
+  { label: 'Every 5 minutes', expr: '*/5 * * * *' },
+  { label: 'Every hour at :00', expr: '0 * * * *' },
+  { label: 'Every day at midnight (00:00)', expr: '0 0 * * *' },
+  { label: 'Every Monday at 09:00', expr: '0 9 * * 1' },
+  { label: 'First day of every month at 00:00', expr: '0 0 1 * *' },
+];
+---
+
+<ToolLayout
+  title="Cron Expression Builder & Translator"
+  subtitle="5-Part Standard Cron Schedule Generator"
+  pill="BROWSER TOOLS"
+  toolSlug="cron-builder"
+  description="Build, translate, and debug standard 5-part cron expressions with human-readable explanations and upcoming schedule run times."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center;">
+          <span style="font-size: 0.875rem; font-weight: 600;">Presets:</span>
+          {PRESETS.map((p) => (
+            <button
+              type="button"
+              class="preset-cron-btn"
+              data-expr={p.expr}
+              style="font-size: 0.8rem; padding: 4px 10px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer;"
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+
+        <div class={sharedStyles.field}>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <label class={sharedStyles.fieldLabel} for="cronExprInput">
+              Cron Expression (5-part standard)
+            </label>
+            <button type="button" id="btn-copy-cron" class={sharedStyles.button}>
+              Copy Expression
+            </button>
+          </div>
+          <input
+            id="cronExprInput"
+            type="text"
+            value="0 0 * * *"
+            class={sharedStyles.input}
+            style="font-family: monospace; font-size: 1.2rem; font-weight: bold;"
+          />
+        </div>
+
+        <!-- Visual Fields Builder -->
+        <div
+          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-top: 20px; margin-bottom: 20px;"
+        >
+          <div style="padding: 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+            <label style="display: block; font-size: 0.8rem; opacity: 0.8; margin-bottom: 4px;">Minute (0-59)</label>
+            <input id="part-min" type="text" class={sharedStyles.input} style="font-family: monospace;" value="0" />
+          </div>
+          <div style="padding: 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+            <label style="display: block; font-size: 0.8rem; opacity: 0.8; margin-bottom: 4px;">Hour (0-23)</label>
+            <input id="part-hour" type="text" class={sharedStyles.input} style="font-family: monospace;" value="0" />
+          </div>
+          <div style="padding: 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+            <label style="display: block; font-size: 0.8rem; opacity: 0.8; margin-bottom: 4px;">Day of Month (1-31)</label>
+            <input id="part-dom" type="text" class={sharedStyles.input} style="font-family: monospace;" value="*" />
+          </div>
+          <div style="padding: 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+            <label style="display: block; font-size: 0.8rem; opacity: 0.8; margin-bottom: 4px;">Month (1-12)</label>
+            <input id="part-mon" type="text" class={sharedStyles.input} style="font-family: monospace;" value="*" />
+          </div>
+          <div style="padding: 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+            <label style="display: block; font-size: 0.8rem; opacity: 0.8; margin-bottom: 4px;">Day of Week (0-6)</label>
+            <input id="part-dow" type="text" class={sharedStyles.input} style="font-family: monospace;" value="*" />
+          </div>
+        </div>
+
+        <!-- Human Readable Explanation -->
+        <div
+          style="padding: 16px; border-radius: 8px; background: rgba(33, 150, 243, 0.08); border: 1px solid rgba(33, 150, 243, 0.2); margin-bottom: 20px;"
+        >
+          <div style="font-size: 0.85rem; opacity: 0.8; margin-bottom: 4px;">Human-Readable Schedule:</div>
+          <div id="cron-human-desc" style="font-size: 1.1rem; font-weight: bold; color: #2196f3;"></div>
+        </div>
+
+        <!-- Next Scheduled Runs -->
+        <div>
+          <h4 style="margin-bottom: 12px;">Next Scheduled Execution Times</h4>
+          <div id="cron-next-runs" class={sharedStyles.outputArea} style="font-family: monospace; font-size: 0.9rem;"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  function translateCronField(val: string, fieldName: string): string {
+    if (val === '*') return `every ${fieldName}`;
+    if (val.startsWith('*/')) return `every ${val.slice(2)} ${fieldName}s`;
+    return `${fieldName} ${val}`;
+  }
+
+  function getHumanDescription(expr: string): string {
+    const parts = expr.trim().split(/\s+/);
+    if (parts.length !== 5) {
+      return 'Invalid cron format (must be 5 space-separated parts: minute hour day-of-month month day-of-week)';
+    }
+
+    const [min, hour, dom, mon, dow] = parts;
+
+    let timeDesc = '';
+    if (min === '*' && hour === '*') {
+      timeDesc = 'Every minute';
+    } else if (min.startsWith('*/') && hour === '*') {
+      timeDesc = `Every ${min.slice(2)} minutes`;
+    } else if (min === '0' && hour === '*') {
+      timeDesc = 'At minute 0 of every hour';
+    } else if (!isNaN(Number(min)) && !isNaN(Number(hour))) {
+      const formattedHour = Number(hour).toString().padStart(2, '0');
+      const formattedMin = Number(min).toString().padStart(2, '0');
+      timeDesc = `At ${formattedHour}:${formattedMin}`;
+    } else {
+      timeDesc = `At ${translateCronField(min, 'minute')}, ${translateCronField(hour, 'hour')}`;
+    }
+
+    let dateDesc = '';
+    if (dom === '*' && mon === '*' && dow === '*') {
+      dateDesc = 'every day';
+    } else {
+      const details = [];
+      if (dom !== '*') details.push(`on day ${dom} of the month`);
+      if (mon !== '*') details.push(`in month ${mon}`);
+      if (dow !== '*') {
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const dNum = Number(dow);
+        details.push(`on ${days[dNum] || `day-of-week ${dow}`}`);
+      }
+      dateDesc = details.join(', ');
+    }
+
+    return `${timeDesc}, ${dateDesc}`;
+  }
+
+  function calculateNextRuns(expr: string, count: number = 5): string[] {
+    const parts = expr.trim().split(/\s+/);
+    if (parts.length !== 5) return [];
+
+    const [minStr, hourStr] = parts;
+    const runs: string[] = [];
+    let current = new Date();
+
+    let stepMinutes = 1;
+    if (minStr.startsWith('*/')) {
+      stepMinutes = parseInt(minStr.slice(2), 10) || 1;
+    }
+
+    for (let i = 0; i < count * 60 && runs.length < count; i++) {
+      current = new Date(current.getTime() + stepMinutes * 60 * 1000);
+      const m = current.getMinutes();
+      const h = current.getHours();
+
+      const minMatch = minStr === '*' || (minStr.startsWith('*/') && m % stepMinutes === 0) || Number(minStr) === m;
+      const hourMatch = hourStr === '*' || (hourStr.startsWith('*/') && h % (parseInt(hourStr.slice(2), 10) || 1) === 0) || Number(hourStr) === h;
+
+      if (minMatch && hourMatch) {
+        runs.push(current.toLocaleString());
+      }
+    }
+
+    return runs;
+  }
+
+  const cronInput = document.getElementById('cronExprInput') as HTMLInputElement;
+  const partMin = document.getElementById('part-min') as HTMLInputElement;
+  const partHour = document.getElementById('part-hour') as HTMLInputElement;
+  const partDom = document.getElementById('part-dom') as HTMLInputElement;
+  const partMon = document.getElementById('part-mon') as HTMLInputElement;
+  const partDow = document.getElementById('part-dow') as HTMLInputElement;
+
+  const humanDesc = document.getElementById('cron-human-desc');
+  const nextRunsOut = document.getElementById('cron-next-runs');
+  const btnCopy = document.getElementById('btn-copy-cron');
+  const presetBtns = document.querySelectorAll('.preset-cron-btn');
+
+  function syncFromInput() {
+    const expr = cronInput?.value.trim() || '* * * * *';
+    const split = expr.split(/\s+/);
+
+    if (partMin) partMin.value = split[0] || '*';
+    if (partHour) partHour.value = split[1] || '*';
+    if (partDom) partDom.value = split[2] || '*';
+    if (partMon) partMon.value = split[3] || '*';
+    if (partDow) partDow.value = split[4] || '*';
+
+    updateOutputs(expr);
+  }
+
+  function syncFromParts() {
+    const min = partMin?.value.trim() || '*';
+    const hour = partHour?.value.trim() || '*';
+    const dom = partDom?.value.trim() || '*';
+    const mon = partMon?.value.trim() || '*';
+    const dow = partDow?.value.trim() || '*';
+
+    const expr = `${min} ${hour} ${dom} ${mon} ${dow}`;
+    if (cronInput) cronInput.value = expr;
+    updateOutputs(expr);
+  }
+
+  function updateOutputs(expr: string) {
+    if (humanDesc) humanDesc.textContent = getHumanDescription(expr);
+    if (nextRunsOut) {
+      const runs = calculateNextRuns(expr, 5);
+      nextRunsOut.innerHTML = runs.length > 0
+        ? runs.map((t, idx) => `<div style="padding: 4px 0;">${idx + 1}. ${t}</div>`).join('')
+        : '<div>Unable to calculate upcoming run times.</div>';
+    }
+  }
+
+  presetBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const expr = (btn as HTMLElement).dataset.expr;
+      if (expr && cronInput) {
+        cronInput.value = expr;
+        syncFromInput();
+      }
+    });
+  });
+
+  cronInput?.addEventListener('input', syncFromInput);
+  [partMin, partHour, partDom, partMon, partDow].forEach((el) => el?.addEventListener('input', syncFromParts));
+
+  btnCopy?.addEventListener('click', async () => {
+    if (cronInput?.value && btnCopy) {
+      await navigator.clipboard.writeText(cronInput.value);
+      const prev = btnCopy.textContent;
+      btnCopy.textContent = 'Copied!';
+      setTimeout(() => (btnCopy.textContent = prev), 1500);
+    }
+  });
+
+  syncFromInput();
+</script>

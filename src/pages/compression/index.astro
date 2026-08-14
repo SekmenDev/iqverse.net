@@ -1,0 +1,134 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+---
+
+<ToolLayout
+  title="Compression"
+  subtitle="Deflate & Gzip Text Compressor"
+  pill="BROWSER TOOLS"
+  toolSlug="compression"
+  description="Compress and decompress text strings using browser-native Deflate and Gzip algorithms with Base64 output."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.sectionLabel}>Compression</div>
+      <div class={sharedStyles.card}>
+        <div class={sharedStyles.field}>
+          <span class={sharedStyles.fieldLabel}>Mode</span>
+          <div class={sharedStyles.buttonGroup} style="margin: 0;" role="group" aria-label="Compression mode">
+            <button
+              id="btn-mode-compress"
+              class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
+              type="button"
+              aria-pressed="true"
+            >
+              Compress
+            </button>
+            <button
+              id="btn-mode-decompress"
+              class={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`}
+              type="button"
+              aria-pressed="false"
+            >
+              Decompress
+            </button>
+          </div>
+        </div>
+
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="compressionInput">
+            Input
+          </label>
+          <textarea
+            id="compressionInput"
+            class={sharedStyles.textarea}
+            rows="6"
+          >Hello IQVerse compression</textarea>
+        </div>
+
+        <div class={sharedStyles.buttonGroup}>
+          <button type="button" id="btn-run-compression" class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}>
+            Run
+          </button>
+        </div>
+
+        <div style="margin-top: 18px;" class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="compressionOutput">Output</label>
+          <textarea id="compressionOutput" readonly class={sharedStyles.outputArea} rows="6"></textarea>
+        </div>
+
+        <div id="comp-error-box" class={sharedStyles.errorCard} style="margin-top: 12px; display: none;">
+          <div id="comp-error-msg" class={sharedStyles.errorMessage}></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  let mode: 'compress' | 'decompress' = 'compress';
+
+  const btnComp = document.getElementById('btn-mode-compress');
+  const btnDecomp = document.getElementById('btn-mode-decompress');
+  const inputEl = document.getElementById('compressionInput') as HTMLTextAreaElement;
+  const outputEl = document.getElementById('compressionOutput') as HTMLTextAreaElement;
+  const btnRun = document.getElementById('btn-run-compression');
+  const errorBox = document.getElementById('comp-error-box');
+  const errorMsg = document.getElementById('comp-error-msg');
+
+  if (btnComp && btnDecomp) {
+    btnComp.onclick = () => {
+      mode = 'compress';
+      btnComp.className = 'sharedStyles_button sharedStyles_buttonPrimary button-primary';
+      btnDecomp.className = 'sharedStyles_button sharedStyles_buttonSecondary';
+      btnComp.setAttribute('aria-pressed', 'true');
+      btnDecomp.setAttribute('aria-pressed', 'false');
+    };
+
+    btnDecomp.onclick = () => {
+      mode = 'decompress';
+      btnDecomp.className = 'sharedStyles_button sharedStyles_buttonPrimary button-primary';
+      btnComp.className = 'sharedStyles_button sharedStyles_buttonSecondary';
+      btnDecomp.setAttribute('aria-pressed', 'true');
+      btnComp.setAttribute('aria-pressed', 'false');
+    };
+  }
+
+  async function compressText(text: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const compressed = await new Response(
+      new Blob([await new Response(encoder.encode(text)).arrayBuffer()]).stream().pipeThrough(new CompressionStream('deflate'))
+    ).arrayBuffer();
+    return btoa(String.fromCodePoint(...new Uint8Array(compressed)));
+  }
+
+  async function decompressText(base64: string): Promise<string> {
+    const binary = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+    const decompressed = await new Response(
+      new Blob([await new Response(binary).arrayBuffer()]).stream().pipeThrough(new DecompressionStream('deflate'))
+    ).arrayBuffer();
+    return new TextDecoder().decode(decompressed);
+  }
+
+  btnRun?.addEventListener('click', async () => {
+    if (errorBox) errorBox.style.display = 'none';
+    if (outputEl) outputEl.value = '';
+
+    try {
+      const text = inputEl?.value || '';
+      if (mode === 'compress') {
+        const res = await compressText(text);
+        if (outputEl) outputEl.value = res;
+      } else {
+        const res = await decompressText(text);
+        if (outputEl) outputEl.value = res;
+      }
+    } catch (err: any) {
+      if (errorBox && errorMsg) {
+        errorBox.style.display = 'block';
+        errorMsg.textContent = err.message || 'Compression operation failed.';
+      }
+    }
+  });
+</script>

@@ -1,0 +1,281 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+---
+
+<ToolLayout
+  title="Sitemap XML Generator"
+  subtitle="Standard XML Sitemap Builder & Exporter"
+  pill="BROWSER TOOLS"
+  toolSlug="sitemap-generator"
+  description="Generate valid XML sitemaps for search engines and AI crawlers with change frequency, priority, and lastmod tags."
+>
+  <div style="max-width: 1050px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
+          <div class={sharedStyles.field} style="margin: 0; flex: 1; min-width: 240px;">
+            <label class={sharedStyles.fieldLabel} for="baseUrlInput">
+              Base Website URL
+            </label>
+            <input
+              id="baseUrlInput"
+              type="text"
+              value="https://iqverse.net"
+              class={sharedStyles.input}
+            />
+          </div>
+          <button type="button" id="btn-add-sitemap-url" class={sharedStyles.button} style="margin-top: 22px;">
+            + Add URL
+          </button>
+        </div>
+
+        <!-- Bulk Import -->
+        <div
+          style="padding: 14px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); margin-bottom: 20px;"
+        >
+          <label class={sharedStyles.fieldLabel} for="bulkArea">
+            Bulk Import URLs (one path or URL per line)
+          </label>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <textarea
+              id="bulkArea"
+              class={sharedStyles.textarea}
+              rows="2"
+              placeholder="/about&#10;/contact&#10;/pricing"
+              style="flex: 1;"
+            ></textarea>
+            <button type="button" id="btn-bulk-import" class={sharedStyles.button} style="align-self: flex-end;">
+              Import
+            </button>
+          </div>
+        </div>
+
+        <!-- URL List -->
+        <div style="margin-bottom: 24px;">
+          <h4 style="margin-bottom: 12px;">Sitemap Entries</h4>
+          <div id="sitemap-urls-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
+        </div>
+
+        <!-- Generated XML -->
+        <div class={sharedStyles.field}>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+            <label class={sharedStyles.fieldLabel} for="xmlOutput">
+              Generated sitemap.xml
+            </label>
+            <div style="display: flex; gap: 8px;">
+              <button type="button" id="btn-copy-sitemap-xml" class={sharedStyles.button}>
+                Copy XML
+              </button>
+              <button type="button" id="btn-download-sitemap-xml" class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}>
+                Download sitemap.xml
+              </button>
+            </div>
+          </div>
+          <textarea
+            id="xmlOutput"
+            readonly
+            class={sharedStyles.outputArea}
+            rows="12"
+            style="font-family: monospace;"
+          ></textarea>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  interface UrlEntry {
+    loc: string;
+    lastmod: string;
+    changefreq: string;
+    priority: string;
+  }
+
+  const today = new Date().toISOString().split('T')[0];
+  let urls: UrlEntry[] = [
+    { loc: 'https://iqverse.net/', lastmod: today, changefreq: 'daily', priority: '1.0' },
+    { loc: 'https://iqverse.net/agentscan/', lastmod: today, changefreq: 'weekly', priority: '0.8' },
+    { loc: 'https://iqverse.net/llmstxt/', lastmod: today, changefreq: 'weekly', priority: '0.8' },
+  ];
+
+  const baseUrlInput = document.getElementById('baseUrlInput') as HTMLInputElement;
+  const btnAddUrl = document.getElementById('btn-add-sitemap-url');
+  const bulkArea = document.getElementById('bulkArea') as HTMLTextAreaElement;
+  const btnBulkImport = document.getElementById('btn-bulk-import');
+  const urlsListContainer = document.getElementById('sitemap-urls-list');
+  const xmlOutput = document.getElementById('xmlOutput') as HTMLTextAreaElement;
+  const btnCopy = document.getElementById('btn-copy-sitemap-xml');
+  const btnDownload = document.getElementById('btn-download-sitemap-xml');
+
+  function renderList() {
+    if (!urlsListContainer) return;
+    urlsListContainer.innerHTML = urls
+      .map(
+        (entry, idx) => `
+      <div
+        style="display: grid; grid-template-columns: 2fr 1fr 1fr 0.8fr auto; gap: 8px; align-items: center; background: rgba(255,255,255,0.01); padding: 8px; border-radius: 6px; border: 1px solid var(--border);"
+      >
+        <input
+          type="text"
+          class="url-field-loc"
+          data-idx="${idx}"
+          value="${entry.loc}"
+          style="padding: 6px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.85rem;"
+          placeholder="https://..."
+        />
+        <input
+          type="date"
+          class="url-field-lastmod"
+          data-idx="${idx}"
+          value="${entry.lastmod}"
+          style="padding: 6px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.85rem;"
+        />
+        <select
+          class="url-field-changefreq"
+          data-idx="${idx}"
+          style="padding: 6px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.85rem;"
+        >
+          <option value="always" ${entry.changefreq === 'always' ? 'selected' : ''}>always</option>
+          <option value="hourly" ${entry.changefreq === 'hourly' ? 'selected' : ''}>hourly</option>
+          <option value="daily" ${entry.changefreq === 'daily' ? 'selected' : ''}>daily</option>
+          <option value="weekly" ${entry.changefreq === 'weekly' ? 'selected' : ''}>weekly</option>
+          <option value="monthly" ${entry.changefreq === 'monthly' ? 'selected' : ''}>monthly</option>
+          <option value="yearly" ${entry.changefreq === 'yearly' ? 'selected' : ''}>yearly</option>
+          <option value="never" ${entry.changefreq === 'never' ? 'selected' : ''}>never</option>
+        </select>
+        <select
+          class="url-field-priority"
+          data-idx="${idx}"
+          style="padding: 6px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.85rem;"
+        >
+          <option value="1.0" ${entry.priority === '1.0' ? 'selected' : ''}>1.0 (Highest)</option>
+          <option value="0.9" ${entry.priority === '0.9' ? 'selected' : ''}>0.9</option>
+          <option value="0.8" ${entry.priority === '0.8' ? 'selected' : ''}>0.8</option>
+          <option value="0.7" ${entry.priority === '0.7' ? 'selected' : ''}>0.7</option>
+          <option value="0.6" ${entry.priority === '0.6' ? 'selected' : ''}>0.6</option>
+          <option value="0.5" ${entry.priority === '0.5' ? 'selected' : ''}>0.5 (Default)</option>
+          <option value="0.3" ${entry.priority === '0.3' ? 'selected' : ''}>0.3</option>
+          <option value="0.1" ${entry.priority === '0.1' ? 'selected' : ''}>0.1 (Lowest)</option>
+        </select>
+        <button
+          type="button"
+          class="btn-remove-url"
+          data-idx="${idx}"
+          style="background: transparent; color: #ff4d4f; border: none; font-size: 1.1rem; cursor: pointer;"
+        >
+          ✕
+        </button>
+      </div>
+    `
+      )
+      .join('');
+
+    document.querySelectorAll('.url-field-loc').forEach((el) => {
+      el.addEventListener('input', (e) => {
+        const i = Number((e.target as HTMLElement).dataset.idx);
+        urls[i].loc = (e.target as HTMLInputElement).value;
+        updateXml();
+      });
+    });
+
+    document.querySelectorAll('.url-field-lastmod').forEach((el) => {
+      el.addEventListener('input', (e) => {
+        const i = Number((e.target as HTMLElement).dataset.idx);
+        urls[i].lastmod = (e.target as HTMLInputElement).value;
+        updateXml();
+      });
+    });
+
+    document.querySelectorAll('.url-field-changefreq').forEach((el) => {
+      el.addEventListener('change', (e) => {
+        const i = Number((e.target as HTMLElement).dataset.idx);
+        urls[i].changefreq = (e.target as HTMLSelectElement).value;
+        updateXml();
+      });
+    });
+
+    document.querySelectorAll('.url-field-priority').forEach((el) => {
+      el.addEventListener('change', (e) => {
+        const i = Number((e.target as HTMLElement).dataset.idx);
+        urls[i].priority = (e.target as HTMLSelectElement).value;
+        updateXml();
+      });
+    });
+
+    document.querySelectorAll('.btn-remove-url').forEach((el) => {
+      el.addEventListener('click', (e) => {
+        const i = Number((e.target as HTMLElement).dataset.idx);
+        urls = urls.filter((_, idx) => idx !== i);
+        renderList();
+        updateXml();
+      });
+    });
+  }
+
+  function generateXml(): string {
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+    xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+
+    urls.forEach((u) => {
+      if (u.loc.trim()) {
+        xml += `  <url>\n`;
+        xml += `    <loc>${u.loc.trim()}</loc>\n`;
+        if (u.lastmod.trim()) xml += `    <lastmod>${u.lastmod.trim()}</lastmod>\n`;
+        if (u.changefreq) xml += `    <changefreq>${u.changefreq}</changefreq>\n`;
+        if (u.priority) xml += `    <priority>${u.priority}</priority>\n`;
+        xml += `  </url>\n`;
+      }
+    });
+
+    xml += `</urlset>`;
+    return xml;
+  }
+
+  function updateXml() {
+    if (xmlOutput) xmlOutput.value = generateXml();
+  }
+
+  btnAddUrl?.addEventListener('click', () => {
+    const base = baseUrlInput?.value.trim().replace(/\/$/, '') || 'https://example.com';
+    urls.push({ loc: `${base}/new-page`, lastmod: today, changefreq: 'monthly', priority: '0.5' });
+    renderList();
+    updateXml();
+  });
+
+  btnBulkImport?.addEventListener('click', () => {
+    const base = baseUrlInput?.value.trim().replace(/\/$/, '') || 'https://example.com';
+    const lines = (bulkArea?.value || '').split('\n').map((l) => l.trim()).filter(Boolean);
+    const newEntries = lines.map((l) => {
+      const fullLoc = l.startsWith('http') ? l : `${base}${l.startsWith('/') ? '' : '/'}${l}`;
+      return { loc: fullLoc, lastmod: today, changefreq: 'monthly', priority: '0.5' };
+    });
+    urls = [...urls, ...newEntries];
+    if (bulkArea) bulkArea.value = '';
+    renderList();
+    updateXml();
+  });
+
+  btnCopy?.addEventListener('click', async () => {
+    if (xmlOutput?.value && btnCopy) {
+      await navigator.clipboard.writeText(xmlOutput.value);
+      const prev = btnCopy.textContent;
+      btnCopy.textContent = 'Copied!';
+      setTimeout(() => (btnCopy.textContent = prev), 1500);
+    }
+  });
+
+  btnDownload?.addEventListener('click', () => {
+    const blob = new Blob([generateXml()], { type: 'application/xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'sitemap.xml';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  renderList();
+  updateXml();
+</script>

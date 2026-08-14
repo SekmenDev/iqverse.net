@@ -1,0 +1,233 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+---
+
+<ToolLayout
+  title="UUID & ULID Generator"
+  subtitle="Cryptographic UUID v4 & Time-Sortable ULID Batch Generator"
+  pill="BROWSER TOOLS"
+  toolSlug="uuid-ulid-generator"
+  description="Generate bulk UUID v4 identifiers and time-sortable ULID strings with format customization and ULID timestamp decoding."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;">
+          <div class={sharedStyles.buttonGroup} style="margin: 0;">
+            <label for="idType">Type:</label>
+            <select id="idType" style="margin-left: 8px;">
+              <option value="uuid">UUID v4 (Random)</option>
+              <option value="ulid">ULID (Sortable)</option>
+            </select>
+          </div>
+
+          <div class={sharedStyles.buttonGroup} style="margin: 0;">
+            <label for="idCount">Quantity:</label>
+            <input
+              id="idCount"
+              type="number"
+              min="1"
+              max="500"
+              value="5"
+              class={sharedStyles.input}
+              style="width: 80px; margin-left: 8px;"
+            />
+          </div>
+
+          <button
+            type="button"
+            id="btn-gen-ids"
+            class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
+          >
+            Generate IDs
+          </button>
+        </div>
+
+        <div style="display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; font-size: 0.875rem;">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+            <input id="cb-uppercase" type="checkbox" />
+            UPPERCASE
+          </label>
+
+          <label id="lbl-remove-hyphens" style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+            <input id="cb-remove-hyphens" type="checkbox" />
+            Remove Hyphens
+          </label>
+
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+            <input id="cb-braces" type="checkbox" />
+            Enclose in Braces {`{}`}
+          </label>
+        </div>
+
+        <div id="output-ids-field" class={sharedStyles.field} style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <label class={sharedStyles.fieldLabel} for="outputIds">
+              Generated Batch Output
+            </label>
+            <button type="button" id="btn-copy-ids" class={sharedStyles.button}>
+              Copy Batch
+            </button>
+          </div>
+          <textarea
+            id="outputIds"
+            readonly
+            class={sharedStyles.outputArea}
+            rows="8"
+            style="font-family: monospace;"
+          ></textarea>
+        </div>
+
+        <!-- ULID Decoder -->
+        <div
+          style="margin-top: 28px; padding: 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);"
+        >
+          <h4 style="margin: 0 0 12px 0;">ULID Timestamp Decoder</h4>
+          <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+            <input
+              id="inspectInput"
+              type="text"
+              class={sharedStyles.input}
+              placeholder="Paste ULID string (e.g. 01ARZ3NDEKTSV4RRFFQ69G5FAV)"
+              style="flex: 1; min-width: 260px;"
+            />
+            <button type="button" id="btn-decode-ulid" class={sharedStyles.button}>
+              Decode Date
+            </button>
+          </div>
+
+          <div id="inspect-result" style="margin-top: 12px; font-size: 0.9rem; display: none;"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  const CROCKFORD_BASE32 = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+
+  function generateRandomBytes(count: number): Uint8Array {
+    const bytes = new Uint8Array(count);
+    if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+      crypto.getRandomValues(bytes);
+    } else {
+      for (let i = 0; i < count; i++) {
+        bytes[i] = Math.floor(Math.random() * 256);
+      }
+    }
+    return bytes;
+  }
+
+  function generateUuidV4(): string {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
+    }
+    const bytes = generateRandomBytes(16);
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    const hex = Array.from(bytes).map((b) => b.toString(16).padStart(2, '0')).join('');
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+  }
+
+  function generateUlid(now: number = Date.now()): string {
+    let timeStr = '';
+    let time = now;
+    for (let i = 9; i >= 0; i--) {
+      const mod = time % 32;
+      timeStr = CROCKFORD_BASE32[mod] + timeStr;
+      time = Math.floor(time / 32);
+    }
+
+    const randBytes = generateRandomBytes(10);
+    let randStr = '';
+    for (let i = 0; i < 16; i++) {
+      const charIndex = randBytes[i % 10] % 32;
+      randStr += CROCKFORD_BASE32[charIndex];
+    }
+    return timeStr.padStart(10, '0') + randStr;
+  }
+
+  function decodeUlidTimestamp(ulid: string): string | null {
+    const clean = ulid.trim().toUpperCase();
+    if (clean.length < 10) return null;
+    const timePart = clean.slice(0, 10);
+    let timestamp = 0;
+    for (let i = 0; i < 10; i++) {
+      const char = timePart[i];
+      const val = CROCKFORD_BASE32.indexOf(char);
+      if (val === -1) return null;
+      timestamp = timestamp * 32 + val;
+    }
+    return new Date(timestamp).toISOString();
+  }
+
+  const idType = document.getElementById('idType') as HTMLSelectElement;
+  const idCount = document.getElementById('idCount') as HTMLInputElement;
+  const cbUpper = document.getElementById('cb-uppercase') as HTMLInputElement;
+  const cbHyphens = document.getElementById('cb-remove-hyphens') as HTMLInputElement;
+  const lblHyphens = document.getElementById('lbl-remove-hyphens');
+  const cbBraces = document.getElementById('cb-braces') as HTMLInputElement;
+  const btnGen = document.getElementById('btn-gen-ids');
+  const outField = document.getElementById('output-ids-field');
+  const outIds = document.getElementById('outputIds') as HTMLTextAreaElement;
+  const btnCopy = document.getElementById('btn-copy-ids');
+
+  const inspectInput = document.getElementById('inspectInput') as HTMLInputElement;
+  const btnDecodeUlid = document.getElementById('btn-decode-ulid');
+  const inspectResult = document.getElementById('inspect-result');
+
+  idType?.addEventListener('change', () => {
+    if (lblHyphens) {
+      lblHyphens.style.display = idType.value === 'uuid' ? 'flex' : 'none';
+    }
+  });
+
+  function generate() {
+    const type = idType?.value || 'uuid';
+    const count = Math.max(1, parseInt(idCount?.value || '5', 10));
+    const uppercase = cbUpper?.checked || false;
+    const removeHyphens = cbHyphens?.checked || false;
+    const braces = cbBraces?.checked || false;
+
+    const list: string[] = [];
+    for (let i = 0; i < count; i++) {
+      let id = type === 'uuid' ? generateUuidV4() : generateUlid();
+      if (type === 'uuid' && removeHyphens) id = id.replace(/-/g, '');
+      if (uppercase) id = id.toUpperCase();
+      else if (type === 'uuid') id = id.toLowerCase();
+      if (braces) id = `{${id}}`;
+      list.push(id);
+    }
+
+    if (outIds && outField) {
+      outIds.value = list.join('\n');
+      outField.style.display = 'block';
+    }
+  }
+
+  btnGen?.addEventListener('click', generate);
+
+  btnCopy?.addEventListener('click', async () => {
+    if (outIds?.value && btnCopy) {
+      await navigator.clipboard.writeText(outIds.value);
+      const prev = btnCopy.textContent;
+      btnCopy.textContent = 'Copied!';
+      setTimeout(() => (btnCopy.textContent = prev), 1500);
+    }
+  });
+
+  btnDecodeUlid?.addEventListener('click', () => {
+    if (!inspectResult) return;
+    const str = inspectInput?.value.trim() || '';
+    const dateStr = decodeUlidTimestamp(str);
+    inspectResult.style.display = 'block';
+    if (dateStr) {
+      inspectResult.innerHTML = `<strong style="color: #4caf50;">Timestamp: ${dateStr}</strong>`;
+    } else {
+      inspectResult.innerHTML = `<strong style="color: #ff4d4f;">Invalid ULID string format.</strong>`;
+    }
+  });
+
+  generate();
+</script>
