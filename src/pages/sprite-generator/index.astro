@@ -1,0 +1,290 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+---
+
+<ToolLayout
+  title="Icon & Sprite Sheet Generator"
+  subtitle="Combine Icons into a CSS Image Sprite Sheet & JSON Map"
+  pill="DESIGN"
+  toolSlug="sprite-generator"
+  description="Combine multiple PNG/SVG icons into optimized image sprite sheets with automatically generated CSS classes and JSON coordinate maps."
+>
+  <div style="max-width: 1050px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="spriteFileInput">
+            Upload Icons (Select multiple PNG/SVG files)
+          </label>
+          <input
+            id="spriteFileInput"
+            type="file"
+            multiple
+            accept="image/*"
+            class={sharedStyles.input}
+          />
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin: 20px 0;">
+          <div class={sharedStyles.field} style="margin: 0;">
+            <label class={sharedStyles.fieldLabel} for="iconSize">
+              Icon Size (<span id="icon-size-val">32</span>px)
+            </label>
+            <input id="iconSize" type="range" min="16" max="128" step="8" value="32" />
+          </div>
+
+          <div class={sharedStyles.field} style="margin: 0;">
+            <label class={sharedStyles.fieldLabel} for="spritePadding">
+              Padding (<span id="padding-val">8</span>px)
+            </label>
+            <input id="spritePadding" type="range" min="0" max="32" step="2" value="8" />
+          </div>
+
+          <div class={sharedStyles.field} style="margin: 0;">
+            <label class={sharedStyles.fieldLabel} for="spriteColumns">
+              Columns (<span id="columns-val">4</span>)
+            </label>
+            <input id="spriteColumns" type="range" min="1" max="12" step="1" value="4" />
+          </div>
+        </div>
+
+        <!-- Icons Uploaded List -->
+        <div id="uploaded-icons-box" style="margin-bottom: 20px; display: none;">
+          <h4 style="margin-bottom: 10px;">Loaded Icons (<span id="icons-count">0</span>)</h4>
+          <div id="icons-grid" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+        </div>
+
+        <button
+          type="button"
+          id="btn-generate-sprite"
+          class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
+        >
+          Generate Sprite Sheet
+        </button>
+
+        <!-- Output Section -->
+        <div id="sprite-output-area" style="display: none; margin-top: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+            <h4 style="margin: 0;">Generated Sprite Sheet</h4>
+            <div style="display: flex; gap: 8px;">
+              <button type="button" id="btn-download-sprite" class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}>
+                Download sprite.png
+              </button>
+            </div>
+          </div>
+
+          <!-- Preview Canvas / Image -->
+          <div style="padding: 16px; background: rgba(0,0,0,0.3); border: 1px dashed var(--border); border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: center; overflow-x: auto;">
+            <img id="sprite-preview-img" alt="Sprite Sheet" style="image-rendering: pixelated;" />
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
+            <div class={sharedStyles.field}>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <label class={sharedStyles.fieldLabel} for="spriteCss">
+                  Generated CSS Classes
+                </label>
+                <button type="button" id="btn-copy-css" class={sharedStyles.button}>
+                  Copy CSS
+                </button>
+              </div>
+              <textarea
+                id="spriteCss"
+                readonly
+                class={sharedStyles.outputArea}
+                rows="10"
+                style="font-family: monospace; font-size: 0.85rem;"
+              ></textarea>
+            </div>
+
+            <div class={sharedStyles.field}>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <label class={sharedStyles.fieldLabel} for="spriteJson">
+                  JSON Coordinates Map
+                </label>
+                <button type="button" id="btn-copy-json" class={sharedStyles.button}>
+                  Copy JSON
+                </button>
+              </div>
+              <textarea
+                id="spriteJson"
+                readonly
+                class={sharedStyles.outputArea}
+                rows="10"
+                style="font-family: monospace; font-size: 0.85rem;"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  interface SpriteIcon {
+    name: string;
+    previewUrl: string;
+  }
+
+  let icons: SpriteIcon[] = [];
+
+  const fileInput = document.getElementById('spriteFileInput') as HTMLInputElement;
+  const sizeSlider = document.getElementById('iconSize') as HTMLInputElement;
+  const paddingSlider = document.getElementById('spritePadding') as HTMLInputElement;
+  const colSlider = document.getElementById('spriteColumns') as HTMLInputElement;
+
+  const sizeVal = document.getElementById('icon-size-val');
+  const paddingVal = document.getElementById('padding-val');
+  const colVal = document.getElementById('columns-val');
+
+  const iconsBox = document.getElementById('uploaded-icons-box');
+  const iconsCount = document.getElementById('icons-count');
+  const iconsGrid = document.getElementById('icons-grid');
+
+  const btnGenerate = document.getElementById('btn-generate-sprite');
+  const outputArea = document.getElementById('sprite-output-area');
+  const spriteImg = document.getElementById('sprite-preview-img') as HTMLImageElement;
+  const spriteCss = document.getElementById('spriteCss') as HTMLTextAreaElement;
+  const spriteJson = document.getElementById('spriteJson') as HTMLTextAreaElement;
+  const btnDownload = document.getElementById('btn-download-sprite');
+  const btnCopyCss = document.getElementById('btn-copy-css');
+  const btnCopyJson = document.getElementById('btn-copy-json');
+
+  let currentDataUrl: string | null = null;
+
+  sizeSlider?.addEventListener('input', () => {
+    if (sizeVal) sizeVal.textContent = sizeSlider.value;
+  });
+  paddingSlider?.addEventListener('input', () => {
+    if (paddingVal) paddingVal.textContent = paddingSlider.value;
+  });
+  colSlider?.addEventListener('input', () => {
+    if (colVal) colVal.textContent = colSlider.value;
+  });
+
+  fileInput?.addEventListener('change', () => {
+    const files = Array.from(fileInput.files || []);
+    if (files.length === 0) return;
+
+    files.forEach((file) => {
+      const name = file.name.replace(/\.[^/.]+$/, '').toLowerCase().replace(/[^a-z0-9_-]/g, '-');
+      const previewUrl = URL.createObjectURL(file);
+      icons.push({ name, previewUrl });
+    });
+
+    renderIconsList();
+  });
+
+  function renderIconsList() {
+    if (!iconsBox || !iconsCount || !iconsGrid) return;
+    if (icons.length === 0) {
+      iconsBox.style.display = 'none';
+      return;
+    }
+
+    iconsBox.style.display = 'block';
+    iconsCount.textContent = String(icons.length);
+
+    iconsGrid.innerHTML = icons
+      .map(
+        (icon, idx) => `
+      <div style="display: flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 4px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); font-size: 0.8rem;">
+        <img src="${icon.previewUrl}" alt="${icon.name}" width="20" height="20" style="object-fit: contain;" />
+        <span>${icon.name}</span>
+        <button type="button" class="btn-remove-icon" data-idx="${idx}" style="background: none; border: none; color: #ff4d4f; cursor: pointer; margin-left: 4px;">✕</button>
+      </div>
+    `
+      )
+      .join('');
+
+    document.querySelectorAll('.btn-remove-icon').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const idx = Number((e.currentTarget as HTMLElement).dataset.idx);
+        icons = icons.filter((_, i) => i !== idx);
+        renderIconsList();
+      });
+    });
+  }
+
+  btnGenerate?.addEventListener('click', () => {
+    if (icons.length === 0) return;
+
+    const iconSize = Number(sizeSlider?.value || 32);
+    const padding = Number(paddingSlider?.value || 8);
+    const columns = Number(colSlider?.value || 4);
+
+    const cols = Math.min(columns, icons.length);
+    const rows = Math.ceil(icons.length / cols);
+    const cellWidth = iconSize + padding * 2;
+    const cellHeight = iconSize + padding * 2;
+
+    const canvasWidth = cols * cellWidth;
+    const canvasHeight = rows * cellHeight;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let cssStr = `.sprite {\n  background-image: url('sprite.png');\n  background-repeat: no-repeat;\n  display: inline-block;\n}\n\n`;
+    const jsonMapping: Record<string, { x: number; y: number; width: number; height: number }> = {};
+
+    let loadedCount = 0;
+    icons.forEach((icon, idx) => {
+      const col = idx % cols;
+      const row = Math.floor(idx / cols);
+
+      const x = col * cellWidth + padding;
+      const y = row * cellHeight + padding;
+
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.src = icon.previewUrl;
+
+      img.onload = () => {
+        ctx.drawImage(img, x, y, iconSize, iconSize);
+        loadedCount++;
+
+        cssStr += `.icon-${icon.name} {\n  width: ${iconSize}px;\n  height: ${iconSize}px;\n  background-position: -${x}px -${y}px;\n}\n\n`;
+        jsonMapping[icon.name] = { x, y, width: iconSize, height: iconSize };
+
+        if (loadedCount === icons.length) {
+          currentDataUrl = canvas.toDataURL('image/png');
+          if (spriteImg) spriteImg.src = currentDataUrl;
+          if (spriteCss) spriteCss.value = cssStr.trim();
+          if (spriteJson) spriteJson.value = JSON.stringify(jsonMapping, null, 2);
+          if (outputArea) outputArea.style.display = 'block';
+        }
+      };
+    });
+  });
+
+  btnDownload?.addEventListener('click', () => {
+    if (!currentDataUrl) return;
+    const a = document.createElement('a');
+    a.href = currentDataUrl;
+    a.download = 'sprite.png';
+    a.click();
+  });
+
+  btnCopyCss?.addEventListener('click', async () => {
+    if (spriteCss?.value && btnCopyCss) {
+      await navigator.clipboard.writeText(spriteCss.value);
+      const prev = btnCopyCss.textContent;
+      btnCopyCss.textContent = 'Copied!';
+      setTimeout(() => (btnCopyCss.textContent = prev), 1500);
+    }
+  });
+
+  btnCopyJson?.addEventListener('click', async () => {
+    if (spriteJson?.value && btnCopyJson) {
+      await navigator.clipboard.writeText(spriteJson.value);
+      const prev = btnCopyJson.textContent;
+      btnCopyJson.textContent = 'Copied!';
+      setTimeout(() => (btnCopyJson.textContent = prev), 1500);
+    }
+  });
+</script>

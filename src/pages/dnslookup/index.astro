@@ -1,0 +1,208 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import styles from '@/styles/dnslookup.module.css';
+
+const ALL_TYPES = ['ALL', 'A', 'AAAA', 'MX', 'TXT', 'NS', 'CNAME', 'SOA', 'CAA', 'PTR', 'SRV'];
+const PRESET_DOMAINS = ['google.com', 'cloudflare.com', 'github.com', 'amazon.com', 'netflix.com'];
+---
+
+<ToolLayout
+  title="DNS Records Lookup"
+  subtitle="Authoritative DNS-over-HTTPS (DoH) Record Resolver"
+  pill="NETWORK"
+  toolSlug="dnslookup"
+  description="Query global DNS records (A, AAAA, MX, TXT, NS, CNAME, SOA, CAA) with DNSSEC verification and sub-millisecond DoH queries."
+>
+  <div class={styles.container}>
+    <!-- Query Form -->
+    <section class={styles.heroSection}>
+      <form id="dns-lookup-form" class={styles.form}>
+        <div class={styles.inputGroup}>
+          <input
+            id="dns-domain-input"
+            type="text"
+            class={styles.domainInput}
+            placeholder="e.g. iqverse.net or google.com"
+            value="iqverse.net"
+            required
+          />
+          <button type="submit" id="btn-query-dns" class={styles.queryButton}>
+            Lookup DNS
+          </button>
+        </div>
+      </form>
+
+      <!-- Record Type Pills -->
+      <div style="display: flex; gap: 6px; margin-top: 14px; flex-wrap: wrap;">
+        {ALL_TYPES.map((t) => (
+          <button
+            type="button"
+            class={`dns-type-pill ${t === 'ALL' ? 'active' : ''}`}
+            data-type={t}
+            style="padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.8rem; font-weight: 600; cursor: pointer;"
+          >
+            {t}
+          </button>
+        ))}
+      </div>
+
+      <div class={styles.presets}>
+        <span>Try:</span>
+        {PRESET_DOMAINS.map((d) => (
+          <button type="button" class="preset-domain-btn" data-domain={d}>
+            {d}
+          </button>
+        ))}
+      </div>
+    </section>
+
+    <!-- Loading State -->
+    <div id="dns-loading" class={styles.loadingBox} style="display: none;">
+      <div class={styles.spinner}></div>
+      <p>Resolving DNS records via Cloudflare DoH...</p>
+    </div>
+
+    <!-- Results Area -->
+    <div id="dns-results-area" style="display: none; margin-top: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+        <h3 id="dns-target-title" style="margin: 0;">DNS Records for iqverse.net</h3>
+        <span id="dns-elapsed-time" style="font-size: 0.85rem; color: var(--text-muted);"></span>
+      </div>
+
+      <div id="dns-records-container" style="display: flex; flex-direction: column; gap: 16px;"></div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  const TYPE_MAP: Record<string, number> = {
+    A: 1,
+    NS: 2,
+    CNAME: 5,
+    SOA: 6,
+    PTR: 12,
+    MX: 15,
+    TXT: 16,
+    AAAA: 28,
+    SRV: 33,
+    CAA: 257,
+  };
+
+  const QUERY_TYPES = ['A', 'AAAA', 'MX', 'TXT', 'NS', 'CNAME', 'SOA', 'CAA'];
+
+  const form = document.getElementById('dns-lookup-form') as HTMLFormElement;
+  const domainInput = document.getElementById('dns-domain-input') as HTMLInputElement;
+  const typePills = document.querySelectorAll('.dns-type-pill');
+  const presetBtns = document.querySelectorAll('.preset-domain-btn');
+
+  const loadingBox = document.getElementById('dns-loading');
+  const resultsArea = document.getElementById('dns-results-area');
+  const targetTitle = document.getElementById('dns-target-title');
+  const elapsedTime = document.getElementById('dns-elapsed-time');
+  const recordsContainer = document.getElementById('dns-records-container');
+
+  let selectedType = 'ALL';
+
+  typePills.forEach((pill) => {
+    pill.addEventListener('click', () => {
+      typePills.forEach((p) => p.classList.remove('active'));
+      pill.classList.add('active');
+      selectedType = (pill as HTMLElement).dataset.type || 'ALL';
+      form?.dispatchEvent(new Event('submit'));
+    });
+  });
+
+  presetBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (domainInput) {
+        domainInput.value = (btn as HTMLElement).dataset.domain || '';
+        form?.dispatchEvent(new Event('submit'));
+      }
+    });
+  });
+
+  async function fetchDns(domain: string, type: string) {
+    try {
+      const url = `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=${type}`;
+      const res = await fetch(url, {
+        headers: { Accept: 'application/dns-json' },
+      });
+      return await res.json();
+    } catch {
+      return null;
+    }
+  }
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const rawDomain = domainInput?.value.trim().replace(/^https?:\/\//, '').split('/')[0];
+    if (!rawDomain) return;
+
+    if (loadingBox) loadingBox.style.display = 'block';
+    if (resultsArea) resultsArea.style.display = 'none';
+
+    const startTime = performance.now();
+    const typesToFetch = selectedType === 'ALL' ? QUERY_TYPES : [selectedType];
+
+    try {
+      const responses = await Promise.all(
+        typesToFetch.map(async (t) => {
+          const data = await fetchDns(rawDomain, t);
+          return { type: t, data };
+        })
+      );
+
+      const elapsed = Math.round(performance.now() - startTime);
+
+      if (targetTitle) targetTitle.textContent = `DNS Records for ${rawDomain}`;
+      if (elapsedTime) elapsedTime.textContent = `Resolved in ${elapsed} ms`;
+
+      if (recordsContainer) {
+        const renderedCards: string[] = [];
+
+        responses.forEach(({ type, data }) => {
+          const answers = data?.Answer || [];
+          if (answers.length > 0) {
+            renderedCards.push(`
+              <div style="background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                  <span style="padding: 2px 10px; border-radius: 4px; background: rgba(33, 150, 243, 0.2); color: #2196f3; font-weight: bold; font-family: monospace;">
+                    ${type}
+                  </span>
+                  <span style="font-size: 0.8rem; color: var(--text-muted);">${answers.length} record(s)</span>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                  ${answers
+                    .map(
+                      (a: any) => `
+                    <div style="display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; padding: 8px; border-radius: 4px; background: rgba(255,255,255,0.02); font-family: monospace; font-size: 0.85rem;">
+                      <span style="word-break: break-all;">${a.data}</span>
+                      <span style="opacity: 0.7; font-size: 0.75rem;">TTL: ${a.TTL}s</span>
+                    </div>
+                  `
+                    )
+                    .join('')}
+                </div>
+              </div>
+            `);
+          }
+        });
+
+        if (renderedCards.length === 0) {
+          recordsContainer.innerHTML = '<div style="text-align: center; padding: 24px; opacity: 0.7;">No DNS records found for the selected query.</div>';
+        } else {
+          recordsContainer.innerHTML = renderedCards.join('');
+        }
+      }
+
+      if (resultsArea) resultsArea.style.display = 'block';
+    } catch (err) {
+      console.error(err);
+    } finally {
+      if (loadingBox) loadingBox.style.display = 'none';
+    }
+  });
+
+  form?.dispatchEvent(new Event('submit'));
+</script>

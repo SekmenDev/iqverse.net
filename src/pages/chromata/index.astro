@@ -1,0 +1,251 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import styles from '@/styles/chromata.module.css';
+
+const HARMONY_OPTIONS = [
+  { value: 'complementary', label: 'Complementary' },
+  { value: 'triadic', label: 'Triadic' },
+  { value: 'analogous', label: 'Analogous' },
+  { value: 'split-complementary', label: 'Split Complementary' },
+  { value: 'tetradic', label: 'Tetradic' },
+  { value: 'monochromatic', label: 'Monochromatic' },
+];
+
+const EXPORT_FORMATS = [
+  { value: 'css', label: 'CSS' },
+  { value: 'tailwind', label: 'Tailwind' },
+  { value: 'figma', label: 'Figma' },
+  { value: 'sass', label: 'SASS' },
+  { value: 'json', label: 'JSON' },
+  { value: 'swift', label: 'Swift' },
+];
+
+const COLOR_FORMATS = [
+  { value: 'hex', label: 'HEX' },
+  { value: 'rgb', label: 'RGB' },
+  { value: 'hsl', label: 'HSL' },
+];
+---
+
+<ToolLayout
+  title="Chromata"
+  subtitle="Advanced Color Palette & Design System Generator"
+  pill="DESIGN"
+  toolSlug="chromata"
+  description="Generate comprehensive design system color scales, semantic UI shades, WCAG contrast audits, and export to CSS, Tailwind, Figma, or Swift."
+>
+  <div class={styles.layout}>
+    <aside class={styles.panel}>
+      <!-- Controls -->
+      <div class={styles.sectionTitle}>Seed Color</div>
+      <div class={styles.colorInputWrap} style="display: flex; gap: 10px; align-items: center; margin-bottom: 16px;">
+        <input type="color" id="seedColorPicker" value="#6366f1" style="width: 44px; height: 44px; border: none; border-radius: 6px; cursor: pointer;" />
+        <input type="text" id="seedHexInput" value="#6366f1" style="flex: 1; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-family: monospace;" />
+      </div>
+
+      <div class={styles.sectionTitle}>Color Harmony</div>
+      <div class={styles.harmonyPicker} style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 16px;">
+        {HARMONY_OPTIONS.map((opt) => (
+          <button
+            type="button"
+            class={`btn-harmony-opt ${styles.harmonyBtn} ${opt.value === 'complementary' ? styles.harmonyBtnActive : ''}`}
+            data-harmony={opt.value}
+            style="padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.8rem; cursor: pointer;"
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+
+      <div class={styles.sectionTitle}>Shades &amp; Curves</div>
+      <div style="margin-bottom: 16px;">
+        <label style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px;">
+          <span>Shades Count:</span>
+          <strong id="shades-count-val">10</strong>
+        </label>
+        <input id="shadesCountInput" type="range" min="5" max="15" value="10" style="width: 100%;" />
+      </div>
+
+      <div style="margin-bottom: 16px;">
+        <label style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px;">
+          <span>Saturation Boost:</span>
+          <strong id="sat-boost-val">0%</strong>
+        </label>
+        <input id="satBoostInput" type="range" min="-50" max="50" value="0" style="width: 100%;" />
+      </div>
+
+      <div style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem;">
+        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+          <input id="cb-neutrals" type="checkbox" checked />
+          Include Neutral Scale
+        </label>
+        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+          <input id="cb-semantic" type="checkbox" checked />
+          Include Semantic Colors (Success, Warning, Danger, Info)
+        </label>
+      </div>
+
+      <!-- Export Panel -->
+      <div class={styles.sectionTitle}>Export Code</div>
+      <div style="display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap;">
+        {EXPORT_FORMATS.map((fmt) => (
+          <button
+            type="button"
+            class={`btn-export-fmt ${fmt.value === 'css' ? 'active' : ''}`}
+            data-fmt={fmt.value}
+            style="padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.75rem; cursor: pointer;"
+          >
+            {fmt.label}
+          </button>
+        ))}
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <span style="font-size: 0.8rem; color: var(--text-muted);">Generated Code</span>
+        <button type="button" id="btn-copy-export" style="font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer;">
+          Copy
+        </button>
+      </div>
+      <textarea id="export-code-area" readonly rows="8" style="width: 100%; font-family: monospace; font-size: 0.8rem; padding: 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--text);"></textarea>
+    </aside>
+
+    <!-- Palette View Area -->
+    <main class={styles.previewArea}>
+      <div id="palette-groups-container" style="display: flex; flex-direction: column; gap: 20px;"></div>
+    </main>
+  </div>
+</ToolLayout>
+
+<script>
+  import {
+    generatePalette,
+    formatColor,
+    exportCSS,
+    exportTailwind,
+    exportFigma,
+    exportSass,
+    exportJSON,
+    exportSwift,
+  } from '@/lib/colors';
+
+  let seedHex = '#6366f1';
+  let harmony = 'complementary';
+  let shadesCount = 10;
+  let satBoost = 0;
+  let includeNeutrals = true;
+  let includeSemantic = true;
+  let exportFormat = 'css';
+
+  const seedPicker = document.getElementById('seedColorPicker') as HTMLInputElement;
+  const seedInput = document.getElementById('seedHexInput') as HTMLInputElement;
+  const shadesSlider = document.getElementById('shadesCountInput') as HTMLInputElement;
+  const shadesVal = document.getElementById('shades-count-val');
+  const satSlider = document.getElementById('satBoostInput') as HTMLInputElement;
+  const satVal = document.getElementById('sat-boost-val');
+  const cbNeutrals = document.getElementById('cb-neutrals') as HTMLInputElement;
+  const cbSemantic = document.getElementById('cb-semantic') as HTMLInputElement;
+  const harmonyBtns = document.querySelectorAll('.btn-harmony-opt');
+  const exportFmtBtns = document.querySelectorAll('.btn-export-fmt');
+  const exportArea = document.getElementById('export-code-area') as HTMLTextAreaElement;
+  const btnCopy = document.getElementById('btn-copy-export');
+  const container = document.getElementById('palette-groups-container');
+
+  function update() {
+    seedHex = seedInput?.value || '#6366f1';
+    shadesCount = Number(shadesSlider?.value || 10);
+    satBoost = Number(satSlider?.value || 0);
+    includeNeutrals = cbNeutrals?.checked || false;
+    includeSemantic = cbSemantic?.checked || false;
+
+    if (shadesVal) shadesVal.textContent = String(shadesCount);
+    if (satVal) satVal.textContent = `${satBoost}%`;
+
+    const groups = generatePalette(
+      seedHex,
+      harmony,
+      shadesCount,
+      'linear',
+      satBoost,
+      0,
+      0,
+      includeNeutrals,
+      includeSemantic
+    );
+
+    // Render Preview
+    if (container) {
+      container.innerHTML = groups
+        .map(
+          (g) => `
+        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px;">
+          <h3 style="margin: 0 0 12px 0; font-size: 1.1rem; text-transform: capitalize;">${g.name}</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)); gap: 4px; border-radius: 6px; overflow: hidden;">
+            ${g.shades
+              .map(
+                (s) => `
+              <div style="background: ${s.hex}; padding: 12px 4px; text-align: center; color: ${s.l > 0.55 ? '#000' : '#fff'};">
+                <div style="font-size: 0.75rem; font-weight: bold;">${s.label}</div>
+                <div style="font-size: 0.7rem; font-family: monospace; opacity: 0.9;">${s.hex}</div>
+              </div>
+            `
+              )
+              .join('')}
+          </div>
+        </div>
+      `
+        )
+        .join('');
+    }
+
+    // Render Export Code
+    if (exportArea) {
+      if (exportFormat === 'css') exportArea.value = exportCSS(groups, 'color', 'hex');
+      else if (exportFormat === 'tailwind') exportArea.value = exportTailwind(groups);
+      else if (exportFormat === 'figma') exportArea.value = exportFigma(groups);
+      else if (exportFormat === 'sass') exportArea.value = exportSass(groups, 'color', 'hex');
+      else if (exportFormat === 'json') exportArea.value = exportJSON(groups);
+      else if (exportFormat === 'swift') exportArea.value = exportSwift(groups);
+    }
+  }
+
+  seedPicker?.addEventListener('input', () => {
+    if (seedInput) seedInput.value = seedPicker.value;
+    update();
+  });
+
+  seedInput?.addEventListener('input', () => {
+    if (seedPicker) seedPicker.value = seedInput.value;
+    update();
+  });
+
+  harmonyBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      harmonyBtns.forEach((b) => b.classList.remove('styles_harmonyBtnActive', 'active'));
+      btn.classList.add('styles_harmonyBtnActive', 'active');
+      harmony = (btn as HTMLElement).dataset.harmony || 'complementary';
+      update();
+    });
+  });
+
+  exportFmtBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      exportFmtBtns.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      exportFormat = (btn as HTMLElement).dataset.fmt || 'css';
+      update();
+    });
+  });
+
+  [shadesSlider, satSlider, cbNeutrals, cbSemantic].forEach((el) => el?.addEventListener('input', update));
+
+  btnCopy?.addEventListener('click', async () => {
+    if (exportArea?.value && btnCopy) {
+      await navigator.clipboard.writeText(exportArea.value);
+      const prev = btnCopy.textContent;
+      btnCopy.textContent = 'Copied!';
+      setTimeout(() => (btnCopy.textContent = prev), 1500);
+    }
+  });
+
+  update();
+</script>

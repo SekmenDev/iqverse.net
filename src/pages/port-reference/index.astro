@@ -1,0 +1,129 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+
+const COMMON_PORTS = [
+  { port: 21, protocol: 'TCP', name: 'FTP', category: 'Remote Access', desc: 'File Transfer Protocol for transferring files between host and client.', securityNote: 'Insecure plaintext transmission. Prefer SFTP (SSH port 22).' },
+  { port: 22, protocol: 'TCP', name: 'SSH / SFTP', category: 'Remote Access', desc: 'Secure Shell for encrypted remote command line shell sessions and SFTP file transfers.', securityNote: 'Use key-based authentication and disable root login.' },
+  { port: 25, protocol: 'TCP', name: 'SMTP', category: 'Email', desc: 'Simple Mail Transfer Protocol for mail server-to-server routing.', securityNote: 'Often blocked by ISPs to prevent spam relays.' },
+  { port: 53, protocol: 'TCP/UDP', name: 'DNS', category: 'Infrastructure', desc: 'Domain Name System for resolving hostname to IP addresses.', securityNote: 'Ensure DNS amplification DDoS protections are enabled.' },
+  { port: 80, protocol: 'TCP', name: 'HTTP', category: 'Web', desc: 'Hypertext Transfer Protocol for unencrypted web page delivery.', securityNote: 'Redirect all HTTP traffic to HTTPS (port 443).' },
+  { port: 110, protocol: 'TCP', name: 'POP3', category: 'Email', desc: 'Post Office Protocol for retrieving email from mail servers.', securityNote: 'Prefer POP3S (port 995 with SSL/TLS encryption).' },
+  { port: 143, protocol: 'TCP', name: 'IMAP', category: 'Email', desc: 'Internet Message Access Protocol for syncing mailbox folders across devices.', securityNote: 'Prefer IMAPS (port 993 with SSL/TLS encryption).' },
+  { port: 443, protocol: 'TCP', name: 'HTTPS', category: 'Web', desc: 'Hypertext Transfer Protocol Secure (TLS/SSL encrypted web traffic).', securityNote: 'Standard secure port for modern web traffic.' },
+  { port: 465, protocol: 'TCP', name: 'SMTPS', category: 'Email', desc: 'SMTP over SSL/TLS for secure mail submission.', securityNote: 'Recommended secure SMTP port alongside 587.' },
+  { port: 1433, protocol: 'TCP', name: 'MS SQL Server', category: 'Database', desc: 'Microsoft SQL Server database engine listener.', securityNote: 'Do not expose directly to public internet; restrict via firewall/VPC.' },
+  { port: 3306, protocol: 'TCP', name: 'MySQL / MariaDB', category: 'Database', desc: 'MySQL and MariaDB relational database server listener.', securityNote: 'Bind to 127.0.0.1 or internal private subnet.' },
+  { port: 3389, protocol: 'TCP/UDP', name: 'RDP', category: 'Remote Access', desc: 'Remote Desktop Protocol for graphical Windows Desktop administration.', securityNote: 'High target for brute-force ransomware attacks. Require VPN or Bastion.' },
+  { port: 5432, protocol: 'TCP', name: 'PostgreSQL', category: 'Database', desc: 'PostgreSQL object-relational database server listener.', securityNote: 'Configure pg_hba.conf for strict IP restriction.' },
+  { port: 6379, protocol: 'TCP', name: 'Redis', category: 'Database', desc: 'In-memory key-value data store and cache.', securityNote: 'Default installation lacks password authentication. Never expose to public internet.' },
+  { port: 8080, protocol: 'TCP', name: 'HTTP Alternate / Proxy', category: 'Web', desc: 'Common alternate port for web dev servers (Vite, Next.js) and proxy servers.', securityNote: 'Check dev server configuration before deploying to production.' },
+  { port: 27017, protocol: 'TCP', name: 'MongoDB', category: 'Database', desc: 'MongoDB NoSQL database engine default instance.', securityNote: 'Enable MongoDB authentication and TLS.' },
+];
+---
+
+<ToolLayout
+  title="Port Status & Reference Guide"
+  subtitle="Common TCP & UDP Network Port Numbers & Security Reference"
+  pill="NETWORK"
+  toolSlug="port-reference"
+  description="Explore common TCP and UDP network port numbers, protocol service definitions, and reachability status references."
+>
+  <div style="max-width: 1100px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
+          <div class={sharedStyles.field} style="flex: 1; min-width: 260px; margin: 0;">
+            <label class={sharedStyles.fieldLabel} for="portSearch">
+              Search Port Number or Service Name
+            </label>
+            <input
+              id="portSearch"
+              type="text"
+              class={sharedStyles.input}
+              placeholder="e.g., 3306, SSH, MySQL, HTTPS..."
+            />
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <label for="catFilter" style="font-size: 0.85rem; font-weight: 600;">Category:</label>
+            <select id="catFilter" class={sharedStyles.input} style="padding: 4px 8px;">
+              <option value="All">All Categories</option>
+              <option value="Web">Web</option>
+              <option value="Database">Database</option>
+              <option value="Remote Access">Remote Access</option>
+              <option value="Email">Email</option>
+              <option value="Infrastructure">Infrastructure</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="ports-list" style="display: flex; flex-direction: column; gap: 12px;"></div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script define:vars={{ COMMON_PORTS }}>
+  const searchInput = document.getElementById('portSearch');
+  const catSelect = document.getElementById('catFilter');
+  const list = document.getElementById('ports-list');
+
+  function render() {
+    if (!list) return;
+    const query = (searchInput?.value || '').toLowerCase().trim();
+    const cat = catSelect?.value || 'All';
+
+    const filtered = COMMON_PORTS.filter((entry) => {
+      const matchesSearch =
+        entry.port.toString().includes(query) ||
+        entry.name.toLowerCase().includes(query) ||
+        entry.desc.toLowerCase().includes(query);
+
+      const matchesCat = cat === 'All' || entry.category === cat;
+      return matchesSearch && matchesCat;
+    });
+
+    if (filtered.length === 0) {
+      list.innerHTML = '<div style="text-align: center; padding: 24px; opacity: 0.6;">No ports match your search criteria.</div>';
+      return;
+    }
+
+    list.innerHTML = filtered
+      .map(
+        (entry) => `
+      <div
+        style="padding: 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);"
+      >
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span
+              style="padding: 4px 10px; border-radius: 6px; font-weight: bold; font-family: monospace; font-size: 1.1rem; background: rgba(33, 150, 243, 0.1); color: #2196f3; border: 1px solid rgba(33, 150, 243, 0.3);"
+            >
+              Port ${entry.port} / ${entry.protocol}
+            </span>
+            <strong style="font-size: 1.1rem;">${entry.name}</strong>
+          </div>
+
+          <span
+            style="padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; background: rgba(255, 255, 255, 0.05); color: #aaa;"
+          >
+            ${entry.category}
+          </span>
+        </div>
+
+        <p style="margin: 0 0 8px 0; font-size: 0.9rem; opacity: 0.9;">${entry.desc}</p>
+
+        <div style="font-size: 0.825rem; color: #faad14; background: rgba(250, 173, 20, 0.08); padding: 6px 10px; border-radius: 4px; border: 1px solid rgba(250, 173, 20, 0.2);">
+          <strong>🔒 Security Note:</strong> ${entry.securityNote}
+        </div>
+      </div>
+    `
+      )
+      .join('');
+  }
+
+  searchInput?.addEventListener('input', render);
+  catSelect?.addEventListener('change', render);
+  render();
+</script>

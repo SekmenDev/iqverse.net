@@ -1,0 +1,231 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+---
+
+<ToolLayout
+  title="CSS Gradient Builder"
+  subtitle="Linear, Radial & Conic CSS Gradient Generator"
+  pill="DESIGN"
+  toolSlug="gradient-builder"
+  description="Design linear, radial, and conic CSS gradients visually. Adjust color stops and export production-ready CSS code."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <!-- Gradient Preview Canvas -->
+        <div
+          id="gradient-preview-box"
+          style="height: 180px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.3); background: linear-gradient(135deg, #2196f3 0%, #e91e63 100%);"
+        ></div>
+
+        <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <label for="gradType" style="font-size: 0.85rem; font-weight: 600;">Type:</label>
+            <select id="gradType" class={sharedStyles.input} style="padding: 4px 8px;">
+              <option value="linear">Linear</option>
+              <option value="radial">Radial</option>
+              <option value="conic">Conic</option>
+            </select>
+          </div>
+
+          <div id="gradAngleGroup" style="display: flex; align-items: center; gap: 8px;">
+            <label for="gradAngle" style="font-size: 0.85rem; font-weight: 600;">
+              Angle (<span id="angle-val">135</span>°):
+            </label>
+            <input
+              id="gradAngle"
+              type="range"
+              min="0"
+              max="360"
+              value="135"
+              style="width: 120px;"
+            />
+          </div>
+
+          <button type="button" id="btn-add-stop" class={sharedStyles.button} style="margin-left: auto;">
+            + Add Color Stop
+          </button>
+        </div>
+
+        <!-- Color Stops Controls -->
+        <div style="margin-bottom: 24px;">
+          <h4 style="margin-bottom: 12px;">Color Stops</h4>
+          <div id="stops-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
+        </div>
+
+        <!-- Output Code -->
+        <div class={sharedStyles.field}>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <label class={sharedStyles.fieldLabel} for="cssOutput">
+              Generated CSS Code
+            </label>
+            <button type="button" id="btn-copy-css" class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}>
+              Copy CSS
+            </button>
+          </div>
+          <textarea
+            id="cssOutput"
+            readonly
+            class={sharedStyles.outputArea}
+            rows="3"
+            style="font-family: monospace; font-size: 0.95rem;"
+          ></textarea>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  interface ColorStop {
+    color: string;
+    stop: number;
+  }
+
+  let gradientType = 'linear';
+  let angle = 135;
+  let stops: ColorStop[] = [
+    { color: '#2196f3', stop: 0 },
+    { color: '#e91e63', stop: 100 },
+  ];
+
+  const previewBox = document.getElementById('gradient-preview-box');
+  const typeSelect = document.getElementById('gradType') as HTMLSelectElement;
+  const angleGroup = document.getElementById('gradAngleGroup');
+  const angleSlider = document.getElementById('gradAngle') as HTMLInputElement;
+  const angleVal = document.getElementById('angle-val');
+  const stopsContainer = document.getElementById('stops-container');
+  const cssOutput = document.getElementById('cssOutput') as HTMLTextAreaElement;
+  const btnAddStop = document.getElementById('btn-add-stop');
+  const btnCopy = document.getElementById('btn-copy-css');
+
+  function render() {
+    if (angleVal) angleVal.textContent = String(angle);
+    if (angleGroup) angleGroup.style.display = gradientType === 'radial' ? 'none' : 'flex';
+
+    const stopString = stops.map((s) => `${s.color} ${s.stop}%`).join(', ');
+    let cssRule = '';
+    if (gradientType === 'linear') {
+      cssRule = `background: linear-gradient(${angle}deg, ${stopString});`;
+    } else if (gradientType === 'radial') {
+      cssRule = `background: radial-gradient(circle at center, ${stopString});`;
+    } else {
+      cssRule = `background: conic-gradient(from ${angle}deg at 50% 50%, ${stopString});`;
+    }
+
+    if (previewBox) {
+      previewBox.style.background = cssRule.replace('background: ', '').replace(';', '');
+    }
+    if (cssOutput) cssOutput.value = cssRule;
+
+    if (stopsContainer) {
+      stopsContainer.innerHTML = stops
+        .map(
+          (s, idx) => `
+        <div
+          style="display: grid; grid-template-columns: auto 1fr auto auto; gap: 12px; align-items: center; background: rgba(255, 255, 255, 0.02); padding: 8px; border-radius: 6px; border: 1px solid var(--border);"
+        >
+          <input
+            type="color"
+            value="${s.color}"
+            data-idx="${idx}"
+            class="stop-color-input"
+            style="width: 40px; height: 32px; cursor: pointer; border: none; background: none;"
+          />
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value="${s.stop}"
+              data-idx="${idx}"
+              class="stop-range-input"
+              style="flex: 1;"
+            />
+            <span style="font-size: 0.85rem; width: 45px; font-family: monospace;">${s.stop}%</span>
+          </div>
+          <input
+            type="text"
+            value="${s.color}"
+            data-idx="${idx}"
+            class="stop-hex-input"
+            style="width: 90px; font-family: monospace; font-size: 0.85rem; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text);"
+          />
+          <button
+            type="button"
+            data-idx="${idx}"
+            class="stop-remove-btn"
+            style="padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: #ff4d4f; cursor: pointer;"
+            ${stops.length <= 2 ? 'disabled' : ''}
+          >
+            ✕
+          </button>
+        </div>
+      `
+        )
+        .join('');
+
+      // Add event listeners for dynamic stop inputs
+      document.querySelectorAll('.stop-color-input').forEach((input) => {
+        input.addEventListener('input', (e) => {
+          const idx = Number((e.target as HTMLElement).dataset.idx);
+          stops[idx].color = (e.target as HTMLInputElement).value;
+          render();
+        });
+      });
+
+      document.querySelectorAll('.stop-range-input').forEach((input) => {
+        input.addEventListener('input', (e) => {
+          const idx = Number((e.target as HTMLElement).dataset.idx);
+          stops[idx].stop = Number((e.target as HTMLInputElement).value);
+          render();
+        });
+      });
+
+      document.querySelectorAll('.stop-hex-input').forEach((input) => {
+        input.addEventListener('change', (e) => {
+          const idx = Number((e.target as HTMLElement).dataset.idx);
+          stops[idx].color = (e.target as HTMLInputElement).value;
+          render();
+        });
+      });
+
+      document.querySelectorAll('.stop-remove-btn').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          if (stops.length <= 2) return;
+          const idx = Number((e.currentTarget as HTMLElement).dataset.idx);
+          stops = stops.filter((_, i) => i !== idx);
+          render();
+        });
+      });
+    }
+  }
+
+  typeSelect?.addEventListener('change', () => {
+    gradientType = typeSelect.value;
+    render();
+  });
+
+  angleSlider?.addEventListener('input', () => {
+    angle = Number(angleSlider.value);
+    render();
+  });
+
+  btnAddStop?.addEventListener('click', () => {
+    stops.push({ color: '#9c27b0', stop: 50 });
+    stops.sort((a, b) => a.stop - b.stop);
+    render();
+  });
+
+  btnCopy?.addEventListener('click', async () => {
+    if (cssOutput?.value && btnCopy) {
+      await navigator.clipboard.writeText(cssOutput.value);
+      const prev = btnCopy.textContent;
+      btnCopy.textContent = 'Copied!';
+      setTimeout(() => (btnCopy.textContent = prev), 1500);
+    }
+  });
+
+  render();
+</script>
