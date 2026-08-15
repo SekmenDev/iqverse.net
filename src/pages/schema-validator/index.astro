@@ -1,5 +1,6 @@
 ---
 import ToolLayout from '@/layouts/ToolLayout.astro';
+import CapCaptcha from '@/components/CapCaptcha.astro';
 import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
 const SAMPLE_TEMPLATES: Record<string, string> = {
@@ -57,6 +58,70 @@ const SAMPLE_TEMPLATES: Record<string, string> = {
     }
   }]
 }`,
+  WebSite: `{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "IQVerse",
+  "url": "https://iqverse.net/",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://iqverse.net/?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}`,
+  Breadcrumb: `{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://iqverse.net/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Tools",
+      "item": "https://iqverse.net/schema-validator/"
+    }
+  ]
+}`,
+  LocalBusiness: `{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "CyberTech Repairs",
+  "image": "https://example.com/store.jpg",
+  "telephone": "+1-800-555-0199",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "123 Innovation Way",
+    "addressLocality": "San Francisco",
+    "addressRegion": "CA",
+    "postalCode": "94107",
+    "addressCountry": "US"
+  }
+}`,
+  Recipe: `{
+  "@context": "https://schema.org",
+  "@type": "Recipe",
+  "name": "Classic Developer Coffee",
+  "image": ["https://example.com/coffee.jpg"],
+  "author": {
+    "@type": "Person",
+    "name": "Barista Bot"
+  },
+  "recipeIngredient": [
+    "20g freshly ground coffee beans",
+    "300ml hot water (92°C)"
+  ],
+  "recipeInstructions": [
+    {
+      "@type": "HowToStep",
+      "text": "Pour hot water over coffee grounds in circular motion."
+    }
+  ]
+}`
 };
 ---
 
@@ -65,167 +130,743 @@ const SAMPLE_TEMPLATES: Record<string, string> = {
   subtitle="JSON-LD & Schema.org Rich Snippets Linter"
   pill="AI & AGENTS"
   toolSlug="schema-validator"
-  description="Validate JSON-LD structured data and Schema.org markup online. Ensure rich snippet compatibility for search engines and AI web crawlers."
+  description="Validate JSON-LD structured data and Schema.org markup online or fetch by URL. Ensure rich snippet compatibility for search engines and AI web crawlers."
 >
-  <div style="max-width: 1050px;">
+  <div style="max-width: 1080px;">
     <section class={sharedStyles.section}>
       <div class={sharedStyles.card}>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-          <label class={sharedStyles.fieldLabel} for="schemaInput">
-            JSON-LD Schema Markup (or HTML &lt;script&gt;)
-          </label>
-          <div style="display: flex; gap: 6px; align-items: center;">
-            <span style="font-size: 0.8rem; color: var(--text-muted);">Load Template:</span>
-            {Object.keys(SAMPLE_TEMPLATES).map((key) => (
-              <button
-                type="button"
-                class="tpl-btn"
-                data-key={key}
-                style="padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.75rem; cursor: pointer;"
-              >
-                {key}
-              </button>
-            ))}
+        <!-- Input Mode Switcher Tabs -->
+        <div style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 14px; flex-wrap: wrap;">
+          <button
+            type="button"
+            id="tab-mode-manual"
+            class="mode-tab-btn active-tab"
+            style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; border-radius: var(--radius-sm); font-size: 0.9rem; font-weight: 600; cursor: pointer; border: 1px solid var(--accent); background: var(--accent); color: #ffffff; transition: all 0.2s ease;"
+          >
+            <span>✍️</span>
+            <span>Manual Structured Data</span>
+          </button>
+          <button
+            type="button"
+            id="tab-mode-url"
+            class="mode-tab-btn"
+            style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; border-radius: var(--radius-sm); font-size: 0.9rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text); transition: all 0.2s ease;"
+          >
+            <span>🌐</span>
+            <span>Fetch from URL</span>
+          </button>
+        </div>
+
+        <!-- 1. MANUAL MODE CONTAINER -->
+        <div id="mode-container-manual">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+            <label class={sharedStyles.fieldLabel} for="schemaInput" style="margin-bottom: 0;">
+              JSON-LD Schema Markup (or HTML &lt;script&gt;)
+            </label>
+            <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Load Template:</span>
+              {Object.keys(SAMPLE_TEMPLATES).map((key) => (
+                <button
+                  type="button"
+                  class="tpl-btn"
+                  data-key={key}
+                  style="padding: 3px 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.75rem; cursor: pointer;"
+                >
+                  {key}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <textarea
+            id="schemaInput"
+            class={sharedStyles.textarea}
+            rows="12"
+            style="font-family: var(--font-mono, monospace); font-size: 0.85rem; line-height: 1.5;"
+          >{SAMPLE_TEMPLATES.Article}</textarea>
+
+          <div style="margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap;">
+            <button
+              type="button"
+              id="btn-validate-schema"
+              class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
+            >
+              Validate Structured Data
+            </button>
+            <button
+              type="button"
+              id="btn-format-schema"
+              class={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`}
+            >
+              Format JSON
+            </button>
+            <button
+              type="button"
+              id="btn-clear-schema"
+              class={sharedStyles.button}
+              style="border: 1px solid var(--border); background: transparent; color: var(--text-muted);"
+            >
+              Clear
+            </button>
           </div>
         </div>
 
-        <textarea
-          id="schemaInput"
-          class={sharedStyles.textarea}
-          rows="12"
-          style="font-family: monospace; font-size: 0.85rem;"
-        >{SAMPLE_TEMPLATES.Article}</textarea>
+        <!-- 2. URL FETCH MODE CONTAINER -->
+        <div id="mode-container-url" style="display: none;">
+          <form id="schema-url-form">
+            <div class={sharedStyles.field}>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
+                <label class={sharedStyles.fieldLabel} for="targetUrl" style="margin-bottom: 0;">
+                  Webpage URL to Inspect & Validate
+                </label>
+                <div style="display: flex; gap: 6px; align-items: center;">
+                  <span style="font-size: 0.78rem; color: var(--text-muted);">Quick Test:</span>
+                  <button
+                    type="button"
+                    class="url-example-btn"
+                    data-url="https://iqverse.net"
+                    style="padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.75rem; cursor: pointer;"
+                  >
+                    iqverse.net
+                  </button>
+                  <button
+                    type="button"
+                    class="url-example-btn"
+                    data-url="https://schema.org"
+                    style="padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.75rem; cursor: pointer;"
+                  >
+                    schema.org
+                  </button>
+                </div>
+              </div>
 
-        <div style="margin-top: 16px; display: flex; gap: 10px;">
-          <button
-            type="button"
-            id="btn-validate-schema"
-            class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
-          >
-            Validate Structured Data
-          </button>
-          <button
-            type="button"
-            id="btn-format-schema"
-            class={`${sharedStyles.button} ${sharedStyles.buttonSecondary}`}
-          >
-            Format JSON
-          </button>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <input
+                  id="targetUrl"
+                  type="url"
+                  value="https://iqverse.net"
+                  class={sharedStyles.input}
+                  style="flex: 1; min-width: 260px; padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface); color: var(--text); font-family: var(--font-mono, monospace); font-size: 0.9rem;"
+                  placeholder="https://example.com"
+                  required
+                />
+                <button
+                  type="submit"
+                  id="btn-fetch-url"
+                  class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
+                  style="display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;"
+                >
+                  <span id="btn-fetch-spinner" style="display: none; width: 14px; height: 14px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite;"></span>
+                  <span id="btn-fetch-text">Fetch & Validate</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- CAPTCHA CHALLENGE -->
+            <div style="margin-top: 14px; padding: 14px; border-radius: var(--radius-sm); background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+              <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 500;">
+                🛡️ Security Verification:
+              </div>
+              <CapCaptcha id="schema-cap-widget" />
+            </div>
+          </form>
+
+          <!-- Extracted Schemas Pill Navigation (Shown when >1 JSON-LD found on URL) -->
+          <div id="url-schemas-selector" style="display: none; margin-top: 20px; padding: 12px 16px; border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span style="font-size: 0.85rem; font-weight: 600; color: var(--text);">Extracted Schema Items:</span>
+                <div id="schema-pills-container" style="display: flex; gap: 6px; flex-wrap: wrap;"></div>
+              </div>
+              <button
+                type="button"
+                id="btn-edit-in-manual"
+                style="padding: 4px 12px; border-radius: 4px; border: 1px solid var(--accent); background: transparent; color: var(--accent); font-size: 0.8rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;"
+              >
+                <span>✏️</span>
+                <span>Open in Manual Editor</span>
+              </button>
+            </div>
+          </div>
         </div>
 
+        <!-- URL Loading / Status Box -->
+        <div id="url-status-message" style="display: none; margin-top: 20px; padding: 14px; border-radius: 8px;"></div>
+
+        <!-- UNIFIED VALIDATION RESULTS CARD -->
         <div id="schema-results-box" style="margin-top: 24px; display: none;"></div>
       </div>
     </section>
   </div>
 </ToolLayout>
 
-<script is:inline define:vars={{ SAMPLE_TEMPLATES }}>
-  const schemaInput = document.getElementById('schemaInput');
-  const btnValidate = document.getElementById('btn-validate-schema');
-  const btnFormat = document.getElementById('btn-format-schema');
-  const resultsBox = document.getElementById('schema-results-box');
+<style>
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .mode-tab-btn:hover {
+    filter: brightness(1.08);
+  }
+</style>
+
+<script>
+  import { validateCaptcha } from '@/lib/captcha';
+  import {
+    validateSchema,
+    extractAndValidateAllFromHtml,
+    type ExtractedSchemaItem,
+    type SchemaValidationResult,
+  } from '@/lib/schema-validator';
+
+  // Sample templates map for client side template loader
+  const CLIENT_TEMPLATES: Record<string, string> = {
+    Article: `{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Understanding AI Agents and Web Standards",
+  "image": ["https://example.com/photos/1x1/photo.jpg"],
+  "datePublished": "2026-01-15T08:00:00+08:00",
+  "dateModified": "2026-02-01T09:20:00+08:00",
+  "author": [{
+    "@type": "Person",
+    "name": "Jane Doe",
+    "url": "https://example.com/profile/janedoe"
+  }]
+}`,
+    Product: `{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": "Developer Pro Laptop",
+  "image": ["https://example.com/photos/laptop.jpg"],
+  "description": "High performance laptop built for AI development.",
+  "sku": "0446310",
+  "brand": {
+    "@type": "Brand",
+    "name": "TechCorp"
+  },
+  "offers": {
+    "@type": "Offer",
+    "url": "https://example.com/laptop",
+    "priceCurrency": "USD",
+    "price": "1499.00",
+    "availability": "https://schema.org/InStock"
+  }
+}`,
+    Organization: `{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "IQVerse",
+  "url": "https://iqverse.net",
+  "logo": "https://iqverse.net/logo.png",
+  "sameAs": [
+    "https://github.com/SekmenDev/iqverse.net"
+  ]
+}`,
+    FAQ: `{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{
+    "@type": "Question",
+    "name": "Is IQVerse free?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes, IQVerse provides open-source tools running client-side in the browser."
+    }
+  }]
+}`,
+    WebSite: `{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "IQVerse",
+  "url": "https://iqverse.net/",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://iqverse.net/?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}`,
+    Breadcrumb: `{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://iqverse.net/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Tools",
+      "item": "https://iqverse.net/schema-validator/"
+    }
+  ]
+}`,
+    LocalBusiness: `{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "CyberTech Repairs",
+  "image": "https://example.com/store.jpg",
+  "telephone": "+1-800-555-0199",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "123 Innovation Way",
+    "addressLocality": "San Francisco",
+    "addressRegion": "CA",
+    "postalCode": "94107",
+    "addressCountry": "US"
+  }
+}`,
+    Recipe: `{
+  "@context": "https://schema.org",
+  "@type": "Recipe",
+  "name": "Classic Developer Coffee",
+  "image": ["https://example.com/coffee.jpg"],
+  "author": {
+    "@type": "Person",
+    "name": "Barista Bot"
+  },
+  "recipeIngredient": [
+    "20g freshly ground coffee beans",
+    "300ml hot water (92°C)"
+  ],
+  "recipeInstructions": [
+    {
+      "@type": "HowToStep",
+      "text": "Pour hot water over coffee grounds in circular motion."
+    }
+  ]
+}`
+  };
+
+  // DOM Elements
+  const tabManual = document.getElementById('tab-mode-manual') as HTMLButtonElement;
+  const tabUrl = document.getElementById('tab-mode-url') as HTMLButtonElement;
+  const containerManual = document.getElementById('mode-container-manual');
+  const containerUrl = document.getElementById('mode-container-url');
+
+  const schemaInput = document.getElementById('schemaInput') as HTMLTextAreaElement;
+  const btnValidateManual = document.getElementById('btn-validate-schema');
+  const btnFormatManual = document.getElementById('btn-format-schema');
+  const btnClearManual = document.getElementById('btn-clear-schema');
   const tplBtns = document.querySelectorAll('.tpl-btn');
 
+  const urlForm = document.getElementById('schema-url-form') as HTMLFormElement;
+  const targetUrlInput = document.getElementById('targetUrl') as HTMLInputElement;
+  const btnFetchUrl = document.getElementById('btn-fetch-url') as HTMLButtonElement;
+  const btnFetchSpinner = document.getElementById('btn-fetch-spinner');
+  const btnFetchText = document.getElementById('btn-fetch-text');
+  const urlExampleBtns = document.querySelectorAll('.url-example-btn');
+  const urlStatusMessage = document.getElementById('url-status-message');
+  const urlSchemasSelector = document.getElementById('url-schemas-selector');
+  const schemaPillsContainer = document.getElementById('schema-pills-container');
+  const btnEditInManual = document.getElementById('btn-edit-in-manual');
+
+  const resultsBox = document.getElementById('schema-results-box');
+
+  // State
+  let extractedItems: ExtractedSchemaItem[] = [];
+  let selectedSchemaIndex = 0;
+
+  // Mode switching
+  function switchMode(mode: 'manual' | 'url') {
+    if (mode === 'manual') {
+      tabManual.style.background = 'var(--accent)';
+      tabManual.style.borderColor = 'var(--accent)';
+      tabManual.style.color = '#ffffff';
+
+      tabUrl.style.background = 'var(--surface)';
+      tabUrl.style.borderColor = 'var(--border)';
+      tabUrl.style.color = 'var(--text)';
+
+      if (containerManual) containerManual.style.display = 'block';
+      if (containerUrl) containerUrl.style.display = 'none';
+
+      // Validate manual input
+      validateManual();
+    } else {
+      tabUrl.style.background = 'var(--accent)';
+      tabUrl.style.borderColor = 'var(--accent)';
+      tabUrl.style.color = '#ffffff';
+
+      tabManual.style.background = 'var(--surface)';
+      tabManual.style.borderColor = 'var(--border)';
+      tabManual.style.color = 'var(--text)';
+
+      if (containerManual) containerManual.style.display = 'none';
+      if (containerUrl) containerUrl.style.display = 'block';
+
+      if (extractedItems.length > 0) {
+        renderExtractedItem(selectedSchemaIndex);
+      } else {
+        if (resultsBox) resultsBox.style.display = 'none';
+      }
+    }
+  }
+
+  tabManual?.addEventListener('click', () => switchMode('manual'));
+  tabUrl?.addEventListener('click', () => switchMode('url'));
+
+  // Template loader
   tplBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
-      const key = btn.dataset.key;
-      if (key && SAMPLE_TEMPLATES[key] && schemaInput) {
-        schemaInput.value = SAMPLE_TEMPLATES[key];
-        validate();
+      const key = (btn as HTMLElement).dataset.key;
+      if (key && CLIENT_TEMPLATES[key] && schemaInput) {
+        schemaInput.value = CLIENT_TEMPLATES[key];
+        validateManual();
       }
     });
   });
 
-  btnFormat?.addEventListener('click', () => {
+  // URL Example buttons
+  urlExampleBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const url = (btn as HTMLElement).dataset.url;
+      if (url && targetUrlInput) {
+        targetUrlInput.value = url;
+      }
+    });
+  });
+
+  // Format JSON action
+  btnFormatManual?.addEventListener('click', () => {
     if (!schemaInput) return;
     try {
       let val = schemaInput.value.trim();
-      if (val.includes('<script')) {
-        const match = val.match(/<script[^>]*>([\s\S]*?)<\/script>/i);
+      const isScript = val.includes('<script');
+      if (isScript) {
+        const match = val.match(/<script[^>]*>([\s\S]*?)<\x2fscript>/i);
         if (match) val = match[1].trim();
       }
       const parsed = JSON.parse(val);
-      schemaInput.value = JSON.stringify(parsed, null, 2);
+      const formatted = JSON.stringify(parsed, null, 2);
+      schemaInput.value = isScript ? '<script type="application/ld+json">\n' + formatted + '\n<' + '/script>' : formatted;
+      validateManual();
     } catch {
-      // ignore invalid json during formatting
+      // ignore invalid json during formatting attempt
     }
   });
 
-  function validate() {
-    if (!schemaInput || !resultsBox) return;
-    const raw = schemaInput.value.trim();
-    if (!raw) {
+  // Clear action
+  btnClearManual?.addEventListener('click', () => {
+    if (schemaInput) {
+      schemaInput.value = '';
+      if (resultsBox) resultsBox.style.display = 'none';
+    }
+  });
+
+  // Render validation results UI
+  function renderValidationResults(
+    validation: SchemaValidationResult,
+    sourceJsonString: string,
+    originLabel?: string
+  ) {
+    if (!resultsBox) return;
+
+    if (!sourceJsonString.trim()) {
       resultsBox.style.display = 'none';
       return;
     }
 
-    let clean = raw;
-    if (clean.includes('<script')) {
-      const match = clean.match(/<script[^>]*>([\s\S]*?)<\/script>/i);
-      if (match) clean = match[1].trim();
-    }
-
-    const errors = [];
-    const warnings = [];
-    let parsed = null;
-    let typeFound = null;
-    let contextFound = null;
-    let properties = [];
-
-    try {
-      parsed = JSON.parse(clean);
-    } catch (err) {
-      errors.push(`JSON Syntax Error: ${err.message}`);
-    }
-
-    if (parsed) {
-      if (typeof parsed !== 'object' || parsed === null) {
-        errors.push('Schema root must be a valid JSON object.');
-      } else {
-        contextFound = parsed['@context'];
-        typeFound = parsed['@type'];
-        properties = Object.keys(parsed);
-
-        if (!contextFound) {
-          errors.push("Missing required '@context' property (expected 'https://schema.org').");
-        } else if (!String(contextFound).includes('schema.org')) {
-          warnings.push(`Unusual @context value: '${contextFound}'`);
-        }
-
-        if (!typeFound) {
-          errors.push("Missing required '@type' property (e.g. 'Article', 'Product', 'Organization').");
-        }
-      }
-    }
-
     resultsBox.style.display = 'block';
-    const isSuccess = errors.length === 0;
+
+    const isSuccess = validation.valid && validation.errors.length === 0;
+    const hasWarnings = validation.warnings.length > 0;
+    const statusColor = !isSuccess ? '#ff4d4f' : hasWarnings ? '#faad14' : '#4caf50';
+    const statusBg = !isSuccess
+      ? 'rgba(255, 77, 79, 0.08)'
+      : hasWarnings
+      ? 'rgba(250, 173, 20, 0.08)'
+      : 'rgba(76, 175, 80, 0.08)';
+
+    const typeBadges = validation.types.length > 0
+      ? validation.types
+          .map(
+            (t) =>
+              `<span style="padding: 2px 10px; border-radius: 12px; background: rgba(33, 150, 243, 0.15); color: #2196f3; font-weight: bold; font-size: 0.8rem; border: 1px solid rgba(33, 150, 243, 0.3);">@type: ${t}</span>`
+          )
+          .join(' ')
+      : '';
+
+    let formattedJson = '';
+    try {
+      formattedJson = JSON.stringify(validation.parsed || JSON.parse(sourceJsonString), null, 2);
+    } catch {
+      formattedJson = sourceJsonString;
+    }
 
     resultsBox.innerHTML = `
-      <div style="padding: 16px; border-radius: 8px; background: ${isSuccess ? 'rgba(76, 175, 80, 0.1)' : 'rgba(255, 77, 79, 0.1)'}; border: 1px solid ${isSuccess ? '#4caf50' : '#ff4d4f'};">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-          <h4 style="margin: 0; color: ${isSuccess ? '#4caf50' : '#ff4d4f'};">
-            ${isSuccess ? '✓ Valid Schema.org Structured Data' : '✕ Schema Validation Errors'}
-          </h4>
-          ${typeFound ? `<span style="padding: 2px 10px; border-radius: 12px; background: rgba(33, 150, 243, 0.2); color: #2196f3; font-weight: bold; font-size: 0.8rem;">@type: ${typeFound}</span>` : ''}
+      <div style="padding: 20px; border-radius: 8px; background: ${statusBg}; border: 1px solid ${statusColor};">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <h4 style="margin: 0; color: ${statusColor}; font-size: 1.05rem; display: flex; align-items: center; gap: 6px;">
+              ${
+                !isSuccess
+                  ? '✕ Schema Validation Errors'
+                  : hasWarnings
+                  ? '⚠️ Valid Schema with Recommendations'
+                  : '✓ Valid Schema.org Structured Data'
+              }
+            </h4>
+            ${originLabel ? `<span style="font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; background: var(--surface); color: var(--text-muted); border: 1px solid var(--border);">${originLabel}</span>` : ''}
+          </div>
+          <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+            ${typeBadges}
+          </div>
         </div>
 
-        ${errors.length > 0 ? `<div style="color: #ff4d4f; font-size: 0.9rem; margin-bottom: 6px;"><strong>Errors:</strong> ${errors.join(' | ')}</div>` : ''}
-        ${warnings.length > 0 ? `<div style="color: #faad14; font-size: 0.9rem; margin-bottom: 6px;"><strong>Warnings:</strong> ${warnings.join(' | ')}</div>` : ''}
-
         ${
-          isSuccess
+          validation.errors.length > 0
             ? `
-          <div style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted);">
-            Detected Properties: <strong>${properties.join(', ')}</strong>
+          <div style="margin-bottom: 12px; padding: 12px; border-radius: 6px; background: rgba(255, 77, 79, 0.12); border: 1px solid rgba(255, 77, 79, 0.25);">
+            <div style="color: #ff4d4f; font-weight: 600; font-size: 0.85rem; margin-bottom: 6px;">Errors (${validation.errors.length}):</div>
+            <ul style="margin: 0; padding-left: 20px; color: #ff4d4f; font-size: 0.85rem; line-height: 1.5;">
+              ${validation.errors.map((e) => `<li>${e}</li>`).join('')}
+            </ul>
           </div>
         `
             : ''
         }
+
+        ${
+          validation.warnings.length > 0
+            ? `
+          <div style="margin-bottom: 12px; padding: 12px; border-radius: 6px; background: rgba(250, 173, 20, 0.12); border: 1px solid rgba(250, 173, 20, 0.25);">
+            <div style="color: #faad14; font-weight: 600; font-size: 0.85rem; margin-bottom: 6px;">Recommendations & Warnings (${validation.warnings.length}):</div>
+            <ul style="margin: 0; padding-left: 20px; color: #faad14; font-size: 0.85rem; line-height: 1.5;">
+              ${validation.warnings.map((w) => `<li>${w}</li>`).join('')}
+            </ul>
+          </div>
+        `
+            : ''
+        }
+
+        ${
+          validation.properties.length > 0
+            ? `
+          <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 600;">
+              Detected Properties (${validation.properties.length}):
+            </div>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              ${validation.properties
+                .map(
+                  (p) =>
+                    `<span style="padding: 2px 8px; border-radius: 4px; background: var(--surface); color: var(--text); border: 1px solid var(--border); font-size: 0.75rem; font-family: var(--font-mono, monospace);">${p}</span>`
+                )
+                .join('')}
+            </div>
+          </div>
+        `
+            : ''
+        }
+
+        <!-- JSON Preview & Copy -->
+        <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Formatted JSON-LD Structure:</span>
+            <button
+              type="button"
+              id="btn-copy-validated-json"
+              style="padding: 2px 10px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.75rem; cursor: pointer;"
+            >
+              Copy JSON
+            </button>
+          </div>
+          <pre style="margin: 0; padding: 12px; border-radius: 6px; background: var(--surface); border: 1px solid var(--border); color: var(--text); font-family: var(--font-mono, monospace); font-size: 0.8rem; overflow-x: auto; max-height: 280px; line-height: 1.4;"><code>${formattedJson}</code></pre>
+        </div>
       </div>
     `;
+
+    const btnCopy = document.getElementById('btn-copy-validated-json');
+    btnCopy?.addEventListener('click', () => {
+      navigator.clipboard.writeText(formattedJson).then(() => {
+        if (btnCopy) {
+          const orig = btnCopy.textContent;
+          btnCopy.textContent = 'Copied!';
+          setTimeout(() => {
+            if (btnCopy) btnCopy.textContent = orig;
+          }, 1500);
+        }
+      });
+    });
   }
 
-  btnValidate?.addEventListener('click', validate);
-  validate();
+  // Validate manual input
+  function validateManual() {
+    if (!schemaInput) return;
+    const raw = schemaInput.value.trim();
+    if (!raw) {
+      if (resultsBox) resultsBox.style.display = 'none';
+      return;
+    }
+
+    const validation = validateSchema(raw);
+    renderValidationResults(validation, raw, 'Direct Input');
+  }
+
+  btnValidateManual?.addEventListener('click', validateManual);
+
+  // Render a specific extracted schema from URL results
+  function renderExtractedItem(index: number) {
+    if (!extractedItems[index]) return;
+    selectedSchemaIndex = index;
+
+    // Update pill styles
+    const pills = schemaPillsContainer?.querySelectorAll('.schema-pill-btn');
+    pills?.forEach((p, idx) => {
+      if (idx === index) {
+        p.setAttribute('style', 'padding: 3px 10px; border-radius: 4px; border: 1px solid var(--accent); background: var(--accent); color: #fff; font-size: 0.78rem; font-weight: 600; cursor: pointer;');
+      } else {
+        p.setAttribute('style', 'padding: 3px 10px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.78rem; cursor: pointer;');
+      }
+    });
+
+    const item = extractedItems[index];
+    renderValidationResults(
+      item.validation,
+      item.rawJson,
+      `URL Schema #${item.index} (${item.type})`
+    );
+  }
+
+  // Load selected extracted schema in manual editor
+  btnEditInManual?.addEventListener('click', () => {
+    const item = extractedItems[selectedSchemaIndex];
+    if (item && schemaInput) {
+      try {
+        schemaInput.value = JSON.stringify(JSON.parse(item.rawJson), null, 2);
+      } catch {
+        schemaInput.value = item.rawJson;
+      }
+      switchMode('manual');
+    }
+  });
+
+  // URL Form Submission
+  urlForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const rawUrl = targetUrlInput?.value.trim();
+    if (!rawUrl) return;
+
+    // Validate CAPTCHA first
+    const { valid, token } = validateCaptcha(urlForm);
+    if (!valid) {
+      return;
+    }
+
+    const normalizedUrl = rawUrl.startsWith('http://') || rawUrl.startsWith('https://')
+      ? rawUrl
+      : `https://${rawUrl}`;
+
+    // Set Loading State
+    if (btnFetchSpinner) btnFetchSpinner.style.display = 'inline-block';
+    if (btnFetchText) btnFetchText.textContent = 'Crawling & Validating...';
+    if (btnFetchUrl) btnFetchUrl.disabled = true;
+
+    if (urlStatusMessage) {
+      urlStatusMessage.style.display = 'block';
+      urlStatusMessage.style.background = 'rgba(33, 150, 243, 0.08)';
+      urlStatusMessage.style.border = '1px solid rgba(33, 150, 243, 0.3)';
+      urlStatusMessage.style.color = '#2196f3';
+      urlStatusMessage.innerHTML = `Fetching webpage content and parsing structured data from <strong>${normalizedUrl}</strong>...`;
+    }
+    if (urlSchemasSelector) urlSchemasSelector.style.display = 'none';
+    if (resultsBox) resultsBox.style.display = 'none';
+
+    try {
+      const tokenParam = token ? `&token=${encodeURIComponent(token)}` : '';
+      const proxyUrl = `/api/check-url?url=${encodeURIComponent(normalizedUrl)}${tokenParam}`;
+      const res = await fetch(proxyUrl);
+
+      if (!res.ok) {
+        throw new Error(`Server returned HTTP ${res.status}`);
+      }
+
+      const json = await res.json();
+      const htmlContent = json.html || json.body || '';
+
+      if (!htmlContent) {
+        if (urlStatusMessage) {
+          urlStatusMessage.style.background = 'rgba(255, 77, 79, 0.08)';
+          urlStatusMessage.style.border = '1px solid rgba(255, 77, 79, 0.3)';
+          urlStatusMessage.style.color = '#ff4d4f';
+          urlStatusMessage.innerHTML = `Unable to retrieve HTML content from <strong>${normalizedUrl}</strong>. Check if the URL is accessible.`;
+        }
+        return;
+      }
+
+      // Extract all JSON-LD blocks
+      extractedItems = extractAndValidateAllFromHtml(htmlContent);
+
+      if (extractedItems.length === 0) {
+        if (urlStatusMessage) {
+          urlStatusMessage.style.background = 'rgba(250, 173, 20, 0.08)';
+          urlStatusMessage.style.border = '1px solid rgba(250, 173, 20, 0.3)';
+          urlStatusMessage.style.color = '#faad14';
+          urlStatusMessage.innerHTML = `ℹ️ No JSON-LD structured data (<code>&lt;script type="application/ld+json"&gt;</code>) was found on <strong>${normalizedUrl}</strong>.`;
+        }
+        if (resultsBox) resultsBox.style.display = 'none';
+        return;
+      }
+
+      // Found schemas!
+      if (urlStatusMessage) {
+        urlStatusMessage.style.background = 'rgba(76, 175, 80, 0.08)';
+        urlStatusMessage.style.border = '1px solid rgba(76, 175, 80, 0.3)';
+        urlStatusMessage.style.color = '#4caf50';
+        urlStatusMessage.innerHTML = `✓ Successfully discovered <strong>${extractedItems.length}</strong> JSON-LD structured data block${extractedItems.length > 1 ? 's' : ''} on <strong>${normalizedUrl}</strong>.`;
+      }
+
+      // Render schema selector pills if multiple schemas found
+      if (schemaPillsContainer) {
+        schemaPillsContainer.innerHTML = extractedItems
+          .map(
+            (item, idx) => `
+          <button
+            type="button"
+            class="schema-pill-btn"
+            data-index="${idx}"
+            style="padding: 3px 10px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.78rem; cursor: pointer;"
+          >
+            #${item.index}: ${item.type}
+          </button>
+        `
+          )
+          .join('');
+
+        schemaPillsContainer.querySelectorAll('.schema-pill-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const idx = Number((btn as HTMLElement).dataset.index);
+            renderExtractedItem(idx);
+          });
+        });
+      }
+
+      if (urlSchemasSelector) {
+        urlSchemasSelector.style.display = 'block';
+      }
+
+      renderExtractedItem(0);
+    } catch (err: any) {
+      if (urlStatusMessage) {
+        urlStatusMessage.style.background = 'rgba(255, 77, 79, 0.08)';
+        urlStatusMessage.style.border = '1px solid rgba(255, 77, 79, 0.3)';
+        urlStatusMessage.style.color = '#ff4d4f';
+        urlStatusMessage.innerHTML = `✕ Error fetching target URL: ${err?.message || 'Network request failed'}`;
+      }
+    } finally {
+      if (btnFetchSpinner) btnFetchSpinner.style.display = 'none';
+      if (btnFetchText) btnFetchText.textContent = 'Fetch & Validate';
+      if (btnFetchUrl) btnFetchUrl.disabled = false;
+    }
+  });
+
+  // Initial validation for default sample on load
+  validateManual();
 </script>
