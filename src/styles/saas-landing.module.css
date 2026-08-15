@@ -19,6 +19,49 @@
   gap: 1rem;
 }
 
+.navLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navLogo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+  color: #f7f9ff;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: opacity 0.15s ease;
+}
+
+.navLogo:hover {
+  opacity: 0.85;
+}
+
+.navBreadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 13px;
+  color: #a7b2c8;
+  white-space: nowrap;
+}
+
+.sep {
+  opacity: 0.5;
+}
+
+.current {
+  color: #f7f9ff;
+  font-weight: 600;
+}
+
 .brand {
   display: inline-flex;
   align-items: center;
@@ -44,6 +87,14 @@
   display: flex;
   gap: 1.25rem;
   color: #a7b2c8;
+}
+
+.navLinks a {
+  transition: color 0.15s ease;
+}
+
+.navLinks a:hover {
+  color: #f7f9ff;
 }
 
 .navCta,
