@@ -22,6 +22,13 @@ describe('lib/encoding.ts - Encoding & Decoding Functions', () => {
       expect(decoded).toBe(original);
     });
 
+    it('should correctly encode and decode unicode / multi-byte UTF-8 strings', () => {
+      const original = 'Türkçe karakterler: ğüşıöç 🚀 🌍';
+      const encoded = b64Encode(original);
+      const decoded = b64Decode(encoded);
+      expect(decoded).toBe(original);
+    });
+
     it('should handle empty input strings gracefully', () => {
       expect(b64Encode('')).toBe('');
       expect(b64Decode('')).toBe('');

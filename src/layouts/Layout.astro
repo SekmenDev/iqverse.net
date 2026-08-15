@@ -77,13 +77,15 @@ const jsonLdString = JSON.stringify(finalJsonLd).replace(/</g, '\\u003c');
     <script is:inline>
       (function() {
         try {
-          var saved = localStorage.getItem('iqverse-theme');
+          const saved = localStorage.getItem('iqverse-theme');
           if (saved === 'light' || saved === 'dark') {
             document.documentElement.setAttribute('data-theme', saved);
           } else {
             document.documentElement.setAttribute('data-theme', 'dark');
           }
-        } catch(e) {}
+        } catch {
+          // ignore localStorage access errors
+        }
       })();
     </script>
 

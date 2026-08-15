@@ -81,7 +81,7 @@ const HTTP_STATUS_CODES = [
   </div>
 </ToolLayout>
 
-<script define:vars={{ HTTP_STATUS_CODES }}>
+<script is:inline define:vars={{ HTTP_STATUS_CODES }}>
   const searchInput = document.getElementById('httpSearch');
   const catBtns = document.querySelectorAll('.http-cat-btn');
   const listContainer = document.getElementById('http-codes-list');

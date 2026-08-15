@@ -1,7 +1,6 @@
 {
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*", "./*"]
     },
@@ -15,8 +14,14 @@
     "e2e/**/*"
   ],
   "exclude": [
+    ".astro/**",
     "dist",
     "node_modules",
-    "out"
+    "out",
+    "public",
+    "src/**/__tests__",
+    "coverage",
+    "playwright-report",
+    "test-results",
   ]
 }

@@ -196,11 +196,8 @@ const hello = (name: string): string => {
   const colHtml = document.getElementById('col-html');
   const colPreview = document.getElementById('col-preview');
 
-  let mode: 'split' | 'preview' | 'html' = 'split';
-
   if (btnSplit && btnPreview && btnHtml) {
     btnSplit.onclick = () => {
-      mode = 'split';
       btnSplit.className = 'sharedStyles_button sharedStyles_buttonPrimary button-primary';
       btnPreview.className = 'sharedStyles_button';
       btnHtml.className = 'sharedStyles_button';
@@ -210,7 +207,6 @@ const hello = (name: string): string => {
     };
 
     btnPreview.onclick = () => {
-      mode = 'preview';
       btnPreview.className = 'sharedStyles_button sharedStyles_buttonPrimary button-primary';
       btnSplit.className = 'sharedStyles_button';
       btnHtml.className = 'sharedStyles_button';
@@ -220,7 +216,6 @@ const hello = (name: string): string => {
     };
 
     btnHtml.onclick = () => {
-      mode = 'html';
       btnHtml.className = 'sharedStyles_button sharedStyles_buttonPrimary button-primary';
       btnSplit.className = 'sharedStyles_button';
       btnPreview.className = 'sharedStyles_button';

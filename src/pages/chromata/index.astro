@@ -19,12 +19,6 @@ const EXPORT_FORMATS = [
   { value: 'json', label: 'JSON' },
   { value: 'swift', label: 'Swift' },
 ];
-
-const COLOR_FORMATS = [
-  { value: 'hex', label: 'HEX' },
-  { value: 'rgb', label: 'RGB' },
-  { value: 'hsl', label: 'HSL' },
-];
 ---
 
 <ToolLayout
@@ -119,7 +113,6 @@ const COLOR_FORMATS = [
 <script>
   import {
     generatePalette,
-    formatColor,
     exportCSS,
     exportTailwind,
     exportFigma,

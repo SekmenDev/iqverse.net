@@ -1,6 +1,13 @@
 export function b64Encode(input: string, urlSafe = false): string {
   try {
-    const encoded = typeof btoa !== 'undefined' ? btoa(unescape(encodeURIComponent(input))) : Buffer.from(input, 'utf-8').toString('base64');
+    let encoded: string;
+    if (typeof Buffer !== 'undefined') {
+      encoded = Buffer.from(input, 'utf-8').toString('base64');
+    } else {
+      const bytes = new TextEncoder().encode(input);
+      const binString = Array.from(bytes, (byte) => String.fromCodePoint(byte)).join('');
+      encoded = btoa(binString);
+    }
     return urlSafe ? encoded.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '') : encoded;
   } catch {
     return 'Encoding error';
@@ -14,8 +21,13 @@ export function b64Decode(input: string, urlSafe = false): string {
       data = data.replace(/-/g, '+').replace(/_/g, '/');
       while (data.length % 4) data += '=';
     }
-    const decoded = typeof atob !== 'undefined' ? decodeURIComponent(escape(atob(data))) : Buffer.from(data, 'base64').toString('utf-8');
-    return decoded;
+    if (typeof Buffer !== 'undefined') {
+      return Buffer.from(data, 'base64').toString('utf-8');
+    } else {
+      const binString = atob(data);
+      const bytes = Uint8Array.from(binString, (m) => m.codePointAt(0) || 0);
+      return new TextDecoder().decode(bytes);
+    }
   } catch {
     return 'Decoding error';
   }

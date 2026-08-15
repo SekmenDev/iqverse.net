@@ -142,8 +142,6 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   const urlInput = document.getElementById('targetUrl') as HTMLInputElement;
   const btnStart = document.getElementById('btn-start-scan');
   const btnStop = document.getElementById('btn-stop-scan');
-  const optExternal = document.getElementById('opt-external') as HTMLInputElement;
-  const optImages = document.getElementById('opt-images') as HTMLInputElement;
   const optCrawl = document.getElementById('opt-crawl') as HTMLInputElement;
 
   const statsCard = document.getElementById('scan-stats-card');
@@ -288,14 +286,16 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
       if (optCrawl?.checked && item.depth < 2 && res.html && res.url.startsWith(new URL(origin).origin)) {
         const matches = res.html.matchAll(/href=["']([^"']+)["']/g);
         for (const m of matches) {
-          let foundUrl = m[1];
+          const foundUrl = m[1];
           if (foundUrl.startsWith('#') || foundUrl.startsWith('javascript:') || foundUrl.startsWith('mailto:')) continue;
           try {
             const absolute = new URL(foundUrl, res.url).href;
             if (!visited.has(absolute)) {
               queue.push({ url: absolute, depth: item.depth + 1, sourceUrl: res.url, tag: 'A' });
             }
-          } catch {}
+          } catch {
+            // ignore malformed URL
+          }
         }
       }
     }

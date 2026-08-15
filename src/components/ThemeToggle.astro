@@ -50,7 +50,9 @@ import styles from '@/styles/theme-toggle.module.css';
         document.documentElement.setAttribute('data-theme', nextTheme);
         try {
           localStorage.setItem('iqverse-theme', nextTheme);
-        } catch {}
+        } catch {
+          // ignore localStorage access errors
+        }
         updateThemeUI();
       };
     }
