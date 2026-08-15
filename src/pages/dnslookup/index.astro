@@ -211,53 +211,50 @@ const FAQS = [
         </div>
       </div>
 
-      <!-- Navigation & Filters Toolbar -->
-      <div class={styles.resultsToolbar}>
-        <div class={styles.filterBar}>
-          <span class={styles.filterLabel}>Records:</span>
-          <div id="result-filter-pills" class={styles.filterPills}></div>
-        </div>
+      <!-- Single Unified Toolbar: Pills, Search, Actions & Counter -->
+      <div id="dns-unified-toolbar" class="tool-filter-bar" style="margin-top: 18px; margin-bottom: 10px;">
+        <div id="result-filter-pills" class={styles.filterPills}></div>
 
-        <div class={styles.toolbarActions}>
-          <button type="button" id="btn-copy-all" class={styles.actionBtn}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <div class="search-input-wrap" style="max-width: 320px;">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <span id="btn-copy-all-text">Copy All</span>
-          </button>
-          <button type="button" id="btn-copy-json" class={styles.actionBtn}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-              <polyline points="10 9 9 9 8 9"></polyline>
-            </svg>
-            <span>JSON</span>
-          </button>
+            <input
+              id="dns-search-input"
+              type="text"
+              class="tool-search-input"
+              placeholder="Search records, IPs, hostnames..."
+            />
+            <button type="button" id="btn-clear-dns-search" class="search-clear-btn" title="Clear search">✕</button>
+          </div>
+
+          <div class={styles.toolbarActions}>
+            <button type="button" id="btn-copy-all" class={styles.actionBtn}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span id="btn-copy-all-text">Copy All</span>
+            </button>
+            <button type="button" id="btn-copy-json" class={styles.actionBtn}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+              <span>JSON</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      <!-- Live Search Toolbar -->
-      <div id="dns-search-bar-wrap" class="tool-filter-bar" style="margin-top: 12px;">
-        <div class="search-input-wrap" style="max-width: 440px;">
-          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input
-            id="dns-search-input"
-            type="text"
-            class="tool-search-input"
-            placeholder="Search DNS records, values, IPs, hostnames..."
-          />
-          <button type="button" id="btn-clear-dns-search" class="search-clear-btn" title="Clear search">✕</button>
-        </div>
-
-        <div id="dns-results-count-bar" class="table-results-counter" style="margin: 0;">
-          <span>Showing <strong id="dns-visible-count">0</strong> of <span id="dns-total-badge-count">0</span> records</span>
-        </div>
+      <!-- Live Counter -->
+      <div id="dns-results-count-bar" class="table-results-counter" style="margin-top: 4px; margin-bottom: 12px;">
+        <span>Showing <strong id="dns-visible-count">0</strong> of <span id="dns-total-badge-count">0</span> records</span>
       </div>
 
       <!-- Tab Content: Records Grid -->
@@ -430,7 +427,7 @@ const FAQS = [
   const btnResetFilters = document.getElementById('btn-reset-dns-filters');
   const visibleCountEl = document.getElementById('dns-visible-count');
   const totalBadgeCountEl = document.getElementById('dns-total-badge-count');
-  const searchBarWrap = document.getElementById('dns-search-bar-wrap');
+  const resultsCountBar = document.getElementById('dns-results-count-bar');
   const emptyState = document.getElementById('dns-empty-state');
 
   const btnCopyAll = document.getElementById('btn-copy-all');
@@ -706,14 +703,14 @@ const FAQS = [
   function renderRecordsView(groups: GroupedRecord[]) {
     if (activeFilterTab === 'raw') {
       if (recordsGrid) recordsGrid.style.display = 'none';
-      if (searchBarWrap) searchBarWrap.style.display = 'none';
+      if (resultsCountBar) resultsCountBar.style.display = 'none';
       if (emptyState) emptyState.style.display = 'none';
       if (rawPane) rawPane.style.display = 'flex';
       return;
     }
 
     if (rawPane) rawPane.style.display = 'none';
-    if (searchBarWrap) searchBarWrap.style.display = 'flex';
+    if (resultsCountBar) resultsCountBar.style.display = 'flex';
 
     const query = (searchInput?.value || '').toLowerCase().trim();
 

@@ -163,15 +163,15 @@ const FAQS = [
           <div class={styles.scoreLabel}>Audit Target</div>
           <h2 id="scanned-target-title" style="margin: 6px 0 14px; font-size: 1.4rem; font-weight: 700; word-break: break-all; color: var(--text);">--</h2>
           <div class={styles.badges}>
-            <span class={`${styles.badge} ${styles.badgePass}`}>
+            <button type="button" class={`${styles.badge} ${styles.badgePass} agent-stat-badge`} data-status="pass" style="cursor: pointer; font-family: inherit;">
               <span id="count-passed">0</span> Passed
-            </span>
-            <span class={`${styles.badge} ${styles.badgeWarning}`}>
+            </button>
+            <button type="button" class={`${styles.badge} ${styles.badgeWarning} agent-stat-badge`} data-status="warn" style="cursor: pointer; font-family: inherit;">
               <span id="count-warnings">0</span> Warnings
-            </span>
-            <span class={`${styles.badge} ${styles.badgeFail}`}>
+            </button>
+            <button type="button" class={`${styles.badge} ${styles.badgeFail} agent-stat-badge`} data-status="fail" style="cursor: pointer; font-family: inherit;">
               <span id="count-failed">0</span> Failed
-            </span>
+            </button>
           </div>
         </div>
 
@@ -182,54 +182,30 @@ const FAQS = [
         </div>
       </div>
 
-      <!-- Filter Tabs -->
-      <div class={styles.resultsToolbar}>
-        <div class={styles.filterBar}>
-          <span class={styles.filterLabel}>Category:</span>
-          <div id="category-filter-buttons" class={styles.filterPills}>
-            <button type="button" class={`${styles.filterPill} ${styles.activeFilter}`} data-cat="all">
-              All Checks (<span id="count-cat-all">17</span>)
-            </button>
-            <button type="button" class={styles.filterPill} data-cat="scored">
-              ⭐ Scored Signals (<span id="count-cat-scored">9</span>)
-            </button>
-            <button type="button" class={styles.filterPill} data-cat="protocol">
-              🔌 Protocol & MCP (<span id="count-cat-protocol">4</span>)
-            </button>
-            <button type="button" class={styles.filterPill} data-cat="content">
-              📄 Content & Schema (<span id="count-cat-content">2</span>)
-            </button>
-            <button type="button" class={styles.filterPill} data-cat="commerce">
-              💳 Commerce (<span id="count-cat-commerce">2</span>)
-            </button>
-            <button type="button" class={styles.filterPill} data-cat="performance">
-              ⚡ Security & HTTP (<span id="count-cat-performance">1</span>)
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Live Search & Status Toolbar -->
-      <div id="agent-filter-toolbar" class="tool-filter-bar" style="margin-top: 12px;">
-        <div class="tool-filter-group" id="agent-status-filters">
-          <button type="button" class="filter-pill active agent-status-pill-btn" data-status="all">
-            All Status
+      <!-- Navigation & Filter Toolbar (Category Tabs + Inline Search) -->
+      <div class="tool-filter-bar" style="margin-top: 18px; margin-bottom: 12px;">
+        <div id="category-filter-buttons" class={styles.filterPills}>
+          <button type="button" class={`${styles.filterPill} ${styles.activeFilter}`} data-cat="all">
+            All Checks (<span id="count-cat-all">17</span>)
           </button>
-          <button type="button" class="filter-pill agent-status-pill-btn" data-status="pass">
-            ✓ Passed (<span id="agent-pill-pass">0</span>)
+          <button type="button" class={styles.filterPill} data-cat="scored">
+            ⭐ Scored Signals (<span id="count-cat-scored">9</span>)
           </button>
-          <button type="button" class="filter-pill agent-status-pill-btn" data-status="warn">
-            ⚠️ Warnings (<span id="agent-pill-warn">0</span>)
+          <button type="button" class={styles.filterPill} data-cat="protocol">
+            🔌 Protocol & MCP (<span id="count-cat-protocol">4</span>)
           </button>
-          <button type="button" class="filter-pill filter-pill-danger agent-status-pill-btn" data-status="fail">
-            ✕ Failed (<span id="agent-pill-fail">0</span>)
+          <button type="button" class={styles.filterPill} data-cat="content">
+            📄 Content & Schema (<span id="count-cat-content">2</span>)
           </button>
-          <button type="button" class="filter-pill agent-status-pill-btn" data-status="info">
-            ℹ️ Info (<span id="agent-pill-info">0</span>)
+          <button type="button" class={styles.filterPill} data-cat="commerce">
+            💳 Commerce (<span id="count-cat-commerce">2</span>)
+          </button>
+          <button type="button" class={styles.filterPill} data-cat="performance">
+            ⚡ Security & HTTP (<span id="count-cat-performance">1</span>)
           </button>
         </div>
 
-        <div class="search-input-wrap">
+        <div class="search-input-wrap" style="max-width: 340px;">
           <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -238,7 +214,7 @@ const FAQS = [
             id="agent-search-input"
             type="text"
             class="tool-search-input"
-            placeholder="Search AI signals, endpoints, protocols..."
+            placeholder="Search AI signals, protocols..."
           />
           <button type="button" id="btn-clear-agent-search" class="search-clear-btn" title="Clear search">✕</button>
         </div>
@@ -445,7 +421,7 @@ const FAQS = [
   const agentSearchInput = document.getElementById('agent-search-input') as HTMLInputElement;
   const btnClearAgentSearch = document.getElementById('btn-clear-agent-search');
   const btnResetAgentFilters = document.getElementById('btn-reset-agent-filters');
-  const agentStatusFilterBtns = document.querySelectorAll('.agent-status-pill-btn');
+  const agentStatBadges = document.querySelectorAll('.agent-stat-badge');
 
   const checksGrid = document.getElementById('checks-grid');
   const catFilterBtns = document.querySelectorAll('#category-filter-buttons button');
@@ -479,15 +455,24 @@ const FAQS = [
     });
   });
 
-  agentStatusFilterBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      agentStatusFilterBtns.forEach((b) => {
-        b.classList.remove('active');
-        b.removeAttribute('data-active');
-      });
-      btn.classList.add('active');
-      btn.setAttribute('data-active', 'true');
-      currentStatus = (btn as HTMLElement).dataset.status || 'all';
+  agentStatBadges.forEach((badge) => {
+    badge.addEventListener('click', () => {
+      const clickedStatus = (badge as HTMLElement).dataset.status || 'all';
+      if (currentStatus === clickedStatus) {
+        currentStatus = 'all';
+        agentStatBadges.forEach((b) => ((b as HTMLElement).style.opacity = '1'));
+      } else {
+        currentStatus = clickedStatus;
+        agentStatBadges.forEach((b) => {
+          if ((b as HTMLElement).dataset.status === clickedStatus) {
+            (b as HTMLElement).style.opacity = '1';
+            (b as HTMLElement).style.boxShadow = '0 0 0 2px var(--accent)';
+          } else {
+            (b as HTMLElement).style.opacity = '0.55';
+            (b as HTMLElement).style.boxShadow = 'none';
+          }
+        });
+      }
       renderChecks();
     });
   });
@@ -510,12 +495,9 @@ const FAQS = [
 
   btnResetAgentFilters?.addEventListener('click', () => {
     currentStatus = 'all';
-    agentStatusFilterBtns.forEach((b) => {
-      if ((b as HTMLElement).dataset.status === 'all') {
-        b.classList.add('active');
-      } else {
-        b.classList.remove('active');
-      }
+    agentStatBadges.forEach((b) => {
+      (b as HTMLElement).style.opacity = '1';
+      (b as HTMLElement).style.boxShadow = 'none';
     });
     if (agentSearchInput) {
       agentSearchInput.value = '';
