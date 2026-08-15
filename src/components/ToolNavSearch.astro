@@ -1,0 +1,269 @@
+---
+import styles from '@/styles/tool-nav-search.module.css';
+---
+
+<div class={styles.navSearchWrap} id="tool-search-wrap">
+  <span class={styles.navSearchIcon} aria-hidden="true">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+      <circle cx="6.5" cy="6.5" r="4.5" />
+      <path d="M10.5 10.5l3 3" />
+    </svg>
+  </span>
+
+  <input
+    id="tool-nav-search"
+    type="text"
+    placeholder="Search tools… (press /)"
+    autocomplete="off"
+    spellcheck="false"
+    class={styles.navSearch}
+    aria-label="Search tools"
+    role="combobox"
+    aria-expanded="false"
+    aria-controls="tool-search-dropdown"
+    aria-autocomplete="list"
+  />
+
+  <span class={styles.searchKbd} id="tool-search-kbd">/</span>
+  <button
+    type="button"
+    class={styles.clearBtn}
+    id="tool-search-clear"
+    aria-label="Clear search"
+    tabindex="-1"
+  >
+    ✕
+  </button>
+
+  <!-- Floating Quick Search Dropdown -->
+  <div
+    class={styles.dropdown}
+    id="tool-search-dropdown"
+    role="listbox"
+    aria-label="Search results"
+    style="display: none;"
+  >
+    <div class={styles.resultsList} id="tool-search-results"></div>
+    <div class={styles.dropdownFooter} id="tool-search-footer">
+      <span id="tool-search-count">0 tools</span>
+      <div class={styles.footerKeys}>
+        <span class={styles.footerKeyItem}><kbd class={styles.kbdKey}>↑</kbd><kbd class={styles.kbdKey}>↓</kbd> Navigate</span>
+        <span class={styles.footerKeyItem}><kbd class={styles.kbdKey}>↵</kbd> Open</span>
+        <span class={styles.footerKeyItem}><kbd class={styles.kbdKey}>ESC</kbd> Close</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { tools, filterTools, type Tool } from '@/lib/tools';
+
+  function initToolNavSearch() {
+    const wrap = document.getElementById('tool-search-wrap');
+    const input = document.getElementById('tool-nav-search') as HTMLInputElement | null;
+    const kbd = document.getElementById('tool-search-kbd');
+    const clearBtn = document.getElementById('tool-search-clear') as HTMLButtonElement | null;
+    const dropdown = document.getElementById('tool-search-dropdown');
+    const resultsList = document.getElementById('tool-search-results');
+    const countEl = document.getElementById('tool-search-count');
+
+    if (!wrap || !input || !dropdown || !resultsList) return;
+
+    let currentMatches: Tool[] = [];
+    let activeIndex = -1;
+
+    function escapeHtml(str: string): string {
+      return (str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function showDropdown() {
+      dropdown!.style.display = 'flex';
+      input!.setAttribute('aria-expanded', 'true');
+    }
+
+    function hideDropdown() {
+      dropdown!.style.display = 'none';
+      input!.setAttribute('aria-expanded', 'false');
+      activeIndex = -1;
+    }
+
+    function updateActiveItem() {
+      const items = resultsList!.querySelectorAll('.tool-search-item');
+      items.forEach((item, idx) => {
+        if (idx === activeIndex) {
+          item.classList.add('tool-search-active');
+          item.setAttribute('aria-selected', 'true');
+          item.scrollIntoView({ block: 'nearest' });
+        } else {
+          item.classList.remove('tool-search-active');
+          item.setAttribute('aria-selected', 'false');
+        }
+      });
+    }
+
+    function renderResults() {
+      const q = input!.value.trim();
+      currentMatches = q ? filterTools(q, 'all', 'all') : tools.slice(0, 8);
+
+      if (clearBtn && kbd) {
+        if (q.length > 0) {
+          clearBtn.style.display = 'inline-flex';
+          kbd.style.display = 'none';
+        } else {
+          clearBtn.style.display = 'none';
+          kbd.style.display = '';
+        }
+      }
+
+      if (countEl) {
+        countEl.textContent = `${currentMatches.length} tool${currentMatches.length === 1 ? '' : 's'}`;
+      }
+
+      if (currentMatches.length === 0) {
+        resultsList!.innerHTML = `
+          <div class="tool-search-empty">
+            <div class="tool-search-empty-icon">🔍</div>
+            <div class="tool-search-empty-title">No tools found</div>
+            <div class="tool-search-empty-sub">Try searching for "JSON", "QR", "AI", "Hash", etc.</div>
+          </div>
+        `;
+        activeIndex = -1;
+        showDropdown();
+        return;
+      }
+
+      resultsList!.innerHTML = currentMatches
+        .map((tool, idx) => {
+          const isExternal = !!tool.url && /^(https?:\/\/|mailto:)/i.test(tool.url);
+          const targetAttr = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
+          return `
+            <a
+              href="${escapeHtml(tool.url || '/')}"
+              class="tool-search-item"
+              role="option"
+              data-index="${idx}"
+              ${targetAttr}
+            >
+              <div class="tool-search-icon" aria-hidden="true">
+                ${escapeHtml(tool.icon || '🛠️')}
+              </div>
+              <div class="tool-search-content">
+                <div class="tool-search-header">
+                  <span class="tool-search-title">${escapeHtml(tool.name)}</span>
+                  <span class="tool-search-cat">${escapeHtml(tool.cat || 'Tool')}</span>
+                </div>
+                <div class="tool-search-desc">${escapeHtml(tool.desc || '')}</div>
+              </div>
+              <div class="tool-search-arrow" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 8h10M8 3l5 5-5 5" />
+                </svg>
+              </div>
+            </a>
+          `;
+        })
+        .join('');
+
+      activeIndex = 0;
+      updateActiveItem();
+      showDropdown();
+    }
+
+    // Input Event
+    input.addEventListener('input', () => {
+      renderResults();
+    });
+
+    // Focus Event
+    input.addEventListener('focus', () => {
+      renderResults();
+    });
+
+    // Clear Button
+    if (clearBtn) {
+      clearBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        input.value = '';
+        input.focus();
+        renderResults();
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+    }
+
+    // Keyboard Navigation on Input
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (currentMatches.length > 0) {
+          activeIndex = (activeIndex + 1) % currentMatches.length;
+          updateActiveItem();
+        }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (currentMatches.length > 0) {
+          activeIndex = (activeIndex - 1 + currentMatches.length) % currentMatches.length;
+          updateActiveItem();
+        }
+      } else if (e.key === 'Enter') {
+        if (currentMatches.length > 0) {
+          e.preventDefault();
+          const targetIndex = activeIndex >= 0 ? activeIndex : 0;
+          const targetTool = currentMatches[targetIndex];
+          if (targetTool && targetTool.url) {
+            window.location.href = targetTool.url;
+          }
+        }
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        input.value = '';
+        if (clearBtn && kbd) {
+          clearBtn.style.display = 'none';
+          kbd.style.display = '';
+        }
+        hideDropdown();
+        input.blur();
+      }
+    });
+
+    // Global keyboard shortcuts ("/" to focus, "Escape" to close)
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        hideDropdown();
+        return;
+      }
+
+      const target = e.target as HTMLElement | null;
+      const isEditable =
+        !!target &&
+        (target.isContentEditable ||
+          ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName));
+
+      if (e.key === '/' && !e.metaKey && !e.ctrlKey && !e.altKey && !isEditable) {
+        e.preventDefault();
+        input.focus();
+        input.select();
+        renderResults();
+      }
+    });
+
+    // Click Outside to Dismiss
+    document.addEventListener('click', (e) => {
+      if (!wrap.contains(e.target as Node)) {
+        hideDropdown();
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initToolNavSearch);
+  } else {
+    initToolNavSearch();
+  }
+
+  document.addEventListener('astro:after-swap', initToolNavSearch);
+</script>

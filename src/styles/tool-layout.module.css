@@ -43,8 +43,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  flex: 1;
   min-width: 0;
+  max-width: 240px;
   font-size: 13px;
   color: var(--text-muted);
   white-space: nowrap;
@@ -217,13 +217,16 @@
   margin: 0 auto;
 }
 
+@media (max-width: 860px) {
+  .navBreadcrumb {
+    display: none;
+  }
+}
+
 @media (max-width: 768px) {
   .topNav {
     padding: 0 16px;
-  }
-
-  .navBreadcrumb {
-    display: none;
+    gap: 12px;
   }
 
   .header {
@@ -242,5 +245,12 @@
 
   .content {
     padding: 20px 16px 32px;
+  }
+}
+
+@media (max-width: 520px) {
+  .topNav {
+    padding: 0 10px;
+    gap: 8px;
   }
 }

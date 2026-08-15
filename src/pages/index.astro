@@ -1,6 +1,7 @@
 ---
 import Layout from '@/layouts/Layout.astro';
 import ThemeToggle from '@/components/ThemeToggle.astro';
+import ToolNavSearch from '@/components/ToolNavSearch.astro';
 import { tools, getUniqueCategories, getUniqueStatuses } from '@/lib/tools';
 import { getToolsCollectionJsonLd } from '@/lib/jsonld';
 import styles from '@/styles/catalog.module.css';
@@ -70,24 +71,7 @@ const jsonLdData = getToolsCollectionJsonLd();
         <span>IQVerse</span>
       </a>
 
-      <div class={styles.navSearchWrap}>
-        <span class={styles.navSearchIcon}>
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
-            <circle cx="6.5" cy="6.5" r="4.5" />
-            <path d="M10.5 10.5l3 3" />
-          </svg>
-        </span>
-        <input
-          id="search"
-          type="text"
-          placeholder="Search tools… (press /)"
-          autocomplete="off"
-          spellcheck="false"
-          class={styles.navSearch}
-          aria-label="Search tools"
-        />
-        <span class={styles.searchKbd}>/</span>
-      </div>
+      <ToolNavSearch />
 
       <div class={styles.navRight}>
         <a
@@ -269,7 +253,7 @@ const jsonLdData = getToolsCollectionJsonLd();
     let activeStatus: 'all' | 'open' | 'saas' | 'coming' = 'all';
     let activeSort: 'default' | 'az' = 'default';
 
-    const searchInput = document.getElementById('search') as HTMLInputElement | null;
+    const searchInput = (document.getElementById('tool-nav-search') || document.getElementById('search')) as HTMLInputElement | null;
     const catButtons = document.querySelectorAll('#cat-filters button');
     const statusButtons = document.querySelectorAll('#status-filters button');
     const sortButtons = document.querySelectorAll('.sortWrap button');

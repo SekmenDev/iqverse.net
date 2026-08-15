@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { tools } from '@/lib/tools';
+import { tools, filterTools } from '@/lib/tools';
 
 describe('lib/tools.ts - Tools Registry Integrity', () => {
   it('should contain a list of registered tools', () => {
@@ -21,5 +21,18 @@ describe('lib/tools.ts - Tools Registry Integrity', () => {
     openTools.forEach((tool) => {
       expect(tool.url).toMatch(/^(\/[a-z0-9_-]+\/|https?:\/\/.+)$/i);
     });
+  });
+
+  it('filterTools should match query against name, desc, tags, and cat case-insensitively', () => {
+    const qrResults = filterTools('qr', 'all', 'all');
+    expect(qrResults.length).toBeGreaterThan(0);
+    expect(qrResults.some((t: any) => t.name.toLowerCase().includes('qr'))).toBe(true);
+
+    const jsonResults = filterTools('JSON', 'all', 'all');
+    expect(jsonResults.length).toBeGreaterThan(0);
+    expect(jsonResults.some((t: any) => t.name.toLowerCase().includes('json'))).toBe(true);
+
+    const nonExistent = filterTools('xyz999nonexistentquery', 'all', 'all');
+    expect(nonExistent.length).toBe(0);
   });
 });
