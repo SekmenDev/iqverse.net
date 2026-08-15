@@ -5,6 +5,7 @@ export interface Props {
   endpoint?: string;
   workerCount?: number | string;
   disableHaptics?: boolean | string;
+  resetOnSubmit?: boolean;
   required?: boolean;
   class?: string;
   style?: string;
@@ -15,6 +16,7 @@ const {
   endpoint = DEFAULT_CAPTCHA_ENDPOINT,
   workerCount,
   disableHaptics,
+  resetOnSubmit = true,
   required = true,
   class: className = '',
   style = '',
@@ -28,6 +30,7 @@ const {
     data-cap-api-endpoint={endpoint}
     data-cap-worker-count={workerCount}
     data-cap-disable-haptics={disableHaptics}
+    data-cap-reset-on-submit={resetOnSubmit ? 'true' : 'false'}
     required={required}
   ></cap-widget>
   <div class="cap-captcha-error" style="display: none; color: #ff4d4f; font-size: 0.8rem; font-weight: 500; margin-top: 6px; font-family: var(--font-mono, monospace);">
