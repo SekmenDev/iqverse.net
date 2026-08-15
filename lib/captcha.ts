@@ -22,6 +22,7 @@ export interface CapProgressDetail {
 
 export interface CapCaptchaOptions {
   endpoint?: string;
+  resetOnSubmit?: boolean;
   onSolve?: (token: string) => void;
   onError?: (error: string) => void;
   onProgress?: (progress: number) => void;
@@ -85,37 +86,93 @@ export function isCaptchaSolved(
 /**
  * Resets a cap-widget element if it exists and supports reset.
  */
-export function resetCapWidget(widget: HTMLElement | null | undefined): boolean {
-  if (!widget) return false;
-  const el = widget as CapWidgetElement;
-  el.__cap_token = null;
+export function resetCapWidget(
+  containerOrWidget: HTMLElement | null | undefined
+): boolean {
+  if (!containerOrWidget) return false;
 
-  const wrap = el.closest('.cap-captcha-wrap') || el.parentElement;
-  if (wrap) {
-    const errorEl = wrap.querySelector('.cap-captcha-error') as HTMLElement | null;
-    if (errorEl) {
-      errorEl.style.display = 'none';
-      errorEl.textContent = '';
+  let widgets: CapWidgetElement[] = [];
+
+  if (containerOrWidget.tagName?.toLowerCase() === 'cap-widget') {
+    widgets = [containerOrWidget as CapWidgetElement];
+  } else {
+    widgets = Array.from(
+      containerOrWidget.querySelectorAll<CapWidgetElement>('cap-widget')
+    );
+  }
+
+  if (widgets.length === 0) {
+    const wrap = containerOrWidget.classList?.contains('cap-captcha-wrap')
+      ? containerOrWidget
+      : containerOrWidget.closest?.('.cap-captcha-wrap');
+    if (wrap) {
+      const errorEl = wrap.querySelector('.cap-captcha-error') as HTMLElement | null;
+      if (errorEl) {
+        errorEl.style.display = 'none';
+        errorEl.textContent = '';
+      }
+      wrap.classList.remove('cap-invalid');
     }
-    wrap.classList.remove('cap-invalid');
+    return false;
   }
 
-  const hiddenInput = el.closest('form')?.querySelector<HTMLInputElement>(
-    'input[name="cap-token"], input[name="c-t"]'
-  );
-  if (hiddenInput) {
-    hiddenInput.value = '';
-  }
+  let resetAny = false;
 
-  if (typeof el.reset === 'function') {
-    try {
-      el.reset();
-      return true;
-    } catch {
-      return false;
+  widgets.forEach((el) => {
+    el.__cap_token = null;
+    el.token = null as any;
+    if ('value' in el) {
+      (el as any).value = '';
     }
-  }
-  return false;
+    el.removeAttribute('data-cap-token');
+
+    const wrap = el.closest('.cap-captcha-wrap') || el.parentElement;
+    if (wrap) {
+      const errorEl = wrap.querySelector('.cap-captcha-error') as HTMLElement | null;
+      if (errorEl) {
+        errorEl.style.display = 'none';
+        errorEl.textContent = '';
+      }
+      wrap.classList.remove('cap-invalid');
+    }
+
+    const form = el.closest('form');
+    const hiddenInputs = form
+      ? form.querySelectorAll<HTMLInputElement>(
+          'input[name="cap-token"], input[name="c-t"], input[data-cap-token]'
+        )
+      : wrap?.querySelectorAll<HTMLInputElement>(
+          'input[name="cap-token"], input[name="c-t"], input[data-cap-token]'
+        );
+
+    hiddenInputs?.forEach((input) => {
+      input.value = '';
+    });
+
+    if (typeof el.reset === 'function') {
+      try {
+        el.reset();
+        resetAny = true;
+      } catch {
+        // Ignore reset errors on individual widgets
+      }
+    } else {
+      if (typeof customElements !== 'undefined' && customElements.whenDefined) {
+        customElements.whenDefined('cap-widget').then(() => {
+          if (typeof el.reset === 'function') {
+            try {
+              el.reset();
+            } catch {
+              // ignore
+            }
+          }
+        });
+      }
+      resetAny = true;
+    }
+  });
+
+  return resetAny;
 }
 
 /**
@@ -179,7 +236,7 @@ export function bindCapWidget(
     const token =
       customEvt.detail?.token ||
       el.token ||
-      el.value ||
+      (el as any).value ||
       '';
 
     el.__cap_token = token;
@@ -214,17 +271,51 @@ export function bindCapWidget(
     }
   };
 
+  const handleReset = () => {
+    el.__cap_token = null;
+    const wrap = el.closest('.cap-captcha-wrap') || el.parentElement;
+    if (wrap) {
+      wrap.classList.remove('cap-invalid');
+      const errorEl = wrap.querySelector('.cap-captcha-error') as HTMLElement | null;
+      if (errorEl) {
+        errorEl.style.display = 'none';
+        errorEl.textContent = '';
+      }
+    }
+    options?.onReset?.();
+  };
+
   const form = widget.closest('form');
   const handleFormReset = () => {
     resetCapWidget(widget);
     options?.onReset?.();
   };
 
+  let submitTimeoutId: ReturnType<typeof setTimeout> | null = null;
+
   const handleFormSubmitCapture = (e: Event) => {
     const { valid } = validateCaptcha(widget);
     if (!valid) {
       e.preventDefault();
       e.stopImmediatePropagation();
+      return;
+    }
+
+    const attrReset = widget.getAttribute('data-cap-reset-on-submit');
+    const shouldReset =
+      options?.resetOnSubmit !== undefined
+        ? options.resetOnSubmit
+        : attrReset !== 'false';
+
+    if (shouldReset) {
+      if (submitTimeoutId) {
+        clearTimeout(submitTimeoutId);
+      }
+      submitTimeoutId = setTimeout(() => {
+        submitTimeoutId = null;
+        resetCapWidget(widget);
+        options?.onReset?.();
+      }, 0);
     }
   };
 
@@ -243,20 +334,28 @@ export function bindCapWidget(
   widget.addEventListener('solve', handleSolve);
   widget.addEventListener('error', handleError);
   widget.addEventListener('progress', handleProgress);
+  widget.addEventListener('reset', handleReset);
   widget.addEventListener('invalid', handleInvalid);
 
   let submitButtons: HTMLElement[] = [];
   if (form) {
     form.addEventListener('reset', handleFormReset);
     form.addEventListener('submit', handleFormSubmitCapture, true);
-    submitButtons = Array.from(form.querySelectorAll<HTMLElement>('button[type="submit"], input[type="submit"]'));
+    submitButtons = Array.from(
+      form.querySelectorAll<HTMLElement>('button[type="submit"], input[type="submit"]')
+    );
     submitButtons.forEach((btn) => btn.addEventListener('click', handleBtnClick, true));
   }
 
   return () => {
+    if (submitTimeoutId) {
+      clearTimeout(submitTimeoutId);
+      submitTimeoutId = null;
+    }
     widget.removeEventListener('solve', handleSolve);
     widget.removeEventListener('error', handleError);
     widget.removeEventListener('progress', handleProgress);
+    widget.removeEventListener('reset', handleReset);
     widget.removeEventListener('invalid', handleInvalid);
     if (form) {
       form.removeEventListener('reset', handleFormReset);

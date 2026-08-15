@@ -44,6 +44,43 @@ describe('CapCaptcha utilities & bindings', () => {
     expect(errorEl.style.display).toBe('none');
   });
 
+  it('successfully resets cap-widget when container/form is passed to resetCapWidget', () => {
+    const form = document.createElement('form');
+    const wrap = document.createElement('div');
+    wrap.className = 'cap-captcha-wrap cap-invalid';
+    const errorEl = document.createElement('div');
+    errorEl.className = 'cap-captcha-error';
+    errorEl.style.display = 'block';
+    wrap.appendChild(errorEl);
+
+    const widget = document.createElement('cap-widget');
+    const resetMock = vi.fn();
+    (widget as any).reset = resetMock;
+    (widget as any).__cap_token = 'form-child-token';
+    (widget as any).token = 'token-prop';
+    (widget as any).value = 'token-val';
+    widget.setAttribute('data-cap-token', 'attr-token');
+    wrap.appendChild(widget);
+
+    const hiddenInput = document.createElement('input');
+    hiddenInput.type = 'hidden';
+    hiddenInput.name = 'cap-token';
+    hiddenInput.value = 'hidden-val';
+    form.appendChild(wrap);
+    form.appendChild(hiddenInput);
+
+    const result = resetCapWidget(form);
+    expect(result).toBe(true);
+    expect(resetMock).toHaveBeenCalledTimes(1);
+    expect((widget as any).__cap_token).toBeNull();
+    expect((widget as any).token).toBeNull();
+    expect((widget as any).value).toBe('');
+    expect(widget.getAttribute('data-cap-token')).toBeNull();
+    expect(hiddenInput.value).toBe('');
+    expect(wrap.classList.contains('cap-invalid')).toBe(false);
+    expect(errorEl.style.display).toBe('none');
+  });
+
   describe('getCaptchaToken & isCaptchaSolved', () => {
     it('returns null and false when no token is present', () => {
       const form = document.createElement('form');
@@ -130,7 +167,7 @@ describe('CapCaptcha utilities & bindings', () => {
     });
   });
 
-  describe('bindCapWidget lifecycle', () => {
+  describe('bindCapWidget lifecycle & automatic form submit reset', () => {
     it('binds events and invokes callbacks correctly', () => {
       const form = document.createElement('form');
       const wrap = document.createElement('div');
@@ -187,6 +224,123 @@ describe('CapCaptcha utilities & bindings', () => {
       expect(resetMock).toHaveBeenCalledTimes(1); // no additional calls
 
       document.body.removeChild(form);
+    });
+
+    it('automatically resets widget after form submission while preserving token during synchronous submit handler', async () => {
+      vi.useFakeTimers();
+
+      const form = document.createElement('form');
+      const wrap = document.createElement('div');
+      wrap.className = 'cap-captcha-wrap';
+      const errorEl = document.createElement('div');
+      errorEl.className = 'cap-captcha-error';
+      wrap.appendChild(errorEl);
+
+      const widget = document.createElement('cap-widget');
+      const resetMock = vi.fn();
+      (widget as any).reset = resetMock;
+      wrap.appendChild(widget);
+      form.appendChild(wrap);
+      document.body.appendChild(form);
+
+      const onReset = vi.fn();
+      const cleanup = bindCapWidget(widget, { onReset });
+
+      // Solve the captcha
+      widget.dispatchEvent(new CustomEvent('solve', { detail: { token: 'token-for-submit' } }));
+      expect((widget as any).__cap_token).toBe('token-for-submit');
+
+      let capturedTokenInSubmitHandler: string | null = null;
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        capturedTokenInSubmitHandler = getCaptchaToken(form);
+      });
+
+      // Submit form
+      form.dispatchEvent(new Event('submit', { cancelable: true }));
+
+      // During synchronous submit handler, token is available
+      expect(capturedTokenInSubmitHandler).toBe('token-for-submit');
+      // Widget not yet reset synchronously
+      expect(resetMock).not.toHaveBeenCalled();
+
+      // Advance timers to trigger post-submit reset
+      vi.runAllTimers();
+
+      // Now widget has been reset
+      expect(resetMock).toHaveBeenCalledTimes(1);
+      expect(onReset).toHaveBeenCalledTimes(1);
+      expect((widget as any).__cap_token).toBeNull();
+      expect(getCaptchaToken(form)).toBeNull();
+
+      cleanup();
+      document.body.removeChild(form);
+      vi.useRealTimers();
+    });
+
+    it('blocks submit when captcha is unsolved', () => {
+      const form = document.createElement('form');
+      const wrap = document.createElement('div');
+      wrap.className = 'cap-captcha-wrap';
+      const errorEl = document.createElement('div');
+      errorEl.className = 'cap-captcha-error';
+      wrap.appendChild(errorEl);
+
+      const widget = document.createElement('cap-widget');
+      const resetMock = vi.fn();
+      (widget as any).reset = resetMock;
+      wrap.appendChild(widget);
+      form.appendChild(wrap);
+      document.body.appendChild(form);
+
+      const cleanup = bindCapWidget(widget);
+
+      const submitHandler = vi.fn();
+      form.addEventListener('submit', submitHandler);
+
+      const submitEvent = new Event('submit', { cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      expect(submitEvent.defaultPrevented).toBe(true);
+      expect(submitHandler).not.toHaveBeenCalled();
+      expect(wrap.classList.contains('cap-invalid')).toBe(true);
+
+      cleanup();
+      document.body.removeChild(form);
+    });
+
+    it('respects resetOnSubmit: false option and data-cap-reset-on-submit="false"', () => {
+      vi.useFakeTimers();
+
+      const form = document.createElement('form');
+      const wrap = document.createElement('div');
+      wrap.className = 'cap-captcha-wrap';
+      const errorEl = document.createElement('div');
+      errorEl.className = 'cap-captcha-error';
+      wrap.appendChild(errorEl);
+
+      const widget = document.createElement('cap-widget');
+      widget.setAttribute('data-cap-reset-on-submit', 'false');
+      const resetMock = vi.fn();
+      (widget as any).reset = resetMock;
+      wrap.appendChild(widget);
+      form.appendChild(wrap);
+      document.body.appendChild(form);
+
+      const cleanup = bindCapWidget(widget);
+
+      widget.dispatchEvent(new CustomEvent('solve', { detail: { token: 'token-no-reset' } }));
+      form.dispatchEvent(new Event('submit', { cancelable: true }));
+
+      vi.runAllTimers();
+
+      // Reset was NOT triggered because attribute disabled it
+      expect(resetMock).not.toHaveBeenCalled();
+      expect((widget as any).__cap_token).toBe('token-no-reset');
+
+      cleanup();
+      document.body.removeChild(form);
+      vi.useRealTimers();
     });
   });
 });
