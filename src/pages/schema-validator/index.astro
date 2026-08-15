@@ -146,7 +146,9 @@ const SAMPLE_TEMPLATES: Record<string, string> = {
       }
       const parsed = JSON.parse(val);
       schemaInput.value = JSON.stringify(parsed, null, 2);
-    } catch (e) {}
+    } catch {
+      // ignore invalid json during formatting
+    }
   });
 
   function validate() {

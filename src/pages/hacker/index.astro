@@ -158,7 +158,9 @@ import styles from '@/styles/hacker.module.css';
       try {
         const refUrl = new URL(document.referrer);
         targetPath = refUrl.pathname;
-      } catch {}
+      } catch {
+        // ignore malformed referrer URL
+      }
     }
     targetPathEl.textContent = targetPath;
   }

@@ -125,7 +125,6 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   let selectedFile: File | null = null;
   let previewUrl: string | null = null;
   let convertedUrl: string | null = null;
-  let convertedSize: number | null = null;
 
   fileInput?.addEventListener('change', () => {
     const file = fileInput.files?.[0];
@@ -133,7 +132,6 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
     selectedFile = file;
     convertedUrl = null;
-    convertedSize = null;
 
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     previewUrl = URL.createObjectURL(file);
@@ -187,7 +185,6 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
       const head = `data:${mimeType};base64,`;
       const sizeInBytes = Math.round(((dataUrl.length - head.length) * 3) / 4);
-      convertedSize = sizeInBytes;
 
       if (convImg) {
         convImg.src = dataUrl;

@@ -363,14 +363,13 @@ const presets = [
 <script>
   import { buildQRPayload } from '@/lib/utils';
 
-  let currentStep = 'content';
   let qrType = 'url';
   let dotStyle = 'square';
   let cornerStyle = 'square';
   let dotColor = '#000000';
   let bgColor = '#ffffff';
   let cornerColor = '#000000';
-  let errorLevel = 'M';
+  const errorLevel = 'M';
   let logoData: string | null = null;
   let exportFmt = 'png';
 
@@ -436,7 +435,6 @@ const presets = [
   const nextBtns = document.querySelectorAll('.btn-next-step');
 
   function setStep(step: string) {
-    currentStep = step;
     ['content', 'style', 'logo', 'export'].forEach((s) => {
       const p = document.getElementById(`tab-pane-${s}`);
       if (p) p.style.display = s === step ? 'block' : 'none';
