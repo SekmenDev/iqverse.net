@@ -514,3 +514,293 @@ textarea {
 	padding: 0 1rem;
   }
 }
+
+/* ==========================================================================
+   Tool Results, Filter Bar, Search, Tables & Shared Button Styles
+   ========================================================================== */
+
+.tool-filter-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+  margin-bottom: 14px;
+}
+
+.tool-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  font-family: inherit;
+  line-height: 1.4;
+}
+
+.filter-pill:hover {
+  border-color: var(--accent);
+  color: var(--text);
+  background: rgba(129, 140, 248, 0.08);
+}
+
+.filter-pill.active,
+.filter-pill[data-active="true"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(129, 140, 248, 0.25);
+  font-weight: 600;
+}
+
+.filter-pill.filter-pill-danger:hover {
+  border-color: var(--red);
+  background: rgba(248, 113, 113, 0.08);
+  color: var(--red);
+}
+
+.filter-pill.filter-pill-danger.active {
+  border-color: var(--red);
+  background: var(--red);
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(248, 113, 113, 0.25);
+}
+
+.filter-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.1);
+  color: inherit;
+  min-width: 18px;
+  line-height: 1.2;
+}
+
+.filter-pill.active .filter-badge {
+  background: rgba(0, 0, 0, 0.22);
+  color: #ffffff;
+}
+
+/* Search input with icon and clear button */
+.search-input-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-width: 220px;
+  flex: 1;
+  max-width: 360px;
+}
+
+.search-input-wrap svg.search-icon {
+  position: absolute;
+  left: 12px;
+  width: 15px;
+  height: 15px;
+  color: var(--text-muted);
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.search-input-wrap input.tool-search-input {
+  width: 100%;
+  padding: 7px 30px 7px 34px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.search-input-wrap input.tool-search-input:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 12px rgba(129, 140, 248, 0.15);
+}
+
+.search-input-wrap .search-clear-btn {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px 5px;
+  font-size: 0.8rem;
+  border-radius: 50%;
+  line-height: 1;
+  display: none;
+}
+
+.search-input-wrap .search-clear-btn:hover {
+  color: var(--text);
+}
+
+/* Table results counter & info */
+.table-results-counter {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  margin-top: 10px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.table-results-counter strong {
+  color: var(--accent);
+}
+
+/* Table styling */
+.results-table-container {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  margin-top: 8px;
+}
+
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.results-table thead th {
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.results-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s ease;
+}
+
+.results-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.results-table tbody tr:hover {
+  background: rgba(129, 140, 248, 0.04);
+}
+
+.results-table tbody td {
+  padding: 10px 14px;
+  vertical-align: middle;
+}
+
+/* Empty State */
+.tool-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-muted);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.01);
+  margin-top: 12px;
+}
+
+.tool-empty-state-icon {
+  font-size: 2rem;
+  margin-bottom: 8px;
+  opacity: 0.7;
+}
+
+.tool-empty-state-title {
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+  font-size: 0.95rem;
+}
+
+.tool-empty-state-text {
+  font-size: 0.82rem;
+  margin-bottom: 12px;
+}
+
+.tool-empty-state-btn {
+  padding: 5px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--accent);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tool-empty-state-btn:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+}
+
+/* Backward compatibility classes for JS manipulation */
+.sharedStyles_button,
+.button-secondary {
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 200ms ease;
+  font-family: inherit;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.sharedStyles_button:hover {
+  background: rgba(129, 140, 248, 0.08);
+  border-color: var(--accent);
+}
+
+.sharedStyles_buttonPrimary,
+.button-primary {
+  background: var(--accent) !important;
+  color: #ffffff !important;
+  border-color: var(--accent) !important;
+}
+
+.sharedStyles_buttonPrimary:hover,
+.button-primary:hover {
+  background: var(--accent-dark) !important;
+}
+
+.sharedStyles_buttonSecondary {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}

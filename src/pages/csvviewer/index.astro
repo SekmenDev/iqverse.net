@@ -34,11 +34,38 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
     <section class={sharedStyles.section}>
       <div class={sharedStyles.sectionLabel}>Interactive Table Preview</div>
       <div class={sharedStyles.card}>
-        <div style="overflow-x: auto;">
-          <table id="csv-table" style="width: 100%; border-collapse: collapse;">
+        <div class="tool-filter-bar" style="margin-top: 0;">
+          <div class="search-input-wrap" style="max-width: 420px;">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input
+              id="csv-table-search"
+              type="text"
+              class="tool-search-input"
+              placeholder="Search table rows across columns..."
+            />
+            <button type="button" id="btn-clear-csv-search" class="search-clear-btn" title="Clear search">✕</button>
+          </div>
+
+          <div id="csv-row-counter" class="table-results-counter" style="margin: 0;">
+            <span>Showing <strong id="csv-visible-count">0</strong> of <span id="csv-total-count">0</span> rows</span>
+          </div>
+        </div>
+
+        <div id="csv-table-wrap" class="results-table-container">
+          <table id="csv-table" class="results-table">
             <thead id="csv-thead"></thead>
             <tbody id="csv-tbody"></tbody>
           </table>
+        </div>
+
+        <div id="csv-empty-state" class="tool-empty-state" style="display: none;">
+          <div class="tool-empty-state-icon">🔍</div>
+          <div class="tool-empty-state-title">No matching rows</div>
+          <div class="tool-empty-state-text">No records in the CSV match your search query.</div>
+          <button type="button" id="btn-reset-csv-search" class="tool-empty-state-btn">Clear Search</button>
         </div>
       </div>
     </section>
@@ -54,6 +81,13 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
 <script>
   const csvInput = document.getElementById('csvInput') as HTMLTextAreaElement;
+  const searchInput = document.getElementById('csv-table-search') as HTMLInputElement;
+  const btnClearSearch = document.getElementById('btn-clear-csv-search');
+  const btnResetSearch = document.getElementById('btn-reset-csv-search');
+  const tableWrap = document.getElementById('csv-table-wrap');
+  const emptyState = document.getElementById('csv-empty-state');
+  const visibleCountEl = document.getElementById('csv-visible-count');
+  const totalCountEl = document.getElementById('csv-total-count');
   const csvThead = document.getElementById('csv-thead');
   const csvTbody = document.getElementById('csv-tbody');
   const exportSection = document.getElementById('csv-export-section');
@@ -81,51 +115,100 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
     return { headers, rows: parsedRows };
   }
 
+  function getFilteredRows() {
+    const { headers, rows } = parseCSV(csvInput?.value || '');
+    const query = (searchInput?.value || '').toLowerCase().trim();
+
+    if (!query) return { headers, allRows: rows, filteredRows: rows };
+
+    const filtered = rows.filter((r) => {
+      return Object.values(r).some((val) => String(val).toLowerCase().includes(query));
+    });
+
+    return { headers, allRows: rows, filteredRows: filtered };
+  }
+
   function renderTable() {
-    if (!csvInput || !csvThead || !csvTbody) return;
-    const { headers, rows } = parseCSV(csvInput.value);
+    if (!csvThead || !csvTbody) return;
+    const { headers, allRows, filteredRows } = getFilteredRows();
+
+    if (visibleCountEl) visibleCountEl.textContent = String(filteredRows.length);
+    if (totalCountEl) totalCountEl.textContent = String(allRows.length);
 
     if (headers.length === 0) {
       csvThead.innerHTML = '';
-      csvTbody.innerHTML = '<tr><td style="padding: 1rem; color: var(--text-muted);">No data</td></tr>';
+      csvTbody.innerHTML = '<tr><td style="padding: 1rem; color: var(--text-muted);">No CSV data entered.</td></tr>';
+      if (tableWrap) tableWrap.style.display = 'block';
+      if (emptyState) emptyState.style.display = 'none';
       return;
     }
 
+    if (filteredRows.length === 0 && allRows.length > 0) {
+      if (tableWrap) tableWrap.style.display = 'none';
+      if (emptyState) emptyState.style.display = 'flex';
+      return;
+    }
+
+    if (emptyState) emptyState.style.display = 'none';
+    if (tableWrap) tableWrap.style.display = 'block';
+
     csvThead.innerHTML = `
       <tr>
-        ${headers.map((h) => `<th style="text-align: left; padding: 0.75rem; border-bottom: 1px solid var(--border); color: var(--text-muted); font-size: 0.85rem;">${h}</th>`).join('')}
+        ${headers.map((h) => `<th>${h}</th>`).join('')}
       </tr>
     `;
 
-    csvTbody.innerHTML = rows
+    csvTbody.innerHTML = filteredRows
       .map(
         (r) => `
       <tr>
-        ${headers.map((h) => `<td style="padding: 0.75rem; border-bottom: 1px solid var(--border); font-size: 0.9rem;">${r[h] || ''}</td>`).join('')}
+        ${headers.map((h) => `<td>${r[h] || ''}</td>`).join('')}
       </tr>
     `
       )
       .join('');
   }
 
+  searchInput?.addEventListener('input', () => {
+    if (btnClearSearch) btnClearSearch.style.display = searchInput.value ? 'inline-block' : 'none';
+    renderTable();
+  });
+
+  btnClearSearch?.addEventListener('click', () => {
+    if (searchInput) {
+      searchInput.value = '';
+      btnClearSearch.style.display = 'none';
+      renderTable();
+      searchInput.focus();
+    }
+  });
+
+  btnResetSearch?.addEventListener('click', () => {
+    if (searchInput) {
+      searchInput.value = '';
+      if (btnClearSearch) btnClearSearch.style.display = 'none';
+      renderTable();
+    }
+  });
+
   btnJson?.addEventListener('click', () => {
-    const { rows } = parseCSV(csvInput?.value || '');
+    const { filteredRows } = getFilteredRows();
     if (exportOutput && exportSection) {
-      exportOutput.value = JSON.stringify(rows, null, 2);
+      exportOutput.value = JSON.stringify(filteredRows, null, 2);
       exportSection.style.display = 'block';
     }
   });
 
   btnMd?.addEventListener('click', () => {
-    const { headers, rows } = parseCSV(csvInput?.value || '');
+    const { headers, filteredRows } = getFilteredRows();
     if (exportOutput && exportSection) {
-      if (rows.length === 0) {
+      if (filteredRows.length === 0) {
         exportOutput.value = '';
       } else {
         const lines = [
           `| ${headers.join(' | ')} |`,
           `| ${headers.map(() => '---').join(' | ')} |`,
-          ...rows.map((row) => `| ${headers.map((h) => row[h]).join(' | ')} |`),
+          ...filteredRows.map((row) => `| ${headers.map((h) => row[h]).join(' | ')} |`),
         ];
         exportOutput.value = lines.join('\n');
       }
@@ -134,12 +217,12 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   });
 
   btnSql?.addEventListener('click', () => {
-    const { headers, rows } = parseCSV(csvInput?.value || '');
+    const { headers, filteredRows } = getFilteredRows();
     if (exportOutput && exportSection) {
-      if (rows.length === 0) {
+      if (filteredRows.length === 0) {
         exportOutput.value = '';
       } else {
-        const inserts = rows.map((row) => {
+        const inserts = filteredRows.map((row) => {
           const values = headers
             .map((h) => {
               const escaped = String(row[h]).split("'").join("''");

@@ -214,7 +214,7 @@ const FAQS = [
       <!-- Navigation & Filters Toolbar -->
       <div class={styles.resultsToolbar}>
         <div class={styles.filterBar}>
-          <span class={styles.filterLabel}>Filter:</span>
+          <span class={styles.filterLabel}>Records:</span>
           <div id="result-filter-pills" class={styles.filterPills}></div>
         </div>
 
@@ -239,8 +239,37 @@ const FAQS = [
         </div>
       </div>
 
+      <!-- Live Search Toolbar -->
+      <div id="dns-search-bar-wrap" class="tool-filter-bar" style="margin-top: 12px;">
+        <div class="search-input-wrap" style="max-width: 440px;">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            id="dns-search-input"
+            type="text"
+            class="tool-search-input"
+            placeholder="Search DNS records, values, IPs, hostnames..."
+          />
+          <button type="button" id="btn-clear-dns-search" class="search-clear-btn" title="Clear search">✕</button>
+        </div>
+
+        <div id="dns-results-count-bar" class="table-results-counter" style="margin: 0;">
+          <span>Showing <strong id="dns-visible-count">0</strong> of <span id="dns-total-badge-count">0</span> records</span>
+        </div>
+      </div>
+
       <!-- Tab Content: Records Grid -->
       <div id="dns-records-grid" class={styles.recordsGrid}></div>
+
+      <!-- Empty State -->
+      <div id="dns-empty-state" class="tool-empty-state" style="display: none;">
+        <div class="tool-empty-state-icon">🔍</div>
+        <div class="tool-empty-state-title">No matching DNS records</div>
+        <div class="tool-empty-state-text">No records match your search keyword or selected record type filter.</div>
+        <button type="button" id="btn-reset-dns-filters" class="tool-empty-state-btn">Reset Filters</button>
+      </div>
 
       <!-- Tab Content: Raw JSON Viewer -->
       <div id="dns-raw-pane" class={styles.rawHeaderCard} style="display: none;">
@@ -396,6 +425,13 @@ const FAQS = [
   const recordsGrid = document.getElementById('dns-records-grid');
   const rawPane = document.getElementById('dns-raw-pane');
   const rawOutput = document.getElementById('dns-raw-output');
+  const searchInput = document.getElementById('dns-search-input') as HTMLInputElement;
+  const btnClearSearch = document.getElementById('btn-clear-dns-search');
+  const btnResetFilters = document.getElementById('btn-reset-dns-filters');
+  const visibleCountEl = document.getElementById('dns-visible-count');
+  const totalBadgeCountEl = document.getElementById('dns-total-badge-count');
+  const searchBarWrap = document.getElementById('dns-search-bar-wrap');
+  const emptyState = document.getElementById('dns-empty-state');
 
   const btnCopyAll = document.getElementById('btn-copy-all');
   const btnCopyAllText = document.getElementById('btn-copy-all-text');
@@ -408,6 +444,7 @@ const FAQS = [
   let activeFilterTab = 'all';
   let latestResponses: { type: string; data: DnsResponse | null }[] = [];
   let currentDomain = 'iqverse.net';
+  let currentGroupedRecords: GroupedRecord[] = [];
 
   function showToast(message: string) {
     if (!toast) return;
@@ -442,6 +479,39 @@ const FAQS = [
 
   providerSelect?.addEventListener('change', () => {
     form?.dispatchEvent(new Event('submit'));
+  });
+
+  searchInput?.addEventListener('input', () => {
+    if (btnClearSearch) {
+      btnClearSearch.style.display = searchInput.value ? 'inline-block' : 'none';
+    }
+    renderRecordsView(currentGroupedRecords);
+  });
+
+  btnClearSearch?.addEventListener('click', () => {
+    if (searchInput) {
+      searchInput.value = '';
+      btnClearSearch.style.display = 'none';
+      renderRecordsView(currentGroupedRecords);
+      searchInput.focus();
+    }
+  });
+
+  btnResetFilters?.addEventListener('click', () => {
+    activeFilterTab = 'all';
+    if (searchInput) {
+      searchInput.value = '';
+      if (btnClearSearch) btnClearSearch.style.display = 'none';
+    }
+    const filterBtns = filterPillsContainer?.querySelectorAll('.filter-pill');
+    filterBtns?.forEach((b) => {
+      if ((b as HTMLElement).dataset.tab === 'all') {
+        b.classList.add('active');
+      } else {
+        b.classList.remove('active');
+      }
+    });
+    renderRecordsView(currentGroupedRecords);
   });
 
   async function fetchDns(domain: string, type: string, provider: string): Promise<DnsResponse | null> {
@@ -527,6 +597,7 @@ const FAQS = [
           badgeStatus.style.borderColor = 'rgba(52, 211, 153, 0.3)';
         } else if (primaryStatusCode === 3) {
           badgeStatus.textContent = 'NXDOMAIN (3)';
+          badgeStatus.className = `${badgeStatus.className.split(' ')[0]} badgeFail`;
           badgeStatus.style.background = 'rgba(248, 113, 113, 0.12)';
           badgeStatus.style.color = 'var(--red)';
           badgeStatus.style.borderColor = 'rgba(248, 113, 113, 0.3)';
@@ -564,7 +635,10 @@ const FAQS = [
         }
       });
 
+      currentGroupedRecords = groups;
+
       if (totalCountEl) totalCountEl.textContent = String(totalCount);
+      if (totalBadgeCountEl) totalBadgeCountEl.textContent = String(totalCount);
       if (distinctTypesEl) distinctTypesEl.textContent = `${groups.length} distinct record type${groups.length === 1 ? '' : 's'}`;
 
       // Update Raw JSON Output
@@ -594,21 +668,21 @@ const FAQS = [
     if (!filterPillsContainer) return;
 
     let html = `
-      <button type="button" class="result-filter-btn active" data-tab="all" style="border: 1px solid var(--border); border-radius: 999px; background: var(--card); padding: 6px 12px; color: var(--text); cursor: pointer; font-size: 0.78rem; font-family: var(--font-mono); font-weight: 500; display: inline-flex; align-items: center; gap: 6px;">
-        All Records (${totalCount})
+      <button type="button" class="filter-pill active result-filter-btn" data-tab="all">
+        All Records <span class="filter-badge">${totalCount}</span>
       </button>
     `;
 
     groups.forEach(({ type, answers }) => {
       html += `
-        <button type="button" class="result-filter-btn" data-tab="${type}" style="border: 1px solid var(--border); border-radius: 999px; background: var(--card); padding: 6px 12px; color: var(--text); cursor: pointer; font-size: 0.78rem; font-family: var(--font-mono); font-weight: 500; display: inline-flex; align-items: center; gap: 6px;">
-          ${type} (${answers.length})
+        <button type="button" class="filter-pill result-filter-btn" data-tab="${type}">
+          ${type} <span class="filter-badge">${answers.length}</span>
         </button>
       `;
     });
 
     html += `
-      <button type="button" class="result-filter-btn" data-tab="raw" style="border: 1px solid var(--border); border-radius: 999px; background: var(--card); padding: 6px 12px; color: var(--text); cursor: pointer; font-size: 0.78rem; font-family: var(--font-mono); font-weight: 500; display: inline-flex; align-items: center; gap: 6px;">
+      <button type="button" class="filter-pill result-filter-btn" data-tab="raw">
         📜 Raw JSON
       </button>
     `;
@@ -619,13 +693,9 @@ const FAQS = [
     filterBtns.forEach((btn) => {
       btn.addEventListener('click', () => {
         filterBtns.forEach((b) => {
-          (b as HTMLElement).style.borderColor = 'var(--border)';
-          (b as HTMLElement).style.background = 'var(--card)';
-          (b as HTMLElement).style.color = 'var(--text)';
+          b.classList.remove('active');
         });
-        (btn as HTMLElement).style.borderColor = 'var(--accent)';
-        (btn as HTMLElement).style.background = 'var(--accent-dim)';
-        (btn as HTMLElement).style.color = 'var(--accent)';
+        btn.classList.add('active');
 
         activeFilterTab = (btn as HTMLElement).dataset.tab || 'all';
         renderRecordsView(groups);
@@ -636,31 +706,54 @@ const FAQS = [
   function renderRecordsView(groups: GroupedRecord[]) {
     if (activeFilterTab === 'raw') {
       if (recordsGrid) recordsGrid.style.display = 'none';
+      if (searchBarWrap) searchBarWrap.style.display = 'none';
+      if (emptyState) emptyState.style.display = 'none';
       if (rawPane) rawPane.style.display = 'flex';
       return;
     }
 
     if (rawPane) rawPane.style.display = 'none';
-    if (recordsGrid) recordsGrid.style.display = 'flex';
+    if (searchBarWrap) searchBarWrap.style.display = 'flex';
 
-    const filteredGroups = activeFilterTab === 'all'
+    const query = (searchInput?.value || '').toLowerCase().trim();
+
+    const typeFilteredGroups = activeFilterTab === 'all'
       ? groups
       : groups.filter((g) => g.type === activeFilterTab);
 
+    let totalVisible = 0;
+    const finalGroups = typeFilteredGroups
+      .map((g) => {
+        const filteredAnswers = query
+          ? g.answers.filter((a) => {
+              return (
+                a.data.toLowerCase().includes(query) ||
+                a.name.toLowerCase().includes(query) ||
+                g.type.toLowerCase().includes(query) ||
+                String(a.TTL).includes(query)
+              );
+            })
+          : g.answers;
+
+        totalVisible += filteredAnswers.length;
+        return { type: g.type, answers: filteredAnswers };
+      })
+      .filter((g) => g.answers.length > 0);
+
+    if (visibleCountEl) visibleCountEl.textContent = String(totalVisible);
+
     if (!recordsGrid) return;
 
-    if (filteredGroups.length === 0) {
-      recordsGrid.innerHTML = `
-        <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 40px 20px; text-align: center; color: var(--text-muted);">
-          <div style="font-size: 2rem; margin-bottom: 8px;">🔍</div>
-          <div style="font-weight: 600; color: var(--text); margin-bottom: 4px;">No ${activeFilterTab === 'all' ? 'DNS' : activeFilterTab} records found</div>
-          <div style="font-size: 0.85rem;">The authoritative nameservers did not return any records for this query.</div>
-        </div>
-      `;
+    if (finalGroups.length === 0) {
+      recordsGrid.style.display = 'none';
+      if (emptyState) emptyState.style.display = 'flex';
       return;
     }
 
-    recordsGrid.innerHTML = filteredGroups
+    if (emptyState) emptyState.style.display = 'none';
+    recordsGrid.style.display = 'flex';
+
+    recordsGrid.innerHTML = finalGroups
       .map(({ type, answers }) => {
         return `
         <div class="dns-group-card">
@@ -719,7 +812,7 @@ const FAQS = [
     recordsGrid.querySelectorAll('.copy-group-btn').forEach((btn) => {
       btn.addEventListener('click', async () => {
         const type = (btn as HTMLElement).dataset.type;
-        const group = groups.find((g) => g.type === type);
+        const group = finalGroups.find((g) => g.type === type);
         if (group) {
           const text = group.answers.map((a) => `${currentDomain} ${a.TTL} IN ${group.type} ${a.data}`).join('\n');
           try {

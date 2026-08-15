@@ -205,7 +205,7 @@ const FAQS = [
       <!-- Navigation & Filter Tabs -->
       <div class={styles.resultsToolbar}>
         <div class={styles.filterBar}>
-          <span class={styles.filterLabel}>View:</span>
+          <span class={styles.filterLabel}>Category:</span>
           <div id="category-filter-buttons" class={styles.filterPills}>
             <button type="button" class={`${styles.filterPill} ${styles.activeFilter} header-tab-btn`} data-tab="all">
               All Headers (<span id="count-all">0</span>)
@@ -226,8 +226,53 @@ const FAQS = [
         </div>
       </div>
 
+      <!-- Live Search & Status Filter Toolbar -->
+      <div id="header-filter-toolbar" class="tool-filter-bar" style="margin-top: 12px;">
+        <div class="tool-filter-group" id="header-status-filters">
+          <button type="button" class="filter-pill active header-status-pill-btn" data-status="all">
+            All Status
+          </button>
+          <button type="button" class="filter-pill header-status-pill-btn" data-status="pass">
+            ✓ Passed (<span id="pill-count-pass">0</span>)
+          </button>
+          <button type="button" class="filter-pill header-status-pill-btn" data-status="warn">
+            ⚠️ Warnings (<span id="pill-count-warn">0</span>)
+          </button>
+          <button type="button" class="filter-pill filter-pill-danger header-status-pill-btn" data-status="fail">
+            ✕ Failed (<span id="pill-count-fail">0</span>)
+          </button>
+        </div>
+
+        <div class="search-input-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            id="header-search-input"
+            type="text"
+            class="tool-search-input"
+            placeholder="Search headers, values, directives..."
+          />
+          <button type="button" id="btn-clear-header-search" class="search-clear-btn" title="Clear search">✕</button>
+        </div>
+      </div>
+
+      <!-- Counter -->
+      <div id="header-counter-bar" class="table-results-counter">
+        <span>Showing <strong id="header-visible-count">0</strong> of <span id="header-total-count">0</span> checks</span>
+      </div>
+
       <!-- Tab Content - Assessments Grid -->
       <div id="checks-grid" class={styles.checksGrid}></div>
+
+      <!-- Empty State -->
+      <div id="header-empty-state" class="tool-empty-state" style="display: none;">
+        <div class="tool-empty-state-icon">🔍</div>
+        <div class="tool-empty-state-title">No matching headers found</div>
+        <div class="tool-empty-state-text">Try adjusting your search query or switching the category/status filter.</div>
+        <button type="button" id="btn-reset-header-filters" class="tool-empty-state-btn">Reset Filters</button>
+      </div>
 
       <!-- Tab Content - Raw Headers Output -->
       <div id="raw-headers-pane" class={styles.rawHeaderCard} style="display: none;">
@@ -402,6 +447,20 @@ const FAQS = [
   const countInfo = document.getElementById('count-info');
   const countRaw = document.getElementById('count-raw');
 
+  const pillPass = document.getElementById('pill-count-pass');
+  const pillWarn = document.getElementById('pill-count-warn');
+  const pillFail = document.getElementById('pill-count-fail');
+
+  const filterToolbar = document.getElementById('header-filter-toolbar');
+  const counterBar = document.getElementById('header-counter-bar');
+  const headerVisibleCount = document.getElementById('header-visible-count');
+  const headerTotalCount = document.getElementById('header-total-count');
+  const headerEmptyState = document.getElementById('header-empty-state');
+  const headerSearchInput = document.getElementById('header-search-input') as HTMLInputElement;
+  const btnClearHeaderSearch = document.getElementById('btn-clear-header-search');
+  const btnResetHeaderFilters = document.getElementById('btn-reset-header-filters');
+  const statusFilterBtns = document.querySelectorAll('.header-status-pill-btn');
+
   const checksGrid = document.getElementById('checks-grid');
   const rawHeadersPane = document.getElementById('raw-headers-pane');
   const rawHeadersOut = document.getElementById('raw-headers-output');
@@ -410,6 +469,7 @@ const FAQS = [
   const copyBtnText = document.getElementById('copy-btn-text');
 
   let currentTab = 'all';
+  let currentStatus = 'all';
   let latestResult: HeaderAnalysisResult | null = null;
 
   sampleBtns.forEach((btn) => {
@@ -435,6 +495,51 @@ const FAQS = [
       currentTab = (btn as HTMLElement).dataset.tab || 'all';
       renderView();
     });
+  });
+
+  statusFilterBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      statusFilterBtns.forEach((b) => {
+        b.classList.remove('active');
+        b.removeAttribute('data-active');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('data-active', 'true');
+      currentStatus = (btn as HTMLElement).dataset.status || 'all';
+      renderView();
+    });
+  });
+
+  headerSearchInput?.addEventListener('input', () => {
+    if (btnClearHeaderSearch) {
+      btnClearHeaderSearch.style.display = headerSearchInput.value ? 'inline-block' : 'none';
+    }
+    renderView();
+  });
+
+  btnClearHeaderSearch?.addEventListener('click', () => {
+    if (headerSearchInput) {
+      headerSearchInput.value = '';
+      btnClearHeaderSearch.style.display = 'none';
+      renderView();
+      headerSearchInput.focus();
+    }
+  });
+
+  btnResetHeaderFilters?.addEventListener('click', () => {
+    currentStatus = 'all';
+    statusFilterBtns.forEach((b) => {
+      if ((b as HTMLElement).dataset.status === 'all') {
+        b.classList.add('active');
+      } else {
+        b.classList.remove('active');
+      }
+    });
+    if (headerSearchInput) {
+      headerSearchInput.value = '';
+      if (btnClearHeaderSearch) btnClearHeaderSearch.style.display = 'none';
+    }
+    renderView();
   });
 
   btnCopyRaw?.addEventListener('click', async () => {
@@ -495,6 +600,10 @@ const FAQS = [
       if (countFailed) countFailed.textContent = String(fCount);
       if (countInfoBadge) countInfoBadge.textContent = String(iCount);
 
+      if (pillPass) pillPass.textContent = String(pCount);
+      if (pillWarn) pillWarn.textContent = String(wCount);
+      if (pillFail) pillFail.textContent = String(fCount);
+
       // Category counts
       const secItems = result.assessments.filter((a) => a.category === 'security');
       const perfItems = result.assessments.filter((a) => a.category === 'performance');
@@ -528,17 +637,50 @@ const FAQS = [
 
     if (currentTab === 'raw') {
       if (checksGrid) checksGrid.style.display = 'none';
+      if (filterToolbar) filterToolbar.style.display = 'none';
+      if (counterBar) counterBar.style.display = 'none';
+      if (headerEmptyState) headerEmptyState.style.display = 'none';
       if (rawHeadersPane) rawHeadersPane.style.display = 'flex';
       return;
     }
 
     if (rawHeadersPane) rawHeadersPane.style.display = 'none';
-    if (checksGrid) checksGrid.style.display = 'grid';
+    if (filterToolbar) filterToolbar.style.display = 'flex';
+    if (counterBar) counterBar.style.display = 'flex';
 
-    const filtered = latestResult.assessments.filter((a) => {
+    const query = (headerSearchInput?.value || '').toLowerCase().trim();
+
+    const categoryFiltered = latestResult.assessments.filter((a) => {
       if (currentTab === 'all') return true;
       return a.category === currentTab;
     });
+
+    const filtered = categoryFiltered.filter((a) => {
+      if (currentStatus !== 'all' && a.status !== currentStatus) return false;
+      if (query) {
+        const matchesName = a.name.toLowerCase().includes(query);
+        const matchesShort = (a.short || '').toLowerCase().includes(query);
+        const matchesDesc = a.description.toLowerCase().includes(query);
+        const matchesMsg = a.message.toLowerCase().includes(query);
+        const matchesRec = (a.recommendation || '').toLowerCase().includes(query);
+        if (!matchesName && !matchesShort && !matchesDesc && !matchesMsg && !matchesRec) {
+          return false;
+        }
+      }
+      return true;
+    });
+
+    if (headerVisibleCount) headerVisibleCount.textContent = String(filtered.length);
+    if (headerTotalCount) headerTotalCount.textContent = String(categoryFiltered.length);
+
+    if (filtered.length === 0) {
+      if (checksGrid) checksGrid.style.display = 'none';
+      if (headerEmptyState) headerEmptyState.style.display = 'flex';
+      return;
+    }
+
+    if (headerEmptyState) headerEmptyState.style.display = 'none';
+    if (checksGrid) checksGrid.style.display = 'grid';
 
     if (checksGrid) {
       checksGrid.innerHTML = filtered
