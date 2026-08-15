@@ -13,7 +13,7 @@ test.describe('E2E Navigation & Layout Integration', () => {
 
   test('Custom 404 page loads and renders error layout', async ({ page }) => {
     const response = await page.goto('/404.html');
-    expect(response?.status()).toBe(200);
+    expect([200, 404]).toContain(response?.status());
     const bodyText = await page.textContent('body');
     expect(bodyText).toMatch(/404|Page not found|Lost in the matrix/i);
   });

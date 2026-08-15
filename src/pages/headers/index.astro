@@ -100,6 +100,7 @@ const SAMPLE_URLS = ['https://example.com', 'https://github.com', 'https://googl
 
 <script>
   import { analyzeHeaders, type HeaderAssessment } from '@/lib/headers';
+  import { validateCaptcha } from '@/lib/captcha';
 
   const form = document.getElementById('header-scan-form') as HTMLFormElement;
   const urlInput = document.getElementById('url-input') as HTMLInputElement;
@@ -120,7 +121,10 @@ const SAMPLE_URLS = ['https://example.com', 'https://github.com', 'https://googl
     btn.addEventListener('click', () => {
       if (urlInput) {
         urlInput.value = (btn as HTMLElement).dataset.url || '';
-        form?.dispatchEvent(new Event('submit'));
+        const { valid } = validateCaptcha(form);
+        if (valid) {
+          form?.dispatchEvent(new Event('submit'));
+        }
       }
     });
   });
@@ -144,12 +148,15 @@ const SAMPLE_URLS = ['https://example.com', 'https://github.com', 'https://googl
     const url = urlInput?.value.trim();
     if (!url) return;
 
+    const { valid, token } = validateCaptcha(form);
+    if (!valid) return;
+
     if (loadingBox) loadingBox.style.display = 'block';
     if (errorBox) errorBox.style.display = 'none';
     if (resultsSection) resultsSection.style.display = 'none';
 
     try {
-      const result = await analyzeHeaders(url);
+      const result = await analyzeHeaders(url, token || undefined);
 
       if (targetUrlEl) targetUrlEl.textContent = result.url;
       if (scoreBadge) {

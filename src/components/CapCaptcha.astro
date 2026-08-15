@@ -15,14 +15,14 @@ const {
   endpoint = DEFAULT_CAPTCHA_ENDPOINT,
   workerCount,
   disableHaptics,
-  required,
+  required = true,
   class: className = '',
   style = '',
   id,
 } = Astro.props;
 ---
 
-<div class={`cap-captcha-wrap ${className}`.trim()} style={`display: inline-flex; align-items: center; margin: 8px 0; ${style}`.trim()}>
+<div class={`cap-captcha-wrap ${className}`.trim()} style={`display: inline-flex; flex-direction: column; align-items: flex-start; margin: 8px 0; ${style}`.trim()}>
   <cap-widget
     id={id}
     data-cap-api-endpoint={endpoint}
@@ -30,7 +30,35 @@ const {
     data-cap-disable-haptics={disableHaptics}
     required={required}
   ></cap-widget>
+  <div class="cap-captcha-error" style="display: none; color: #ff4d4f; font-size: 0.8rem; font-weight: 500; margin-top: 6px; font-family: var(--font-mono, monospace);">
+    ⚠️ Please complete the CAPTCHA challenge before proceeding.
+  </div>
 </div>
+
+<style>
+  .cap-captcha-wrap {
+    transition: transform 0.2s ease;
+  }
+
+  .cap-captcha-wrap.cap-invalid :global(cap-widget) {
+    outline: 2px solid #ff4d4f;
+    outline-offset: 2px;
+    border-radius: 6px;
+    animation: cap-shake 0.4s ease-in-out;
+  }
+
+  @keyframes cap-shake {
+    0%, 100% {
+      transform: translateX(0);
+    }
+    20%, 60% {
+      transform: translateX(-6px);
+    }
+    40%, 80% {
+      transform: translateX(6px);
+    }
+  }
+</style>
 
 <script>
   import { bindCapWidget } from '@/lib/captcha';

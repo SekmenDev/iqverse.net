@@ -111,8 +111,9 @@ export const HEADER_DEFINITIONS = [
   },
 ];
 
-export async function analyzeHeaders(targetUrl: string): Promise<HeaderAnalysisResult> {
-  const proxyUrl = `/api/check-url?url=${encodeURIComponent(targetUrl)}`;
+export async function analyzeHeaders(targetUrl: string, token?: string): Promise<HeaderAnalysisResult> {
+  const tokenParam = token ? `&token=${encodeURIComponent(token)}` : '';
+  const proxyUrl = `/api/check-url?url=${encodeURIComponent(targetUrl)}${tokenParam}`;
   const res = await fetch(proxyUrl);
   if (!res.ok) {
     throw new Error(`Failed to fetch headers: HTTP ${res.status}`);

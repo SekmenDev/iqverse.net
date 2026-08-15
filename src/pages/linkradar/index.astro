@@ -130,6 +130,8 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 </ToolLayout>
 
 <script>
+  import { validateCaptcha, getCaptchaToken } from '@/lib/captcha';
+
   interface ResultItem {
     url: string;
     sourceUrl?: string;
@@ -233,7 +235,9 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
   async function checkUrl(url: string, sourceUrl?: string, tag?: string) {
     try {
-      const res = await fetch(`/api/check-url?url=${encodeURIComponent(url)}`, { signal: abortCtrl?.signal });
+      const token = getCaptchaToken(form);
+      const tokenParam = token ? `&token=${encodeURIComponent(token)}` : '';
+      const res = await fetch(`/api/check-url?url=${encodeURIComponent(url)}${tokenParam}`, { signal: abortCtrl?.signal });
       const json = await res.json();
       return {
         url,
@@ -257,6 +261,9 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
     e.preventDefault();
     const raw = urlInput?.value.trim();
     if (!raw) return;
+
+    const { valid } = validateCaptcha(form);
+    if (!valid) return;
 
     isScanning = true;
     allResults = [];

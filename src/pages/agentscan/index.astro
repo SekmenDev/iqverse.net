@@ -372,6 +372,8 @@ const FAQS = [
     { id: 'https', name: 'Secure HTTPS', category: 'performance', desc: 'Confirms the website is served over secure, encrypted HTTPS.', weight: 0, rec: 'Enforce HTTPS for all web crawler and API traffic.' },
   ];
 
+  import { validateCaptcha, getCaptchaToken } from '@/lib/captcha';
+
   const form = document.getElementById('agent-scan-form') as HTMLFormElement;
   const urlInput = document.getElementById('agent-url-input') as HTMLInputElement;
   const exampleBtns = document.querySelectorAll('.example-btn');
@@ -393,7 +395,10 @@ const FAQS = [
     btn.addEventListener('click', () => {
       if (urlInput) {
         urlInput.value = (btn as HTMLElement).dataset.url || '';
-        form?.dispatchEvent(new Event('submit'));
+        const { valid } = validateCaptcha(form);
+        if (valid) {
+          form?.dispatchEvent(new Event('submit'));
+        }
       }
     });
   });
@@ -413,7 +418,9 @@ const FAQS = [
 
   async function proxyFetch(targetUrl: string) {
     try {
-      const res = await fetch(`/api/check-url?url=${encodeURIComponent(targetUrl)}`);
+      const token = getCaptchaToken(form);
+      const tokenParam = token ? `&token=${encodeURIComponent(token)}` : '';
+      const res = await fetch(`/api/check-url?url=${encodeURIComponent(targetUrl)}${tokenParam}`);
       const json = await res.json();
       return {
         ok: json.status >= 200 && json.status < 400,
@@ -430,6 +437,9 @@ const FAQS = [
     e.preventDefault();
     const raw = urlInput?.value.trim();
     if (!raw) return;
+
+    const { valid } = validateCaptcha(form);
+    if (!valid) return;
 
     const normalized = raw.startsWith('http://') || raw.startsWith('https://') ? raw : `https://${raw}`;
     let origin = '';
