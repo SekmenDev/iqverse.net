@@ -5,10 +5,18 @@ import {
   bindCapWidget,
   getCaptchaToken,
   isCaptchaSolved,
+  isCaptchaLoaded,
   validateCaptcha,
+  CAPTCHA_MSG_UNSOLVED,
+  CAPTCHA_MSG_NOT_LOADED,
+  CAPTCHA_MSG_ERROR,
 } from '@/lib/captcha';
 
 describe('CapCaptcha utilities & bindings', () => {
+  if (typeof customElements !== 'undefined' && !customElements.get('cap-widget')) {
+    customElements.define('cap-widget', class extends HTMLElement {});
+  }
+
   it('has valid default captcha endpoint', () => {
     expect(DEFAULT_CAPTCHA_ENDPOINT).toBe('https://captcha.sekmen.dev/b2962a01e4/');
   });
@@ -81,6 +89,38 @@ describe('CapCaptcha utilities & bindings', () => {
     expect(errorEl.style.display).toBe('none');
   });
 
+  describe('isCaptchaLoaded', () => {
+    it('returns false for null, undefined, or element without cap-widget', () => {
+      expect(isCaptchaLoaded(null)).toBe(false);
+      expect(isCaptchaLoaded(undefined)).toBe(false);
+      const div = document.createElement('div');
+      expect(isCaptchaLoaded(div)).toBe(false);
+    });
+
+    it('returns false when widget has __cap_error or __cap_load_failed', () => {
+      const widget = document.createElement('cap-widget');
+      (widget as any).__cap_error = true;
+      expect(isCaptchaLoaded(widget)).toBe(false);
+
+      (widget as any).__cap_error = false;
+      (widget as any).__cap_load_failed = true;
+      expect(isCaptchaLoaded(widget)).toBe(false);
+    });
+
+    it('returns false when customElements.get returns undefined and element is un-upgraded', () => {
+      const origGet = customElements.get.bind(customElements);
+      (customElements as any).get = vi.fn().mockReturnValue(undefined);
+      const widget = document.createElement('cap-widget');
+      expect(isCaptchaLoaded(widget)).toBe(false);
+      (customElements as any).get = origGet;
+    });
+
+    it('returns true for ready cap-widget', () => {
+      const widget = document.createElement('cap-widget');
+      expect(isCaptchaLoaded(widget)).toBe(true);
+    });
+  });
+
   describe('getCaptchaToken & isCaptchaSolved', () => {
     it('returns null and false when no token is present', () => {
       const form = document.createElement('form');
@@ -125,7 +165,7 @@ describe('CapCaptcha utilities & bindings', () => {
   });
 
   describe('validateCaptcha', () => {
-    it('fails validation, applies cap-invalid class, and displays error when token is missing', () => {
+    it('fails validation, applies cap-invalid class, and displays error when token is missing and captcha is loaded', () => {
       const form = document.createElement('form');
       const wrap = document.createElement('div');
       wrap.className = 'cap-captcha-wrap';
@@ -140,9 +180,54 @@ describe('CapCaptcha utilities & bindings', () => {
       const res = validateCaptcha(form, 'Please solve the captcha first');
       expect(res.valid).toBe(false);
       expect(res.token).toBeNull();
+      expect(res.reason).toBe('unsolved');
       expect(wrap.classList.contains('cap-invalid')).toBe(true);
       expect(errorEl.style.display).toBe('block');
       expect(errorEl.textContent).toBe('Please solve the captcha first');
+    });
+
+    it('returns not_loaded reason and warning message when captcha failed to load', () => {
+      const form = document.createElement('form');
+      const wrap = document.createElement('div');
+      wrap.className = 'cap-captcha-wrap';
+      const errorEl = document.createElement('div');
+      errorEl.className = 'cap-captcha-error';
+      wrap.appendChild(errorEl);
+
+      const widget = document.createElement('cap-widget');
+      (widget as any).__cap_load_failed = true;
+      wrap.appendChild(widget);
+      form.appendChild(wrap);
+
+      const res = validateCaptcha(form);
+      expect(res.valid).toBe(false);
+      expect(res.token).toBeNull();
+      expect(res.reason).toBe('not_loaded');
+      expect(wrap.classList.contains('cap-invalid')).toBe(true);
+      expect(errorEl.style.display).toBe('block');
+      expect(errorEl.textContent).toBe(CAPTCHA_MSG_NOT_LOADED);
+    });
+
+    it('returns error reason when captcha encountered runtime error', () => {
+      const form = document.createElement('form');
+      const wrap = document.createElement('div');
+      wrap.className = 'cap-captcha-wrap';
+      const errorEl = document.createElement('div');
+      errorEl.className = 'cap-captcha-error';
+      wrap.appendChild(errorEl);
+
+      const widget = document.createElement('cap-widget');
+      (widget as any).__cap_error = true;
+      wrap.appendChild(widget);
+      form.appendChild(wrap);
+
+      const res = validateCaptcha(form);
+      expect(res.valid).toBe(false);
+      expect(res.token).toBeNull();
+      expect(res.reason).toBe('error');
+      expect(wrap.classList.contains('cap-invalid')).toBe(true);
+      expect(errorEl.style.display).toBe('block');
+      expect(errorEl.textContent).toBe(CAPTCHA_MSG_ERROR);
     });
 
     it('passes validation, cleans up error state, and returns token when solved', () => {
@@ -294,6 +379,72 @@ describe('CapCaptcha utilities & bindings', () => {
       document.body.appendChild(form);
 
       const cleanup = bindCapWidget(widget);
+
+      const submitHandler = vi.fn();
+      form.addEventListener('submit', submitHandler);
+
+      const submitEvent = new Event('submit', { cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      expect(submitEvent.defaultPrevented).toBe(true);
+      expect(submitHandler).not.toHaveBeenCalled();
+      expect(wrap.classList.contains('cap-invalid')).toBe(true);
+      expect(errorEl.textContent).toBe(CAPTCHA_MSG_UNSOLVED);
+
+      cleanup();
+      document.body.removeChild(form);
+    });
+
+    it('blocks submit when captcha failed to load', () => {
+      const form = document.createElement('form');
+      const wrap = document.createElement('div');
+      wrap.className = 'cap-captcha-wrap';
+      const errorEl = document.createElement('div');
+      errorEl.className = 'cap-captcha-error';
+      wrap.appendChild(errorEl);
+
+      const widget = document.createElement('cap-widget');
+      (widget as any).__cap_load_failed = true;
+      wrap.appendChild(widget);
+      form.appendChild(wrap);
+      document.body.appendChild(form);
+
+      const cleanup = bindCapWidget(widget);
+
+      const submitHandler = vi.fn();
+      form.addEventListener('submit', submitHandler);
+
+      const submitEvent = new Event('submit', { cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      expect(submitEvent.defaultPrevented).toBe(true);
+      expect(submitHandler).not.toHaveBeenCalled();
+      expect(wrap.classList.contains('cap-invalid')).toBe(true);
+      expect(errorEl.textContent).toBe(CAPTCHA_MSG_NOT_LOADED);
+
+      cleanup();
+      document.body.removeChild(form);
+    });
+
+    it('blocks submit when captcha is in error state', () => {
+      const form = document.createElement('form');
+      const wrap = document.createElement('div');
+      wrap.className = 'cap-captcha-wrap';
+      const errorEl = document.createElement('div');
+      errorEl.className = 'cap-captcha-error';
+      wrap.appendChild(errorEl);
+
+      const widget = document.createElement('cap-widget');
+      wrap.appendChild(widget);
+      form.appendChild(wrap);
+      document.body.appendChild(form);
+
+      const cleanup = bindCapWidget(widget);
+
+      // Trigger error event
+      widget.dispatchEvent(new CustomEvent('error', { detail: { message: 'Network failed' } }));
+      expect((widget as any).__cap_error).toBe(true);
+      expect(errorEl.textContent).toContain('Network failed');
 
       const submitHandler = vi.fn();
       form.addEventListener('submit', submitHandler);
