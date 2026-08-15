@@ -145,20 +145,25 @@ const SAMPLE_LOG = `192.168.1.10 - - [15/Jan/2026:10:14:32 +0000] "GET /robots.t
         </div>
       </div>
 
-      <!-- Bots Breakdown -->
+      <!-- Bots Breakdown (Clickable Filter Cards) -->
       <div style="margin-bottom: 24px;">
-        <h4 style="margin-bottom: 12px;">Detected AI Crawlers</h4>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h4 style="margin: 0;">Detected AI Crawlers (Click to Filter)</h4>
+          <button type="button" id="btn-show-all-bots" class="filter-pill active log-filter-btn" data-bot="all">
+            Show All Bots <span class="filter-badge">${hits.length}</span>
+          </button>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
           ${Object.entries(botCounts)
             .map(
               ([name, data]) => `
-            <div style="padding: 14px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+            <button type="button" class="stat-filter-card log-filter-btn" data-bot="${name}" style="padding: 12px 14px;">
               <div style="display: flex; justify-content: space-between; align-items: center;">
-                <strong>${name}</strong>
+                <strong style="font-size: 0.95rem;">${name}</strong>
                 <span class="filter-badge" style="background: rgba(129, 140, 248, 0.18); color: var(--accent);">${data.count} hits</span>
               </div>
-              <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Vendor: ${data.vendor}</div>
-            </div>
+              <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">Vendor: ${data.vendor}</div>
+            </button>
           `
             )
             .join('')}
@@ -182,27 +187,14 @@ const SAMPLE_LOG = `192.168.1.10 - - [15/Jan/2026:10:14:32 +0000] "GET /robots.t
         </div>
       </div>
 
-      <!-- All AI Crawler Requests Table with Search & Filter -->
+      <!-- All AI Crawler Requests Table with Search Toolbar -->
       <div>
-        <h4 style="margin-bottom: 12px;">AI Crawler Requests Log</h4>
-        
-        <div class="tool-filter-bar">
-          <div class="tool-filter-group" id="log-bot-filter-pills">
-            <button type="button" class="filter-pill active log-filter-btn" data-bot="all">
-              All Bots <span class="filter-badge">${hits.length}</span>
-            </button>
-            ${Object.entries(botCounts)
-              .map(
-                ([name, data]) => `
-              <button type="button" class="filter-pill log-filter-btn" data-bot="${name}">
-                ${name} <span class="filter-badge">${data.count}</span>
-              </button>
-            `
-              )
-              .join('')}
+        <div class="tool-filter-bar" style="margin-top: 0; margin-bottom: 10px;">
+          <div class="table-results-counter" style="margin: 0;">
+            <span>Showing <strong id="log-visible-count">${hits.length}</strong> of <span>${hits.length}</span> requests</span>
           </div>
 
-          <div class="search-input-wrap">
+          <div class="search-input-wrap" style="max-width: 380px;">
             <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -215,10 +207,6 @@ const SAMPLE_LOG = `192.168.1.10 - - [15/Jan/2026:10:14:32 +0000] "GET /robots.t
             />
             <button type="button" id="btn-clear-log-search" class="search-clear-btn" title="Clear search">✕</button>
           </div>
-        </div>
-
-        <div class="table-results-counter">
-          <span>Showing <strong id="log-visible-count">${hits.length}</strong> of <span>${hits.length}</span> requests</span>
         </div>
 
         <div id="log-table-wrap" class="results-table-container">

@@ -172,23 +172,24 @@ const FAQS = [
     <!-- Scan Results Section -->
     <section id="scan-results-section" class={styles.resultsSection} style="display: none;">
       <!-- Score Overview Card -->
+      <!-- Score Overview Card -->
       <div class={styles.scorePanel}>
         <div>
           <div class={styles.scoreLabel}>Analyzed Target</div>
           <h2 id="target-url-display" class={styles.targetUrl}>--</h2>
           <div class={styles.badges}>
-            <span class={`${styles.badge} ${styles.badgePass}`}>
+            <button type="button" class={`${styles.badge} ${styles.badgePass} header-stat-badge`} data-status="pass" style="cursor: pointer; font-family: inherit;">
               <span id="count-passed">0</span> Passed
-            </span>
-            <span class={`${styles.badge} ${styles.badgeWarning}`}>
+            </button>
+            <button type="button" class={`${styles.badge} ${styles.badgeWarning} header-stat-badge`} data-status="warn" style="cursor: pointer; font-family: inherit;">
               <span id="count-warnings">0</span> Warnings
-            </span>
-            <span class={`${styles.badge} ${styles.badgeFail}`}>
+            </button>
+            <button type="button" class={`${styles.badge} ${styles.badgeFail} header-stat-badge`} data-status="fail" style="cursor: pointer; font-family: inherit;">
               <span id="count-failed">0</span> Failed
-            </span>
-            <span class={`${styles.badge} ${styles.badgeInfo}`}>
+            </button>
+            <button type="button" class={`${styles.badge} ${styles.badgeInfo} header-stat-badge`} data-status="info" style="cursor: pointer; font-family: inherit;">
               <span id="count-info-badge">0</span> Info
-            </span>
+            </button>
           </div>
         </div>
 
@@ -202,48 +203,27 @@ const FAQS = [
         </div>
       </div>
 
-      <!-- Navigation & Filter Tabs -->
-      <div class={styles.resultsToolbar}>
-        <div class={styles.filterBar}>
-          <span class={styles.filterLabel}>Category:</span>
-          <div id="category-filter-buttons" class={styles.filterPills}>
-            <button type="button" class={`${styles.filterPill} ${styles.activeFilter} header-tab-btn`} data-tab="all">
-              All Headers (<span id="count-all">0</span>)
-            </button>
-            <button type="button" class={`${styles.filterPill} header-tab-btn`} data-tab="security">
-              🛡️ Security (<span id="count-security">0</span>)
-            </button>
-            <button type="button" class={`${styles.filterPill} header-tab-btn`} data-tab="performance">
-              ⚡ Performance (<span id="count-performance">0</span>)
-            </button>
-            <button type="button" class={`${styles.filterPill} header-tab-btn`} data-tab="info">
-              ℹ️ Server & Info (<span id="count-info">0</span>)
-            </button>
-            <button type="button" class={`${styles.filterPill} header-tab-btn`} data-tab="raw">
-              📜 Raw Headers (<span id="count-raw">0</span>)
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Live Search & Status Filter Toolbar -->
-      <div id="header-filter-toolbar" class="tool-filter-bar" style="margin-top: 12px;">
-        <div class="tool-filter-group" id="header-status-filters">
-          <button type="button" class="filter-pill active header-status-pill-btn" data-status="all">
-            All Status
+      <!-- Navigation & Filter Toolbar (Category Tabs + Inline Search) -->
+      <div class="tool-filter-bar" style="margin-top: 18px; margin-bottom: 12px;">
+        <div id="category-filter-buttons" class={styles.filterPills}>
+          <button type="button" class={`${styles.filterPill} ${styles.activeFilter} header-tab-btn`} data-tab="all">
+            All Headers (<span id="count-all">0</span>)
           </button>
-          <button type="button" class="filter-pill header-status-pill-btn" data-status="pass">
-            ✓ Passed (<span id="pill-count-pass">0</span>)
+          <button type="button" class={`${styles.filterPill} header-tab-btn`} data-tab="security">
+            🛡️ Security (<span id="count-security">0</span>)
           </button>
-          <button type="button" class="filter-pill header-status-pill-btn" data-status="warn">
-            ⚠️ Warnings (<span id="pill-count-warn">0</span>)
+          <button type="button" class={`${styles.filterPill} header-tab-btn`} data-tab="performance">
+            ⚡ Performance (<span id="count-performance">0</span>)
           </button>
-          <button type="button" class="filter-pill filter-pill-danger header-status-pill-btn" data-status="fail">
-            ✕ Failed (<span id="pill-count-fail">0</span>)
+          <button type="button" class={`${styles.filterPill} header-tab-btn`} data-tab="info">
+            ℹ️ Server & Info (<span id="count-info">0</span>)
+          </button>
+          <button type="button" class={`${styles.filterPill} header-tab-btn`} data-tab="raw">
+            📜 Raw Headers (<span id="count-raw">0</span>)
           </button>
         </div>
 
-        <div class="search-input-wrap">
+        <div class="search-input-wrap" style="max-width: 340px;">
           <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -459,7 +439,7 @@ const FAQS = [
   const headerSearchInput = document.getElementById('header-search-input') as HTMLInputElement;
   const btnClearHeaderSearch = document.getElementById('btn-clear-header-search');
   const btnResetHeaderFilters = document.getElementById('btn-reset-header-filters');
-  const statusFilterBtns = document.querySelectorAll('.header-status-pill-btn');
+  const headerStatBadges = document.querySelectorAll('.header-stat-badge');
 
   const checksGrid = document.getElementById('checks-grid');
   const rawHeadersPane = document.getElementById('raw-headers-pane');
@@ -497,15 +477,24 @@ const FAQS = [
     });
   });
 
-  statusFilterBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      statusFilterBtns.forEach((b) => {
-        b.classList.remove('active');
-        b.removeAttribute('data-active');
-      });
-      btn.classList.add('active');
-      btn.setAttribute('data-active', 'true');
-      currentStatus = (btn as HTMLElement).dataset.status || 'all';
+  headerStatBadges.forEach((badge) => {
+    badge.addEventListener('click', () => {
+      const clickedStatus = (badge as HTMLElement).dataset.status || 'all';
+      if (currentStatus === clickedStatus) {
+        currentStatus = 'all';
+        headerStatBadges.forEach((b) => ((b as HTMLElement).style.opacity = '1'));
+      } else {
+        currentStatus = clickedStatus;
+        headerStatBadges.forEach((b) => {
+          if ((b as HTMLElement).dataset.status === clickedStatus) {
+            (b as HTMLElement).style.opacity = '1';
+            (b as HTMLElement).style.boxShadow = '0 0 0 2px var(--accent)';
+          } else {
+            (b as HTMLElement).style.opacity = '0.55';
+            (b as HTMLElement).style.boxShadow = 'none';
+          }
+        });
+      }
       renderView();
     });
   });
@@ -528,12 +517,9 @@ const FAQS = [
 
   btnResetHeaderFilters?.addEventListener('click', () => {
     currentStatus = 'all';
-    statusFilterBtns.forEach((b) => {
-      if ((b as HTMLElement).dataset.status === 'all') {
-        b.classList.add('active');
-      } else {
-        b.classList.remove('active');
-      }
+    headerStatBadges.forEach((b) => {
+      (b as HTMLElement).style.opacity = '1';
+      (b as HTMLElement).style.boxShadow = 'none';
     });
     if (headerSearchInput) {
       headerSearchInput.value = '';

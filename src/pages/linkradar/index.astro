@@ -67,49 +67,45 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
           </div>
         </form>
 
-        <!-- Live Scan Status Overview -->
+        <!-- Live Scan Status Overview (Clickable Filter Cards) -->
         <div
           id="scan-stats-card"
-          style="display: none; margin-top: 24px; padding: 18px; border-radius: 12px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);"
+          style="display: none; margin-top: 24px;"
         >
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
-            <div>
-              <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Total Checked</div>
-              <div id="stat-total" style="font-size: 1.6rem; font-weight: bold; margin-top: 4px;">0</div>
-            </div>
-            <div>
-              <div style="font-size: 0.75rem; color: var(--green); text-transform: uppercase; letter-spacing: 0.05em;">2xx Successful</div>
-              <div id="stat-2xx" style="font-size: 1.6rem; font-weight: bold; color: var(--green); margin-top: 4px;">0</div>
-            </div>
-            <div>
-              <div style="font-size: 0.75rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em;">3xx Redirects</div>
-              <div id="stat-3xx" style="font-size: 1.6rem; font-weight: bold; color: var(--accent); margin-top: 4px;">0</div>
-            </div>
-            <div>
-              <div style="font-size: 0.75rem; color: var(--red); text-transform: uppercase; letter-spacing: 0.05em;">Broken / Errors</div>
-              <div id="stat-broken" style="font-size: 1.6rem; font-weight: bold; color: var(--red); margin-top: 4px;">0</div>
-            </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px;">
+            <button type="button" class="stat-filter-card active filter-stat-card" data-filter="all" id="stat-card-total">
+              <div class="stat-card-label">Total Checked</div>
+              <div id="stat-total" class="stat-card-val">0</div>
+              <div class="stat-card-hint">Click to show all</div>
+            </button>
+
+            <button type="button" class="stat-filter-card stat-filter-card-2xx filter-stat-card" data-filter="2xx" id="stat-card-2xx">
+              <div class="stat-card-label" style="color: var(--green);">2xx Successful</div>
+              <div id="stat-2xx" class="stat-card-val" style="color: var(--green);">0</div>
+              <div class="stat-card-hint">Filter 2xx OK</div>
+            </button>
+
+            <button type="button" class="stat-filter-card stat-filter-card-3xx filter-stat-card" data-filter="3xx" id="stat-card-3xx">
+              <div class="stat-card-label" style="color: var(--accent);">3xx Redirects</div>
+              <div id="stat-3xx" class="stat-card-val" style="color: var(--accent);">0</div>
+              <div class="stat-card-hint">Filter redirects</div>
+            </button>
+
+            <button type="button" class="stat-filter-card stat-filter-card-broken filter-stat-card" data-filter="broken" id="stat-card-broken">
+              <div class="stat-card-label" style="color: var(--red);">Broken / Errors</div>
+              <div id="stat-broken" class="stat-card-val" style="color: var(--red);">0</div>
+              <div class="stat-card-hint">Filter broken</div>
+            </button>
           </div>
         </div>
 
-        <!-- Filter and Search Bar -->
-        <div id="table-controls" class="tool-filter-bar" style="display: none;">
-          <div class="tool-filter-group">
-            <button type="button" class="filter-pill active filter-status-btn" data-filter="all">
-              All <span class="filter-badge" id="badge-count-all">0</span>
-            </button>
-            <button type="button" class="filter-pill filter-status-btn" data-filter="2xx">
-              2xx OK <span class="filter-badge" id="badge-count-2xx">0</span>
-            </button>
-            <button type="button" class="filter-pill filter-status-btn" data-filter="3xx">
-              3xx Redirect <span class="filter-badge" id="badge-count-3xx">0</span>
-            </button>
-            <button type="button" class="filter-pill filter-pill-danger filter-status-btn" data-filter="broken">
-              Broken <span class="filter-badge" id="badge-count-broken">0</span>
-            </button>
+        <!-- Table Toolbar: Counter & Search Bar -->
+        <div id="table-toolbar" class="tool-filter-bar" style="display: none; margin-top: 18px; margin-bottom: 10px;">
+          <div class="table-results-counter" style="margin: 0;">
+            <span>Showing <strong id="visible-count">0</strong> of <span id="total-results-count">0</span> links</span>
           </div>
 
-          <div class="search-input-wrap">
+          <div class="search-input-wrap" style="max-width: 380px;">
             <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -122,11 +118,6 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
             />
             <button type="button" id="btn-clear-search" class="search-clear-btn" title="Clear search">✕</button>
           </div>
-        </div>
-
-        <!-- Results Counter -->
-        <div id="results-count-bar" class="table-results-counter" style="display: none;">
-          <span>Showing <strong id="visible-count">0</strong> of <span id="total-results-count">0</span> links</span>
         </div>
 
         <!-- Results Table -->
@@ -149,8 +140,8 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
         <div id="empty-results-state" class="tool-empty-state" style="display: none;">
           <div class="tool-empty-state-icon">🔍</div>
           <div class="tool-empty-state-title">No matching links found</div>
-          <div class="tool-empty-state-text">Try adjusting your search keyword or switching the status filter tab.</div>
-          <button type="button" id="btn-reset-filters" class="tool-empty-state-btn">Reset Filters</button>
+          <div class="tool-empty-state-text">Try adjusting your search keyword or switching the active stat card.</div>
+          <button type="button" id="btn-reset-filters" class="tool-empty-state-btn">Show All Links</button>
         </div>
       </div>
     </section>
@@ -180,13 +171,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   const stat3xx = document.getElementById('stat-3xx');
   const statBroken = document.getElementById('stat-broken');
 
-  const badgeCountAll = document.getElementById('badge-count-all');
-  const badgeCount2xx = document.getElementById('badge-count-2xx');
-  const badgeCount3xx = document.getElementById('badge-count-3xx');
-  const badgeCountBroken = document.getElementById('badge-count-broken');
-
-  const tableControls = document.getElementById('table-controls');
-  const resultsCountBar = document.getElementById('results-count-bar');
+  const tableToolbar = document.getElementById('table-toolbar');
   const visibleCountEl = document.getElementById('visible-count');
   const totalResultsCountEl = document.getElementById('total-results-count');
   const tableContainer = document.getElementById('results-table-container');
@@ -195,22 +180,20 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   const searchInput = document.getElementById('table-search') as HTMLInputElement;
   const btnClearSearch = document.getElementById('btn-clear-search');
   const btnResetFilters = document.getElementById('btn-reset-filters');
-  const filterBtns = document.querySelectorAll('.filter-status-btn');
+  const statFilterCards = document.querySelectorAll('.filter-stat-card');
 
   let activeFilter = 'all';
   let isScanning = false;
   let abortCtrl: AbortController | null = null;
   let allResults: ResultItem[] = [];
 
-  filterBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      filterBtns.forEach((b) => {
-        b.classList.remove('active');
-        b.removeAttribute('data-active');
+  statFilterCards.forEach((card) => {
+    card.addEventListener('click', () => {
+      statFilterCards.forEach((c) => {
+        c.classList.remove('active');
       });
-      btn.classList.add('active');
-      btn.setAttribute('data-active', 'true');
-      activeFilter = (btn as HTMLElement).dataset.filter || 'all';
+      card.classList.add('active');
+      activeFilter = (card as HTMLElement).dataset.filter || 'all';
       renderTable();
     });
   });
@@ -233,11 +216,11 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
   btnResetFilters?.addEventListener('click', () => {
     activeFilter = 'all';
-    filterBtns.forEach((b) => {
-      if ((b as HTMLElement).dataset.filter === 'all') {
-        b.classList.add('active');
+    statFilterCards.forEach((c) => {
+      if ((c as HTMLElement).dataset.filter === 'all') {
+        c.classList.add('active');
       } else {
-        b.classList.remove('active');
+        c.classList.remove('active');
       }
     });
     if (searchInput) {
@@ -266,7 +249,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
     if (totalResultsCountEl) totalResultsCountEl.textContent = String(allResults.length);
 
     if (allResults.length > 0) {
-      if (resultsCountBar) resultsCountBar.style.display = 'flex';
+      if (tableToolbar) tableToolbar.style.display = 'flex';
     }
 
     if (filtered.length === 0 && allResults.length > 0) {
@@ -328,11 +311,6 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
     if (stat2xx) stat2xx.textContent = String(s200);
     if (stat3xx) stat3xx.textContent = String(s300);
     if (statBroken) statBroken.textContent = String(sBroken);
-
-    if (badgeCountAll) badgeCountAll.textContent = String(allResults.length);
-    if (badgeCount2xx) badgeCount2xx.textContent = String(s200);
-    if (badgeCount3xx) badgeCount3xx.textContent = String(s300);
-    if (badgeCountBroken) badgeCountBroken.textContent = String(sBroken);
   }
 
   async function checkUrl(url: string, sourceUrl?: string, tag?: string) {
@@ -374,7 +352,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
     if (btnStart) btnStart.style.display = 'none';
     if (btnStop) btnStop.style.display = 'inline-block';
     if (statsCard) statsCard.style.display = 'block';
-    if (tableControls) tableControls.style.display = 'flex';
+    if (tableToolbar) tableToolbar.style.display = 'flex';
     if (tableContainer) tableContainer.style.display = 'block';
 
     const origin = raw.startsWith('http') ? raw : `https://${raw}`;

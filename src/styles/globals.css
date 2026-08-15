@@ -519,6 +519,80 @@ textarea {
    Tool Results, Filter Bar, Search, Tables & Shared Button Styles
    ========================================================================== */
 
+/* Clickable Stat Filter Cards */
+.stat-filter-card {
+  position: relative;
+  text-align: left;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.stat-filter-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(129, 140, 248, 0.4);
+  transform: translateY(-2px);
+}
+
+.stat-filter-card.active {
+  background: rgba(129, 140, 248, 0.08);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), 0 4px 14px rgba(129, 140, 248, 0.15);
+}
+
+.stat-filter-card-2xx.active {
+  background: rgba(52, 211, 153, 0.08);
+  border-color: var(--green);
+  box-shadow: 0 0 0 1px var(--green), 0 4px 14px rgba(52, 211, 153, 0.15);
+}
+
+.stat-filter-card-3xx.active {
+  background: rgba(129, 140, 248, 0.08);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), 0 4px 14px rgba(129, 140, 248, 0.15);
+}
+
+.stat-filter-card-broken.active {
+  background: rgba(248, 113, 113, 0.08);
+  border-color: var(--red);
+  box-shadow: 0 0 0 1px var(--red), 0 4px 14px rgba(248, 113, 113, 0.15);
+}
+
+.stat-card-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.stat-card-val {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.stat-card-hint {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  margin-top: 4px;
+}
+
+.stat-filter-card:hover .stat-card-hint,
+.stat-filter-card.active .stat-card-hint {
+  opacity: 0.8;
+}
+
 .tool-filter-bar {
   display: flex;
   justify-content: space-between;
