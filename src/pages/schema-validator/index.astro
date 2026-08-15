@@ -119,7 +119,7 @@ const SAMPLE_TEMPLATES: Record<string, string> = {
   </div>
 </ToolLayout>
 
-<script define:vars={{ SAMPLE_TEMPLATES }}>
+<script is:inline define:vars={{ SAMPLE_TEMPLATES }}>
   const schemaInput = document.getElementById('schemaInput');
   const btnValidate = document.getElementById('btn-validate-schema');
   const btnFormat = document.getElementById('btn-format-schema');
