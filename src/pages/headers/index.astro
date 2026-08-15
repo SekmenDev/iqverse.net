@@ -2,9 +2,92 @@
 import ToolLayout from '@/layouts/ToolLayout.astro';
 import CapCaptcha from '@/components/CapCaptcha.astro';
 import styles from '@/styles/header-scan.module.css';
-import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
-const SAMPLE_URLS = ['https://example.com', 'https://github.com', 'https://google.com'];
+const QUICK_EXAMPLES = [
+  'https://iqverse.net',
+  'https://cloudflare.com',
+  'https://github.com',
+  'https://google.com',
+  'https://stripe.com',
+];
+
+const HEADERS_GUIDE = [
+  {
+    name: 'Content-Security-Policy',
+    short: 'CSP',
+    importance: 'Critical (Security)',
+    desc: 'Restricts the sources from which scripts, styles, images, and frames can be loaded.',
+    why: 'Blocks Cross-Site Scripting (XSS), data injection, and malicious external script execution.',
+  },
+  {
+    name: 'Strict-Transport-Security',
+    short: 'HSTS',
+    importance: 'Critical (Security)',
+    desc: 'Forces browsers to communicate exclusively over HTTPS for all present and future requests.',
+    why: 'Eliminates man-in-the-middle SSL stripping and protocol downgrade attacks.',
+  },
+  {
+    name: 'X-Content-Type-Options',
+    short: 'XCTO',
+    importance: 'High (Security)',
+    desc: 'Prevents the browser from MIME-sniffing a response away from the declared content-type.',
+    why: 'Stops malicious executable files disguised as benign images or text from executing.',
+  },
+  {
+    name: 'X-Frame-Options',
+    short: 'XFO',
+    importance: 'High (Security)',
+    desc: 'Controls whether the page can be rendered inside a <frame>, <iframe>, <embed>, or <object>.',
+    why: 'Protects users against clickjacking attacks by forbidding illegitimate foreign iframe embedding.',
+  },
+  {
+    name: 'Referrer-Policy',
+    short: 'Referrer',
+    importance: 'Medium (Privacy)',
+    desc: 'Controls how much referrer information is sent along with navigation and subresource requests.',
+    why: 'Prevents sensitive query parameters, user tokens, and internal paths from leaking to third parties.',
+  },
+  {
+    name: 'Permissions-Policy',
+    short: 'Permissions',
+    importance: 'Medium (Security)',
+    desc: 'Explicitly grants or denies browser hardware and API permissions (camera, microphone, geolocation).',
+    why: 'Hardens user privacy by restricting unauthorized feature usage in embedded frames and third-party scripts.',
+  },
+  {
+    name: 'Cache-Control',
+    short: 'Cache',
+    importance: 'High (Performance)',
+    desc: 'Instructs browser and edge CDN caches how long responses may be cached and when to revalidate.',
+    why: 'Accelerates load times while ensuring dynamic or sensitive endpoints are not cached publicly.',
+  },
+  {
+    name: 'Server & Framework Masking',
+    short: 'Server',
+    importance: 'Informational (Hardening)',
+    desc: 'Removes or masks server banners (e.g. nginx/1.18.0, Express, Apache, PHP version).',
+    why: 'Denies attackers automated fingerprinting and version-specific vulnerability targeting.',
+  },
+];
+
+const FAQS = [
+  {
+    q: 'What are HTTP security response headers and why are they vital?',
+    a: 'HTTP security headers are directives sent by the web server in response to browser requests. They configure built-in browser security mechanisms to prevent critical vulnerabilities like Cross-Site Scripting (XSS), clickjacking, MIME-type confusion, and protocol downgrade attacks.',
+  },
+  {
+    q: 'What does a failing grade or low security score mean?',
+    a: 'A low score indicates that your server is not transmitting key defense-in-depth headers (like Content-Security-Policy or Strict-Transport-Security). While your website may still function normally, it is relying solely on application-level defenses without the browser-level containment policies recommended by OWASP.',
+  },
+  {
+    q: 'How does Content-Security-Policy (CSP) protect my users?',
+    a: "CSP specifies trusted sources for executable scripts and media. Even if an attacker discovers a code injection flaw on your website, a strong CSP prevents the browser from executing foreign or untrusted inline scripts, neutralizing most XSS vectors.",
+  },
+  {
+    q: 'Why should I hide or mask the Server header?',
+    a: 'Exposing exact web server and framework version numbers (like Apache/2.4.41 or PHP/7.4) lets automated scanners quickly identify unpatched CVEs on your host. Masking or removing this header prevents easy automated reconnaissance.',
+  },
+];
 ---
 
 <ToolLayout
@@ -14,92 +97,286 @@ const SAMPLE_URLS = ['https://example.com', 'https://github.com', 'https://googl
   toolSlug="headers"
   description="Analyze HTTP response headers for any web URL. Inspect security policies, cache directives, server configurations, and CSP."
 >
-  <div style="max-width: 1100px;">
-    <section class={styles.heroSection}>
-      <form id="header-scan-form" class={styles.form}>
-        <div class={styles.inputGroup}>
-          <input
-            id="url-input"
-            type="url"
-            class={styles.urlInput}
-            placeholder="https://example.com"
-            value="https://example.com"
-            required
-          />
+  <div class={styles.headerScanContainer}>
+    <!-- Scanner Card -->
+    <section class={styles.scannerCard}>
+      <form id="header-scan-form">
+        <div class={styles.inputRow}>
+          <div class={styles.inputWrapper}>
+            <svg
+              class={styles.inputIcon}
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <input
+              id="url-input"
+              type="url"
+              class={styles.urlInput}
+              placeholder="https://example.com"
+              value="https://iqverse.net"
+              required
+            />
+          </div>
           <button type="submit" id="scan-submit-btn" class={styles.scanButton}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
             Scan Headers
           </button>
         </div>
-        <div style="margin-top: 12px;">
+
+        <div style="margin-top: 14px;">
           <CapCaptcha />
         </div>
       </form>
 
-      <div class={styles.samples}>
-        <span>Try:</span>
-        {SAMPLE_URLS.map((u) => (
-          <button type="button" class="sample-btn" data-url={u}>
-            {u}
+      <div class={styles.quickExamples}>
+        <span class={styles.examplesLabel}>Try an example:</span>
+        {QUICK_EXAMPLES.map((url) => (
+          <button type="button" class={`${styles.exampleBtn} sample-btn`} data-url={url}>
+            {url.replace('https://', '')}
           </button>
         ))}
       </div>
     </section>
 
-    <div id="scan-loading" class={styles.loadingBox} style="display: none;">
-      <div class={styles.spinner}></div>
-      <p>Analyzing HTTP response headers...</p>
+    <!-- Loading State -->
+    <div id="scan-loading" class={styles.statusBar} style="display: none;">
+      <div style="display: inline-flex; align-items: center; justify-content: center; gap: 12px;">
+        <div class={styles.spinner}></div>
+        <span id="loading-message" style="font-size: 0.95rem; font-weight: 500; font-family: var(--font-mono);">
+          Fetching HTTP response headers and analyzing security policies…
+        </span>
+      </div>
     </div>
 
-    <div id="scan-error" class={sharedStyles.errorCard} style="margin-top: 20px; display: none;">
-      <div id="scan-error-msg" class={sharedStyles.errorMessage}></div>
+    <!-- Error Box -->
+    <div id="scan-error" class={styles.errorCard} style="display: none;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 2px;">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <div id="scan-error-msg" class={styles.errorMessage}></div>
     </div>
 
-    <section id="scan-results-section" style="display: none; margin-top: 24px;">
-      <!-- Score Overview -->
-      <div class={styles.scoreCard}>
-        <div class={styles.scoreRow}>
+    <!-- Scan Results Section -->
+    <section id="scan-results-section" class={styles.resultsSection} style="display: none;">
+      <!-- Score Overview Card -->
+      <div class={styles.scorePanel}>
+        <div>
+          <div class={styles.scoreLabel}>Analyzed Target</div>
+          <h2 id="target-url-display" class={styles.targetUrl}>--</h2>
+          <div class={styles.badges}>
+            <span class={`${styles.badge} ${styles.badgePass}`}>
+              <span id="count-passed">0</span> Passed
+            </span>
+            <span class={`${styles.badge} ${styles.badgeWarning}`}>
+              <span id="count-warnings">0</span> Warnings
+            </span>
+            <span class={`${styles.badge} ${styles.badgeFail}`}>
+              <span id="count-failed">0</span> Failed
+            </span>
+            <span class={`${styles.badge} ${styles.badgeInfo}`}>
+              <span id="count-info-badge">0</span> Info
+            </span>
+          </div>
+        </div>
+
+        <div class={styles.scoreValueWrap}>
+          <div class={styles.scoreLabel}>Security Score</div>
+          <div id="score-number" class={styles.scoreValue}>0</div>
           <div>
-            <span class={styles.scoreMeta}>Target URL</span>
-            <h3 id="target-url-display" class={styles.targetUrl}></h3>
+            <span id="score-grade" class={styles.scoreGrade}>Grade A</span>
           </div>
-          <div class={styles.scoreBadgeWrap}>
-            <span class={styles.scoreMeta}>Security Score</span>
-            <div id="score-badge" class={styles.scoreBadge}>--</div>
+          <div id="score-subtitle" class={styles.scoreSubtitle} style="margin-top: 4px;">Security Posture</div>
+        </div>
+      </div>
+
+      <!-- Navigation & Filter Tabs -->
+      <div class={styles.resultsToolbar}>
+        <div class={styles.filterBar}>
+          <span class={styles.filterLabel}>View:</span>
+          <div id="category-filter-buttons" class={styles.filterPills}>
+            <button type="button" class={`${styles.filterPill} ${styles.activeFilter} header-tab-btn`} data-tab="all">
+              All Headers (<span id="count-all">0</span>)
+            </button>
+            <button type="button" class={`${styles.filterPill} header-tab-btn`} data-tab="security">
+              🛡️ Security (<span id="count-security">0</span>)
+            </button>
+            <button type="button" class={`${styles.filterPill} header-tab-btn`} data-tab="performance">
+              ⚡ Performance (<span id="count-performance">0</span>)
+            </button>
+            <button type="button" class={`${styles.filterPill} header-tab-btn`} data-tab="info">
+              ℹ️ Server & Info (<span id="count-info">0</span>)
+            </button>
+            <button type="button" class={`${styles.filterPill} header-tab-btn`} data-tab="raw">
+              📜 Raw Headers (<span id="count-raw">0</span>)
+            </button>
           </div>
         </div>
       </div>
 
-      <!-- Navigation Tabs -->
-      <div class={styles.tabs}>
-        <button type="button" class="header-tab-btn" data-tab="security" style="padding: 8px 16px; border-radius: 6px; border: 1px solid var(--accent); background: var(--surface); color: var(--text); cursor: pointer;">
-          Security (<span id="count-security">0</span>)
-        </button>
-        <button type="button" class="header-tab-btn" data-tab="performance" style="padding: 8px 16px; border-radius: 6px; border: 1px solid transparent; background: var(--surface); color: var(--text); cursor: pointer;">
-          Performance (<span id="count-performance">0</span>)
-        </button>
-        <button type="button" class="header-tab-btn" data-tab="info" style="padding: 8px 16px; border-radius: 6px; border: 1px solid transparent; background: var(--surface); color: var(--text); cursor: pointer;">
-          Info (<span id="count-info">0</span>)
-        </button>
-        <button type="button" class="header-tab-btn" data-tab="raw" style="padding: 8px 16px; border-radius: 6px; border: 1px solid transparent; background: var(--surface); color: var(--text); cursor: pointer;">
-          Raw Headers (<span id="count-raw">0</span>)
-        </button>
+      <!-- Tab Content - Assessments Grid -->
+      <div id="checks-grid" class={styles.checksGrid}></div>
+
+      <!-- Tab Content - Raw Headers Output -->
+      <div id="raw-headers-pane" class={styles.rawHeaderCard} style="display: none;">
+        <div class={styles.rawHeaderHeader}>
+          <h3 class={styles.rawHeaderTitle}>Raw HTTP Response Headers</h3>
+          <button type="button" id="btn-copy-raw" class={styles.copyButton}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span id="copy-btn-text">Copy Headers</span>
+          </button>
+        </div>
+        <pre id="raw-headers-output" class={styles.rawOutput}></pre>
+      </div>
+    </section>
+
+    <!-- Methodology & Security Layers -->
+    <section class={styles.infoSection}>
+      <div class={styles.sectionHeader}>
+        <span class={styles.sectionBadge}>Methodology</span>
+        <h2 class={styles.sectionTitle}>Defense-in-Depth HTTP Security Architecture</h2>
+        <p class={styles.sectionSub}>
+          Security headers instruct modern browsers to enforce strict behavioral sandboxes, cutting off major exploitation vectors at the protocol layer.
+        </p>
       </div>
 
-      <!-- Tab Contents -->
-      <div id="tab-content-security" class="tab-pane" style="margin-top: 16px;"></div>
-      <div id="tab-content-performance" class="tab-pane" style="margin-top: 16px; display: none;"></div>
-      <div id="tab-content-info" class="tab-pane" style="margin-top: 16px; display: none;"></div>
-      <div id="tab-content-raw" class="tab-pane" style="margin-top: 16px; display: none;">
-        <div class={sharedStyles.card}>
-          <pre id="raw-headers-output" style="max-height: 400px; overflow: auto; font-family: monospace;"></pre>
+      <div class={styles.stepsGrid}>
+        <div class={styles.stepCard}>
+          <span class={styles.stepNumber}>Layer 01</span>
+          <h3 class={styles.stepTitle}>Transport & Encryption</h3>
+          <p class={styles.stepText}>
+            <code>HSTS</code> forces encrypted TLS connections and prevents SSL stripping attacks, securing data in transit across all subdomains.
+          </p>
         </div>
+        <div class={styles.stepCard}>
+          <span class={styles.stepNumber}>Layer 02</span>
+          <h3 class={styles.stepTitle}>Execution Sandboxing</h3>
+          <p class={styles.stepText}>
+            <code>CSP</code> and <code>X-Content-Type-Options</code> prevent unauthorized code execution, neutralizing Cross-Site Scripting (XSS) and MIME confusion.
+          </p>
+        </div>
+        <div class={styles.stepCard}>
+          <span class={styles.stepNumber}>Layer 03</span>
+          <h3 class={styles.stepTitle}>Framing & Leak Prevention</h3>
+          <p class={styles.stepText}>
+            <code>X-Frame-Options</code>, <code>Referrer-Policy</code>, and <code>Permissions-Policy</code> block clickjacking and prevent accidental token leakage.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scoring Bands -->
+    <section class={styles.infoSection}>
+      <div class={styles.sectionHeader}>
+        <span class={styles.sectionBadge}>Grading</span>
+        <h2 class={styles.sectionTitle}>Security Score & Grade Bands</h2>
+        <p class={styles.sectionSub}>
+          Scores are computed from OWASP-recommended HTTP header checks and security configurations.
+        </p>
+      </div>
+
+      <div class={styles.bandsGrid}>
+        <div class={`${styles.bandCard} ${styles.bandStrong}`}>
+          <div class={styles.bandHeader}>
+            <span class={styles.bandScore}>90 – 100</span>
+            <span class={styles.bandBadge}>Grade A+</span>
+          </div>
+          <p class={styles.bandReading}>
+            Outstanding defense posture. Complete security policies configured without unsafe directives.
+          </p>
+        </div>
+        <div class={`${styles.bandCard} ${styles.bandGood}`}>
+          <div class={styles.bandHeader}>
+            <span class={styles.bandScore}>80 – 89</span>
+            <span class={styles.bandBadge}>Grade A</span>
+          </div>
+          <p class={styles.bandReading}>
+            Robust protection. Core security headers present with minor configuration recommendations.
+          </p>
+        </div>
+        <div class={`${styles.bandCard} ${styles.bandNeedsWork}`}>
+          <div class={styles.bandHeader}>
+            <span class={styles.bandScore}>60 – 79</span>
+            <span class={styles.bandBadge}>Grade B / C</span>
+          </div>
+          <p class={styles.bandReading}>
+            Partial coverage. Critical headers like CSP or HSTS are missing or weakly configured.
+          </p>
+        </div>
+        <div class={`${styles.bandCard} ${styles.bandAtRisk}`}>
+          <div class={styles.bandHeader}>
+            <span class={styles.bandScore}>0 – 59</span>
+            <span class={styles.bandBadge}>Grade D / F</span>
+          </div>
+          <p class={styles.bandReading}>
+            Vulnerable posture. Lacks basic browser-enforced security headers and protections.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Headers Reference Guide -->
+    <section class={styles.infoSection}>
+      <div class={styles.sectionHeader}>
+        <span class={styles.sectionBadge}>Reference</span>
+        <h2 class={styles.sectionTitle}>Key HTTP Headers Reference Guide</h2>
+      </div>
+
+      <div class={styles.guideCardsGrid}>
+        {HEADERS_GUIDE.map((h) => (
+          <div class={styles.guideDetailCard}>
+            <div class={styles.guideHeader}>
+              <h3 class={styles.guideName}>{h.name}</h3>
+              <span class={styles.guideBadge}>{h.short}</span>
+            </div>
+            <p class={styles.guideBlock}>{h.desc}</p>
+            <p class={styles.guideBlock} style="margin-top: 4px;">
+              <strong>Why it matters:</strong> {h.why}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class={styles.infoSection}>
+      <div class={styles.sectionHeader}>
+        <span class={styles.sectionBadge}>FAQ</span>
+        <h2 class={styles.sectionTitle}>Frequently Asked Questions</h2>
+      </div>
+
+      <div class={styles.faqList}>
+        {FAQS.map((faq) => (
+          <details class={styles.faqCard}>
+            <summary class={styles.faqQuestionRow} style="list-style: none; cursor: pointer;">
+              <h3 class={styles.faqQuestion}>{faq.q}</h3>
+              <span class={styles.faqIcon}>+</span>
+            </summary>
+            <p class={styles.faqAnswer}>{faq.a}</p>
+          </details>
+        ))}
       </div>
     </section>
   </div>
 </ToolLayout>
 
 <script>
-  import { analyzeHeaders, type HeaderAssessment } from '@/lib/headers';
+  import { analyzeHeaders, type HeaderAssessment, type HeaderAnalysisResult } from '@/lib/headers';
   import { validateCaptcha } from '@/lib/captcha';
 
   const form = document.getElementById('header-scan-form') as HTMLFormElement;
@@ -111,11 +388,29 @@ const SAMPLE_URLS = ['https://example.com', 'https://github.com', 'https://googl
   const errorMsg = document.getElementById('scan-error-msg');
   const resultsSection = document.getElementById('scan-results-section');
   const targetUrlEl = document.getElementById('target-url-display');
-  const scoreBadge = document.getElementById('score-badge');
+  const scoreNum = document.getElementById('score-number');
+  const scoreGrade = document.getElementById('score-grade');
+  const scoreSubtitle = document.getElementById('score-subtitle');
+  const countPassed = document.getElementById('count-passed');
+  const countWarnings = document.getElementById('count-warnings');
+  const countFailed = document.getElementById('count-failed');
+  const countInfoBadge = document.getElementById('count-info-badge');
+
+  const countAll = document.getElementById('count-all');
+  const countSec = document.getElementById('count-security');
+  const countPerf = document.getElementById('count-performance');
+  const countInfo = document.getElementById('count-info');
+  const countRaw = document.getElementById('count-raw');
+
+  const checksGrid = document.getElementById('checks-grid');
+  const rawHeadersPane = document.getElementById('raw-headers-pane');
   const rawHeadersOut = document.getElementById('raw-headers-output');
   const tabBtns = document.querySelectorAll('.header-tab-btn');
+  const btnCopyRaw = document.getElementById('btn-copy-raw');
+  const copyBtnText = document.getElementById('copy-btn-text');
 
-  let activeTab = 'security';
+  let currentTab = 'all';
+  let latestResult: HeaderAnalysisResult | null = null;
 
   sampleBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -131,103 +426,179 @@ const SAMPLE_URLS = ['https://example.com', 'https://github.com', 'https://googl
 
   tabBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
-      tabBtns.forEach((b) => ((b as HTMLElement).style.borderColor = 'transparent'));
-      (btn as HTMLElement).style.borderColor = 'var(--accent)';
-      activeTab = (btn as HTMLElement).dataset.tab || 'security';
-
-      document.querySelectorAll('.tab-pane').forEach((pane) => {
-        (pane as HTMLElement).style.display = 'none';
+      tabBtns.forEach((b) => {
+        b.classList.remove('active');
+        b.removeAttribute('data-active');
       });
-      const currentPane = document.getElementById(`tab-content-${activeTab}`);
-      if (currentPane) currentPane.style.display = 'block';
+      btn.classList.add('active');
+      btn.setAttribute('data-active', 'true');
+      currentTab = (btn as HTMLElement).dataset.tab || 'all';
+      renderView();
     });
+  });
+
+  btnCopyRaw?.addEventListener('click', async () => {
+    if (!rawHeadersOut?.textContent) return;
+    try {
+      await navigator.clipboard.writeText(rawHeadersOut.textContent);
+      if (copyBtnText) copyBtnText.textContent = '✓ Copied!';
+      setTimeout(() => {
+        if (copyBtnText) copyBtnText.textContent = 'Copy Headers';
+      }, 2000);
+    } catch {
+      // Fallback
+    }
   });
 
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const url = urlInput?.value.trim();
-    if (!url) return;
+    const raw = urlInput?.value.trim();
+    if (!raw) return;
 
     const { valid, token } = validateCaptcha(form);
     if (!valid) return;
+
+    const normalized = raw.startsWith('http://') || raw.startsWith('https://') ? raw : `https://${raw}`;
 
     if (loadingBox) loadingBox.style.display = 'block';
     if (errorBox) errorBox.style.display = 'none';
     if (resultsSection) resultsSection.style.display = 'none';
 
     try {
-      const result = await analyzeHeaders(url, token || undefined);
+      const result = await analyzeHeaders(normalized, token || undefined);
+      latestResult = result;
 
       if (targetUrlEl) targetUrlEl.textContent = result.url;
-      if (scoreBadge) {
-        scoreBadge.textContent = `${result.score}/100 Grade ${result.grade}`;
-        scoreBadge.style.color = result.score >= 80 ? '#4caf50' : result.score >= 50 ? '#faad14' : '#ff4d4f';
+      if (scoreNum) {
+        scoreNum.textContent = String(result.score);
+        scoreNum.style.color = result.score >= 80 ? 'var(--green)' : result.score >= 50 ? 'var(--yellow)' : 'var(--red)';
       }
 
-      // Counts
-      const secItems = result.assessments.filter((a: HeaderAssessment) => a.category === 'security');
-      const perfItems = result.assessments.filter((a: HeaderAssessment) => a.category === 'performance');
-      const infoItems = result.assessments.filter((a: HeaderAssessment) => a.category === 'info');
+      if (scoreGrade) {
+        scoreGrade.textContent = `Grade ${result.grade}`;
+        scoreGrade.style.color = result.score >= 80 ? 'var(--green)' : result.score >= 50 ? 'var(--yellow)' : 'var(--red)';
+        scoreGrade.style.background = result.score >= 80 ? 'rgba(52, 211, 153, 0.15)' : result.score >= 50 ? 'rgba(251, 191, 36, 0.15)' : 'rgba(248, 113, 113, 0.15)';
+      }
 
-      const countSec = document.getElementById('count-security');
-      const countPerf = document.getElementById('count-performance');
-      const countInfo = document.getElementById('count-info');
-      const countRaw = document.getElementById('count-raw');
+      if (scoreSubtitle) {
+        scoreSubtitle.textContent = result.score >= 80 ? 'Strong Security Posture' : result.score >= 50 ? 'Partial Protection' : 'At Risk - Needs Hardening';
+      }
 
+      // Count assessments
+      const pCount = result.assessments.filter((a) => a.status === 'pass').length;
+      const wCount = result.assessments.filter((a) => a.status === 'warn').length;
+      const fCount = result.assessments.filter((a) => a.status === 'fail').length;
+      const iCount = result.assessments.filter((a) => a.status === 'info').length;
+
+      if (countPassed) countPassed.textContent = String(pCount);
+      if (countWarnings) countWarnings.textContent = String(wCount);
+      if (countFailed) countFailed.textContent = String(fCount);
+      if (countInfoBadge) countInfoBadge.textContent = String(iCount);
+
+      // Category counts
+      const secItems = result.assessments.filter((a) => a.category === 'security');
+      const perfItems = result.assessments.filter((a) => a.category === 'performance');
+      const infoItems = result.assessments.filter((a) => a.category === 'info');
+
+      if (countAll) countAll.textContent = String(result.assessments.length);
       if (countSec) countSec.textContent = String(secItems.length);
       if (countPerf) countPerf.textContent = String(perfItems.length);
       if (countInfo) countInfo.textContent = String(infoItems.length);
       if (countRaw) countRaw.textContent = String(Object.keys(result.rawHeaders).length);
 
-      // Render cards helper
-      const renderCards = (items: HeaderAssessment[]) => {
-        return items
-          .map((item: HeaderAssessment) => {
-            const statusColor =
-              item.status === 'pass'
-                ? '#4caf50'
-                : item.status === 'warn'
-                ? '#faad14'
-                : item.status === 'fail'
-                ? '#ff4d4f'
-                : '#2196f3';
-            return `
-            <div style="background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 12px; border-left: 4px solid ${statusColor};">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <strong>${item.name}</strong>
-                <span style="text-transform: uppercase; font-size: 0.75rem; font-weight: bold; color: ${statusColor};">${item.status}</span>
-              </div>
-              <div style="font-size: 0.85rem; margin-bottom: 4px;">${item.message}</div>
-              <div style="font-size: 0.8rem; color: var(--text-muted);">${item.description}</div>
-              ${item.recommendation ? `<div style="font-size: 0.8rem; color: #faad14; margin-top: 6px;">💡 ${item.recommendation}</div>` : ''}
-            </div>
-          `;
-          })
-          .join('');
-      };
-
-      const paneSec = document.getElementById('tab-content-security');
-      const panePerf = document.getElementById('tab-content-performance');
-      const paneInfo = document.getElementById('tab-content-info');
-
-      if (paneSec) paneSec.innerHTML = renderCards(secItems);
-      if (panePerf) panePerf.innerHTML = renderCards(perfItems);
-      if (paneInfo) paneInfo.innerHTML = renderCards(infoItems);
-
       if (rawHeadersOut) {
-        rawHeadersOut.textContent = Object.entries(result.rawHeaders)
-          .map(([k, v]) => `${k}: ${v}`)
-          .join('\n');
+        const sortedEntries = Object.entries(result.rawHeaders).sort(([a], [b]) => a.localeCompare(b));
+        rawHeadersOut.textContent = sortedEntries.map(([k, v]) => `${k}: ${v}`).join('\n');
       }
 
-      if (resultsSection) resultsSection.style.display = 'block';
+      renderView();
+      if (resultsSection) resultsSection.style.display = 'flex';
     } catch (err: any) {
       if (errorBox && errorMsg) {
-        errorBox.style.display = 'block';
-        errorMsg.textContent = err.message || 'Failed to scan headers.';
+        errorBox.style.display = 'flex';
+        errorMsg.textContent = err.message || 'Failed to analyze headers for the target URL.';
       }
     } finally {
       if (loadingBox) loadingBox.style.display = 'none';
     }
   });
+
+  function renderView() {
+    if (!latestResult) return;
+
+    if (currentTab === 'raw') {
+      if (checksGrid) checksGrid.style.display = 'none';
+      if (rawHeadersPane) rawHeadersPane.style.display = 'flex';
+      return;
+    }
+
+    if (rawHeadersPane) rawHeadersPane.style.display = 'none';
+    if (checksGrid) checksGrid.style.display = 'grid';
+
+    const filtered = latestResult.assessments.filter((a) => {
+      if (currentTab === 'all') return true;
+      return a.category === currentTab;
+    });
+
+    if (checksGrid) {
+      checksGrid.innerHTML = filtered
+        .map((item: HeaderAssessment) => {
+          const statusClass =
+            item.status === 'pass'
+              ? 'header-check-card-pass'
+              : item.status === 'warn'
+              ? 'header-check-card-warn'
+              : item.status === 'fail'
+              ? 'header-check-card-fail'
+              : 'header-check-card-info';
+
+          const statusPillClass =
+            item.status === 'pass'
+              ? 'header-status-pill-pass'
+              : item.status === 'warn'
+              ? 'header-status-pill-warn'
+              : item.status === 'fail'
+              ? 'header-status-pill-fail'
+              : 'header-status-pill-info';
+
+          const statusIcon =
+            item.status === 'pass'
+              ? '✓'
+              : item.status === 'warn'
+              ? '⚠️'
+              : item.status === 'fail'
+              ? '✕'
+              : 'ℹ';
+
+          return `
+          <div class="header-check-card ${statusClass}">
+            <div class="header-check-head">
+              <div class="header-check-title-wrap">
+                <h3 class="header-check-name">${item.name}</h3>
+                ${item.short ? `<span class="header-short-badge">${item.short}</span>` : ''}
+                <span class="header-category-badge">${item.category}</span>
+              </div>
+              <div class="header-check-meta-badges">
+                <span class="header-status-pill ${statusPillClass}">${item.status}</span>
+              </div>
+            </div>
+            <p class="header-check-desc">${item.description}</p>
+            <div class="header-check-result-box">
+              <span>${statusIcon}</span>
+              <span><strong>Result:</strong> ${item.message}</span>
+            </div>
+            ${
+              item.recommendation && item.status !== 'pass'
+                ? `<div class="header-rec-box">
+                    <span class="header-rec-highlight">💡 Recommendation:</span>
+                    <span>${item.recommendation}</span>
+                  </div>`
+                : ''
+            }
+          </div>
+        `;
+        })
+        .join('');
+    }
+  }
 </script>
