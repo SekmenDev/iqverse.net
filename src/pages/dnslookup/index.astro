@@ -3,7 +3,77 @@ import ToolLayout from '@/layouts/ToolLayout.astro';
 import styles from '@/styles/dnslookup.module.css';
 
 const ALL_TYPES = ['ALL', 'A', 'AAAA', 'MX', 'TXT', 'NS', 'CNAME', 'SOA', 'CAA', 'PTR', 'SRV'];
-const PRESET_DOMAINS = ['google.com', 'cloudflare.com', 'github.com', 'amazon.com', 'netflix.com'];
+const PRESET_DOMAINS = ['iqverse.net', 'google.com', 'cloudflare.com', 'github.com', 'amazon.com', 'netflix.com', 'wikipedia.org'];
+
+const DNS_GUIDE = [
+  {
+    type: 'A (IPv4 Address)',
+    short: 'A',
+    purpose: 'Maps a human-readable domain name directly to a 32-bit IPv4 address.',
+    why: 'The foundational record of the web, enabling browsers to connect to host web servers over IPv4.',
+  },
+  {
+    type: 'AAAA (IPv6 Address)',
+    short: 'AAAA',
+    purpose: 'Maps a domain name to a 128-bit next-generation IPv6 address.',
+    why: 'Essential for modern high-speed internet routing, dual-stack networks, and mobile connectivity.',
+  },
+  {
+    type: 'MX (Mail Exchange)',
+    short: 'MX',
+    purpose: 'Specifies the mail servers responsible for accepting incoming email on behalf of the domain.',
+    why: 'Required for reliable email routing with priority weighting and fallback server configuration.',
+  },
+  {
+    type: 'TXT (Text & Security Policies)',
+    short: 'TXT',
+    purpose: 'Carries arbitrary text metadata, most crucially SPF, DKIM, DMARC, and domain ownership tokens.',
+    why: 'Critical for email anti-spoofing security (preventing phishing) and third-party SaaS domain validation.',
+  },
+  {
+    type: 'NS (Name Server)',
+    short: 'NS',
+    purpose: 'Delegates a DNS zone to use authoritative DNS servers (e.g. Cloudflare, Route53).',
+    why: 'Tells global resolvers which nameservers hold the master source-of-truth records for this domain.',
+  },
+  {
+    type: 'CNAME (Canonical Name)',
+    short: 'CNAME',
+    purpose: 'Aliases one domain or subdomain name to another canonical domain name.',
+    why: 'Simplifies management of subdomains (e.g., www, app, docs) pointing to CDNs or cloud hostnames.',
+  },
+  {
+    type: 'SOA (Start of Authority)',
+    short: 'SOA',
+    purpose: 'Stores core zone administrative info, including primary nameserver, admin email, serial number, and refresh timers.',
+    why: 'Coordinates secondary DNS synchronization and dictates negative caching (NXDOMAIN TTL) behavior.',
+  },
+  {
+    type: 'CAA (Certification Authority Authorization)',
+    short: 'CAA',
+    purpose: 'Restricts which Certificate Authorities (CAs like Let\'s Encrypt, DigiCert) are allowed to issue SSL/TLS certificates.',
+    why: 'Prevents rogue or compromised CAs from issuing illegitimate certificates for your domain.',
+  },
+];
+
+const FAQS = [
+  {
+    q: 'What is DNS-over-HTTPS (DoH) and why is it safer?',
+    a: 'Traditional DNS queries travel unencrypted over UDP port 53, making them vulnerable to eavesdropping, ISP tracking, and DNS spoofing / cache poisoning attacks. DNS-over-HTTPS (DoH, RFC 8484) encrypts DNS lookups inside standard HTTPS traffic, protecting your privacy and preventing man-in-the-middle manipulation.',
+  },
+  {
+    q: 'What does TTL (Time to Live) mean in DNS records?',
+    a: 'TTL indicates the number of seconds that DNS resolvers and ISP recursive caches are permitted to store the answer before querying the authoritative nameserver again. A TTL of 300 means 5 minutes, while 86400 means 24 hours.',
+  },
+  {
+    q: 'How does DNSSEC provide authenticity?',
+    a: 'Domain Name System Security Extensions (DNSSEC) uses public-key cryptography to digitally sign DNS records. Validating resolvers verify that DNS responses originated from the legitimate zone owner and were not forged in transit.',
+  },
+  {
+    q: 'Why do my updated DNS records take time to propagate?',
+    a: 'DNS propagation delay is primarily driven by intermediate resolver caching governed by previous record TTL values. Until the old cache entries expire worldwide, some visitors may still receive the previous record values.',
+  },
+];
 ---
 
 <ToolLayout
@@ -13,43 +83,78 @@ const PRESET_DOMAINS = ['google.com', 'cloudflare.com', 'github.com', 'amazon.co
   toolSlug="dnslookup"
   description="Query global DNS records (A, AAAA, MX, TXT, NS, CNAME, SOA, CAA) with DNSSEC verification and sub-millisecond DoH queries."
 >
-  <div class={styles.container}>
-    <!-- Query Form -->
-    <section class={styles.heroSection}>
-      <form id="dns-lookup-form" class={styles.form}>
-        <div class={styles.inputGroup}>
-          <input
-            id="dns-domain-input"
-            type="text"
-            class={styles.domainInput}
-            placeholder="e.g. iqverse.net or google.com"
-            value="iqverse.net"
-            required
-          />
+  <div class={styles.dnsContainer}>
+    <!-- Query Card -->
+    <section class={styles.scannerCard}>
+      <form id="dns-lookup-form">
+        <div class={styles.inputRow}>
+          <div class={styles.inputWrapper}>
+            <svg
+              class={styles.inputIcon}
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+            <input
+              id="dns-domain-input"
+              type="text"
+              class={styles.domainInput}
+              placeholder="e.g. iqverse.net or google.com"
+              value="iqverse.net"
+              required
+            />
+          </div>
           <button type="submit" id="btn-query-dns" class={styles.queryButton}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
             Lookup DNS
           </button>
         </div>
+
+        <div class={styles.controlsRow}>
+          <!-- DoH Provider Selector -->
+          <div class={styles.providerSelectGroup}>
+            <span class={styles.controlLabel}>Resolver:</span>
+            <select id="doh-provider-select" class={styles.providerSelect}>
+              <option value="cloudflare">Cloudflare (1.1.1.1 DoH)</option>
+              <option value="google">Google Public DNS (8.8.8.8 DoH)</option>
+            </select>
+          </div>
+
+          <!-- Type Filter Pills -->
+          <div class={styles.typeFilterRow}>
+            <span class={styles.controlLabel}>Query:</span>
+            <div class={styles.typePills}>
+              {ALL_TYPES.map((t) => (
+                <button
+                  type="button"
+                  class={`${styles.typePill} dns-type-pill ${t === 'ALL' ? styles.typePillActive : ''}`}
+                  data-type={t}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
       </form>
 
-      <!-- Record Type Pills -->
-      <div style="display: flex; gap: 6px; margin-top: 14px; flex-wrap: wrap;">
-        {ALL_TYPES.map((t) => (
-          <button
-            type="button"
-            class={`dns-type-pill ${t === 'ALL' ? 'active' : ''}`}
-            data-type={t}
-            style="padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.8rem; font-weight: 600; cursor: pointer;"
-          >
-            {t}
-          </button>
-        ))}
-      </div>
-
-      <div class={styles.presets}>
-        <span>Try:</span>
+      <!-- Presets -->
+      <div class={styles.quickExamples}>
+        <span class={styles.examplesLabel}>Try an example:</span>
         {PRESET_DOMAINS.map((d) => (
-          <button type="button" class="preset-domain-btn" data-domain={d}>
+          <button type="button" class={`${styles.exampleBtn} preset-domain-btn`} data-domain={d}>
             {d}
           </button>
         ))}
@@ -57,44 +162,271 @@ const PRESET_DOMAINS = ['google.com', 'cloudflare.com', 'github.com', 'amazon.co
     </section>
 
     <!-- Loading State -->
-    <div id="dns-loading" class={styles.loadingBox} style="display: none;">
-      <div class={styles.spinner}></div>
-      <p>Resolving DNS records via Cloudflare DoH...</p>
+    <div id="dns-loading" class={styles.statusBar} style="display: none;">
+      <div style="display: inline-flex; align-items: center; justify-content: center; gap: 12px;">
+        <div class={styles.spinner}></div>
+        <span id="dns-loading-msg" style="font-size: 0.95rem; font-weight: 500; font-family: var(--font-mono);">
+          Resolving authoritative DNS records via DoH…
+        </span>
+      </div>
     </div>
 
-    <!-- Results Area -->
-    <div id="dns-results-area" style="display: none; margin-top: 24px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
-        <h3 id="dns-target-title" style="margin: 0;">DNS Records for iqverse.net</h3>
-        <span id="dns-elapsed-time" style="font-size: 0.85rem; color: var(--text-muted);"></span>
+    <!-- Error Box -->
+    <div id="dns-error" class={styles.errorCard} style="display: none;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 2px;">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <div id="dns-error-msg" class={styles.errorMessage}></div>
+    </div>
+
+    <!-- Results Section -->
+    <section id="dns-results-area" class={styles.resultsSection} style="display: none;">
+      <!-- Overview Card -->
+      <div class={styles.scorePanel}>
+        <div>
+          <div class={styles.scoreLabel}>Target Domain</div>
+          <h2 id="dns-target-title" class={styles.targetDomain}>iqverse.net</h2>
+          <div class={styles.badges}>
+            <span id="badge-status" class={`${styles.badge} ${styles.badgePass}`}>
+              NOERROR
+            </span>
+            <span id="badge-elapsed" class={`${styles.badge} ${styles.badgeInfo}`}>
+              0 ms
+            </span>
+            <span id="badge-provider" class={`${styles.badge} ${styles.badgeInfo}`}>
+              Cloudflare DoH
+            </span>
+            <span id="badge-dnssec" class={`${styles.badge} ${styles.badgePass}`}>
+              DNSSEC: Active
+            </span>
+          </div>
+        </div>
+
+        <div class={styles.metaWrap}>
+          <div class={styles.scoreLabel}>Total Records</div>
+          <div id="dns-total-count" class={styles.metaValue}>0</div>
+          <div id="dns-distinct-types" class={styles.metaSubtitle}>0 distinct types</div>
+        </div>
       </div>
 
-      <div id="dns-records-container" style="display: flex; flex-direction: column; gap: 16px;"></div>
-    </div>
+      <!-- Navigation & Filters Toolbar -->
+      <div class={styles.resultsToolbar}>
+        <div class={styles.filterBar}>
+          <span class={styles.filterLabel}>Filter:</span>
+          <div id="result-filter-pills" class={styles.filterPills}></div>
+        </div>
+
+        <div class={styles.toolbarActions}>
+          <button type="button" id="btn-copy-all" class={styles.actionBtn}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span id="btn-copy-all-text">Copy All</span>
+          </button>
+          <button type="button" id="btn-copy-json" class={styles.actionBtn}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span>JSON</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab Content: Records Grid -->
+      <div id="dns-records-grid" class={styles.recordsGrid}></div>
+
+      <!-- Tab Content: Raw JSON Viewer -->
+      <div id="dns-raw-pane" class={styles.rawHeaderCard} style="display: none;">
+        <div class={styles.rawHeaderHeader}>
+          <h3 class={styles.rawHeaderTitle}>Raw DoH JSON Response</h3>
+          <button type="button" id="btn-copy-raw-json" class={styles.actionBtn}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span id="btn-copy-raw-text">Copy JSON</span>
+          </button>
+        </div>
+        <pre id="dns-raw-output" class={styles.rawOutput}></pre>
+      </div>
+    </section>
+
+    <!-- Methodology & Security Layers -->
+    <section class={styles.infoSection}>
+      <div class={styles.sectionHeader}>
+        <span class={styles.sectionBadge}>Methodology</span>
+        <h2 class={styles.sectionTitle}>DNS-over-HTTPS (DoH) Architecture</h2>
+        <p class={styles.sectionSub}>
+          Modern recursive resolvers use encrypted DoH protocols (RFC 8484) to eliminate plain-text UDP queries and prevent MITM DNS spoofing.
+        </p>
+      </div>
+
+      <div class={styles.stepsGrid}>
+        <div class={styles.stepCard}>
+          <span class={styles.stepNumber}>Layer 01</span>
+          <h3 class={styles.stepTitle}>Encrypted Transport</h3>
+          <p class={styles.stepText}>
+            DNS queries are encapsulated in HTTP/2 or HTTP/3 over TLS, shielding query hostnames from ISP monitoring and local network sniffing.
+          </p>
+        </div>
+        <div class={styles.stepCard}>
+          <span class={styles.stepNumber}>Layer 02</span>
+          <h3 class={styles.stepTitle}>DNSSEC Authenticity</h3>
+          <p class={styles.stepText}>
+            Cryptographic signatures (<code>RRSIG</code> and <code>DS</code> records) validate that response data exactly matches the domain owner’s zone file.
+          </p>
+        </div>
+        <div class={styles.stepCard}>
+          <span class={styles.stepNumber}>Layer 03</span>
+          <h3 class={styles.stepTitle}>Anycast Performance</h3>
+          <p class={styles.stepText}>
+            Global Anycast edge nodes resolve records in single-digit milliseconds with edge caching and automatic zone synchronization.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- DNS Record Types Reference Guide -->
+    <section class={styles.infoSection}>
+      <div class={styles.sectionHeader}>
+        <span class={styles.sectionBadge}>Reference</span>
+        <h2 class={styles.sectionTitle}>DNS Record Types Reference Guide</h2>
+        <p class={styles.sectionSub}>
+          Understand the role and security implications of standard DNS resource records.
+        </p>
+      </div>
+
+      <div class={styles.guideCardsGrid}>
+        {DNS_GUIDE.map((rec) => (
+          <div class={styles.guideDetailCard}>
+            <div class={styles.guideHeader}>
+              <h3 class={styles.guideName}>{rec.type}</h3>
+              <span class={styles.guideBadge}>{rec.short}</span>
+            </div>
+            <p class={styles.guideBlock}>{rec.purpose}</p>
+            <p class={styles.guideBlock} style="margin-top: 4px;">
+              <strong>Why it matters:</strong> {rec.why}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Frequently Asked Questions -->
+    <section class={styles.infoSection}>
+      <div class={styles.sectionHeader}>
+        <span class={styles.sectionBadge}>FAQ</span>
+        <h2 class={styles.sectionTitle}>Frequently Asked Questions</h2>
+      </div>
+
+      <div class={styles.faqList}>
+        {FAQS.map((faq) => (
+          <details class={styles.faqCard}>
+            <summary class={styles.faqQuestionRow} style="list-style: none; cursor: pointer;">
+              <h3 class={styles.faqQuestion}>{faq.q}</h3>
+              <span class={styles.faqIcon}>+</span>
+            </summary>
+            <p class={styles.faqAnswer}>{faq.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <!-- Toast Notification -->
+    <div id="dns-toast" class={styles.toast}>Copied to clipboard!</div>
   </div>
 </ToolLayout>
 
 <script>
-  const QUERY_TYPES = ['A', 'AAAA', 'MX', 'TXT', 'NS', 'CNAME', 'SOA', 'CAA'];
+  interface DnsAnswer {
+    name: string;
+    type: number;
+    TTL: number;
+    data: string;
+  }
+
+  interface DnsResponse {
+    Status: number;
+    TC?: boolean;
+    RD?: boolean;
+    RA?: boolean;
+    AD?: boolean;
+    CD?: boolean;
+    Question?: { name: string; type: number }[];
+    Answer?: DnsAnswer[];
+    Authority?: DnsAnswer[];
+    Additional?: DnsAnswer[];
+    Comment?: string;
+  }
+
+  interface GroupedRecord {
+    type: string;
+    answers: DnsAnswer[];
+  }
+
+  const QUERY_TYPES = ['A', 'AAAA', 'MX', 'TXT', 'NS', 'CNAME', 'SOA', 'CAA', 'PTR', 'SRV'];
 
   const form = document.getElementById('dns-lookup-form') as HTMLFormElement;
   const domainInput = document.getElementById('dns-domain-input') as HTMLInputElement;
+  const providerSelect = document.getElementById('doh-provider-select') as HTMLSelectElement;
   const typePills = document.querySelectorAll('.dns-type-pill');
   const presetBtns = document.querySelectorAll('.preset-domain-btn');
 
   const loadingBox = document.getElementById('dns-loading');
+  const errorBox = document.getElementById('dns-error');
+  const errorMsg = document.getElementById('dns-error-msg');
   const resultsArea = document.getElementById('dns-results-area');
-  const targetTitle = document.getElementById('dns-target-title');
-  const elapsedTime = document.getElementById('dns-elapsed-time');
-  const recordsContainer = document.getElementById('dns-records-container');
 
-  let selectedType = 'ALL';
+  const targetTitle = document.getElementById('dns-target-title');
+  const badgeStatus = document.getElementById('badge-status');
+  const badgeElapsed = document.getElementById('badge-elapsed');
+  const badgeProvider = document.getElementById('badge-provider');
+  const badgeDnssec = document.getElementById('badge-dnssec');
+  const totalCountEl = document.getElementById('dns-total-count');
+  const distinctTypesEl = document.getElementById('dns-distinct-types');
+
+  const filterPillsContainer = document.getElementById('result-filter-pills');
+  const recordsGrid = document.getElementById('dns-records-grid');
+  const rawPane = document.getElementById('dns-raw-pane');
+  const rawOutput = document.getElementById('dns-raw-output');
+
+  const btnCopyAll = document.getElementById('btn-copy-all');
+  const btnCopyAllText = document.getElementById('btn-copy-all-text');
+  const btnCopyJson = document.getElementById('btn-copy-json');
+  const btnCopyRawJson = document.getElementById('btn-copy-raw-json');
+  const btnCopyRawText = document.getElementById('btn-copy-raw-text');
+  const toast = document.getElementById('dns-toast');
+
+  let selectedQueryType = 'ALL';
+  let activeFilterTab = 'all';
+  let latestResponses: { type: string; data: DnsResponse | null }[] = [];
+  let currentDomain = 'iqverse.net';
+
+  function showToast(message: string) {
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 2200);
+  }
 
   typePills.forEach((pill) => {
     pill.addEventListener('click', () => {
-      typePills.forEach((p) => p.classList.remove('active'));
+      typePills.forEach((p) => {
+        p.classList.remove('active');
+        p.removeAttribute('data-active');
+      });
       pill.classList.add('active');
-      selectedType = (pill as HTMLElement).dataset.type || 'ALL';
+      pill.setAttribute('data-active', 'true');
+      selectedQueryType = (pill as HTMLElement).dataset.type || 'ALL';
       form?.dispatchEvent(new Event('submit'));
     });
   });
@@ -108,88 +440,348 @@ const PRESET_DOMAINS = ['google.com', 'cloudflare.com', 'github.com', 'amazon.co
     });
   });
 
-  async function fetchDns(domain: string, type: string) {
+  providerSelect?.addEventListener('change', () => {
+    form?.dispatchEvent(new Event('submit'));
+  });
+
+  async function fetchDns(domain: string, type: string, provider: string): Promise<DnsResponse | null> {
     try {
-      const url = `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=${type}`;
+      let url = '';
+      if (provider === 'google') {
+        url = `https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=${encodeURIComponent(type)}&do=true`;
+      } else {
+        url = `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=${encodeURIComponent(type)}&do=true`;
+      }
+
       const res = await fetch(url, {
         headers: { Accept: 'application/dns-json' },
       });
+
+      if (!res.ok) return null;
       return await res.json();
     } catch {
       return null;
     }
   }
 
+  function formatTtl(seconds: number): string {
+    if (seconds < 60) return `${seconds}s`;
+    if (seconds < 3600) return `${seconds}s (${Math.round(seconds / 60)}m)`;
+    return `${seconds}s (${Math.round(seconds / 3600)}h)`;
+  }
+
+  function escapeHtml(str: string): string {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const rawDomain = domainInput?.value.trim().replace(/^https?:\/\//, '').split('/')[0];
+    const rawDomain = domainInput?.value.trim().replace(/^https?:\/\//, '').split('/')[0].split('?')[0];
     if (!rawDomain) return;
 
+    currentDomain = rawDomain;
+    const provider = providerSelect?.value || 'cloudflare';
+
     if (loadingBox) loadingBox.style.display = 'block';
+    if (errorBox) errorBox.style.display = 'none';
     if (resultsArea) resultsArea.style.display = 'none';
 
     const startTime = performance.now();
-    const typesToFetch = selectedType === 'ALL' ? QUERY_TYPES : [selectedType];
+    const typesToFetch = selectedQueryType === 'ALL' ? QUERY_TYPES : [selectedQueryType];
 
     try {
       const responses = await Promise.all(
         typesToFetch.map(async (t) => {
-          const data = await fetchDns(rawDomain, t);
+          const data = await fetchDns(rawDomain, t, provider);
           return { type: t, data };
         })
       );
 
       const elapsed = Math.round(performance.now() - startTime);
+      latestResponses = responses;
 
-      if (targetTitle) targetTitle.textContent = `DNS Records for ${rawDomain}`;
-      if (elapsedTime) elapsedTime.textContent = `Resolved in ${elapsed} ms`;
+      if (targetTitle) targetTitle.textContent = rawDomain;
+      if (badgeElapsed) badgeElapsed.textContent = `${elapsed} ms`;
+      if (badgeProvider) badgeProvider.textContent = provider === 'google' ? 'Google 8.8.8.8 DoH' : 'Cloudflare 1.1.1.1 DoH';
 
-      if (recordsContainer) {
-        const renderedCards: string[] = [];
+      // Evaluate DNSSEC and status code
+      let hasDnssec = false;
+      let primaryStatusCode = 0;
 
-        responses.forEach(({ type, data }) => {
-          const answers = data?.Answer || [];
-          if (answers.length > 0) {
-            renderedCards.push(`
-              <div style="background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                  <span style="padding: 2px 10px; border-radius: 4px; background: rgba(33, 150, 243, 0.2); color: #2196f3; font-weight: bold; font-family: monospace;">
-                    ${type}
-                  </span>
-                  <span style="font-size: 0.8rem; color: var(--text-muted);">${answers.length} record(s)</span>
-                </div>
+      responses.forEach(({ data }) => {
+        if (data?.AD) hasDnssec = true;
+        if (data?.Status && data.Status !== 0) primaryStatusCode = data.Status;
+      });
 
-                <div style="display: flex; flex-direction: column; gap: 8px;">
-                  ${answers
-                    .map(
-                      (a: any) => `
-                    <div style="display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; padding: 8px; border-radius: 4px; background: rgba(255,255,255,0.02); font-family: monospace; font-size: 0.85rem;">
-                      <span style="word-break: break-all;">${a.data}</span>
-                      <span style="opacity: 0.7; font-size: 0.75rem;">TTL: ${a.TTL}s</span>
-                    </div>
-                  `
-                    )
-                    .join('')}
-                </div>
-              </div>
-            `);
-          }
-        });
-
-        if (renderedCards.length === 0) {
-          recordsContainer.innerHTML = '<div style="text-align: center; padding: 24px; opacity: 0.7;">No DNS records found for the selected query.</div>';
+      if (badgeStatus) {
+        if (primaryStatusCode === 0) {
+          badgeStatus.textContent = 'NOERROR (0)';
+          badgeStatus.className = `${badgeStatus.className.split(' ')[0]} badgePass`;
+          badgeStatus.style.background = 'rgba(52, 211, 153, 0.12)';
+          badgeStatus.style.color = 'var(--green)';
+          badgeStatus.style.borderColor = 'rgba(52, 211, 153, 0.3)';
+        } else if (primaryStatusCode === 3) {
+          badgeStatus.textContent = 'NXDOMAIN (3)';
+          badgeStatus.style.background = 'rgba(248, 113, 113, 0.12)';
+          badgeStatus.style.color = 'var(--red)';
+          badgeStatus.style.borderColor = 'rgba(248, 113, 113, 0.3)';
         } else {
-          recordsContainer.innerHTML = renderedCards.join('');
+          badgeStatus.textContent = `STATUS (${primaryStatusCode})`;
+          badgeStatus.style.background = 'rgba(251, 191, 36, 0.12)';
+          badgeStatus.style.color = 'var(--yellow)';
+          badgeStatus.style.borderColor = 'rgba(251, 191, 36, 0.3)';
         }
       }
 
-      if (resultsArea) resultsArea.style.display = 'block';
-    } catch (err) {
-      console.error(err);
+      if (badgeDnssec) {
+        if (hasDnssec) {
+          badgeDnssec.textContent = 'DNSSEC: Validated ✓';
+          badgeDnssec.style.background = 'rgba(52, 211, 153, 0.12)';
+          badgeDnssec.style.color = 'var(--green)';
+          badgeDnssec.style.borderColor = 'rgba(52, 211, 153, 0.3)';
+        } else {
+          badgeDnssec.textContent = 'DNSSEC: Unsigned';
+          badgeDnssec.style.background = 'rgba(129, 140, 248, 0.1)';
+          badgeDnssec.style.color = 'var(--accent)';
+          badgeDnssec.style.borderColor = 'rgba(129, 140, 248, 0.3)';
+        }
+      }
+
+      // Group records by type
+      const groups: GroupedRecord[] = [];
+      let totalCount = 0;
+
+      responses.forEach(({ type, data }) => {
+        const answers = data?.Answer || [];
+        if (answers.length > 0) {
+          groups.push({ type, answers });
+          totalCount += answers.length;
+        }
+      });
+
+      if (totalCountEl) totalCountEl.textContent = String(totalCount);
+      if (distinctTypesEl) distinctTypesEl.textContent = `${groups.length} distinct record type${groups.length === 1 ? '' : 's'}`;
+
+      // Update Raw JSON Output
+      if (rawOutput) {
+        rawOutput.textContent = JSON.stringify(responses, null, 2);
+      }
+
+      // Render Filter Toolbar
+      renderFilterToolbar(groups, totalCount);
+
+      // Render View
+      activeFilterTab = 'all';
+      renderRecordsView(groups);
+
+      if (resultsArea) resultsArea.style.display = 'flex';
+    } catch (err: any) {
+      if (errorBox && errorMsg) {
+        errorBox.style.display = 'flex';
+        errorMsg.textContent = err?.message || 'Failed to resolve DNS records for the requested domain.';
+      }
     } finally {
       if (loadingBox) loadingBox.style.display = 'none';
     }
   });
 
+  function renderFilterToolbar(groups: GroupedRecord[], totalCount: number) {
+    if (!filterPillsContainer) return;
+
+    let html = `
+      <button type="button" class="result-filter-btn active" data-tab="all" style="border: 1px solid var(--border); border-radius: 999px; background: var(--card); padding: 6px 12px; color: var(--text); cursor: pointer; font-size: 0.78rem; font-family: var(--font-mono); font-weight: 500; display: inline-flex; align-items: center; gap: 6px;">
+        All Records (${totalCount})
+      </button>
+    `;
+
+    groups.forEach(({ type, answers }) => {
+      html += `
+        <button type="button" class="result-filter-btn" data-tab="${type}" style="border: 1px solid var(--border); border-radius: 999px; background: var(--card); padding: 6px 12px; color: var(--text); cursor: pointer; font-size: 0.78rem; font-family: var(--font-mono); font-weight: 500; display: inline-flex; align-items: center; gap: 6px;">
+          ${type} (${answers.length})
+        </button>
+      `;
+    });
+
+    html += `
+      <button type="button" class="result-filter-btn" data-tab="raw" style="border: 1px solid var(--border); border-radius: 999px; background: var(--card); padding: 6px 12px; color: var(--text); cursor: pointer; font-size: 0.78rem; font-family: var(--font-mono); font-weight: 500; display: inline-flex; align-items: center; gap: 6px;">
+        📜 Raw JSON
+      </button>
+    `;
+
+    filterPillsContainer.innerHTML = html;
+
+    const filterBtns = filterPillsContainer.querySelectorAll('.result-filter-btn');
+    filterBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach((b) => {
+          (b as HTMLElement).style.borderColor = 'var(--border)';
+          (b as HTMLElement).style.background = 'var(--card)';
+          (b as HTMLElement).style.color = 'var(--text)';
+        });
+        (btn as HTMLElement).style.borderColor = 'var(--accent)';
+        (btn as HTMLElement).style.background = 'var(--accent-dim)';
+        (btn as HTMLElement).style.color = 'var(--accent)';
+
+        activeFilterTab = (btn as HTMLElement).dataset.tab || 'all';
+        renderRecordsView(groups);
+      });
+    });
+  }
+
+  function renderRecordsView(groups: GroupedRecord[]) {
+    if (activeFilterTab === 'raw') {
+      if (recordsGrid) recordsGrid.style.display = 'none';
+      if (rawPane) rawPane.style.display = 'flex';
+      return;
+    }
+
+    if (rawPane) rawPane.style.display = 'none';
+    if (recordsGrid) recordsGrid.style.display = 'flex';
+
+    const filteredGroups = activeFilterTab === 'all'
+      ? groups
+      : groups.filter((g) => g.type === activeFilterTab);
+
+    if (!recordsGrid) return;
+
+    if (filteredGroups.length === 0) {
+      recordsGrid.innerHTML = `
+        <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 40px 20px; text-align: center; color: var(--text-muted);">
+          <div style="font-size: 2rem; margin-bottom: 8px;">🔍</div>
+          <div style="font-weight: 600; color: var(--text); margin-bottom: 4px;">No ${activeFilterTab === 'all' ? 'DNS' : activeFilterTab} records found</div>
+          <div style="font-size: 0.85rem;">The authoritative nameservers did not return any records for this query.</div>
+        </div>
+      `;
+      return;
+    }
+
+    recordsGrid.innerHTML = filteredGroups
+      .map(({ type, answers }) => {
+        return `
+        <div class="dns-group-card">
+          <div class="dns-group-head">
+            <div class="dns-group-title-wrap">
+              <span class="dns-type-tag dns-type-tag-${type}">${type}</span>
+              <span class="dns-group-count">${answers.length} record${answers.length === 1 ? '' : 's'}</span>
+            </div>
+            <button type="button" class="dns-copy-entry-btn copy-group-btn" data-type="${type}">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span>Copy ${type}</span>
+            </button>
+          </div>
+
+          <div class="dns-entries-list">
+            ${answers
+              .map(
+                (a) => `
+              <div class="dns-entry-row">
+                <div class="dns-entry-data">${escapeHtml(a.data)}</div>
+                <div class="dns-entry-ttl">TTL: ${formatTtl(a.TTL)}</div>
+                <button type="button" class="dns-copy-entry-btn copy-single-val-btn" data-val="${escapeHtml(a.data)}">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                  <span>Copy</span>
+                </button>
+              </div>
+            `
+              )
+              .join('')}
+          </div>
+        </div>
+      `;
+      })
+      .join('');
+
+    // Attach click listeners to individual copy buttons
+    recordsGrid.querySelectorAll('.copy-single-val-btn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const val = (btn as HTMLElement).dataset.val || '';
+        try {
+          await navigator.clipboard.writeText(val);
+          showToast('Copied record value to clipboard!');
+        } catch {
+          // Fallback
+        }
+      });
+    });
+
+    // Attach click listeners to group copy buttons
+    recordsGrid.querySelectorAll('.copy-group-btn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const type = (btn as HTMLElement).dataset.type;
+        const group = groups.find((g) => g.type === type);
+        if (group) {
+          const text = group.answers.map((a) => `${currentDomain} ${a.TTL} IN ${group.type} ${a.data}`).join('\n');
+          try {
+            await navigator.clipboard.writeText(text);
+            showToast(`Copied ${group.type} records to clipboard!`);
+          } catch {
+            // Fallback
+          }
+        }
+      });
+    });
+  }
+
+  // Copy All Records as zone-like text
+  btnCopyAll?.addEventListener('click', async () => {
+    const lines: string[] = [];
+    latestResponses.forEach(({ type, data }) => {
+      const answers = data?.Answer || [];
+      answers.forEach((a) => {
+        lines.push(`${currentDomain}.\t${a.TTL}\tIN\t${type}\t${a.data}`);
+      });
+    });
+
+    if (lines.length === 0) return;
+    try {
+      await navigator.clipboard.writeText(lines.join('\n'));
+      if (btnCopyAllText) btnCopyAllText.textContent = '✓ Copied!';
+      showToast('All DNS records copied to clipboard!');
+      setTimeout(() => {
+        if (btnCopyAllText) btnCopyAllText.textContent = 'Copy All';
+      }, 2000);
+    } catch {
+      // Fallback
+    }
+  });
+
+  // Copy JSON
+  btnCopyJson?.addEventListener('click', async () => {
+    if (latestResponses.length === 0) return;
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(latestResponses, null, 2));
+      showToast('DNS JSON copied to clipboard!');
+    } catch {
+      // Fallback
+    }
+  });
+
+  // Copy Raw JSON
+  btnCopyRawJson?.addEventListener('click', async () => {
+    if (!rawOutput?.textContent) return;
+    try {
+      await navigator.clipboard.writeText(rawOutput.textContent);
+      if (btnCopyRawText) btnCopyRawText.textContent = '✓ Copied!';
+      showToast('Raw JSON copied to clipboard!');
+      setTimeout(() => {
+        if (btnCopyRawText) btnCopyRawText.textContent = 'Copy JSON';
+      }, 2000);
+    } catch {
+      // Fallback
+    }
+  });
+
+  // Initial trigger
   form?.dispatchEvent(new Event('submit'));
 </script>
