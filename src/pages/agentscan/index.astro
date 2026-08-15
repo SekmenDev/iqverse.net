@@ -3,7 +3,89 @@ import ToolLayout from '@/layouts/ToolLayout.astro';
 import CapCaptcha from '@/components/CapCaptcha.astro';
 import styles from '@/styles/agentscan.module.css';
 
-const QUICK_EXAMPLES = ['https://cloudflare.com', 'https://github.com', 'https://openai.com', 'https://stripe.com', 'https://anthropic.com'];
+const QUICK_EXAMPLES = [
+  'https://cloudflare.com',
+  'https://github.com',
+  'https://openai.com',
+  'https://stripe.com',
+  'https://anthropic.com',
+];
+
+const SIGNALS_GUIDE = [
+  {
+    name: 'llms.txt Standard',
+    weight: '18 pts (High)',
+    desc: 'Curated markdown map at /llms.txt serving structured, LLM-optimized summary of your site.',
+    why: 'Provides instant site overview for AI agents, cutting down crawling overhead and hallucination.',
+  },
+  {
+    name: 'robots.txt AI Bot Rules',
+    weight: '18 pts (High)',
+    desc: 'Explicit permissions and rules for AI crawlers like GPTBot, ClaudeBot, PerplexityBot, and CCBot.',
+    why: 'Controls and optimizes crawler access so search models index your key knowledge without rate limits.',
+  },
+  {
+    name: 'Schema.org JSON-LD',
+    weight: '14 pts (High)',
+    desc: 'Structured JSON-LD schemas describing Organization, WebSite, SoftwareApplication, and FAQs.',
+    why: 'Machine-readable entity graph allows AI engines to identify authority, author, and content semantics.',
+  },
+  {
+    name: 'Sitemap XML',
+    weight: '12 pts (Medium)',
+    desc: 'Reachable sitemap.xml declared at root or referenced in robots.txt.',
+    why: 'Essential for complete URL discovery and fresh content ingestion by automated agents.',
+  },
+  {
+    name: 'Document Title & Meta',
+    weight: '10 pts (Medium)',
+    desc: 'Clean <title> and descriptive <meta name="description"> tags.',
+    why: 'Primary context anchors used by retrieval models to summarize target pages.',
+  },
+  {
+    name: 'llms-full.txt Extended Docs',
+    weight: '8 pts (Medium)',
+    desc: 'Extended full-text documentation companion at /llms-full.txt.',
+    why: 'Allows deep context retrieval for multi-turn reasoning and agentic workflow integrations.',
+  },
+  {
+    name: 'Canonical URL Tag',
+    weight: '8 pts (Medium)',
+    desc: 'Authoritative <link rel="canonical"> pointing to the primary URL.',
+    why: 'Prevents duplicate content confusion when AI systems ingest syndicated or parameterized pages.',
+  },
+  {
+    name: 'Open Graph Metadata',
+    weight: '6 pts (Low)',
+    desc: 'og:title, og:description, og:image social cards.',
+    why: 'Provides rich preview data for AI chat apps and snippet cards.',
+  },
+  {
+    name: 'Indexable Page Directives',
+    weight: '6 pts (Low)',
+    desc: 'Ensures the page has no unintended noindex or nofollow robot tags.',
+    why: 'Guarantees AI bots and search agents can index and cite your pages.',
+  },
+];
+
+const FAQS = [
+  {
+    q: 'What is an AI Agents Scanner and why does it matter?',
+    a: 'Modern search and workflow engines (like Perplexity, ChatGPT Search, Claude, and Gemini) rely on machine-readable discovery standards. An AI Agent Audit checks if your domain provides structured guidance, permissions, and metadata so AI crawlers index, cite, and integrate your service accurately.',
+  },
+  {
+    q: 'What is /llms.txt?',
+    a: 'llms.txt is an open standard proposed by Jeremy Howard and adopted across the AI ecosystem. It is a concise markdown file hosted at the root of a domain that guides Large Language Models to the most relevant information and documentation on your site.',
+  },
+  {
+    q: 'How does the Model Context Protocol (MCP) fit in?',
+    a: 'MCP (Model Context Protocol) is Anthropic’s open standard connecting AI models with local or remote tool servers. Publishing an MCP server card at /.well-known/mcp.json lets autonomous AI agents discover and call your APIs natively.',
+  },
+  {
+    q: 'How is the AI Readiness Score calculated?',
+    a: 'The readiness score is a weighted composite (0-100) based on 9 scored signals, including llms.txt availability (18%), AI crawler rules in robots.txt (18%), Schema.org JSON-LD (14%), sitemap reachable (12%), meta context (10%), llms-full.txt (8%), canonical tags (8%), Open Graph (6%), and indexability (6%). Protocol endpoints like MCP and UCP are audited as informational capabilities.',
+  },
+];
 ---
 
 <ToolLayout
@@ -13,36 +95,50 @@ const QUICK_EXAMPLES = ['https://cloudflare.com', 'https://github.com', 'https:/
   toolSlug="agentscan"
   description="Scan any website for AI agent readiness. Inspect robots.txt, sitemaps, MCP configuration, OpenAPI specs, and metadata for AI crawler optimization."
 >
-  <div class={styles.page}>
-    <!-- Hero / Scanner Header -->
-    <section class={styles.heroSection}>
-      <p class={styles.heroDesc}>
-        Scan any website to discover how well-prepared it is for AI search agents, web crawlers, Model Context Protocol (MCP), and machine-readable discovery.
-      </p>
-
-      <form id="agent-scan-form" class={styles.form}>
-        <div class={styles.inputGroup}>
-          <input
-            id="agent-url-input"
-            type="text"
-            class={styles.urlInput}
-            placeholder="https://example.com"
-            value="https://iqverse.net"
-            required
-          />
+  <div class={styles.agentScanContainer}>
+    <!-- Scanner Card -->
+    <section class={styles.scannerCard}>
+      <form id="agent-scan-form">
+        <div class={styles.inputRow}>
+          <div class={styles.inputWrapper}>
+            <svg
+              class={styles.inputIcon}
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+            <input
+              id="agent-url-input"
+              type="text"
+              class={styles.urlInput}
+              placeholder="https://example.com"
+              value="https://iqverse.net"
+              required
+            />
+          </div>
           <button type="submit" id="btn-run-scan" class={styles.scanButton}>
             Scan Website
           </button>
         </div>
-        <div style="margin-top: 12px;">
+
+        <div style="margin-top: 14px;">
           <CapCaptcha />
         </div>
       </form>
 
-      <div class={styles.samples}>
-        <span>Try an example:</span>
+      <div class={styles.quickExamples}>
+        <span class={styles.examplesLabel}>Try an example:</span>
         {QUICK_EXAMPLES.map((url) => (
-          <button type="button" class="example-btn" data-url={url}>
+          <button type="button" class={`${styles.exampleBtn} example-btn`} data-url={url}>
             {url.replace('https://', '')}
           </button>
         ))}
@@ -50,89 +146,233 @@ const QUICK_EXAMPLES = ['https://cloudflare.com', 'https://github.com', 'https:/
     </section>
 
     <!-- Loading State -->
-    <div id="scan-loading-box" class={styles.loadingBox} style="display: none;">
-      <div class={styles.spinner}></div>
-      <p id="loading-message">Resolving domain and fetching public discovery files…</p>
+    <div id="scan-loading-box" class={styles.statusBar} style="display: none;">
+      <div style="display: inline-flex; align-items: center; justify-content: center; gap: 12px;">
+        <div style="width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+        <span id="loading-message" style="font-size: 0.95rem; font-weight: 500; font-family: var(--font-mono);">
+          Resolving domain and fetching public discovery files…
+        </span>
+      </div>
     </div>
 
     <!-- Scan Results -->
-    <div id="scan-results-area" style="display: none;">
-      <!-- Score Overview Header -->
-      <div class={styles.scoreOverviewCard}>
-        <div class={styles.scoreMain}>
-          <div class={styles.scoreCircle}>
-            <span id="score-number" class={styles.scoreNumber}>0</span>
-            <span class={styles.scoreLabel}>Score</span>
+    <div id="scan-results-area" class={styles.resultsSection} style="display: none;">
+      <!-- Score Overview Card -->
+      <div class={styles.scorePanel}>
+        <div>
+          <div class={styles.scoreLabel}>Audit Target</div>
+          <h2 id="scanned-target-title" style="margin: 6px 0 14px; font-size: 1.4rem; font-weight: 700; word-break: break-all; color: var(--text);">--</h2>
+          <div class={styles.badges}>
+            <span class={`${styles.badge} ${styles.badgePass}`}>
+              <span id="count-passed">0</span> Passed
+            </span>
+            <span class={`${styles.badge} ${styles.badgeWarning}`}>
+              <span id="count-warnings">0</span> Warnings
+            </span>
+            <span class={`${styles.badge} ${styles.badgeFail}`}>
+              <span id="count-failed">0</span> Failed
+            </span>
           </div>
-          <div class={styles.scoreMeta}>
-            <h2 id="scanned-target-title" class={styles.scannedTarget}>--</h2>
-            <div class={styles.summaryBadges}>
-              <span class={`${styles.badge} ${styles.badgePass}`}>
-                <span id="count-passed">0</span> Passed
-              </span>
-              <span class={`${styles.badge} ${styles.badgeWarn}`}>
-                <span id="count-warnings">0</span> Warnings
-              </span>
-              <span class={`${styles.badge} ${styles.badgeFail}`}>
-                <span id="count-failed">0</span> Failed
-              </span>
-            </div>
-          </div>
+        </div>
+
+        <div style="text-align: right; min-width: 140px;">
+          <div class={styles.scoreLabel}>Readiness Score</div>
+          <div id="score-number" class={styles.scoreValue}>0</div>
+          <div id="score-subtitle" class={styles.scoreSubtitle}>AI Ready</div>
         </div>
       </div>
 
       <!-- Filter Tabs -->
-      <div class={styles.filterBar}>
-        <div id="category-filter-buttons" class={styles.catFilters}>
-          <button type="button" class={`${styles.filterBtn} ${styles.filterBtnActive}`} data-cat="all">
-            All Checks
-          </button>
-          <button type="button" class={styles.filterBtn} data-cat="scored">
-            ⭐ Scored Signals
-          </button>
-          <button type="button" class={styles.filterBtn} data-cat="protocol">
-            🔌 Protocol & MCP
-          </button>
-          <button type="button" class={styles.filterBtn} data-cat="content">
-            📄 Content & Schema
-          </button>
-          <button type="button" class={styles.filterBtn} data-cat="commerce">
-            💳 Commerce
-          </button>
-          <button type="button" class={styles.filterBtn} data-cat="performance">
-            ⚡ Security & HTTP
-          </button>
+      <div class={styles.resultsToolbar}>
+        <div class={styles.filterBar}>
+          <span class={styles.filterLabel}>Filter:</span>
+          <div id="category-filter-buttons" class={styles.filterPills}>
+            <button type="button" class={`${styles.filterPill} ${styles.activeFilter}`} data-cat="all">
+              All Checks (<span id="count-cat-all">17</span>)
+            </button>
+            <button type="button" class={styles.filterPill} data-cat="scored">
+              ⭐ Scored Signals (<span id="count-cat-scored">9</span>)
+            </button>
+            <button type="button" class={styles.filterPill} data-cat="protocol">
+              🔌 Protocol & MCP (<span id="count-cat-protocol">4</span>)
+            </button>
+            <button type="button" class={styles.filterPill} data-cat="content">
+              📄 Content & Schema (<span id="count-cat-content">2</span>)
+            </button>
+            <button type="button" class={styles.filterPill} data-cat="commerce">
+              💳 Commerce (<span id="count-cat-commerce">2</span>)
+            </button>
+            <button type="button" class={styles.filterPill} data-cat="performance">
+              ⚡ Security & HTTP (<span id="count-cat-performance">1</span>)
+            </button>
+          </div>
         </div>
       </div>
 
       <!-- Check Results Grid -->
       <div id="checks-grid" class={styles.checksGrid}></div>
     </div>
+
+    <!-- Educational Methodology Section -->
+    <section class={styles.infoSection}>
+      <div class={styles.sectionHeader}>
+        <span class={styles.sectionBadge}>Methodology</span>
+        <h2 class={styles.sectionTitle}>How AI Agent Readiness is Evaluated</h2>
+        <p class={styles.sectionSub}>
+          Autonomous search agents, LLM browser assistants, and web crawlers query a sequence of machine-readable endpoints to safely understand and cite web content.
+        </p>
+      </div>
+
+      <div class={styles.stepsGrid}>
+        <div class={styles.stepCard}>
+          <span class={styles.stepNumber}>Step 01</span>
+          <h3 class={styles.stepTitle}>Discovery Endpoints</h3>
+          <p class={styles.stepText}>
+            AI agents check <code>/llms.txt</code>, <code>/robots.txt</code>, and <code>/sitemap.xml</code> to map available content without parsing megabytes of HTML boilerplate.
+          </p>
+        </div>
+        <div class={styles.stepCard}>
+          <span class={styles.stepNumber}>Step 02</span>
+          <h3 class={styles.stepTitle}>Protocols & MCP</h3>
+          <p class={styles.stepText}>
+            Agents look for Model Context Protocol servers (<code>/.well-known/mcp.json</code>) or OpenAPI catalogs to execute programmatic tool calls and dynamic actions.
+          </p>
+        </div>
+        <div class={styles.stepCard}>
+          <span class={styles.stepNumber}>Step 03</span>
+          <h3 class={styles.stepTitle}>Schema & Semantics</h3>
+          <p class={styles.stepText}>
+            Embedded Schema.org JSON-LD and semantic tags allow neural models to extract structured entities, pricing, authorship, and canonical sources with zero ambiguity.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scoring Table & Bands -->
+    <section class={styles.infoSection}>
+      <div class={styles.sectionHeader}>
+        <span class={styles.sectionBadge}>Weights & Bands</span>
+        <h2 class={styles.sectionTitle}>Signal Weights & Readiness Bands</h2>
+        <p class={styles.sectionSub}>
+          The composite readiness score evaluates 9 core signals totaling 100 points, plus optional protocol checks.
+        </p>
+      </div>
+
+      <div class={styles.bandsGrid}>
+        <div class={`${styles.bandCard} ${styles.bandStrong}`}>
+          <div class={styles.bandHeader}>
+            <span class={styles.bandScore}>80 – 100</span>
+            <span class={styles.bandBadge}>AI Ready</span>
+          </div>
+          <p class={styles.bandReading}>
+            Optimized for AI search engines, crawler discovery, and machine-readable citations.
+          </p>
+        </div>
+        <div class={`${styles.bandCard} ${styles.bandNeedsWork}`}>
+          <div class={styles.bandHeader}>
+            <span class={styles.bandScore}>50 – 79</span>
+            <span class={styles.bandBadge}>Partial</span>
+          </div>
+          <p class={styles.bandReading}>
+            Basic SEO present, but missing dedicated AI artifacts (like /llms.txt or AI bot permissions).
+          </p>
+        </div>
+        <div class={`${styles.bandCard} ${styles.bandAtRisk}`}>
+          <div class={styles.bandHeader}>
+            <span class={styles.bandScore}>0 – 49</span>
+            <span class={styles.bandBadge}>AI Blind Spot</span>
+          </div>
+          <p class={styles.bandReading}>
+            Inaccessible to LLM crawlers, missing structured schema, or blocked by generic directives.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Signal Details Grid -->
+    <section class={styles.infoSection}>
+      <div class={styles.sectionHeader}>
+        <span class={styles.sectionBadge}>Reference</span>
+        <h2 class={styles.sectionTitle}>Key AI Signals Reference</h2>
+      </div>
+
+      <div class={styles.signalCardsGrid}>
+        {SIGNALS_GUIDE.map((sig) => (
+          <div class={styles.signalDetailCard}>
+            <div class={styles.signalHeader}>
+              <h3 class={styles.signalName}>{sig.name}</h3>
+              <span class={styles.signalWeightBadge}>{sig.weight}</span>
+            </div>
+            <p class={styles.signalBlock}>{sig.desc}</p>
+            <p class={styles.signalBlock} style="margin-top: 4px;">
+              <strong>Why it matters:</strong> {sig.why}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class={styles.infoSection}>
+      <div class={styles.sectionHeader}>
+        <span class={styles.sectionBadge}>FAQ</span>
+        <h2 class={styles.sectionTitle}>Frequently Asked Questions</h2>
+      </div>
+
+      <div class={styles.faqList}>
+        {FAQS.map((faq) => (
+          <details class={styles.faqCard}>
+            <summary class={styles.faqQuestionRow} style="list-style: none; cursor: pointer;">
+              <h3 class={styles.faqQuestion}>{faq.q}</h3>
+              <span class={styles.faqIcon}>+</span>
+            </summary>
+            <p class={styles.faqAnswer}>{faq.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
   </div>
 </ToolLayout>
 
 <script>
-  const CHECK_DEFS = [
-    { id: 'llms_txt', name: 'llms.txt', category: 'scored', desc: 'A markdown file at /llms.txt that gives AI systems a curated map of your site.', weight: 18 },
-    { id: 'robots_ai_bots', name: 'robots.txt AI bots', category: 'scored', desc: 'Rules in /robots.txt applying to AI crawlers (GPTBot, ClaudeBot, PerplexityBot, etc.).', weight: 18 },
-    { id: 'structured_data', name: 'Schema.org JSON-LD', category: 'scored', desc: 'Structured data embedded in the page describing organization, website and entities.', weight: 14 },
-    { id: 'sitemap', name: 'Sitemap', category: 'scored', desc: 'A valid, reachable sitemap.xml — either at root or declared in robots.txt.', weight: 12 },
-    { id: 'title_meta', name: 'Title & meta description', category: 'scored', desc: 'Document title and meta description of the page being scanned.', weight: 10 },
-    { id: 'llms_full_txt', name: 'llms-full.txt', category: 'scored', desc: 'An optional companion to llms.txt carrying extended context and deeper detail.', weight: 8 },
-    { id: 'canonical_url', name: 'Canonical URL', category: 'scored', desc: 'A link rel="canonical" declaring the authoritative URL for the page.', weight: 8 },
-    { id: 'open_graph', name: 'Open Graph', category: 'scored', desc: 'og:title, og:url, og:image metadata for social and AI snippet rendering.', weight: 6 },
-    { id: 'indexable_page', name: 'Indexable page', category: 'scored', desc: 'Verifies the page does not carry an unintended noindex directive.', weight: 6 },
+  interface CheckDef {
+    id: string;
+    name: string;
+    category: 'scored' | 'protocol' | 'content' | 'commerce' | 'performance';
+    desc: string;
+    weight: number;
+    rec: string;
+  }
+
+  interface ScanResult {
+    id: string;
+    status: 'pass' | 'warn' | 'fail' | 'info';
+    detail: string;
+  }
+
+  const CHECK_DEFS: CheckDef[] = [
+    { id: 'llms_txt', name: 'llms.txt Standard', category: 'scored', desc: 'A markdown file at /llms.txt that gives AI systems a curated map of your site.', weight: 18, rec: 'Create an /llms.txt file at your website root with links to high-value markdown documentation.' },
+    { id: 'robots_ai_bots', name: 'robots.txt AI Crawlers', category: 'scored', desc: 'Rules in /robots.txt applying to AI crawlers (GPTBot, ClaudeBot, PerplexityBot, etc.).', weight: 18, rec: 'Add explicit crawler directives for GPTBot, ClaudeBot, and PerplexityBot in robots.txt.' },
+    { id: 'structured_data', name: 'Schema.org JSON-LD', category: 'scored', desc: 'Structured data embedded in the page describing organization, website, and entities.', weight: 14, rec: 'Embed JSON-LD schemas like WebSite, Organization, or Article to disambiguate content.' },
+    { id: 'sitemap', name: 'Sitemap XML', category: 'scored', desc: 'A reachable sitemap.xml — either at root or declared in robots.txt.', weight: 12, rec: 'Publish a sitemap.xml and declare Sitemap: https://yourdomain.com/sitemap.xml in robots.txt.' },
+    { id: 'title_meta', name: 'Title & Meta Description', category: 'scored', desc: 'Document title and meta description of the page being scanned.', weight: 10, rec: 'Ensure unique <title> and descriptive <meta name="description"> tags are present on every page.' },
+    { id: 'llms_full_txt', name: 'llms-full.txt Extended Docs', category: 'scored', desc: 'An optional companion to llms.txt carrying extended context and deeper detail.', weight: 8, rec: 'Provide a concatenated /llms-full.txt file for full LLM ingestion without multi-hop requests.' },
+    { id: 'canonical_url', name: 'Canonical URL Tag', category: 'scored', desc: 'A link rel="canonical" declaring the authoritative URL for the page.', weight: 8, rec: 'Include a <link rel="canonical"> tag to prevent duplicate content indexing.' },
+    { id: 'open_graph', name: 'Open Graph Metadata', category: 'scored', desc: 'og:title, og:url, og:image metadata for social and AI snippet rendering.', weight: 6, rec: 'Add Open Graph tags so AI previews and social embeds display proper rich cards.' },
+    { id: 'indexable_page', name: 'Indexable Page Directives', category: 'scored', desc: 'Verifies the page does not carry an unintended noindex directive.', weight: 6, rec: 'Ensure public pages do not contain <meta name="robots" content="noindex"> tags.' },
 
     // Protocol & Informational
-    { id: 'mcp_server_card', name: 'MCP Server Card', category: 'protocol', desc: 'Model Context Protocol server at /.well-known/mcp.json.', weight: 0 },
-    { id: 'a2a_agent_card', name: 'A2A Agent Card', category: 'protocol', desc: 'Agent-to-Agent card at /.well-known/agent.json.', weight: 0 },
-    { id: 'oauth_discovery', name: 'OAuth Discovery', category: 'protocol', desc: 'OAuth 2.0 server metadata at /.well-known/oauth-authorization-server.', weight: 0 },
-    { id: 'api_catalog', name: 'API Catalog / OpenAPI', category: 'protocol', desc: 'OpenAPI spec at /openapi.json, /swagger.json or /api-docs.', weight: 0 },
-    { id: 'markdown_negotiation', name: 'Markdown Negotiation', category: 'content', desc: 'Content negotiation support for text/markdown via Accept headers.', weight: 0 },
-    { id: 'x402', name: 'x402 Payment Protocol', category: 'commerce', desc: 'HTTP 402 responses or x402 headers enabling AI agent micropayments.', weight: 0 },
-    { id: 'ucp', name: 'Universal Commerce Protocol (UCP)', category: 'commerce', desc: 'UCP discovery at /.well-known/ucp.json.', weight: 0 },
-    { id: 'https', name: 'HTTPS', category: 'performance', desc: 'Confirms the site is served over secure HTTPS.', weight: 0 },
+    { id: 'mcp_server_card', name: 'MCP Server Card', category: 'protocol', desc: 'Model Context Protocol server configuration at /.well-known/mcp.json.', weight: 0, rec: 'Deploy an MCP server at /.well-known/mcp.json to allow autonomous tools integration.' },
+    { id: 'a2a_agent_card', name: 'A2A Agent Card', category: 'protocol', desc: 'Agent-to-Agent discovery manifest at /.well-known/agent.json.', weight: 0, rec: 'Publish /.well-known/agent.json to expose agent communication capabilities.' },
+    { id: 'oauth_discovery', name: 'OAuth Discovery', category: 'protocol', desc: 'OAuth 2.0 authorization server metadata at /.well-known/oauth-authorization-server.', weight: 0, rec: 'Expose standard OAuth 2.0 authorization metadata if APIs require authenticated agent tokens.' },
+    { id: 'api_catalog', name: 'OpenAPI Catalog', category: 'protocol', desc: 'OpenAPI / Swagger spec at /openapi.json, /swagger.json, or /api-docs.', weight: 0, rec: 'Host an OpenAPI specification at /openapi.json for automated tool calling.' },
+    { id: 'markdown_negotiation', name: 'Markdown Content Negotiation', category: 'content', desc: 'Content negotiation support for text/markdown via HTTP Accept headers.', weight: 0, rec: 'Support Accept: text/markdown header for direct LLM markdown responses.' },
+    { id: 'x402', name: 'x402 Micropayments Protocol', category: 'commerce', desc: 'HTTP 402 responses or x402 headers enabling AI agent micropayments.', weight: 0, rec: 'Implement HTTP 402 or x402 headers for pay-per-query agent APIs.' },
+    { id: 'ucp', name: 'Universal Commerce Protocol (UCP)', category: 'commerce', desc: 'UCP commerce discovery card at /.well-known/ucp.json.', weight: 0, rec: 'Publish /.well-known/ucp.json for automated commerce and purchasing discovery.' },
+    { id: 'https', name: 'Secure HTTPS', category: 'performance', desc: 'Confirms the website is served over secure, encrypted HTTPS.', weight: 0, rec: 'Enforce HTTPS for all web crawler and API traffic.' },
   ];
+
+  import { validateCaptcha, getCaptchaToken } from '@/lib/captcha';
 
   const form = document.getElementById('agent-scan-form') as HTMLFormElement;
   const urlInput = document.getElementById('agent-url-input') as HTMLInputElement;
@@ -140,6 +380,7 @@ const QUICK_EXAMPLES = ['https://cloudflare.com', 'https://github.com', 'https:/
   const loadingBox = document.getElementById('scan-loading-box');
   const resultsArea = document.getElementById('scan-results-area');
   const scoreNum = document.getElementById('score-number');
+  const scoreSubtitle = document.getElementById('score-subtitle');
   const targetTitle = document.getElementById('scanned-target-title');
   const countPassed = document.getElementById('count-passed');
   const countWarnings = document.getElementById('count-warnings');
@@ -148,21 +389,28 @@ const QUICK_EXAMPLES = ['https://cloudflare.com', 'https://github.com', 'https:/
   const catFilterBtns = document.querySelectorAll('#category-filter-buttons button');
 
   let currentCategory = 'all';
-  let allScanResults: any[] = [];
+  let allScanResults: ScanResult[] = [];
 
   exampleBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
       if (urlInput) {
         urlInput.value = (btn as HTMLElement).dataset.url || '';
-        form?.dispatchEvent(new Event('submit'));
+        const { valid } = validateCaptcha(form);
+        if (valid) {
+          form?.dispatchEvent(new Event('submit'));
+        }
       }
     });
   });
 
   catFilterBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
-      catFilterBtns.forEach((b) => b.classList.remove('styles_filterBtnActive', 'active'));
-      btn.classList.add('styles_filterBtnActive', 'active');
+      catFilterBtns.forEach((b) => {
+        b.classList.remove('active');
+        b.removeAttribute('data-active');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('data-active', 'true');
       currentCategory = (btn as HTMLElement).dataset.cat || 'all';
       renderChecks();
     });
@@ -170,7 +418,9 @@ const QUICK_EXAMPLES = ['https://cloudflare.com', 'https://github.com', 'https:/
 
   async function proxyFetch(targetUrl: string) {
     try {
-      const res = await fetch(`/api/check-url?url=${encodeURIComponent(targetUrl)}`);
+      const token = getCaptchaToken(form);
+      const tokenParam = token ? `&token=${encodeURIComponent(token)}` : '';
+      const res = await fetch(`/api/check-url?url=${encodeURIComponent(targetUrl)}${tokenParam}`);
       const json = await res.json();
       return {
         ok: json.status >= 200 && json.status < 400,
@@ -188,8 +438,16 @@ const QUICK_EXAMPLES = ['https://cloudflare.com', 'https://github.com', 'https:/
     const raw = urlInput?.value.trim();
     if (!raw) return;
 
+    const { valid } = validateCaptcha(form);
+    if (!valid) return;
+
     const normalized = raw.startsWith('http://') || raw.startsWith('https://') ? raw : `https://${raw}`;
-    const origin = new URL(normalized).origin;
+    let origin = '';
+    try {
+      origin = new URL(normalized).origin;
+    } catch {
+      origin = normalized;
+    }
 
     if (loadingBox) loadingBox.style.display = 'block';
     if (resultsArea) resultsArea.style.display = 'none';
@@ -210,7 +468,7 @@ const QUICK_EXAMPLES = ['https://cloudflare.com', 'https://github.com', 'https:/
       const html = homeRes.body || '';
 
       const hasLlms = llmsRes.ok && llmsRes.body.trim().length > 10;
-      const hasRobotsAi = /gptbot|claudebot|perplexitybot|ccbot/i.test(robots);
+      const hasRobotsAi = /gptbot|claudebot|perplexitybot|ccbot|applebot-extended/i.test(robots);
       const hasSchema = /application\/ld\+json/i.test(html);
       const hasSitemap = sitemapRes.ok || /sitemap:\s*http/i.test(robots);
       const hasTitle = /<title[^>]*>(.*?)<\/title>/i.test(html);
@@ -225,23 +483,23 @@ const QUICK_EXAMPLES = ['https://cloudflare.com', 'https://github.com', 'https:/
       const isHttps = origin.startsWith('https://');
 
       allScanResults = [
-        { id: 'llms_txt', status: hasLlms ? 'pass' : 'fail', detail: hasLlms ? '/llms.txt found and valid.' : 'Missing /llms.txt' },
-        { id: 'robots_ai_bots', status: hasRobotsAi ? 'pass' : 'warn', detail: hasRobotsAi ? 'AI agent rules declared in robots.txt.' : 'No AI bot rules found in robots.txt.' },
-        { id: 'structured_data', status: hasSchema ? 'pass' : 'warn', detail: hasSchema ? 'Schema.org JSON-LD found on page.' : 'No JSON-LD structured data detected.' },
-        { id: 'sitemap', status: hasSitemap ? 'pass' : 'fail', detail: hasSitemap ? 'Valid sitemap.xml reachable.' : 'No sitemap discovered.' },
+        { id: 'llms_txt', status: hasLlms ? 'pass' : 'fail', detail: hasLlms ? '/llms.txt found and verified.' : 'Missing /llms.txt' },
+        { id: 'robots_ai_bots', status: hasRobotsAi ? 'pass' : 'warn', detail: hasRobotsAi ? 'AI agent directives declared in robots.txt.' : 'No explicit AI crawler rules in robots.txt.' },
+        { id: 'structured_data', status: hasSchema ? 'pass' : 'warn', detail: hasSchema ? 'Schema.org JSON-LD structured data detected.' : 'No JSON-LD structured data detected.' },
+        { id: 'sitemap', status: hasSitemap ? 'pass' : 'fail', detail: hasSitemap ? 'Valid sitemap reachable.' : 'No sitemap discovered.' },
         { id: 'title_meta', status: hasTitle && hasMetaDesc ? 'pass' : 'warn', detail: 'Title and meta description tags verified.' },
         { id: 'llms_full_txt', status: llmsFullRes.ok ? 'pass' : 'info', detail: llmsFullRes.ok ? '/llms-full.txt available.' : 'Optional /llms-full.txt not published.' },
-        { id: 'canonical_url', status: hasCanonical ? 'pass' : 'warn', detail: hasCanonical ? 'Canonical tag present.' : 'Missing canonical link.' },
-        { id: 'open_graph', status: hasOg ? 'pass' : 'warn', detail: hasOg ? 'Open Graph tags present.' : 'No Open Graph metadata.' },
-        { id: 'indexable_page', status: isIndexable ? 'pass' : 'fail', detail: isIndexable ? 'Page is indexable.' : 'noindex tag detected.' },
+        { id: 'canonical_url', status: hasCanonical ? 'pass' : 'warn', detail: hasCanonical ? 'Canonical URL tag present.' : 'Missing canonical link.' },
+        { id: 'open_graph', status: hasOg ? 'pass' : 'warn', detail: hasOg ? 'Open Graph preview tags present.' : 'No Open Graph metadata found.' },
+        { id: 'indexable_page', status: isIndexable ? 'pass' : 'fail', detail: isIndexable ? 'Page is indexable by crawlers.' : 'noindex tag detected.' },
         { id: 'mcp_server_card', status: hasMcp ? 'pass' : 'info', detail: hasMcp ? 'MCP server card discovered.' : 'No MCP endpoint at /.well-known/mcp.json.' },
         { id: 'a2a_agent_card', status: 'info', detail: 'Agent-to-Agent discovery (Optional).' },
-        { id: 'oauth_discovery', status: 'info', detail: 'OAuth metadata check.' },
+        { id: 'oauth_discovery', status: 'info', detail: 'OAuth 2.0 authorization server check.' },
         { id: 'api_catalog', status: 'info', detail: 'OpenAPI catalog check.' },
-        { id: 'markdown_negotiation', status: 'info', detail: 'Markdown Accept header check.' },
-        { id: 'x402', status: hasX402 ? 'pass' : 'info', detail: hasX402 ? 'x402 enabled.' : 'No x402 payment headers.' },
-        { id: 'ucp', status: hasUcp ? 'pass' : 'info', detail: hasUcp ? 'UCP discovery card active.' : 'No UCP endpoint found.' },
-        { id: 'https', status: isHttps ? 'pass' : 'fail', detail: isHttps ? 'Served over HTTPS.' : 'Insecure HTTP.' },
+        { id: 'markdown_negotiation', status: 'info', detail: 'Accept: text/markdown negotiation check.' },
+        { id: 'x402', status: hasX402 ? 'pass' : 'info', detail: hasX402 ? 'x402 micropayments protocol active.' : 'No x402 payment headers detected.' },
+        { id: 'ucp', status: hasUcp ? 'pass' : 'info', detail: hasUcp ? 'UCP discovery card active.' : 'No UCP endpoint at /.well-known/ucp.json.' },
+        { id: 'https', status: isHttps ? 'pass' : 'fail', detail: isHttps ? 'Served over secure HTTPS.' : 'Insecure plain HTTP.' },
       ];
 
       // Calculate Score
@@ -271,7 +529,10 @@ const QUICK_EXAMPLES = ['https://cloudflare.com', 'https://github.com', 'https:/
       if (targetTitle) targetTitle.textContent = origin;
       if (scoreNum) {
         scoreNum.textContent = String(score);
-        scoreNum.style.color = score >= 80 ? '#4caf50' : score >= 50 ? '#faad14' : '#ff4d4f';
+        scoreNum.style.color = score >= 80 ? 'var(--green)' : score >= 50 ? 'var(--yellow)' : 'var(--red)';
+      }
+      if (scoreSubtitle) {
+        scoreSubtitle.textContent = score >= 80 ? 'AI Ready' : score >= 50 ? 'Partial Optimization' : 'AI Blind Spot';
       }
       if (countPassed) countPassed.textContent = String(pCount);
       if (countWarnings) countWarnings.textContent = String(wCount);
@@ -297,30 +558,59 @@ const QUICK_EXAMPLES = ['https://cloudflare.com', 'https://github.com', 'https:/
     checksGrid.innerHTML = filtered
       .map((r) => {
         const def = CHECK_DEFS.find((d) => d.id === r.id);
-        return `
-        <div style="padding: 16px; border-radius: 8px; background: var(--card); border: 1px solid var(--border); margin-bottom: 12px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <strong style="font-size: 1.05rem;">${def?.name || r.id}</strong>
-            <span style="padding: 2px 10px; border-radius: 12px; font-weight: bold; font-size: 0.75rem; text-transform: uppercase; background: ${
-              r.status === 'pass'
-                ? 'rgba(76, 175, 80, 0.2)'
-                : r.status === 'warn'
-                ? 'rgba(250, 173, 20, 0.2)'
-                : r.status === 'fail'
-                ? 'rgba(255, 77, 79, 0.2)'
-                : 'rgba(33, 150, 243, 0.2)'
-            }; color: ${
+        const statusClass =
           r.status === 'pass'
-            ? '#4caf50'
+            ? 'agent-check-card-pass'
             : r.status === 'warn'
-            ? '#faad14'
+            ? 'agent-check-card-warn'
             : r.status === 'fail'
-            ? '#ff4d4f'
-            : '#2196f3'
-        };">${r.status}</span>
+            ? 'agent-check-card-fail'
+            : 'agent-check-card-info';
+
+        const statusPillClass =
+          r.status === 'pass'
+            ? 'agent-status-pill-pass'
+            : r.status === 'warn'
+            ? 'agent-status-pill-warn'
+            : r.status === 'fail'
+            ? 'agent-status-pill-fail'
+            : 'agent-status-pill-info';
+
+        const statusIcon =
+          r.status === 'pass'
+            ? '✓'
+            : r.status === 'warn'
+            ? '⚠️'
+            : r.status === 'fail'
+            ? '✕'
+            : 'ℹ';
+
+        const weightText = def && def.weight > 0 ? `+${def.weight} pts` : 'Info';
+
+        return `
+        <div class="agent-check-card ${statusClass}">
+          <div class="agent-check-head">
+            <div class="agent-check-title-wrap">
+              <h3 class="agent-check-name">${def?.name || r.id}</h3>
+            </div>
+            <div class="agent-check-meta-badges">
+              <span class="agent-weight-pill">${weightText}</span>
+              <span class="agent-status-pill ${statusPillClass}">${r.status}</span>
+            </div>
           </div>
-          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">${def?.desc || ''}</p>
-          <div style="font-size: 0.85rem;"><strong>Result:</strong> ${r.detail}</div>
+          <p class="agent-check-desc">${def?.desc || ''}</p>
+          <div class="agent-check-result-box">
+            <span>${statusIcon}</span>
+            <span><strong>Result:</strong> ${r.detail}</span>
+          </div>
+          ${
+            r.status !== 'pass' && def?.rec
+              ? `<div class="agent-rec-box">
+                  <span class="agent-rec-highlight">💡 Recommendation:</span>
+                  <span>${def.rec}</span>
+                </div>`
+              : ''
+          }
         </div>
       `;
       })

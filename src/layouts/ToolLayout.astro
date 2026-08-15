@@ -1,6 +1,7 @@
 ---
 import Layout from '@/layouts/Layout.astro';
 import ThemeToggle from '@/components/ThemeToggle.astro';
+import ToolNavSearch from '@/components/ToolNavSearch.astro';
 import { getToolJsonLd } from '@/lib/jsonld';
 import { tools } from '@/lib/tools';
 import styles from '@/styles/tool-layout.module.css';
@@ -47,6 +48,8 @@ const pageTitle = subtitle ? `${title} • ${subtitle} | IQVerse` : `${title} | 
         <span class={styles.sep}>/</span>
         <span class={styles.current}>{title}</span>
       </div>
+
+      <ToolNavSearch />
 
       <div class={styles.navRight}>
         <a href="/">Home</a>

@@ -82,10 +82,17 @@ const pageTitle = `${brand} | ${heroTitle} ${heroAccent} | IQVerse`;
 >
   <div class={styles.page}>
     <nav class={styles.nav}>
-      <a class={styles.brand} href="#top">
-        <ThemeToggle />
-        <span>{brand}</span>
-      </a>
+      <div class={styles.navLeft}>
+        <a class={styles.navLogo} href="/">
+          <ThemeToggle />
+          <span>IQVerse</span>
+        </a>
+        <div class={styles.navBreadcrumb}>
+          <span>SaaS</span>
+          <span class={styles.sep}>/</span>
+          <span class={styles.current}>{brand}</span>
+        </div>
+      </div>
       <div class={styles.navLinks}>
         <a href="#features">Features</a>
         <a href="#solution">Benefits</a>
