@@ -48,34 +48,55 @@ const HTTP_STATUS_CODES = [
   <div style="max-width: 1050px;">
     <section class={sharedStyles.section}>
       <div class={sharedStyles.card}>
-        <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
-          <div class={sharedStyles.field} style="margin: 0; flex: 1; min-width: 260px;">
-            <label class={sharedStyles.fieldLabel} for="httpSearch">
-              Search Status Codes, Phrases or Keywords
-            </label>
+        <div class="tool-filter-bar" style="margin-top: 0;">
+          <div class="tool-filter-group" id="http-filter-pills">
+            <button type="button" class="filter-pill active http-cat-btn" data-cat="all">
+              All <span class="filter-badge" id="http-count-all">24</span>
+            </button>
+            <button type="button" class="filter-pill http-cat-btn" data-cat="1xx">
+              1xx Info <span class="filter-badge" id="http-count-1xx">3</span>
+            </button>
+            <button type="button" class="filter-pill http-cat-btn" data-cat="2xx">
+              2xx Success <span class="filter-badge" id="http-count-2xx">4</span>
+            </button>
+            <button type="button" class="filter-pill http-cat-btn" data-cat="3xx">
+              3xx Redirect <span class="filter-badge" id="http-count-3xx">5</span>
+            </button>
+            <button type="button" class="filter-pill http-cat-btn" data-cat="4xx">
+              4xx Client Error <span class="filter-badge" id="http-count-4xx">8</span>
+            </button>
+            <button type="button" class="filter-pill filter-pill-danger http-cat-btn" data-cat="5xx">
+              5xx Server Error <span class="filter-badge" id="http-count-5xx">4</span>
+            </button>
+          </div>
+
+          <div class="search-input-wrap">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
             <input
               id="httpSearch"
               type="text"
-              class={sharedStyles.input}
-              placeholder="e.g. 404 or Unauthorized or Redirect..."
+              class="tool-search-input"
+              placeholder="Search status code (e.g. 404, 200, gateway)..."
             />
-          </div>
-
-          <div style="display: flex; gap: 8px; margin-top: 22px; flex-wrap: wrap;">
-            {(['all', '1xx', '2xx', '3xx', '4xx', '5xx'] as const).map((cat) => (
-              <button
-                type="button"
-                class={`http-cat-btn ${sharedStyles.button} ${cat === 'all' ? sharedStyles.buttonPrimary : ''}`}
-                data-cat={cat}
-                style="text-transform: uppercase;"
-              >
-                {cat}
-              </button>
-            ))}
+            <button type="button" id="btn-clear-http-search" class="search-clear-btn" title="Clear search">✕</button>
           </div>
         </div>
 
-        <div id="http-codes-list" style="display: flex; flexDirection: column; gap: 12px;"></div>
+        <div class="table-results-counter">
+          <span>Showing <strong id="http-visible-count">24</strong> of <span>24</span> HTTP status codes</span>
+        </div>
+
+        <div id="http-codes-list" style="display: flex; flex-direction: column; gap: 12px;"></div>
+
+        <div id="http-empty-state" class="tool-empty-state" style="display: none;">
+          <div class="tool-empty-state-icon">🔍</div>
+          <div class="tool-empty-state-title">No matching status codes</div>
+          <div class="tool-empty-state-text">No HTTP status codes match your current search query or category filter.</div>
+          <button type="button" id="btn-reset-http-filters" class="tool-empty-state-btn">Reset Filters</button>
+        </div>
       </div>
     </section>
   </div>
@@ -83,18 +104,49 @@ const HTTP_STATUS_CODES = [
 
 <script is:inline define:vars={{ HTTP_STATUS_CODES }}>
   const searchInput = document.getElementById('httpSearch');
+  const btnClearSearch = document.getElementById('btn-clear-http-search');
+  const btnResetFilters = document.getElementById('btn-reset-http-filters');
   const catBtns = document.querySelectorAll('.http-cat-btn');
   const listContainer = document.getElementById('http-codes-list');
+  const emptyState = document.getElementById('http-empty-state');
+  const visibleCountEl = document.getElementById('http-visible-count');
 
   let activeCat = 'all';
 
   catBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
-      catBtns.forEach((b) => b.classList.remove('sharedStyles_buttonPrimary', 'button-primary'));
-      btn.classList.add('sharedStyles_buttonPrimary', 'button-primary');
+      catBtns.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
       activeCat = btn.dataset.cat || 'all';
       render();
     });
+  });
+
+  searchInput?.addEventListener('input', () => {
+    if (btnClearSearch) btnClearSearch.style.display = searchInput.value ? 'inline-block' : 'none';
+    render();
+  });
+
+  btnClearSearch?.addEventListener('click', () => {
+    if (searchInput) {
+      searchInput.value = '';
+      btnClearSearch.style.display = 'none';
+      render();
+      searchInput.focus();
+    }
+  });
+
+  btnResetFilters?.addEventListener('click', () => {
+    activeCat = 'all';
+    catBtns.forEach((b) => {
+      if (b.dataset.cat === 'all') b.classList.add('active');
+      else b.classList.remove('active');
+    });
+    if (searchInput) {
+      searchInput.value = '';
+      if (btnClearSearch) btnClearSearch.style.display = 'none';
+    }
+    render();
   });
 
   function render() {
@@ -112,36 +164,41 @@ const HTTP_STATUS_CODES = [
       return matchCat && matchQuery;
     });
 
+    if (visibleCountEl) visibleCountEl.textContent = String(filtered.length);
+
     if (filtered.length === 0) {
-      listContainer.innerHTML = '<div style="text-align: center; padding: 32px; opacity: 0.6;">No HTTP status codes match your search filter.</div>';
+      listContainer.innerHTML = '';
+      if (emptyState) emptyState.style.display = 'flex';
       return;
     }
+
+    if (emptyState) emptyState.style.display = 'none';
 
     listContainer.innerHTML = filtered
       .map((item) => {
         const catColor =
           item.category === '2xx'
-            ? '#4caf50'
+            ? 'var(--green)'
             : item.category === '3xx'
-            ? '#2196f3'
+            ? 'var(--accent)'
             : item.category === '4xx'
-            ? '#faad14'
+            ? 'var(--yellow)'
             : item.category === '5xx'
-            ? '#ff4d4f'
-            : '#9c27b0';
+            ? 'var(--red)'
+            : 'var(--accent)';
 
         return `
         <div
           style="padding: 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-left: 4px solid ${catColor};"
         >
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 8px;">
             <div style="display: flex; align-items: center; gap: 12px;">
-              <span style="font-size: 1.4rem; font-weight: bold; font-family: monospace; color: ${catColor};">
+              <span style="font-size: 1.4rem; font-weight: bold; font-family: var(--font-mono); color: ${catColor};">
                 ${item.code}
               </span>
               <span style="font-size: 1.1rem; font-weight: bold;">${item.phrase}</span>
             </div>
-            <span style="font-size: 0.75rem; opacity: 0.6; font-family: monospace;">${item.spec}</span>
+            <span style="font-size: 0.75rem; opacity: 0.6; font-family: var(--font-mono);">${item.spec}</span>
           </div>
 
           <div style="font-size: 0.95rem; margin-bottom: 6px; font-weight: 500;">${item.summary}</div>
@@ -152,6 +209,5 @@ const HTTP_STATUS_CODES = [
       .join('');
   }
 
-  searchInput?.addEventListener('input', render);
   render();
 </script>

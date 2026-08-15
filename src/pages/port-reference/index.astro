@@ -32,33 +32,55 @@ const COMMON_PORTS = [
   <div style="max-width: 1100px;">
     <section class={sharedStyles.section}>
       <div class={sharedStyles.card}>
-        <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
-          <div class={sharedStyles.field} style="flex: 1; min-width: 260px; margin: 0;">
-            <label class={sharedStyles.fieldLabel} for="portSearch">
-              Search Port Number or Service Name
-            </label>
+        <div class="tool-filter-bar" style="margin-top: 0;">
+          <div class="tool-filter-group" id="port-filter-pills">
+            <button type="button" class="filter-pill active port-cat-btn" data-cat="All">
+              All Ports <span class="filter-badge">17</span>
+            </button>
+            <button type="button" class="filter-pill port-cat-btn" data-cat="Web">
+              Web <span class="filter-badge">3</span>
+            </button>
+            <button type="button" class="filter-pill port-cat-btn" data-cat="Database">
+              Database <span class="filter-badge">4</span>
+            </button>
+            <button type="button" class="filter-pill port-cat-btn" data-cat="Remote Access">
+              Remote Access <span class="filter-badge">3</span>
+            </button>
+            <button type="button" class="filter-pill port-cat-btn" data-cat="Email">
+              Email <span class="filter-badge">4</span>
+            </button>
+            <button type="button" class="filter-pill port-cat-btn" data-cat="Infrastructure">
+              Infrastructure <span class="filter-badge">3</span>
+            </button>
+          </div>
+
+          <div class="search-input-wrap">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
             <input
               id="portSearch"
               type="text"
-              class={sharedStyles.input}
-              placeholder="e.g., 3306, SSH, MySQL, HTTPS..."
+              class="tool-search-input"
+              placeholder="Search port number (e.g. 3306, SSH, MySQL, HTTPS)..."
             />
-          </div>
-
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <label for="catFilter" style="font-size: 0.85rem; font-weight: 600;">Category:</label>
-            <select id="catFilter" class={sharedStyles.input} style="padding: 4px 8px;">
-              <option value="All">All Categories</option>
-              <option value="Web">Web</option>
-              <option value="Database">Database</option>
-              <option value="Remote Access">Remote Access</option>
-              <option value="Email">Email</option>
-              <option value="Infrastructure">Infrastructure</option>
-            </select>
+            <button type="button" id="btn-clear-port-search" class="search-clear-btn" title="Clear search">✕</button>
           </div>
         </div>
 
+        <div class="table-results-counter">
+          <span>Showing <strong id="port-visible-count">17</strong> of <span>17</span> network ports</span>
+        </div>
+
         <div id="ports-list" style="display: flex; flex-direction: column; gap: 12px;"></div>
+
+        <div id="port-empty-state" class="tool-empty-state" style="display: none;">
+          <div class="tool-empty-state-icon">🔍</div>
+          <div class="tool-empty-state-title">No matching ports</div>
+          <div class="tool-empty-state-text">No network ports match your search query or category filter.</div>
+          <button type="button" id="btn-reset-port-filters" class="tool-empty-state-btn">Reset Filters</button>
+        </div>
       </div>
     </section>
   </div>
@@ -66,13 +88,54 @@ const COMMON_PORTS = [
 
 <script is:inline define:vars={{ COMMON_PORTS }}>
   const searchInput = document.getElementById('portSearch');
-  const catSelect = document.getElementById('catFilter');
+  const btnClearSearch = document.getElementById('btn-clear-port-search');
+  const btnResetFilters = document.getElementById('btn-reset-port-filters');
+  const catBtns = document.querySelectorAll('.port-cat-btn');
   const list = document.getElementById('ports-list');
+  const emptyState = document.getElementById('port-empty-state');
+  const visibleCountEl = document.getElementById('port-visible-count');
+
+  let activeCat = 'All';
+
+  catBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      catBtns.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeCat = btn.dataset.cat || 'All';
+      render();
+    });
+  });
+
+  searchInput?.addEventListener('input', () => {
+    if (btnClearSearch) btnClearSearch.style.display = searchInput.value ? 'inline-block' : 'none';
+    render();
+  });
+
+  btnClearSearch?.addEventListener('click', () => {
+    if (searchInput) {
+      searchInput.value = '';
+      btnClearSearch.style.display = 'none';
+      render();
+      searchInput.focus();
+    }
+  });
+
+  btnResetFilters?.addEventListener('click', () => {
+    activeCat = 'All';
+    catBtns.forEach((b) => {
+      if (b.dataset.cat === 'All') b.classList.add('active');
+      else b.classList.remove('active');
+    });
+    if (searchInput) {
+      searchInput.value = '';
+      if (btnClearSearch) btnClearSearch.style.display = 'none';
+    }
+    render();
+  });
 
   function render() {
     if (!list) return;
     const query = (searchInput?.value || '').toLowerCase().trim();
-    const cat = catSelect?.value || 'All';
 
     const filtered = COMMON_PORTS.filter((entry) => {
       const matchesSearch =
@@ -80,14 +143,19 @@ const COMMON_PORTS = [
         entry.name.toLowerCase().includes(query) ||
         entry.desc.toLowerCase().includes(query);
 
-      const matchesCat = cat === 'All' || entry.category === cat;
+      const matchesCat = activeCat === 'All' || entry.category === activeCat;
       return matchesSearch && matchesCat;
     });
 
+    if (visibleCountEl) visibleCountEl.textContent = String(filtered.length);
+
     if (filtered.length === 0) {
-      list.innerHTML = '<div style="text-align: center; padding: 24px; opacity: 0.6;">No ports match your search criteria.</div>';
+      list.innerHTML = '';
+      if (emptyState) emptyState.style.display = 'flex';
       return;
     }
+
+    if (emptyState) emptyState.style.display = 'none';
 
     list.innerHTML = filtered
       .map(
@@ -98,7 +166,7 @@ const COMMON_PORTS = [
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
           <div style="display: flex; align-items: center; gap: 12px;">
             <span
-              style="padding: 4px 10px; border-radius: 6px; font-weight: bold; font-family: monospace; font-size: 1.1rem; background: rgba(33, 150, 243, 0.1); color: #2196f3; border: 1px solid rgba(33, 150, 243, 0.3);"
+              style="padding: 4px 10px; border-radius: 6px; font-weight: bold; font-family: var(--font-mono); font-size: 1.05rem; background: rgba(129, 140, 248, 0.12); color: var(--accent); border: 1px solid rgba(129, 140, 248, 0.3);"
             >
               Port ${entry.port} / ${entry.protocol}
             </span>
@@ -106,7 +174,7 @@ const COMMON_PORTS = [
           </div>
 
           <span
-            style="padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; background: rgba(255, 255, 255, 0.05); color: #aaa;"
+            style="padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; background: rgba(255, 255, 255, 0.05); color: var(--text-muted);"
           >
             ${entry.category}
           </span>
@@ -114,7 +182,7 @@ const COMMON_PORTS = [
 
         <p style="margin: 0 0 8px 0; font-size: 0.9rem; opacity: 0.9;">${entry.desc}</p>
 
-        <div style="font-size: 0.825rem; color: #faad14; background: rgba(250, 173, 20, 0.08); padding: 6px 10px; border-radius: 4px; border: 1px solid rgba(250, 173, 20, 0.2);">
+        <div style="font-size: 0.825rem; color: var(--yellow); background: rgba(251, 191, 36, 0.08); padding: 6px 10px; border-radius: 4px; border: 1px solid rgba(251, 191, 36, 0.2);">
           <strong>🔒 Security Note:</strong> ${entry.securityNote}
         </div>
       </div>
@@ -123,7 +191,5 @@ const COMMON_PORTS = [
       .join('');
   }
 
-  searchInput?.addEventListener('input', render);
-  catSelect?.addEventListener('change', render);
   render();
 </script>

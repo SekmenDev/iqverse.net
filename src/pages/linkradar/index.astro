@@ -70,59 +70,87 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
         <!-- Live Scan Status Overview -->
         <div
           id="scan-stats-card"
-          style="display: none; margin-top: 24px; padding: 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);"
+          style="display: none; margin-top: 24px; padding: 18px; border-radius: 12px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);"
         >
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
             <div>
-              <div style="font-size: 0.75rem; opacity: 0.7;">Total Checked</div>
-              <div id="stat-total" style="font-size: 1.5rem; font-weight: bold;">0</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Total Checked</div>
+              <div id="stat-total" style="font-size: 1.6rem; font-weight: bold; margin-top: 4px;">0</div>
             </div>
             <div>
-              <div style="font-size: 0.75rem; color: #4caf50;">2xx Successful</div>
-              <div id="stat-2xx" style="font-size: 1.5rem; font-weight: bold; color: #4caf50;">0</div>
+              <div style="font-size: 0.75rem; color: var(--green); text-transform: uppercase; letter-spacing: 0.05em;">2xx Successful</div>
+              <div id="stat-2xx" style="font-size: 1.6rem; font-weight: bold; color: var(--green); margin-top: 4px;">0</div>
             </div>
             <div>
-              <div style="font-size: 0.75rem; color: #2196f3;">3xx Redirects</div>
-              <div id="stat-3xx" style="font-size: 1.5rem; font-weight: bold; color: #2196f3;">0</div>
+              <div style="font-size: 0.75rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em;">3xx Redirects</div>
+              <div id="stat-3xx" style="font-size: 1.6rem; font-weight: bold; color: var(--accent); margin-top: 4px;">0</div>
             </div>
             <div>
-              <div style="font-size: 0.75rem; color: #ff4d4f;">Broken / Errors</div>
-              <div id="stat-broken" style="font-size: 1.5rem; font-weight: bold; color: #ff4d4f;">0</div>
+              <div style="font-size: 0.75rem; color: var(--red); text-transform: uppercase; letter-spacing: 0.05em;">Broken / Errors</div>
+              <div id="stat-broken" style="font-size: 1.6rem; font-weight: bold; color: var(--red); margin-top: 4px;">0</div>
             </div>
           </div>
         </div>
 
         <!-- Filter and Search Bar -->
-        <div id="table-controls" style="display: none; margin-top: 20px; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-          <div style="display: flex; gap: 6px;">
-            <button type="button" class="filter-status-btn sharedStyles_button sharedStyles_buttonPrimary button-primary" data-filter="all">All</button>
-            <button type="button" class="filter-status-btn sharedStyles_button" data-filter="2xx">2xx OK</button>
-            <button type="button" class="filter-status-btn sharedStyles_button" data-filter="3xx">3xx Redirect</button>
-            <button type="button" class="filter-status-btn sharedStyles_button" data-filter="broken" style="color: #ff4d4f;">Broken</button>
+        <div id="table-controls" class="tool-filter-bar" style="display: none;">
+          <div class="tool-filter-group">
+            <button type="button" class="filter-pill active filter-status-btn" data-filter="all">
+              All <span class="filter-badge" id="badge-count-all">0</span>
+            </button>
+            <button type="button" class="filter-pill filter-status-btn" data-filter="2xx">
+              2xx OK <span class="filter-badge" id="badge-count-2xx">0</span>
+            </button>
+            <button type="button" class="filter-pill filter-status-btn" data-filter="3xx">
+              3xx Redirect <span class="filter-badge" id="badge-count-3xx">0</span>
+            </button>
+            <button type="button" class="filter-pill filter-pill-danger filter-status-btn" data-filter="broken">
+              Broken <span class="filter-badge" id="badge-count-broken">0</span>
+            </button>
           </div>
 
-          <input
-            id="table-search"
-            type="text"
-            placeholder="Search links..."
-            style="padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.85rem;"
-          />
+          <div class="search-input-wrap">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input
+              id="table-search"
+              type="text"
+              class="tool-search-input"
+              placeholder="Search links, URLs, sources..."
+            />
+            <button type="button" id="btn-clear-search" class="search-clear-btn" title="Clear search">✕</button>
+          </div>
+        </div>
+
+        <!-- Results Counter -->
+        <div id="results-count-bar" class="table-results-counter" style="display: none;">
+          <span>Showing <strong id="visible-count">0</strong> of <span id="total-results-count">0</span> links</span>
         </div>
 
         <!-- Results Table -->
-        <div id="results-table-container" style="display: none; margin-top: 16px; overflow-x: auto;">
-          <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+        <div id="results-table-container" class="results-table-container" style="display: none;">
+          <table class="results-table">
             <thead>
-              <tr style="border-bottom: 1px solid var(--border); color: var(--text-muted); text-align: left;">
-                <th style="padding: 8px;">Status</th>
-                <th style="padding: 8px;">URL</th>
-                <th style="padding: 8px;">Source</th>
-                <th style="padding: 8px;">Type</th>
-                <th style="padding: 8px;">Latency</th>
+              <tr>
+                <th style="width: 100px;">Status</th>
+                <th>Target URL</th>
+                <th>Discovered On (Source)</th>
+                <th style="width: 90px;">Tag</th>
+                <th style="width: 90px;">Latency</th>
               </tr>
             </thead>
             <tbody id="results-tbody"></tbody>
           </table>
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-results-state" class="tool-empty-state" style="display: none;">
+          <div class="tool-empty-state-icon">🔍</div>
+          <div class="tool-empty-state-title">No matching links found</div>
+          <div class="tool-empty-state-text">Try adjusting your search keyword or switching the status filter tab.</div>
+          <button type="button" id="btn-reset-filters" class="tool-empty-state-btn">Reset Filters</button>
         </div>
       </div>
     </section>
@@ -152,10 +180,21 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   const stat3xx = document.getElementById('stat-3xx');
   const statBroken = document.getElementById('stat-broken');
 
+  const badgeCountAll = document.getElementById('badge-count-all');
+  const badgeCount2xx = document.getElementById('badge-count-2xx');
+  const badgeCount3xx = document.getElementById('badge-count-3xx');
+  const badgeCountBroken = document.getElementById('badge-count-broken');
+
   const tableControls = document.getElementById('table-controls');
+  const resultsCountBar = document.getElementById('results-count-bar');
+  const visibleCountEl = document.getElementById('visible-count');
+  const totalResultsCountEl = document.getElementById('total-results-count');
   const tableContainer = document.getElementById('results-table-container');
+  const emptyState = document.getElementById('empty-results-state');
   const tbody = document.getElementById('results-tbody');
   const searchInput = document.getElementById('table-search') as HTMLInputElement;
+  const btnClearSearch = document.getElementById('btn-clear-search');
+  const btnResetFilters = document.getElementById('btn-reset-filters');
   const filterBtns = document.querySelectorAll('.filter-status-btn');
 
   let activeFilter = 'all';
@@ -165,14 +204,48 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
   filterBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
-      filterBtns.forEach((b) => b.classList.remove('sharedStyles_buttonPrimary', 'button-primary'));
-      btn.classList.add('sharedStyles_buttonPrimary', 'button-primary');
+      filterBtns.forEach((b) => {
+        b.classList.remove('active');
+        b.removeAttribute('data-active');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('data-active', 'true');
       activeFilter = (btn as HTMLElement).dataset.filter || 'all';
       renderTable();
     });
   });
 
-  searchInput?.addEventListener('input', renderTable);
+  searchInput?.addEventListener('input', () => {
+    if (btnClearSearch) {
+      btnClearSearch.style.display = searchInput.value ? 'inline-block' : 'none';
+    }
+    renderTable();
+  });
+
+  btnClearSearch?.addEventListener('click', () => {
+    if (searchInput) {
+      searchInput.value = '';
+      btnClearSearch.style.display = 'none';
+      renderTable();
+      searchInput.focus();
+    }
+  });
+
+  btnResetFilters?.addEventListener('click', () => {
+    activeFilter = 'all';
+    filterBtns.forEach((b) => {
+      if ((b as HTMLElement).dataset.filter === 'all') {
+        b.classList.add('active');
+      } else {
+        b.classList.remove('active');
+      }
+    });
+    if (searchInput) {
+      searchInput.value = '';
+      if (btnClearSearch) btnClearSearch.style.display = 'none';
+    }
+    renderTable();
+  });
 
   function renderTable() {
     if (!tbody) return;
@@ -183,33 +256,57 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
       if (activeFilter === '3xx' && (item.status < 300 || item.status >= 400)) return false;
       if (activeFilter === 'broken' && item.status >= 200 && item.status < 400) return false;
 
-      if (query && !item.url.toLowerCase().includes(query) && !(item.sourceUrl || '').toLowerCase().includes(query)) {
+      if (query && !item.url.toLowerCase().includes(query) && !(item.sourceUrl || '').toLowerCase().includes(query) && !(item.tag || '').toLowerCase().includes(query) && !String(item.status).includes(query)) {
         return false;
       }
       return true;
     });
 
+    if (visibleCountEl) visibleCountEl.textContent = String(filtered.length);
+    if (totalResultsCountEl) totalResultsCountEl.textContent = String(allResults.length);
+
+    if (allResults.length > 0) {
+      if (resultsCountBar) resultsCountBar.style.display = 'flex';
+    }
+
+    if (filtered.length === 0 && allResults.length > 0) {
+      if (tableContainer) tableContainer.style.display = 'none';
+      if (emptyState) emptyState.style.display = 'flex';
+      return;
+    }
+
+    if (emptyState) emptyState.style.display = 'none';
+    if (tableContainer) tableContainer.style.display = 'block';
+
     tbody.innerHTML = filtered
       .map((item) => {
         const isOk = item.status >= 200 && item.status < 300;
         const isRedirect = item.status >= 300 && item.status < 400;
-        const color = isOk ? '#4caf50' : isRedirect ? '#2196f3' : '#ff4d4f';
+        const color = isOk ? 'var(--green)' : isRedirect ? 'var(--accent)' : 'var(--red)';
+        const bg = isOk ? 'rgba(52, 211, 153, 0.12)' : isRedirect ? 'rgba(129, 140, 248, 0.12)' : 'rgba(248, 113, 113, 0.12)';
 
         return `
-        <tr style="border-bottom: 1px solid var(--border);">
-          <td style="padding: 8px;">
-            <span style="padding: 2px 8px; border-radius: 4px; font-weight: bold; background: ${color}20; color: ${color};">
+        <tr>
+          <td>
+            <span style="display: inline-block; padding: 3px 8px; border-radius: 6px; font-weight: 700; font-family: var(--font-mono); font-size: 0.78rem; background: ${bg}; color: ${color};">
               ${item.status || 'ERR'}
             </span>
           </td>
-          <td style="padding: 8px; font-family: monospace; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-            <a href="${item.url}" target="_blank" rel="noopener noreferrer" style="color: var(--accent);">${item.url}</a>
+          <td style="font-family: var(--font-mono); max-width: 380px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+            <a href="${item.url}" target="_blank" rel="noopener noreferrer" style="color: var(--accent); display: inline-flex; align-items: center; gap: 4px;">
+              <span>${item.url}</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.7; flex-shrink: 0;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </a>
           </td>
-          <td style="padding: 8px; font-family: monospace; opacity: 0.7; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+          <td style="font-family: var(--font-mono); color: var(--text-muted); max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.82rem;">
             ${item.sourceUrl || 'Root'}
           </td>
-          <td style="padding: 8px; text-transform: uppercase; font-size: 0.75rem;">${item.tag || 'LINK'}</td>
-          <td style="padding: 8px; opacity: 0.7;">${item.time ? `${item.time}ms` : '—'}</td>
+          <td>
+            <span style="padding: 2px 6px; border-radius: 4px; background: rgba(255, 255, 255, 0.05); font-size: 0.72rem; text-transform: uppercase; font-weight: 600; color: var(--text-muted);">
+              ${item.tag || 'LINK'}
+            </span>
+          </td>
+          <td style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">${item.time ? `${item.time}ms` : '—'}</td>
         </tr>
       `;
       })
@@ -231,6 +328,11 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
     if (stat2xx) stat2xx.textContent = String(s200);
     if (stat3xx) stat3xx.textContent = String(s300);
     if (statBroken) statBroken.textContent = String(sBroken);
+
+    if (badgeCountAll) badgeCountAll.textContent = String(allResults.length);
+    if (badgeCount2xx) badgeCount2xx.textContent = String(s200);
+    if (badgeCount3xx) badgeCount3xx.textContent = String(s300);
+    if (badgeCountBroken) badgeCountBroken.textContent = String(sBroken);
   }
 
   async function checkUrl(url: string, sourceUrl?: string, tag?: string) {

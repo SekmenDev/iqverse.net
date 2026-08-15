@@ -185,7 +185,7 @@ const FAQS = [
       <!-- Filter Tabs -->
       <div class={styles.resultsToolbar}>
         <div class={styles.filterBar}>
-          <span class={styles.filterLabel}>Filter:</span>
+          <span class={styles.filterLabel}>Category:</span>
           <div id="category-filter-buttons" class={styles.filterPills}>
             <button type="button" class={`${styles.filterPill} ${styles.activeFilter}`} data-cat="all">
               All Checks (<span id="count-cat-all">17</span>)
@@ -209,8 +209,56 @@ const FAQS = [
         </div>
       </div>
 
+      <!-- Live Search & Status Toolbar -->
+      <div id="agent-filter-toolbar" class="tool-filter-bar" style="margin-top: 12px;">
+        <div class="tool-filter-group" id="agent-status-filters">
+          <button type="button" class="filter-pill active agent-status-pill-btn" data-status="all">
+            All Status
+          </button>
+          <button type="button" class="filter-pill agent-status-pill-btn" data-status="pass">
+            ✓ Passed (<span id="agent-pill-pass">0</span>)
+          </button>
+          <button type="button" class="filter-pill agent-status-pill-btn" data-status="warn">
+            ⚠️ Warnings (<span id="agent-pill-warn">0</span>)
+          </button>
+          <button type="button" class="filter-pill filter-pill-danger agent-status-pill-btn" data-status="fail">
+            ✕ Failed (<span id="agent-pill-fail">0</span>)
+          </button>
+          <button type="button" class="filter-pill agent-status-pill-btn" data-status="info">
+            ℹ️ Info (<span id="agent-pill-info">0</span>)
+          </button>
+        </div>
+
+        <div class="search-input-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            id="agent-search-input"
+            type="text"
+            class="tool-search-input"
+            placeholder="Search AI signals, endpoints, protocols..."
+          />
+          <button type="button" id="btn-clear-agent-search" class="search-clear-btn" title="Clear search">✕</button>
+        </div>
+      </div>
+
+      <!-- Counter -->
+      <div id="agent-counter-bar" class="table-results-counter">
+        <span>Showing <strong id="agent-visible-count">0</strong> of <span id="agent-total-count">0</span> signals</span>
+      </div>
+
       <!-- Check Results Grid -->
       <div id="checks-grid" class={styles.checksGrid}></div>
+
+      <!-- Empty State -->
+      <div id="agent-empty-state" class="tool-empty-state" style="display: none;">
+        <div class="tool-empty-state-icon">🔍</div>
+        <div class="tool-empty-state-title">No matching AI signals found</div>
+        <div class="tool-empty-state-text">Try adjusting your search query or switching the category/status filter.</div>
+        <button type="button" id="btn-reset-agent-filters" class="tool-empty-state-btn">Reset Filters</button>
+      </div>
     </div>
 
     <!-- Educational Methodology Section -->
@@ -385,10 +433,25 @@ const FAQS = [
   const countPassed = document.getElementById('count-passed');
   const countWarnings = document.getElementById('count-warnings');
   const countFailed = document.getElementById('count-failed');
+
+  const agentPillPass = document.getElementById('agent-pill-pass');
+  const agentPillWarn = document.getElementById('agent-pill-warn');
+  const agentPillFail = document.getElementById('agent-pill-fail');
+  const agentPillInfo = document.getElementById('agent-pill-info');
+
+  const agentVisibleCount = document.getElementById('agent-visible-count');
+  const agentTotalCount = document.getElementById('agent-total-count');
+  const agentEmptyState = document.getElementById('agent-empty-state');
+  const agentSearchInput = document.getElementById('agent-search-input') as HTMLInputElement;
+  const btnClearAgentSearch = document.getElementById('btn-clear-agent-search');
+  const btnResetAgentFilters = document.getElementById('btn-reset-agent-filters');
+  const agentStatusFilterBtns = document.querySelectorAll('.agent-status-pill-btn');
+
   const checksGrid = document.getElementById('checks-grid');
   const catFilterBtns = document.querySelectorAll('#category-filter-buttons button');
 
   let currentCategory = 'all';
+  let currentStatus = 'all';
   let allScanResults: ScanResult[] = [];
 
   exampleBtns.forEach((btn) => {
@@ -414,6 +477,51 @@ const FAQS = [
       currentCategory = (btn as HTMLElement).dataset.cat || 'all';
       renderChecks();
     });
+  });
+
+  agentStatusFilterBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      agentStatusFilterBtns.forEach((b) => {
+        b.classList.remove('active');
+        b.removeAttribute('data-active');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('data-active', 'true');
+      currentStatus = (btn as HTMLElement).dataset.status || 'all';
+      renderChecks();
+    });
+  });
+
+  agentSearchInput?.addEventListener('input', () => {
+    if (btnClearAgentSearch) {
+      btnClearAgentSearch.style.display = agentSearchInput.value ? 'inline-block' : 'none';
+    }
+    renderChecks();
+  });
+
+  btnClearAgentSearch?.addEventListener('click', () => {
+    if (agentSearchInput) {
+      agentSearchInput.value = '';
+      btnClearAgentSearch.style.display = 'none';
+      renderChecks();
+      agentSearchInput.focus();
+    }
+  });
+
+  btnResetAgentFilters?.addEventListener('click', () => {
+    currentStatus = 'all';
+    agentStatusFilterBtns.forEach((b) => {
+      if ((b as HTMLElement).dataset.status === 'all') {
+        b.classList.add('active');
+      } else {
+        b.classList.remove('active');
+      }
+    });
+    if (agentSearchInput) {
+      agentSearchInput.value = '';
+      if (btnClearAgentSearch) btnClearAgentSearch.style.display = 'none';
+    }
+    renderChecks();
   });
 
   async function proxyFetch(targetUrl: string) {
@@ -508,6 +616,7 @@ const FAQS = [
       let pCount = 0;
       let wCount = 0;
       let fCount = 0;
+      let iCount = 0;
 
       CHECK_DEFS.forEach((def) => {
         const res = allScanResults.find((r) => r.id === def.id);
@@ -515,6 +624,7 @@ const FAQS = [
           if (res.status === 'pass') pCount++;
           else if (res.status === 'warn') wCount++;
           else if (res.status === 'fail') fCount++;
+          else if (res.status === 'info') iCount++;
 
           if (def.weight > 0) {
             totalMax += def.weight;
@@ -538,6 +648,11 @@ const FAQS = [
       if (countWarnings) countWarnings.textContent = String(wCount);
       if (countFailed) countFailed.textContent = String(fCount);
 
+      if (agentPillPass) agentPillPass.textContent = String(pCount);
+      if (agentPillWarn) agentPillWarn.textContent = String(wCount);
+      if (agentPillFail) agentPillFail.textContent = String(fCount);
+      if (agentPillInfo) agentPillInfo.textContent = String(iCount);
+
       renderChecks();
       if (resultsArea) resultsArea.style.display = 'block';
     } catch (err) {
@@ -549,11 +664,41 @@ const FAQS = [
 
   function renderChecks() {
     if (!checksGrid) return;
-    const filtered = allScanResults.filter((r) => {
+
+    const query = (agentSearchInput?.value || '').toLowerCase().trim();
+
+    const categoryFiltered = allScanResults.filter((r) => {
       const def = CHECK_DEFS.find((d) => d.id === r.id);
       if (currentCategory !== 'all' && def?.category !== currentCategory) return false;
       return true;
     });
+
+    const filtered = categoryFiltered.filter((r) => {
+      if (currentStatus !== 'all' && r.status !== currentStatus) return false;
+      if (query) {
+        const def = CHECK_DEFS.find((d) => d.id === r.id);
+        const name = (def?.name || r.id).toLowerCase();
+        const desc = (def?.desc || '').toLowerCase();
+        const detail = r.detail.toLowerCase();
+        const rec = (def?.rec || '').toLowerCase();
+        if (!name.includes(query) && !desc.includes(query) && !detail.includes(query) && !rec.includes(query)) {
+          return false;
+        }
+      }
+      return true;
+    });
+
+    if (agentVisibleCount) agentVisibleCount.textContent = String(filtered.length);
+    if (agentTotalCount) agentTotalCount.textContent = String(categoryFiltered.length);
+
+    if (filtered.length === 0) {
+      checksGrid.style.display = 'none';
+      if (agentEmptyState) agentEmptyState.style.display = 'flex';
+      return;
+    }
+
+    if (agentEmptyState) agentEmptyState.style.display = 'none';
+    checksGrid.style.display = 'grid';
 
     checksGrid.innerHTML = filtered
       .map((r) => {

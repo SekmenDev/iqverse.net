@@ -28,11 +28,52 @@ const DEFAULT_COOKIES = `Set-Cookie: session_id=xyz12345; Path=/; Domain=iqverse
         </div>
 
         <div style="margin-top: 24px;">
-          <h3 style="margin: 0 0 16px 0; font-size: 1.1rem;">
+          <h3 style="margin: 0 0 14px 0; font-size: 1.1rem;">
             Parsed Cookie Directives
           </h3>
 
+          <div class="tool-filter-bar" style="margin-top: 0;">
+            <div class="tool-filter-group" id="cookie-filter-pills">
+              <button type="button" class="filter-pill active cookie-filter-btn" data-filter="all">
+                All Cookies <span class="filter-badge" id="cookie-count-all">0</span>
+              </button>
+              <button type="button" class="filter-pill cookie-filter-btn" data-filter="secure">
+                🔒 Secure <span class="filter-badge" id="cookie-count-sec">0</span>
+              </button>
+              <button type="button" class="filter-pill cookie-filter-btn" data-filter="httponly">
+                🛡️ HttpOnly <span class="filter-badge" id="cookie-count-http">0</span>
+              </button>
+              <button type="button" class="filter-pill filter-pill-danger cookie-filter-btn" data-filter="warnings">
+                ⚠️ With Warnings <span class="filter-badge" id="cookie-count-warn">0</span>
+              </button>
+            </div>
+
+            <div class="search-input-wrap">
+              <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input
+                id="cookie-search-input"
+                type="text"
+                class="tool-search-input"
+                placeholder="Search cookie name, domain, path..."
+              />
+              <button type="button" id="btn-clear-cookie-search" class="search-clear-btn" title="Clear search">✕</button>
+            </div>
+          </div>
+
+          <div class="table-results-counter">
+            <span>Showing <strong id="cookie-visible-count">0</strong> of <span id="cookie-total-count">0</span> cookies</span>
+          </div>
+
           <div id="cookies-list" style="display: flex; flex-direction: column; gap: 16px;"></div>
+
+          <div id="cookie-empty-state" class="tool-empty-state" style="display: none;">
+            <div class="tool-empty-state-icon">🔍</div>
+            <div class="tool-empty-state-title">No matching cookies</div>
+            <div class="tool-empty-state-text">Try adjusting your search query or switching the active filter.</div>
+          </div>
         </div>
       </div>
     </section>
@@ -124,17 +165,87 @@ const DEFAULT_COOKIES = `Set-Cookie: session_id=xyz12345; Path=/; Domain=iqverse
 
   const cookieInput = document.getElementById('cookieInput') as HTMLTextAreaElement;
   const cookiesList = document.getElementById('cookies-list');
+  const searchInput = document.getElementById('cookie-search-input') as HTMLInputElement;
+  const btnClearSearch = document.getElementById('btn-clear-cookie-search');
+  const emptyState = document.getElementById('cookie-empty-state');
+  const visibleCountEl = document.getElementById('cookie-visible-count');
+  const totalCountEl = document.getElementById('cookie-total-count');
+
+  const countAllEl = document.getElementById('cookie-count-all');
+  const countSecEl = document.getElementById('cookie-count-sec');
+  const countHttpEl = document.getElementById('cookie-count-http');
+  const countWarnEl = document.getElementById('cookie-count-warn');
+
+  const filterBtns = document.querySelectorAll('.cookie-filter-btn');
+  let activeFilter = 'all';
+
+  filterBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeFilter = (btn as HTMLElement).dataset.filter || 'all';
+      render();
+    });
+  });
+
+  searchInput?.addEventListener('input', () => {
+    if (btnClearSearch) btnClearSearch.style.display = searchInput.value ? 'inline-block' : 'none';
+    render();
+  });
+
+  btnClearSearch?.addEventListener('click', () => {
+    if (searchInput) {
+      searchInput.value = '';
+      btnClearSearch.style.display = 'none';
+      render();
+      searchInput.focus();
+    }
+  });
 
   function render() {
     if (!cookieInput || !cookiesList) return;
-    const cookies = parseSetCookieHeader(cookieInput.value);
+    const allCookies = parseSetCookieHeader(cookieInput.value);
+    const query = (searchInput?.value || '').toLowerCase().trim();
 
-    if (cookies.length === 0) {
-      cookiesList.innerHTML = '<div style="opacity: 0.6;">No valid Set-Cookie headers found.</div>';
+    const secCount = allCookies.filter((c) => c.secure).length;
+    const httpCount = allCookies.filter((c) => c.httpOnly).length;
+    const warnCount = allCookies.filter((c) => c.warnings.length > 0).length;
+
+    if (countAllEl) countAllEl.textContent = String(allCookies.length);
+    if (countSecEl) countSecEl.textContent = String(secCount);
+    if (countHttpEl) countHttpEl.textContent = String(httpCount);
+    if (countWarnEl) countWarnEl.textContent = String(warnCount);
+
+    if (totalCountEl) totalCountEl.textContent = String(allCookies.length);
+
+    const filtered = allCookies.filter((cookie) => {
+      if (activeFilter === 'secure' && !cookie.secure) return false;
+      if (activeFilter === 'httponly' && !cookie.httpOnly) return false;
+      if (activeFilter === 'warnings' && cookie.warnings.length === 0) return false;
+
+      if (query) {
+        const matchesName = cookie.name.toLowerCase().includes(query);
+        const matchesVal = cookie.value.toLowerCase().includes(query);
+        const matchesDom = (cookie.domain || '').toLowerCase().includes(query);
+        const matchesPath = (cookie.path || '').toLowerCase().includes(query);
+        if (!matchesName && !matchesVal && !matchesDom && !matchesPath) {
+          return false;
+        }
+      }
+      return true;
+    });
+
+    if (visibleCountEl) visibleCountEl.textContent = String(filtered.length);
+
+    if (filtered.length === 0) {
+      cookiesList.innerHTML = '';
+      if (emptyState) emptyState.style.display = 'flex';
       return;
     }
 
-    cookiesList.innerHTML = cookies
+    if (emptyState) emptyState.style.display = 'none';
+
+    cookiesList.innerHTML = filtered
       .map(
         (cookie) => `
       <div
