@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { tools, filterTools } from '@/lib/tools';
+import { tools, filterTools, sortTools } from '@/lib/tools';
 
 describe('lib/tools.ts - Tools Registry Integrity', () => {
   it('should contain a list of registered tools', () => {
@@ -34,5 +34,19 @@ describe('lib/tools.ts - Tools Registry Integrity', () => {
 
     const nonExistent = filterTools('xyz999nonexistentquery', 'all', 'all');
     expect(nonExistent.length).toBe(0);
+  });
+
+  it('sortTools should sort tools alphabetically when sortBy is az and preserve order when default', () => {
+    const sample = [
+      { name: 'Zebra', desc: '', icon: '', url: '', type: 'open' as const, tags: '', cat: 'Security' },
+      { name: 'Apple', desc: '', icon: '', url: '', type: 'open' as const, tags: '', cat: 'Security' },
+      { name: 'Mango', desc: '', icon: '', url: '', type: 'open' as const, tags: '', cat: 'Security' },
+    ];
+
+    const defaultSorted = sortTools(sample, 'default');
+    expect(defaultSorted.map(s => s.name)).toEqual(['Zebra', 'Apple', 'Mango']);
+
+    const azSorted = sortTools(sample, 'az');
+    expect(azSorted.map(s => s.name)).toEqual(['Apple', 'Mango', 'Zebra']);
   });
 });

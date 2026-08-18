@@ -185,7 +185,7 @@
   background: var(--surface);
 }
 
-.catBtnActive {
+.catBtn[aria-pressed="true"] {
   color: var(--accent);
   background: var(--accent-dim);
 }
@@ -206,7 +206,7 @@
   flex-shrink: 0;
 }
 
-.catBtnActive .catCount {
+.catBtn[aria-pressed="true"] .catCount {
   opacity: 0.8;
 }
 
@@ -259,7 +259,7 @@
   border-color: var(--border-acc);
 }
 
-.sortBtnActive {
+.sortBtn[aria-pressed="true"] {
   color: var(--accent);
   border-color: var(--border-acc);
   background: var(--accent-dim);

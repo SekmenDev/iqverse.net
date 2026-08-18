@@ -19,7 +19,7 @@
   display: flex;
   align-items: center;
   padding: 0 20px;
-  gap: 12px;
+  gap: 16px;
 }
 
 .navLogo {
@@ -33,18 +33,32 @@
   flex-shrink: 0;
 }
 
-.navLogoDot {
-  width: 7px;
-  height: 7px;
-  background: var(--accent);
-  border-radius: 50%;
-}
-
 .navRight {
-  margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.navRight a {
+  font-size: 12px;
+  color: var(--muted);
+  padding: 6px 10px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.navRight a:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.navRight a svg {
+  width: 14px;
+  height: 14px;
 }
 
 .notFoundPage {
@@ -335,6 +349,13 @@
   }
   .resultsGrid {
     grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .topNav {
+    padding: 0 12px;
+    gap: 10px;
   }
 }
 
