@@ -98,8 +98,9 @@ const jsonLdData = getToolsCollectionJsonLd();
           {categories.map(cat => (
             <button
               type="button"
-              class={`${styles.catBtn} ${cat === 'all' ? styles.catBtnActive : ''}`}
+              class={styles.catBtn}
               data-cat={cat}
+              aria-pressed={cat === 'all' ? 'true' : 'false'}
             >
               <span class={styles.catIcon}>{cat === 'all' ? '⊞' : (CAT_ICONS[cat] || '○')}</span>
               <span style="flex: 1; text-align: left;">{cat === 'all' ? 'All Tools' : cat}</span>
@@ -113,8 +114,9 @@ const jsonLdData = getToolsCollectionJsonLd();
           {statuses.map(s => (
             <button
               type="button"
-              class={`${styles.catBtn} ${s === 'all' ? styles.catBtnActive : ''}`}
+              class={styles.catBtn}
               data-status={s}
+              aria-pressed={s === 'all' ? 'true' : 'false'}
             >
               <span
                 class={`${styles.catIcon} ${s !== 'all' ? DOT_CLASS[s] : ''}`}
@@ -135,11 +137,11 @@ const jsonLdData = getToolsCollectionJsonLd();
           <span class={styles.resultCount} id="result-count">
             <strong>{tools.length}</strong> tools
           </span>
-          <div class={styles.sortWrap} aria-label="Sort options">
+          <div class={styles.sortWrap} id="sort-filters" aria-label="Sort options">
             <button
               type="button"
               id="sort-default-btn"
-              class={`${styles.sortBtn} ${styles.sortBtnActive}`}
+              class={styles.sortBtn}
               data-sort="default"
               aria-pressed="true"
             >
@@ -158,86 +160,89 @@ const jsonLdData = getToolsCollectionJsonLd();
         </div>
 
         <div id="content-area">
-          {Object.entries(groupedTools).map(([cat, catTools]) => (
-            <div class="category-group" data-group-cat={cat}>
-              <p class={styles.sectionHead}>
-                {CAT_ICONS[cat] || ''} {cat}
-              </p>
-              <div class={styles.cardGrid}>
-                {catTools.map(tool => {
-                  const coming = tool.type === 'coming';
-                  const href = tool.url && !coming ? tool.url : '';
-                  const isExternalLink = !!href && /^(https?:\/\/|mailto:)/i.test(href);
+          <div id="category-groups-container">
+            {Object.entries(groupedTools).map(([cat, catTools]) => (
+              <div class="category-group" data-group-cat={cat}>
+                <p class={styles.sectionHead}>
+                  {CAT_ICONS[cat] || ''} {cat}
+                </p>
+                <div class={`card-grid-container ${styles.cardGrid}`}>
+                  {catTools.map(tool => {
+                    const coming = tool.type === 'coming';
+                    const href = tool.url && !coming ? tool.url : '';
+                    const isExternalLink = !!href && /^(https?:\/\/|mailto:)/i.test(href);
 
-                  return (
-                    <div
-                      class={`tool-card-item ${styles.cardLink}`}
-                      data-name={tool.name}
-                      data-desc={tool.desc}
-                      data-tags={tool.tags}
-                      data-cat={tool.cat}
-                      data-type={tool.type}
-                    >
-                      {href && !coming ? (
-                        <a
-                          href={href}
-                          class={`${styles.card} ${coming ? styles.cardComing : ''}`}
-                          {...(isExternalLink ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                        >
-                          <div class={styles.cardTop}>
-                            <div class={styles.cardIcon}>
-                              <span>{tool.icon}</span>
+                    return (
+                      <div
+                        class={`tool-card-item ${styles.cardLink}`}
+                        data-name={tool.name}
+                        data-desc={tool.desc}
+                        data-tags={tool.tags}
+                        data-cat={tool.cat}
+                        data-type={tool.type}
+                      >
+                        {href && !coming ? (
+                          <a
+                            href={href}
+                            class={`${styles.card} ${coming ? styles.cardComing : ''}`}
+                            {...(isExternalLink ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                          >
+                            <div class={styles.cardTop}>
+                              <div class={styles.cardIcon}>
+                                <span>{tool.icon}</span>
+                              </div>
+                              <div class={styles.cardStatus}>
+                                <span class={`${styles.statusLabel} ${DOT_CLASS[tool.type]}`}>
+                                  {STATUS_LABELS[tool.type]}
+                                </span>
+                              </div>
                             </div>
-                            <div class={styles.cardStatus}>
-                              <span class={`${styles.statusLabel} ${DOT_CLASS[tool.type]}`}>
-                                {STATUS_LABELS[tool.type]}
+                            <div class={styles.cardName}>{tool.name}</div>
+                            <p class={styles.cardDesc}>{tool.desc}</p>
+                            <div class={styles.cardFooter}>
+                              <div class={styles.cardTags}>
+                                {tool.tags.split(' ').slice(0, 3).map(tag => (
+                                  <span class={styles.tag}>{tag}</span>
+                                ))}
+                              </div>
+                              <span class={styles.cardArrow} aria-hidden="true">
+                                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                  <path d="M3 8h10M8 3l5 5-5 5" />
+                                </svg>
                               </span>
                             </div>
-                          </div>
-                          <div class={styles.cardName}>{tool.name}</div>
-                          <p class={styles.cardDesc}>{tool.desc}</p>
-                          <div class={styles.cardFooter}>
-                            <div class={styles.cardTags}>
-                              {tool.tags.split(' ').slice(0, 3).map(tag => (
-                                <span class={styles.tag}>{tag}</span>
-                              ))}
+                          </a>
+                        ) : (
+                          <div class={`${styles.card} ${coming ? styles.cardComing : ''}`}>
+                            <div class={styles.cardTop}>
+                              <div class={styles.cardIcon}>
+                                <span>{tool.icon}</span>
+                              </div>
+                              <div class={styles.cardStatus}>
+                                <span class={`${styles.statusLabel} ${DOT_CLASS[tool.type]}`}>
+                                  {STATUS_LABELS[tool.type]}
+                                </span>
+                              </div>
                             </div>
-                            <span class={styles.cardArrow} aria-hidden="true">
-                              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M3 8h10M8 3l5 5-5 5" />
-                              </svg>
-                            </span>
-                          </div>
-                        </a>
-                      ) : (
-                        <div class={`${styles.card} ${coming ? styles.cardComing : ''}`}>
-                          <div class={styles.cardTop}>
-                            <div class={styles.cardIcon}>
-                              <span>{tool.icon}</span>
-                            </div>
-                            <div class={styles.cardStatus}>
-                              <span class={`${styles.statusLabel} ${DOT_CLASS[tool.type]}`}>
-                                {STATUS_LABELS[tool.type]}
-                              </span>
+                            <div class={styles.cardName}>{tool.name}</div>
+                            <p class={styles.cardDesc}>{tool.desc}</p>
+                            <div class={styles.cardFooter}>
+                              <div class={styles.cardTags}>
+                                {tool.tags.split(' ').slice(0, 3).map(tag => (
+                                  <span class={styles.tag}>{tag}</span>
+                                ))}
+                              </div>
                             </div>
                           </div>
-                          <div class={styles.cardName}>{tool.name}</div>
-                          <p class={styles.cardDesc}>{tool.desc}</p>
-                          <div class={styles.cardFooter}>
-                            <div class={styles.cardTags}>
-                              {tool.tags.split(' ').slice(0, 3).map(tag => (
-                                <span class={styles.tag}>{tag}</span>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+          <div id="az-grid" class={styles.cardGrid} style="display: none;"></div>
         </div>
       </main>
     </div>
@@ -254,11 +259,13 @@ const jsonLdData = getToolsCollectionJsonLd();
     let activeSort: 'default' | 'az' = 'default';
 
     const searchInput = (document.getElementById('tool-nav-search') || document.getElementById('search')) as HTMLInputElement | null;
-    const catButtons = document.querySelectorAll('#cat-filters button');
-    const statusButtons = document.querySelectorAll('#status-filters button');
-    const sortButtons = document.querySelectorAll('.sortWrap button');
+    const catButtons = document.querySelectorAll<HTMLButtonElement>('#cat-filters button');
+    const statusButtons = document.querySelectorAll<HTMLButtonElement>('#status-filters button');
+    const sortButtons = document.querySelectorAll<HTMLButtonElement>('#sort-filters button, button[data-sort]');
     const resultCountEl = document.getElementById('result-count');
     const contentArea = document.getElementById('content-area');
+    const categoryGroupsContainer = document.getElementById('category-groups-container');
+    const azGrid = document.getElementById('az-grid');
     const menuToggle = document.getElementById('menu-toggle-btn');
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebar-overlay');
@@ -291,33 +298,74 @@ const jsonLdData = getToolsCollectionJsonLd();
       }
     });
 
-    // Tool Cards
+    // Tool Cards and Category structures
     const cardItems = Array.from(document.querySelectorAll<HTMLElement>('.tool-card-item'));
-    const groupItems = Array.from(document.querySelectorAll<HTMLElement>('.category-group'));
+    const cardsByName = new Map<string, HTMLElement>();
+    cardItems.forEach(card => {
+      const name = card.dataset.name || '';
+      if (name) cardsByName.set(name, card);
+    });
+
+    const categoryGroups = Array.from(document.querySelectorAll<HTMLElement>('.category-group'));
+    const categoryGrids = new Map<string, HTMLElement>();
+    const defaultCategoryCards = new Map<string, HTMLElement[]>();
+
+    categoryGroups.forEach(group => {
+      const cat = group.dataset.groupCat || '';
+      const grid = group.querySelector<HTMLElement>('.card-grid-container');
+      if (cat && grid) {
+        categoryGrids.set(cat, grid);
+        defaultCategoryCards.set(cat, Array.from(grid.querySelectorAll<HTMLElement>('.tool-card-item')));
+      }
+    });
 
     function applyFilters() {
       const items = filterTools(activeQuery, activeCat, activeStatus);
       const sorted = sortTools(items, activeSort);
       const sortedNames = new Set(sorted.map(t => t.name));
+      const visibleCount = sorted.length;
 
-      let visibleCount = 0;
-
-      cardItems.forEach(card => {
-        const name = card.dataset.name || '';
-        const isVisible = sortedNames.has(name);
-        card.style.display = isVisible ? '' : 'none';
-        if (isVisible) visibleCount++;
-      });
-
-      groupItems.forEach(group => {
-        const cat = group.dataset.groupCat || '';
-        if (activeCat !== 'all' && activeCat !== cat) {
-          group.style.display = 'none';
-        } else {
-          const hasVisibleChildren = group.querySelector('.tool-card-item:not([style*="display: none"])');
-          group.style.display = hasVisibleChildren ? '' : 'none';
+      if (activeSort === 'az' && activeCat === 'all') {
+        if (categoryGroupsContainer) categoryGroupsContainer.style.display = 'none';
+        if (azGrid) {
+          azGrid.style.display = visibleCount > 0 ? '' : 'none';
+          sorted.forEach(tool => {
+            const card = cardsByName.get(tool.name);
+            if (card) {
+              card.style.display = '';
+              azGrid.appendChild(card);
+            }
+          });
         }
-      });
+      } else {
+        if (azGrid) azGrid.style.display = 'none';
+        if (categoryGroupsContainer) categoryGroupsContainer.style.display = '';
+
+        categoryGroups.forEach(group => {
+          const cat = group.dataset.groupCat || '';
+          const grid = categoryGrids.get(cat);
+          const originalCards = defaultCategoryCards.get(cat) || [];
+
+          if (activeCat !== 'all' && activeCat !== cat) {
+            group.style.display = 'none';
+          } else {
+            let cardsToAppend = originalCards;
+            if (activeSort === 'az') {
+              cardsToAppend = [...originalCards].sort((a, b) =>
+                (a.dataset.name || '').localeCompare(b.dataset.name || '')
+              );
+            }
+            cardsToAppend.forEach(card => {
+              grid?.appendChild(card);
+              const isVisible = sortedNames.has(card.dataset.name || '');
+              card.style.display = isVisible ? '' : 'none';
+            });
+
+            const hasVisible = originalCards.some(card => sortedNames.has(card.dataset.name || ''));
+            group.style.display = hasVisible ? '' : 'none';
+          }
+        });
+      }
 
       if (resultCountEl) {
         resultCountEl.innerHTML = `<strong>${visibleCount}</strong> tool${visibleCount !== 1 ? 's' : ''}`;
@@ -361,9 +409,9 @@ const jsonLdData = getToolsCollectionJsonLd();
     // Category button events
     catButtons.forEach(btn => {
       btn.addEventListener('click', () => {
-        catButtons.forEach(b => b.classList.remove('styles_catBtnActive', 'active'));
-        btn.classList.add('styles_catBtnActive', 'active');
-        activeCat = (btn as HTMLElement).dataset.cat || 'all';
+        catButtons.forEach(b => b.setAttribute('aria-pressed', 'false'));
+        btn.setAttribute('aria-pressed', 'true');
+        activeCat = btn.dataset.cat || 'all';
         applyFilters();
       });
     });
@@ -371,9 +419,9 @@ const jsonLdData = getToolsCollectionJsonLd();
     // Status button events
     statusButtons.forEach(btn => {
       btn.addEventListener('click', () => {
-        statusButtons.forEach(b => b.classList.remove('styles_catBtnActive', 'active'));
-        btn.classList.add('styles_catBtnActive', 'active');
-        activeStatus = ((btn as HTMLElement).dataset.status || 'all') as any;
+        statusButtons.forEach(b => b.setAttribute('aria-pressed', 'false'));
+        btn.setAttribute('aria-pressed', 'true');
+        activeStatus = (btn.dataset.status || 'all') as any;
         applyFilters();
       });
     });
@@ -381,13 +429,9 @@ const jsonLdData = getToolsCollectionJsonLd();
     // Sort button events
     sortButtons.forEach(btn => {
       btn.addEventListener('click', () => {
-        sortButtons.forEach(b => {
-          b.classList.remove('styles_sortBtnActive', 'active');
-          b.setAttribute('aria-pressed', 'false');
-        });
-        btn.classList.add('styles_sortBtnActive', 'active');
+        sortButtons.forEach(b => b.setAttribute('aria-pressed', 'false'));
         btn.setAttribute('aria-pressed', 'true');
-        activeSort = ((btn as HTMLElement).dataset.sort || 'default') as any;
+        activeSort = (btn.dataset.sort || 'default') as any;
         applyFilters();
       });
     });
