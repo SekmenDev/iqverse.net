@@ -11,11 +11,22 @@ test.describe('E2E Navigation & Layout Integration', () => {
     await expect(toolCard).toBeVisible();
   });
 
-  test('Custom 404 page loads and renders error layout', async ({ page }) => {
+  test('Custom 404 page loads and renders error layout with standard header', async ({ page }) => {
     const response = await page.goto('/404.html');
     expect([200, 404]).toContain(response?.status());
     const bodyText = await page.textContent('body');
     expect(bodyText).toMatch(/404|Page not found|Lost in the matrix/i);
+
+    // Verify header elements match general layout
+    const navLogo = page.locator('nav a[href="/"]');
+    await expect(navLogo).toBeVisible();
+    await expect(navLogo.locator('#theme-toggle-btn')).toBeVisible();
+
+    const toolSearchInput = page.locator('#tool-nav-search');
+    await expect(toolSearchInput).toBeVisible();
+
+    const githubLink = page.locator('nav a[aria-label="GitHub"]');
+    await expect(githubLink).toBeVisible();
   });
 
   test('Tool page search bar renders, filters tools, and navigates', async ({ page }) => {
