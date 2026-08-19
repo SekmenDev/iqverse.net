@@ -1,0 +1,536 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.workspaceGrid {
+  display: grid;
+  grid-template-columns: minmax(360px, 480px) minmax(380px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg, 16px);
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.cardTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.presetsRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.presetsLabel {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.presetChip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.presetChip:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.fieldLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.charMeter {
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+
+.charMeterOptimal {
+  color: var(--green);
+  border-color: rgba(52, 211, 153, 0.3);
+  background: rgba(52, 211, 153, 0.08);
+}
+
+.charMeterWarning {
+  color: var(--yellow);
+  border-color: rgba(251, 191, 36, 0.3);
+  background: rgba(251, 191, 36, 0.08);
+}
+
+.charMeterDanger {
+  color: var(--red);
+  border-color: rgba(248, 113, 113, 0.3);
+  background: rgba(248, 113, 113, 0.08);
+}
+
+.textInput {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.textInput:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+.textareaInput {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 90px;
+  padding: 10px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.textareaInput:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+.imageInputWrap {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.imagePreviewThumb {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  flex-shrink: 0;
+}
+
+/* Tabs */
+.platformTabs {
+  display: flex;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.tabBtn {
+  flex: 1;
+  min-width: 90px;
+  padding: 7px 12px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: inherit;
+}
+
+.tabBtn:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.tabBtn[data-active='true'] {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border);
+}
+
+/* Social Preview Cards */
+.previewArea {
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+/* 1. Google Preview */
+.googleCard {
+  background: #ffffff;
+  color: #202124;
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  font-family: Roboto, arial, sans-serif;
+  text-align: left;
+}
+
+.googleHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.googleFavicon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #f1f3f4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a73e8;
+}
+
+.googleSiteName {
+  font-size: 0.85rem;
+  color: #202124;
+  line-height: 1.2;
+}
+
+.googleUrl {
+  font-size: 0.75rem;
+  color: #4d5156;
+  line-height: 1.2;
+}
+
+.googleTitle {
+  font-size: 1.25rem;
+  color: #1a0dab;
+  font-weight: 400;
+  line-height: 1.3;
+  margin-bottom: 4px;
+  cursor: pointer;
+}
+
+.googleTitle:hover {
+  text-decoration: underline;
+}
+
+.googleDesc {
+  font-size: 0.875rem;
+  color: #4d5156;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+/* 2. Twitter / X Card */
+.twitterCard {
+  background: #000000;
+  color: #e7e9ea;
+  border: 1px solid #2f3336;
+  border-radius: 16px;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.twitterImage {
+  width: 100%;
+  height: 220px;
+  background-color: #16181c;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.twitterDomainBadge {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  background: rgba(0, 0, 0, 0.77);
+  backdrop-filter: blur(4px);
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.twitterContent {
+  padding: 14px 16px;
+}
+
+.twitterTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #e7e9ea;
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+.twitterDesc {
+  font-size: 0.85rem;
+  color: #71767b;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 3. Facebook Card */
+.facebookCard {
+  background: #242526;
+  color: #e4e6eb;
+  border: 1px solid #3e4042;
+  border-radius: 8px;
+  overflow: hidden;
+  font-family: Segoe UI Historic, Segoe UI, Helvetica, Arial, sans-serif;
+}
+
+.facebookImage {
+  width: 100%;
+  height: 220px;
+  background-color: #18191a;
+  background-size: cover;
+  background-position: center;
+}
+
+.facebookContent {
+  padding: 12px 14px;
+  background: #242526;
+}
+
+.facebookDomain {
+  font-size: 0.75rem;
+  color: #b0b3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 3px;
+}
+
+.facebookTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e4e6eb;
+  margin-bottom: 4px;
+  line-height: 1.25;
+}
+
+.facebookDesc {
+  font-size: 0.85rem;
+  color: #b0b3b8;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 4. LinkedIn Card */
+.linkedinCard {
+  background: #ffffff;
+  color: rgba(0, 0, 0, 0.9);
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.linkedinImage {
+  width: 100%;
+  height: 200px;
+  background-color: #f3f2ef;
+  background-size: cover;
+  background-position: center;
+}
+
+.linkedinContent {
+  padding: 12px 16px;
+  background: #f9fafb;
+}
+
+.linkedinTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.9);
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+.linkedinDomain {
+  font-size: 0.78rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* 5. Discord Card */
+.discordCard {
+  background: #2b2d31;
+  color: #dbdee1;
+  border-left: 4px solid var(--accent);
+  border-radius: 4px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: 'gg sans', 'Noto Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.discordSite {
+  font-size: 0.75rem;
+  color: #949ba4;
+}
+
+.discordTitle {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #00a8fc;
+  cursor: pointer;
+}
+
+.discordTitle:hover {
+  text-decoration: underline;
+}
+
+.discordDesc {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #dbdee1;
+}
+
+.discordImage {
+  max-width: 100%;
+  height: 180px;
+  border-radius: 6px;
+  background-size: cover;
+  background-position: center;
+  background-color: #1e1f22;
+  margin-top: 4px;
+}
+
+/* Code Exporter */
+.codeHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.btnCopy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.btnCopy:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.outputTextarea {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 180px;
+  padding: 12px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.outputTextarea:focus {
+  border-color: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .workspaceGrid {
+    grid-template-columns: 1fr;
+  }
+}
