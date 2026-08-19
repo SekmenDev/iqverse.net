@@ -8,119 +8,228 @@ import styles from '@/styles/favicongen.module.css';
   subtitle="Multi-Resolution Favicon, Web App Manifest & HTML Meta Generator"
   pill="BROWSER TOOLS"
   toolSlug="favicongen"
-  description="Generate web favicons in multiple resolutions (16x16, 32x32, 180x180 Apple Touch, 192x192 Android) with manifest.json and HTML code."
+  description="Generate web favicons in multiple resolutions (16x16, 32x32, 48x48, 180x180 Apple Touch, 192x192 Android, 512x512 PWA) with manifest.json and HTML code locally."
 >
   <div class={styles.pageWrap}>
     <canvas id="offscreen-canvas" style="display: none;"></canvas>
 
+    <!-- Step 1: Upload -->
     <section class={styles.section}>
       <div class={styles.card}>
         <div class={styles.sectionHeader}>
-          <div class={styles.stepNum}>1</div>
+          <div class={styles.stepNum}>01</div>
           <div>
             <h2 class={styles.sectionTitle}>Upload Source Image</h2>
-            <p class={styles.sectionSub}>Square PNG, SVG or JPEG recommended (at least 512×512px)</p>
+            <p class={styles.sectionSub}>Square PNG, SVG, or JPEG recommended (at least 512×512px for best quality)</p>
           </div>
         </div>
 
-        <input type="file" id="favicon-file-input" accept="image/*" style="display: none;" />
+        <input type="file" id="favicon-file-input" accept="image/png, image/jpeg, image/svg+xml, image/webp" style="display: none;" />
 
         <div id="dropzone" class={styles.dropZone}>
           <div class={styles.dropIcon}>
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
               <polyline points="17 8 12 3 7 8"></polyline>
               <line x1="12" y1="12" x2="12" y2="3"></line>
             </svg>
           </div>
           <div class={styles.dropTitle}>
-            Drag and drop your logo or <span class={styles.dropBrowse}>browse</span>
+            Drag and drop your logo here or <span class={styles.dropBrowse}>browse files</span>
           </div>
-          <div class={styles.dropSub}>PNG, SVG, JPG, WEBP (Processed 100% in browser)</div>
+          <div class={styles.dropSub}>PNG, SVG, JPG, WEBP • Processed 100% locally in your browser</div>
         </div>
 
         <div id="image-info-bar" class={styles.imageInfo} style="display: none;">
           <div class={styles.imageDetails}>
-            <span id="img-name" class={styles.imageName}>logo.png</span>
-            <span id="img-dims" class={styles.imageMeta}>512 × 512px</span>
+            <img id="img-thumb" class={styles.imageThumb} alt="Source thumbnail" />
+            <div class={styles.imageMetaBlock}>
+              <span id="img-name" class={styles.imageName}>logo.png</span>
+              <div class={styles.imageMeta}>
+                <span id="img-dims" class={styles.imageBadge}>512 × 512px</span>
+                <span id="img-size" class={styles.imageBadge}>PNG</span>
+              </div>
+            </div>
           </div>
           <button type="button" id="btn-clear-img" class={styles.btnRemove}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
             Change Image
           </button>
         </div>
       </div>
     </section>
 
-    <!-- Previews -->
+    <!-- Step 2: Multi-Resolution Previews -->
     <section id="preview-section" class={styles.section} style="display: none;">
       <div class={styles.card}>
         <div class={styles.sectionHeader}>
-          <div class={styles.stepNum}>2</div>
+          <div class={styles.stepNum}>02</div>
           <div>
             <h2 class={styles.sectionTitle}>Multi-Resolution Previews</h2>
-            <p class={styles.sectionSub}>Generated across standard browser and mobile formats</p>
+            <p class={styles.sectionSub}>Generated across standard browser, desktop, and mobile formats</p>
           </div>
         </div>
 
         <div class={styles.previewGrid}>
+          <!-- 16x16 -->
           <div class={styles.previewCard}>
-            <canvas id="prev16" width="16" height="16" style="width: 16px; height: 16px;"></canvas>
-            <span class={styles.previewLabel}>16×16 (Tab)</span>
+            <div class={styles.canvasContainer}>
+              <canvas id="prev16" width="16" height="16" style="width: 16px; height: 16px; image-rendering: pixelated;"></canvas>
+            </div>
+            <div class={styles.previewCardInfo}>
+              <span class={styles.previewLabel}>16×16</span>
+              <span class={styles.previewSub}>Browser Tab</span>
+            </div>
+            <button type="button" class={`${styles.cardDownloadBtn} dl-btn`} data-target="prev16" data-filename="favicon-16x16.png">
+              Download
+            </button>
           </div>
+
+          <!-- 32x32 -->
           <div class={styles.previewCard}>
-            <canvas id="prev32" width="32" height="32" style="width: 32px; height: 32px;"></canvas>
-            <span class={styles.previewLabel}>32×32 (Standard)</span>
+            <div class={styles.canvasContainer}>
+              <canvas id="prev32" width="32" height="32" style="width: 32px; height: 32px;"></canvas>
+            </div>
+            <div class={styles.previewCardInfo}>
+              <span class={styles.previewLabel}>32×32</span>
+              <span class={styles.previewSub}>Standard Favicon</span>
+            </div>
+            <button type="button" class={`${styles.cardDownloadBtn} dl-btn`} data-target="prev32" data-filename="favicon-32x32.png">
+              Download
+            </button>
           </div>
+
+          <!-- 48x48 -->
           <div class={styles.previewCard}>
-            <canvas id="prev180" width="180" height="180" style="width: 60px; height: 60px; border-radius: 12px;"></canvas>
-            <span class={styles.previewLabel}>180×180 (Apple)</span>
+            <div class={styles.canvasContainer}>
+              <canvas id="prev48" width="48" height="48" style="width: 48px; height: 48px;"></canvas>
+            </div>
+            <div class={styles.previewCardInfo}>
+              <span class={styles.previewLabel}>48×48</span>
+              <span class={styles.previewSub}>Desktop Shortcut</span>
+            </div>
+            <button type="button" class={`${styles.cardDownloadBtn} dl-btn`} data-target="prev48" data-filename="favicon-48x48.png">
+              Download
+            </button>
           </div>
+
+          <!-- 180x180 -->
           <div class={styles.previewCard}>
-            <canvas id="prev192" width="192" height="192" style="width: 60px; height: 60px;"></canvas>
-            <span class={styles.previewLabel}>192×192 (Android)</span>
+            <div class={styles.canvasContainer}>
+              <canvas id="prev180" width="180" height="180" style="width: 54px; height: 54px; border-radius: 11px;"></canvas>
+            </div>
+            <div class={styles.previewCardInfo}>
+              <span class={styles.previewLabel}>180×180</span>
+              <span class={styles.previewSub}>Apple Touch (iOS)</span>
+            </div>
+            <button type="button" class={`${styles.cardDownloadBtn} dl-btn`} data-target="prev180" data-filename="apple-touch-icon.png">
+              Download
+            </button>
           </div>
+
+          <!-- 192x192 -->
           <div class={styles.previewCard}>
-            <canvas id="prev512" width="512" height="512" style="width: 60px; height: 60px;"></canvas>
-            <span class={styles.previewLabel}>512×512 (PWA)</span>
+            <div class={styles.canvasContainer}>
+              <canvas id="prev192" width="192" height="192" style="width: 54px; height: 54px;"></canvas>
+            </div>
+            <div class={styles.previewCardInfo}>
+              <span class={styles.previewLabel}>192×192</span>
+              <span class={styles.previewSub}>Android Chrome</span>
+            </div>
+            <button type="button" class={`${styles.cardDownloadBtn} dl-btn`} data-target="prev192" data-filename="android-chrome-192x192.png">
+              Download
+            </button>
+          </div>
+
+          <!-- 512x512 -->
+          <div class={styles.previewCard}>
+            <div class={styles.canvasContainer}>
+              <canvas id="prev512" width="512" height="512" style="width: 54px; height: 54px;"></canvas>
+            </div>
+            <div class={styles.previewCardInfo}>
+              <span class={styles.previewLabel}>512×512</span>
+              <span class={styles.previewSub}>PWA Splash Icon</span>
+            </div>
+            <button type="button" class={`${styles.cardDownloadBtn} dl-btn`} data-target="prev512" data-filename="android-chrome-512x512.png">
+              Download
+            </button>
           </div>
         </div>
 
-        <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+        <div class={styles.actionRow}>
           <button type="button" id="btn-download-ico" class={styles.btnPrimary}>
-            Download 32×32 PNG Favicon
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Download Favicon (32×32 PNG)
           </button>
           <button type="button" id="btn-download-apple" class={styles.btnSecondary}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
             Download Apple Touch Icon (180×180)
+          </button>
+          <button type="button" id="btn-download-manifest-file" class={styles.btnSecondary}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            Download site.webmanifest
           </button>
         </div>
       </div>
     </section>
 
-    <!-- Metadata & Code Snippet -->
+    <!-- Step 3: Code Snippets -->
     <section class={styles.section}>
       <div class={styles.card}>
         <div class={styles.sectionHeader}>
-          <div class={styles.stepNum}>3</div>
+          <div class={styles.stepNum}>03</div>
           <div>
             <h2 class={styles.sectionTitle}>HTML &amp; Manifest Code</h2>
-            <p class={styles.sectionSub}>Add this snippet to your &lt;head&gt; section</p>
+            <p class={styles.sectionSub}>Add these snippets directly to your website codebase</p>
           </div>
         </div>
 
         <div class={styles.outputBox}>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <span style="font-size: 0.85rem; color: var(--text-muted);">Recommended HTML Header Tags</span>
-            <button type="button" id="btn-copy-code" class={styles.btnSecondary} style="font-size: 0.75rem; padding: 4px 10px;">
-              Copy Code
-            </button>
+          <div class={styles.outputHeader}>
+            <div class={styles.tabGroup}>
+              <button type="button" id="tab-html" class={styles.tabBtn} data-active="true">
+                HTML &lt;head&gt; Tags
+              </button>
+              <button type="button" id="tab-manifest" class={styles.tabBtn} data-active="false">
+                site.webmanifest
+              </button>
+            </div>
+            <div class={styles.outputActions}>
+              <button type="button" id="btn-copy-code" class={styles.btnSmall}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+                </svg>
+                <span id="copy-btn-text">Copy Code</span>
+              </button>
+            </div>
           </div>
-          <textarea
-            id="html-output-code"
-            readonly
-            class={styles.codeTextarea}
-            rows="10"
-            style="font-family: monospace; font-size: 0.85rem;"
-          >&lt;!-- Standard Favicon --&gt;
+
+          <div class={styles.codeWrapper}>
+            <textarea
+              id="html-output-code"
+              readonly
+              class={styles.codeTextarea}
+              rows="11"
+              spellcheck="false"
+            >&lt;!-- Standard Favicons --&gt;
 &lt;link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" /&gt;
 &lt;link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" /&gt;
 
@@ -129,7 +238,8 @@ import styles from '@/styles/favicongen.module.css';
 
 &lt;!-- Web App Manifest --&gt;
 &lt;link rel="manifest" href="/site.webmanifest" /&gt;
-&lt;meta name="theme-color" content="#1a1a1a" /&gt;</textarea>
+&lt;meta name="theme-color" content="#13161F" /&gt;</textarea>
+          </div>
         </div>
       </div>
     </section>
@@ -140,17 +250,99 @@ import styles from '@/styles/favicongen.module.css';
   const fileInput = document.getElementById('favicon-file-input') as HTMLInputElement;
   const dropzone = document.getElementById('dropzone');
   const infoBar = document.getElementById('image-info-bar');
+  const imgThumb = document.getElementById('img-thumb') as HTMLImageElement;
   const imgName = document.getElementById('img-name');
   const imgDims = document.getElementById('img-dims');
+  const imgSize = document.getElementById('img-size');
   const btnClear = document.getElementById('btn-clear-img');
   const previewSection = document.getElementById('preview-section');
 
   const btnDownloadIco = document.getElementById('btn-download-ico');
   const btnDownloadApple = document.getElementById('btn-download-apple');
+  const btnDownloadManifest = document.getElementById('btn-download-manifest-file');
   const btnCopyCode = document.getElementById('btn-copy-code');
+  const copyBtnText = document.getElementById('copy-btn-text');
   const codeOutput = document.getElementById('html-output-code') as HTMLTextAreaElement;
 
+  const tabHtml = document.getElementById('tab-html');
+  const tabManifest = document.getElementById('tab-manifest');
+
+  let activeTab: 'html' | 'manifest' = 'html';
+
+  const htmlSnippet = `<!-- Standard Favicons -->
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+
+<!-- Apple Touch Icon -->
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+<!-- Web App Manifest -->
+<link rel="manifest" href="/site.webmanifest" />
+<meta name="theme-color" content="#13161F" />`;
+
+  const manifestSnippet = `{
+  "name": "My App",
+  "short_name": "App",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#13161F",
+  "background_color": "#0C0E14",
+  "display": "standalone"
+}`;
+
+  function updateSnippet() {
+    if (!codeOutput) return;
+    if (activeTab === 'html') {
+      codeOutput.value = htmlSnippet;
+      tabHtml?.setAttribute('data-active', 'true');
+      tabManifest?.setAttribute('data-active', 'false');
+    } else {
+      codeOutput.value = manifestSnippet;
+      tabManifest?.setAttribute('data-active', 'true');
+      tabHtml?.setAttribute('data-active', 'false');
+    }
+  }
+
+  tabHtml?.addEventListener('click', () => {
+    activeTab = 'html';
+    updateSnippet();
+  });
+
+  tabManifest?.addEventListener('click', () => {
+    activeTab = 'manifest';
+    updateSnippet();
+  });
+
+  // Dropzone click & drag-and-drop
   dropzone?.addEventListener('click', () => fileInput?.click());
+
+  dropzone?.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropzone.setAttribute('data-dragover', 'true');
+  });
+
+  dropzone?.addEventListener('dragleave', () => {
+    dropzone.removeAttribute('data-dragover');
+  });
+
+  dropzone?.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropzone.removeAttribute('data-dragover');
+    const files = e.dataTransfer?.files;
+    if (files && files.length > 0) {
+      handleFile(files[0]);
+    }
+  });
 
   fileInput?.addEventListener('change', () => {
     const file = fileInput.files?.[0];
@@ -160,17 +352,25 @@ import styles from '@/styles/favicongen.module.css';
   function handleFile(file: File) {
     const reader = new FileReader();
     reader.onload = () => {
+      const dataUrl = reader.result as string;
       const img = new Image();
       img.onload = () => {
         if (imgName) imgName.textContent = file.name;
         if (imgDims) imgDims.textContent = `${img.width} × ${img.height}px`;
+        if (imgSize) {
+          const ext = file.name.split('.').pop()?.toUpperCase() || 'IMAGE';
+          const sizeKb = (file.size / 1024).toFixed(1);
+          imgSize.textContent = `${ext} • ${sizeKb} KB`;
+        }
+        if (imgThumb) imgThumb.src = dataUrl;
+
         if (dropzone) dropzone.style.display = 'none';
         if (infoBar) infoBar.style.display = 'flex';
         if (previewSection) previewSection.style.display = 'block';
 
         renderPreviews(img);
       };
-      img.src = reader.result as string;
+      img.src = dataUrl;
     };
     reader.readAsDataURL(file);
   }
@@ -179,6 +379,7 @@ import styles from '@/styles/favicongen.module.css';
     const sizes = [
       { id: 'prev16', s: 16 },
       { id: 'prev32', s: 32 },
+      { id: 'prev48', s: 48 },
       { id: 'prev180', s: 180 },
       { id: 'prev192', s: 192 },
       { id: 'prev512', s: 512 },
@@ -191,6 +392,8 @@ import styles from '@/styles/favicongen.module.css';
         c.height = s;
         const ctx = c.getContext('2d');
         if (ctx) {
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
           ctx.clearRect(0, 0, s, s);
           ctx.drawImage(img, 0, 0, s, s);
         }
@@ -204,11 +407,39 @@ import styles from '@/styles/favicongen.module.css';
     const a = document.createElement('a');
     a.href = c.toDataURL('image/png');
     a.download = filename;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
   }
+
+  function downloadText(filename: string, text: string) {
+    const blob = new Blob([text], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // Setup individual preview card download buttons
+  document.querySelectorAll('.dl-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const el = e.currentTarget as HTMLElement;
+      const targetId = el.getAttribute('data-target');
+      const filename = el.getAttribute('data-filename');
+      if (targetId && filename) {
+        downloadCanvas(targetId, filename);
+      }
+    });
+  });
 
   btnDownloadIco?.addEventListener('click', () => downloadCanvas('prev32', 'favicon-32x32.png'));
   btnDownloadApple?.addEventListener('click', () => downloadCanvas('prev180', 'apple-touch-icon.png'));
+  btnDownloadManifest?.addEventListener('click', () => downloadText('site.webmanifest', manifestSnippet));
 
   btnClear?.addEventListener('click', () => {
     if (fileInput) fileInput.value = '';
@@ -218,11 +449,11 @@ import styles from '@/styles/favicongen.module.css';
   });
 
   btnCopyCode?.addEventListener('click', async () => {
-    if (codeOutput?.value && btnCopyCode) {
+    if (codeOutput?.value && copyBtnText) {
       await navigator.clipboard.writeText(codeOutput.value);
-      const prev = btnCopyCode.textContent;
-      btnCopyCode.textContent = 'Copied!';
-      setTimeout(() => (btnCopyCode.textContent = prev), 1500);
+      const prev = copyBtnText.textContent;
+      copyBtnText.textContent = 'Copied!';
+      setTimeout(() => (copyBtnText.textContent = prev), 1800);
     }
   });
 </script>
