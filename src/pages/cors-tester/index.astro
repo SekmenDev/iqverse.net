@@ -1,6 +1,6 @@
 ---
 import ToolLayout from '@/layouts/ToolLayout.astro';
-import sharedStyles from '@/styles/shared-tool-styles.module.css';
+import styles from '@/styles/cors-tester.module.css';
 ---
 
 <ToolLayout
@@ -10,167 +10,405 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   toolSlug="cors-tester"
   description="Test CORS response headers and simulate preflight OPTIONS requests to debug cross-origin API permissions."
 >
-  <div style="max-width: 1000px;">
-    <section class={sharedStyles.section}>
-      <div class={sharedStyles.card}>
-        <div class={sharedStyles.field}>
-          <label class={sharedStyles.fieldLabel} for="targetUrl">
-            Target API Endpoint URL
-          </label>
-          <input
-            id="targetUrl"
-            type="text"
-            value="https://api.github.com/zen"
-            class={sharedStyles.input}
-            placeholder="https://api.example.com/v1/resource"
-          />
-        </div>
+  <div class={styles.container}>
+    <div class={styles.card}>
+      <div class={styles.cardHeader}>
+        <h2 class={styles.cardTitle}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+          </svg>
+          CORS Request Configuration
+        </h2>
+      </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-          <div class={sharedStyles.field}>
-            <label class={sharedStyles.fieldLabel} for="reqMethod">
-              HTTP Method
-            </label>
-            <select id="reqMethod" class={sharedStyles.input}>
+      <!-- Presets -->
+      <div class={styles.presetsRow}>
+        <span class={styles.presetsLabel}>Presets:</span>
+        <button type="button" class={styles.presetChip} data-url="https://api.github.com/zen" data-method="GET" data-origin="https://iqverse.net">
+          GitHub API
+        </button>
+        <button type="button" class={styles.presetChip} data-url="https://jsonplaceholder.typicode.com/posts/1" data-method="GET" data-origin="http://localhost:3000">
+          JSONPlaceholder
+        </button>
+        <button type="button" class={styles.presetChip} data-url="https://httpbin.org/get" data-method="GET" data-origin="https://example.com">
+          HTTPBin GET
+        </button>
+        <button type="button" class={styles.presetChip} data-url="https://httpbin.org/post" data-method="POST" data-origin="https://iqverse.net">
+          HTTPBin POST
+        </button>
+      </div>
+
+      <div class={styles.formGrid}>
+        <div class={styles.urlInputRow}>
+          <div class={styles.field}>
+            <label class={styles.fieldLabel} for="reqMethod">Method</label>
+            <select id="reqMethod" class={styles.selectInput}>
               <option value="GET">GET</option>
               <option value="POST">POST</option>
-              <option value="OPTIONS">OPTIONS (Preflight)</option>
+              <option value="OPTIONS">OPTIONS</option>
               <option value="PUT">PUT</option>
               <option value="DELETE">DELETE</option>
+              <option value="PATCH">PATCH</option>
+              <option value="HEAD">HEAD</option>
             </select>
           </div>
 
-          <div class={sharedStyles.field}>
-            <label class={sharedStyles.fieldLabel} for="originHeader">
-              Simulated Origin Header
-            </label>
+          <div class={styles.field}>
+            <label class={styles.fieldLabel} for="targetUrl">Target API Endpoint URL</label>
             <input
-              id="originHeader"
+              id="targetUrl"
               type="text"
-              value="https://iqverse.net"
-              class={sharedStyles.input}
-              placeholder="https://myapp.com"
+              value="https://api.github.com/zen"
+              class={styles.textInput}
+              placeholder="https://api.example.com/v1/resource"
             />
           </div>
         </div>
 
-        <button
-          type="button"
-          id="btn-run-cors-test"
-          class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
-        >
-          Test CORS Preflight & Headers
-        </button>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+          <div class={styles.field}>
+            <label class={styles.fieldLabel} for="originHeader">Simulated Origin Header</label>
+            <input
+              id="originHeader"
+              type="text"
+              value="https://iqverse.net"
+              class={styles.textInput}
+              placeholder="https://myapp.com or http://localhost:3000"
+            />
+          </div>
 
-        <div id="cors-error-card" class={sharedStyles.errorCard} style="margin-top: 16px; display: none;">
-          <div id="cors-error-msg" class={sharedStyles.errorMessage}></div>
+          <div class={styles.field}>
+            <label class={styles.fieldLabel} for="customHeaders">Custom Request Headers (JSON or Key: Value)</label>
+            <input
+              id="customHeaders"
+              type="text"
+              value=""
+              class={styles.textInput}
+              placeholder="Authorization: Bearer token, X-Custom: 123"
+            />
+          </div>
         </div>
 
-        <div id="cors-result-box" style="margin-top: 24px; padding: 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); display: none;"></div>
+        <div class={styles.actionsRow}>
+          <button type="button" id="btn-run-cors-test" class={styles.btnPrimary}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <span id="btn-text">Test CORS Preflight & Headers</span>
+          </button>
+        </div>
       </div>
-    </section>
+
+      <!-- Result Container -->
+      <div id="cors-results" class={styles.resultsContainer} style="display: none;"></div>
+    </div>
   </div>
 </ToolLayout>
 
 <script>
+  import styles from '@/styles/cors-tester.module.css';
+
   const urlInput = document.getElementById('targetUrl') as HTMLInputElement;
   const methodSelect = document.getElementById('reqMethod') as HTMLSelectElement;
   const originInput = document.getElementById('originHeader') as HTMLInputElement;
-  const btnRun = document.getElementById('btn-run-cors-test');
-  const errorCard = document.getElementById('cors-error-card');
-  const errorMsg = document.getElementById('cors-error-msg');
-  const resultBox = document.getElementById('cors-result-box');
+  const customHeadersInput = document.getElementById('customHeaders') as HTMLInputElement;
+  const btnRun = document.getElementById('btn-run-cors-test') as HTMLButtonElement;
+  const btnText = document.getElementById('btn-text') as HTMLSpanElement;
+  const resultsBox = document.getElementById('cors-results') as HTMLDivElement;
+
+  // Preset buttons
+  document.querySelectorAll<HTMLButtonElement>('[data-url]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (urlInput && btn.dataset.url) urlInput.value = btn.dataset.url;
+      if (methodSelect && btn.dataset.method) methodSelect.value = btn.dataset.method;
+      if (originInput && btn.dataset.origin) originInput.value = btn.dataset.origin;
+    });
+  });
 
   btnRun?.addEventListener('click', async () => {
     const targetUrl = urlInput?.value.trim();
-    if (!targetUrl) return;
+    if (!targetUrl) {
+      urlInput?.focus();
+      return;
+    }
 
     const requestMethod = methodSelect?.value || 'GET';
     const originHeader = originInput?.value.trim() || 'https://iqverse.net';
+    const customHeadersRaw = customHeadersInput?.value.trim() || '';
 
-    if (errorCard) errorCard.style.display = 'none';
-    if (resultBox) resultBox.style.display = 'none';
-    if (btnRun) btnRun.textContent = 'Testing CORS Response...';
+    btnRun.disabled = true;
+    if (btnText) btnText.textContent = 'Testing Request...';
+    if (resultsBox) resultsBox.style.display = 'none';
 
-    const notes: string[] = [];
-    let isCorsAllowed = false;
+    const reqHeaders: Record<string, string> = {
+      Origin: originHeader,
+    };
+
+    if (customHeadersRaw) {
+      if (customHeadersRaw.startsWith('{')) {
+        try {
+          Object.assign(reqHeaders, JSON.parse(customHeadersRaw));
+        } catch {
+          // ignore parse error
+        }
+      } else {
+        customHeadersRaw.split(',').forEach((part) => {
+          const [k, ...v] = part.split(':');
+          if (k && v.length) reqHeaders[k.trim()] = v.join(':').trim();
+        });
+      }
+    }
+
+    const startTime = performance.now();
 
     try {
       const response = await fetch(targetUrl, {
         method: requestMethod,
-        headers: {
-          Origin: originHeader,
-        },
+        headers: reqHeaders,
         mode: 'cors',
       });
 
+      const durationMs = Math.round(performance.now() - startTime);
       const allHeaders: Record<string, string> = {};
       response.headers.forEach((val, key) => {
         allHeaders[key.toLowerCase()] = val;
       });
 
       const allowedOrigin = allHeaders['access-control-allow-origin'];
+      const allowedMethods = allHeaders['access-control-allow-methods'];
+      const allowedHeaders = allHeaders['access-control-allow-headers'];
       const allowedCredentials = allHeaders['access-control-allow-credentials'];
+      const maxAge = allHeaders['access-control-max-age'];
+      const exposeHeaders = allHeaders['access-control-expose-headers'];
+
+      let isAllowed = false;
+      let isWarning = false;
+      const notes: { icon: string; text: string; type: 'success' | 'danger' | 'info' }[] = [];
 
       if (allowedOrigin === '*' || allowedOrigin === originHeader) {
-        isCorsAllowed = true;
-        notes.push(`✓ Origin allowed: ${allowedOrigin}`);
+        isAllowed = true;
+        notes.push({
+          icon: '✓',
+          text: `Origin allowed: Server returned Access-Control-Allow-Origin: "${allowedOrigin}".`,
+          type: 'success',
+        });
       } else if (allowedOrigin) {
-        notes.push(`✕ Origin mismatch: Server returned Access-Control-Allow-Origin: ${allowedOrigin}`);
+        notes.push({
+          icon: '✕',
+          text: `Origin mismatch: Server returned "${allowedOrigin}", but simulated origin was "${originHeader}".`,
+          type: 'danger',
+        });
       } else {
-        notes.push('✕ Missing Access-Control-Allow-Origin header in response.');
+        notes.push({
+          icon: '✕',
+          text: 'Missing Access-Control-Allow-Origin header in response. Cross-origin browser requests will be blocked.',
+          type: 'danger',
+        });
       }
 
       if (allowedCredentials === 'true') {
-        notes.push('ℹ Access-Control-Allow-Credentials is enabled.');
+        notes.push({
+          icon: 'ℹ',
+          text: 'Access-Control-Allow-Credentials is true (Cookies and Authorization headers allowed).',
+          type: 'info',
+        });
         if (allowedOrigin === '*') {
-          notes.push('⚠️ Security Warning: Wildcard (*) origin cannot be used with Credentials=true.');
-          isCorsAllowed = false;
+          isAllowed = false;
+          isWarning = true;
+          notes.push({
+            icon: '⚠️',
+            text: 'CORS Security Violation: Wildcard origin ("*") cannot be combined with Credentials=true according to the Fetch specification.',
+            type: 'danger',
+          });
         }
       }
 
-      if (resultBox) {
-        resultBox.style.border = `1px solid ${isCorsAllowed ? '#4caf50' : '#ff4d4f'}`;
-        resultBox.innerHTML = `
-          <h4 style="margin: 0 0 12px 0; color: ${isCorsAllowed ? '#4caf50' : '#ff4d4f'};">
-            ${isCorsAllowed ? '✓ CORS Allowed for Endpoint' : '✕ CORS Request Blocked or Invalid'}
-          </h4>
-
-          <div style="margin-bottom: 12px; font-size: 0.9rem;">
-            HTTP Status: <strong>${response.status} ${response.statusText}</strong>
-          </div>
-
-          <div style="margin-bottom: 16px;">
-            <strong>CORS Analysis Notes:</strong>
-            <ul style="margin: 4px 0 0 18px; padding: 0;">
-              ${notes.map((n) => `<li>${n}</li>`).join('')}
-            </ul>
-          </div>
-
-          <div>
-            <h5 style="margin: 0 0 8px 0;">Received Response Headers</h5>
-            <div style="font-family: monospace; font-size: 0.85rem; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 6px;">
-              ${Object.entries(allHeaders)
-                .map(
-                  ([k, v]) => `
-                <div>
-                  <strong style="color: ${k.startsWith('access-control') ? '#4caf50' : 'inherit'};">${k}:</strong> ${v}
-                </div>
-              `
-                )
-                .join('')}
-            </div>
-          </div>
-        `;
-        resultBox.style.display = 'block';
+      if (allowedMethods) {
+        notes.push({
+          icon: '✓',
+          text: `Allowed Methods: ${allowedMethods}`,
+          type: 'info',
+        });
       }
+
+      if (allowedHeaders) {
+        notes.push({
+          icon: '✓',
+          text: `Allowed Request Headers: ${allowedHeaders}`,
+          type: 'info',
+        });
+      }
+
+      if (maxAge) {
+        notes.push({
+          icon: 'ℹ',
+          text: `Preflight Cache Max-Age: ${maxAge} seconds.`,
+          type: 'info',
+        });
+      }
+
+      if (exposeHeaders) {
+        notes.push({
+          icon: 'ℹ',
+          text: `Exposed Headers to Client JavaScript: ${exposeHeaders}`,
+          type: 'info',
+        });
+      }
+
+      renderSuccessResult({
+        isAllowed,
+        isWarning,
+        status: response.status,
+        statusText: response.statusText || 'OK',
+        durationMs,
+        notes,
+        allHeaders,
+      });
     } catch (err: any) {
-      if (errorCard && errorMsg) {
-        errorCard.style.display = 'block';
-        errorMsg.textContent = `CORS Request Failed: ${err.message || 'Browser blocked cross-origin fetch.'}`;
-      }
+      const durationMs = Math.round(performance.now() - startTime);
+      renderErrorResult({
+        message: err.message || 'Browser blocked cross-origin fetch or network connection failed.',
+        durationMs,
+      });
     } finally {
-      if (btnRun) btnRun.textContent = 'Test CORS Preflight & Headers';
+      btnRun.disabled = false;
+      if (btnText) btnText.textContent = 'Test CORS Preflight & Headers';
     }
   });
+
+  function renderSuccessResult(data: {
+    isAllowed: boolean;
+    isWarning: boolean;
+    status: number;
+    statusText: string;
+    durationMs: number;
+    notes: { icon: string; text: string; type: 'success' | 'danger' | 'info' }[];
+    allHeaders: Record<string, string>;
+  }) {
+    if (!resultsBox) return;
+
+    const bannerClass = data.isAllowed
+      ? `${styles.verdictBanner} ${styles.verdictBannerSuccess}`
+      : data.isWarning
+      ? `${styles.verdictBanner} ${styles.verdictBannerWarning}`
+      : `${styles.verdictBanner} ${styles.verdictBannerDanger}`;
+
+    const bannerIcon = data.isAllowed ? '✓' : data.isWarning ? '⚠️' : '✕';
+    const bannerTitle = data.isAllowed
+      ? 'CORS Headers Validated — Cross-Origin Request Allowed'
+      : data.isWarning
+      ? 'CORS Warning Detected — Check Credentials & Wildcards'
+      : 'CORS Request Blocked — Missing or Invalid Origin Headers';
+
+    const headerEntries = Object.entries(data.allHeaders);
+
+    resultsBox.innerHTML = `
+      <div class="${bannerClass}">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 1.4rem; font-weight: 700; line-height: 1;">${bannerIcon}</span>
+          <div>
+            <h3 style="margin: 0; font-size: 1rem; font-weight: 700;">${bannerTitle}</h3>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; font-family: monospace; font-size: 0.82rem;">
+          <span style="padding: 4px 10px; border-radius: 6px; font-weight: 700; background: rgba(0,0,0,0.25);">HTTP ${data.status} ${data.statusText}</span>
+          <span style="opacity: 0.8;">${data.durationMs}ms</span>
+        </div>
+      </div>
+
+      <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+        <h4 style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">
+          CORS Analysis Findings
+        </h4>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          ${data.notes
+            .map(
+              (n) => `
+            <div style="display: flex; align-items: flex-start; gap: 8px; font-size: 0.88rem; line-height: 1.5;">
+              <span style="font-weight: 700; color: ${
+                n.type === 'success' ? 'var(--green)' : n.type === 'danger' ? 'var(--red)' : 'var(--accent)'
+              };">${n.icon}</span>
+              <span>${n.text}</span>
+            </div>
+          `
+            )
+            .join('')}
+        </div>
+      </div>
+
+      <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border);">
+          <h4 style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">
+            Response Headers (${headerEntries.length})
+          </h4>
+          <button type="button" id="btn-copy-headers" style="font-size: 0.78rem; padding: 4px 10px; border-radius: 6px; background: var(--surface); border: 1px solid var(--border); color: var(--text); cursor: pointer;">
+            Copy Headers
+          </button>
+        </div>
+        <div style="padding: 14px 16px; font-family: monospace; font-size: 0.84rem; line-height: 1.7; max-height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;">
+          ${
+            headerEntries.length > 0
+              ? headerEntries
+                  .map(
+                    ([k, v]) => `
+              <div style="display: flex; gap: 8px; word-break: break-all;">
+                <span style="font-weight: 600; min-width: 240px; color: ${
+                  k.startsWith('access-control') ? 'var(--green)' : 'var(--text-muted)'
+                };">${k}:</span>
+                <span style="color: var(--text);">${v}</span>
+              </div>
+            `
+                  )
+                  .join('')
+              : '<span style="color: var(--text-muted);">No response headers exposed by server.</span>'
+          }
+        </div>
+      </div>
+    `;
+
+    resultsBox.style.display = 'flex';
+
+    document.getElementById('btn-copy-headers')?.addEventListener('click', async (e) => {
+      const btn = e.currentTarget as HTMLButtonElement;
+      const text = headerEntries.map(([k, v]) => `${k}: ${v}`).join('\n');
+      await navigator.clipboard.writeText(text);
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => (btn.textContent = original), 1500);
+    });
+  }
+
+  function renderErrorResult(data: { message: string; durationMs: number }) {
+    if (!resultsBox) return;
+
+    resultsBox.innerHTML = `
+      <div style="background: rgba(248, 113, 113, 0.1); border: 1px solid rgba(248, 113, 113, 0.3); color: var(--red); padding: 16px 20px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 1.4rem; font-weight: 700;">✕</span>
+          <div>
+            <h3 style="margin: 0; font-size: 1rem; font-weight: 700;">CORS Request Failed / Preflight Blocked</h3>
+            <p style="margin: 4px 0 0; font-size: 0.85rem; opacity: 0.9;">${data.message}</p>
+          </div>
+        </div>
+        <div style="font-family: monospace; font-size: 0.82rem; opacity: 0.8;">
+          ${data.durationMs}ms
+        </div>
+      </div>
+
+      <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px;">
+        <h4 style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 8px;">
+          Why did this happen?
+        </h4>
+        <ul style="margin: 0; padding-left: 20px; font-size: 0.86rem; line-height: 1.6; color: var(--text-muted);">
+          <li>The remote server does not include the <code style="color: var(--text);">Access-Control-Allow-Origin</code> header matching your origin.</li>
+          <li>If this is a non-simple request (e.g. POST with JSON body or custom headers), the server did not respond successfully to the browser's preflight <code style="color: var(--text);">OPTIONS</code> probe.</li>
+          <li>For local development APIs (Express, FastAPI, Next.js), ensure you have enabled CORS middleware for your origin.</li>
+        </ul>
+      </div>
+    `;
+
+    resultsBox.style.display = 'flex';
+  }
 </script>

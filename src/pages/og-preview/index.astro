@@ -1,6 +1,6 @@
 ---
 import ToolLayout from '@/layouts/ToolLayout.astro';
-import sharedStyles from '@/styles/shared-tool-styles.module.css';
+import styles from '@/styles/og-preview.module.css';
 ---
 
 <ToolLayout
@@ -10,313 +10,466 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   toolSlug="og-preview"
   description="Generate and preview Open Graph (OG), Twitter Card, and Google Search snippets with live social card rendering and HTML tag exporter."
 >
-  <div style="max-width: 1100px;">
-    <section class={sharedStyles.section}>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px;">
-        <!-- Inputs -->
-        <div class={sharedStyles.card}>
-          <h3 style="margin: 0 0 16px 0; font-size: 1.1rem;">Meta Tags Input</h3>
+  <div class={styles.container}>
+    <div class={styles.workspaceGrid}>
+      <!-- Input Controls Card -->
+      <div class={styles.card}>
+        <div class={styles.cardHeader}>
+          <h2 class={styles.cardTitle}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            Meta Tags Input
+          </h2>
+        </div>
 
-          <div class={sharedStyles.field}>
-            <label class={sharedStyles.fieldLabel} for="ogTitle">
-              Page Title (<span id="title-char-count">44</span>/60 chars)
-            </label>
-            <input
-              id="ogTitle"
-              type="text"
-              value="IQVerse - Free Developer & AI Agent Tools"
-              class={sharedStyles.input}
+        <!-- Presets -->
+        <div class={styles.presetsRow}>
+          <span class={styles.presetsLabel}>Templates:</span>
+          <button type="button" class={styles.presetChip} id="preset-iqverse">
+            IQVerse
+          </button>
+          <button type="button" class={styles.presetChip} id="preset-blog">
+            Blog Post
+          </button>
+          <button type="button" class={styles.presetChip} id="preset-saas">
+            SaaS App
+          </button>
+          <button type="button" class={styles.presetChip} id="preset-ecommerce">
+            Product
+          </button>
+        </div>
+
+        <!-- Title -->
+        <div class={styles.field}>
+          <label class={styles.fieldLabel} for="ogTitle">
+            <span>Page Title</span>
+            <span id="title-char-badge" class={`${styles.charMeter} ${styles.charMeterOptimal}`}>
+              <span id="title-char-count">41</span>/60 chars
+            </span>
+          </label>
+          <input
+            id="ogTitle"
+            type="text"
+            value="IQVerse - Free Developer & AI Agent Tools"
+            class={styles.textInput}
+            placeholder="Clean, punchy title under 60 characters"
+          />
+        </div>
+
+        <!-- Description -->
+        <div class={styles.field}>
+          <label class={styles.fieldLabel} for="ogDesc">
+            <span>Meta Description</span>
+            <span id="desc-char-badge" class={`${styles.charMeter} ${styles.charMeterOptimal}`}>
+              <span id="desc-char-count">85</span>/160 chars
+            </span>
+          </label>
+          <textarea
+            id="ogDesc"
+            class={styles.textareaInput}
+            rows="3"
+            placeholder="Compelling page description between 120-160 characters for search and social feeds..."
+          >Fast, private, client-side browser tools for developers, AI engineers and security researchers.</textarea>
+        </div>
+
+        <!-- Canonical URL -->
+        <div class={styles.field}>
+          <label class={styles.fieldLabel} for="ogUrl">
+            <span>Canonical URL</span>
+          </label>
+          <input
+            id="ogUrl"
+            type="text"
+            value="https://iqverse.net"
+            class={styles.textInput}
+            placeholder="https://example.com/page-url"
+          />
+        </div>
+
+        <!-- OG Image -->
+        <div class={styles.field}>
+          <label class={styles.fieldLabel} for="ogImg">
+            <span>Open Graph Image URL (og:image)</span>
+            <span style="font-size: 0.72rem; opacity: 0.7;">1200 × 630 px</span>
+          </label>
+          <div class={styles.imageInputWrap}>
+            <img
+              id="ogImgThumb"
+              src="https://iqverse.net/og-banner.png"
+              alt="OG Preview Thumbnail"
+              class={styles.imagePreviewThumb}
             />
-          </div>
-
-          <div class={sharedStyles.field}>
-            <label class={sharedStyles.fieldLabel} for="ogDesc">
-              Meta Description (<span id="desc-char-count">85</span>/160 chars)
-            </label>
-            <textarea
-              id="ogDesc"
-              class={sharedStyles.textarea}
-              rows="3"
-            >Fast, private, client-side browser tools for developers, AI engineers and security researchers.</textarea>
-          </div>
-
-          <div class={sharedStyles.field}>
-            <label class={sharedStyles.fieldLabel} for="ogUrl">
-              Canonical URL
-            </label>
-            <input
-              id="ogUrl"
-              type="text"
-              value="https://iqverse.net"
-              class={sharedStyles.input}
-            />
-          </div>
-
-          <div class={sharedStyles.field}>
-            <label class={sharedStyles.fieldLabel} for="ogImg">
-              Open Graph Image URL (og:image)
-            </label>
             <input
               id="ogImg"
               type="text"
               value="https://iqverse.net/og-banner.png"
-              class={sharedStyles.input}
+              class={styles.textInput}
+              placeholder="https://example.com/social-banner.png"
             />
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <div class={sharedStyles.field}>
-              <label class={sharedStyles.fieldLabel} for="siteName">
-                Site Name
-              </label>
-              <input
-                id="siteName"
-                type="text"
-                value="IQVerse"
-                class={sharedStyles.input}
-              />
-            </div>
-            <div class={sharedStyles.field}>
-              <label class={sharedStyles.fieldLabel} for="twHandle">
-                Twitter Handle
-              </label>
-              <input
-                id="twHandle"
-                type="text"
-                value="@iqverse"
-                class={sharedStyles.input}
-              />
-            </div>
           </div>
         </div>
 
-        <!-- Social Card Preview -->
-        <div class={sharedStyles.card}>
-          <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
-            <button
-              type="button"
-              id="btn-platform-google"
-              class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
-            >
-              Google
-            </button>
-            <button
-              type="button"
-              id="btn-platform-twitter"
-              class={sharedStyles.button}
-            >
-              Twitter / X
-            </button>
-            <button
-              type="button"
-              id="btn-platform-facebook"
-              class={sharedStyles.button}
-            >
-              Facebook
-            </button>
-            <button
-              type="button"
-              id="btn-platform-linkedin"
-              class={sharedStyles.button}
-            >
-              LinkedIn
-            </button>
+        <!-- Additional Metadata -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class={styles.field}>
+            <label class={styles.fieldLabel} for="siteName">Site Name</label>
+            <input
+              id="siteName"
+              type="text"
+              value="IQVerse"
+              class={styles.textInput}
+              placeholder="IQVerse"
+            />
           </div>
+          <div class={styles.field}>
+            <label class={styles.fieldLabel} for="twHandle">Twitter Handle</label>
+            <input
+              id="twHandle"
+              type="text"
+              value="@iqverse"
+              class={styles.textInput}
+              placeholder="@username"
+            />
+          </div>
+        </div>
+      </div>
 
-          <!-- Google Preview -->
-          <div
-            id="card-google"
-            style="padding: 16px; background: #ffffff; color: #202124; border-radius: 8px; font-family: arial, sans-serif;"
-          >
-            <div id="google-preview-url" style="font-size: 0.85rem; color: #202124; margin-bottom: 2px;">https://iqverse.net</div>
-            <div id="google-preview-title" style="font-size: 1.2rem; color: #1a0dab; font-weight: bold; margin-bottom: 4; cursor: pointer;">
+      <!-- Live Preview & Code Exporter Card -->
+      <div class={styles.card}>
+        <div class={styles.cardHeader}>
+          <h2 class={styles.cardTitle}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            Live Social Cards
+          </h2>
+        </div>
+
+        <!-- Platform Tabs -->
+        <div class={styles.platformTabs}>
+          <button type="button" id="tab-google" class={styles.tabBtn} data-active="true">
+            Google
+          </button>
+          <button type="button" id="tab-twitter" class={styles.tabBtn} data-active="false">
+            Twitter / X
+          </button>
+          <button type="button" id="tab-facebook" class={styles.tabBtn} data-active="false">
+            Facebook
+          </button>
+          <button type="button" id="tab-linkedin" class={styles.tabBtn} data-active="false">
+            LinkedIn
+          </button>
+          <button type="button" id="tab-discord" class={styles.tabBtn} data-active="false">
+            Discord
+          </button>
+        </div>
+
+        <!-- Live Preview Area -->
+        <div class={styles.previewArea}>
+          <!-- 1. Google Preview -->
+          <div id="card-google" class={styles.googleCard}>
+            <div class={styles.googleHeader}>
+              <div class={styles.googleFavicon}>G</div>
+              <div>
+                <div id="google-sitename" class={styles.googleSiteName}>IQVerse</div>
+                <div id="google-preview-url" class={styles.googleUrl}>https://iqverse.net</div>
+              </div>
+            </div>
+            <div id="google-preview-title" class={styles.googleTitle}>
               IQVerse - Free Developer & AI Agent Tools
             </div>
-            <div id="google-preview-desc" style="font-size: 0.875rem; color: #4d5156; line-height: 1.4;">
+            <div id="google-preview-desc" class={styles.googleDesc}>
               Fast, private, client-side browser tools for developers, AI engineers and security researchers.
             </div>
           </div>
 
-          <!-- Twitter Preview -->
-          <div
-            id="card-twitter"
-            style="border: 1px solid #333; border-radius: 12px; overflow: hidden; background: #000000; color: #ffffff; display: none;"
-          >
-            <div
-              id="tw-preview-img-box"
-              style="height: 180px; background: #222 center/cover no-repeat;"
-            ></div>
-            <div style="padding: 12px;">
-              <div id="tw-preview-url" style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 2px;">iqverse.net</div>
-              <div id="tw-preview-title" style="font-size: 0.95rem; font-weight: bold; margin-bottom: 4px;">IQVerse - Free Developer Tools</div>
-              <div id="tw-preview-desc" style="font-size: 0.85rem; opacity: 0.8; line-height: 1.3;">Description</div>
+          <!-- 2. Twitter / X Card -->
+          <div id="card-twitter" class={styles.twitterCard} style="display: none;">
+            <div id="tw-preview-img-box" class={styles.twitterImage}>
+              <div id="tw-preview-domain" class={styles.twitterDomainBadge}>iqverse.net</div>
+            </div>
+            <div class={styles.twitterContent}>
+              <div id="tw-preview-title" class={styles.twitterTitle}>IQVerse - Free Developer & AI Agent Tools</div>
+              <div id="tw-preview-desc" class={styles.twitterDesc}>
+                Fast, private, client-side browser tools for developers, AI engineers and security researchers.
+              </div>
             </div>
           </div>
 
-          <!-- Facebook Preview -->
-          <div
-            id="card-facebook"
-            style="border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: #f2f3f5; color: #1c1e21; font-family: helvetica, arial, sans-serif; display: none;"
-          >
-            <div id="fb-preview-img-box" style="height: 180px; background: #ccc center/cover no-repeat;"></div>
-            <div style="padding: 12px; background: #f2f3f5;">
-              <div id="fb-preview-url" style="font-size: 0.75rem; color: #606770; text-transform: uppercase; margin-bottom: 2px;">IQVERSE.NET</div>
-              <div id="fb-preview-title" style="font-size: 1rem; font-weight: bold; color: #1d2129; margin-bottom: 4px;">IQVerse</div>
-              <div id="fb-preview-desc" style="font-size: 0.85rem; color: #606770; line-height: 1.3;">Description</div>
+          <!-- 3. Facebook Card -->
+          <div id="card-facebook" class={styles.facebookCard} style="display: none;">
+            <div id="fb-preview-img-box" class={styles.facebookImage}></div>
+            <div class={styles.facebookContent}>
+              <div id="fb-preview-url" class={styles.facebookDomain}>IQVERSE.NET</div>
+              <div id="fb-preview-title" class={styles.facebookTitle}>IQVerse - Free Developer & AI Agent Tools</div>
+              <div id="fb-preview-desc" class={styles.facebookDesc}>
+                Fast, private, client-side browser tools for developers, AI engineers and security researchers.
+              </div>
             </div>
           </div>
 
-          <!-- LinkedIn Preview -->
-          <div
-            id="card-linkedin"
-            style="border: 1px solid #e0e0e0; border-radius: 4px; overflow: hidden; background: #ffffff; color: #000000; display: none;"
-          >
-            <div id="li-preview-img-box" style="height: 180px; background: #ddd center/cover no-repeat;"></div>
-            <div style="padding: 12px;">
-              <div id="li-preview-title" style="font-size: 0.9rem; font-weight: bold; color: rgba(0,0,0,0.9); margin-bottom: 4px;">IQVerse</div>
-              <div id="li-preview-url" style="font-size: 0.75rem; color: rgba(0,0,0,0.6);">iqverse.net</div>
+          <!-- 4. LinkedIn Card -->
+          <div id="card-linkedin" class={styles.linkedinCard} style="display: none;">
+            <div id="li-preview-img-box" class={styles.linkedinImage}></div>
+            <div class={styles.linkedinContent}>
+              <div id="li-preview-title" class={styles.linkedinTitle}>IQVerse - Free Developer & AI Agent Tools</div>
+              <div id="li-preview-url" class={styles.linkedinDomain}>iqverse.net</div>
             </div>
           </div>
 
-          <!-- Code Output -->
-          <div style="margin-top: 24px;" class={sharedStyles.field}>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <label class={sharedStyles.fieldLabel} for="metaCodeOutput">
-                Generated HTML Meta Tags
-              </label>
-              <button type="button" id="btn-copy-meta-tags" class={sharedStyles.button}>
-                Copy Tags
-              </button>
+          <!-- 5. Discord Card -->
+          <div id="card-discord" class={styles.discordCard} style="display: none;">
+            <div id="discord-sitename" class={styles.discordSite}>IQVerse</div>
+            <div id="discord-preview-title" class={styles.discordTitle}>IQVerse - Free Developer & AI Agent Tools</div>
+            <div id="discord-preview-desc" class={styles.discordDesc}>
+              Fast, private, client-side browser tools for developers, AI engineers and security researchers.
             </div>
-            <textarea
-              id="metaCodeOutput"
-              readonly
-              class={sharedStyles.outputArea}
-              rows="10"
-              style="font-family: monospace;"
-            ></textarea>
+            <div id="discord-preview-img" class={styles.discordImage}></div>
           </div>
         </div>
+
+        <!-- Code Exporter -->
+        <div style="border-top: 1px solid var(--border); padding-top: 18px;">
+          <div class={styles.codeHeader}>
+            <label class={styles.fieldLabel} for="metaCodeOutput" style="margin: 0;">
+              Generated HTML Meta Tags
+            </label>
+            <button type="button" id="btn-copy-meta-tags" class={styles.btnCopy}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span id="copy-btn-text">Copy Tags</span>
+            </button>
+          </div>
+          <textarea
+            id="metaCodeOutput"
+            readonly
+            class={styles.outputTextarea}
+            rows="8"
+          ></textarea>
+        </div>
       </div>
-    </section>
+    </div>
   </div>
 </ToolLayout>
 
 <script>
+  import styles from '@/styles/og-preview.module.css';
+
   const titleInput = document.getElementById('ogTitle') as HTMLInputElement;
   const descInput = document.getElementById('ogDesc') as HTMLTextAreaElement;
   const urlInput = document.getElementById('ogUrl') as HTMLInputElement;
   const imgInput = document.getElementById('ogImg') as HTMLInputElement;
+  const imgThumb = document.getElementById('ogImgThumb') as HTMLImageElement;
   const siteNameInput = document.getElementById('siteName') as HTMLInputElement;
   const twHandleInput = document.getElementById('twHandle') as HTMLInputElement;
 
   const titleCount = document.getElementById('title-char-count');
+  const titleBadge = document.getElementById('title-char-badge');
   const descCount = document.getElementById('desc-char-count');
+  const descBadge = document.getElementById('desc-char-badge');
+
   const metaOut = document.getElementById('metaCodeOutput') as HTMLTextAreaElement;
   const btnCopy = document.getElementById('btn-copy-meta-tags');
+  const copyBtnText = document.getElementById('copy-btn-text');
 
-  const btnGoogle = document.getElementById('btn-platform-google');
-  const btnTwitter = document.getElementById('btn-platform-twitter');
-  const btnFacebook = document.getElementById('btn-platform-facebook');
-  const btnLinkedin = document.getElementById('btn-platform-linkedin');
+  const tabGoogle = document.getElementById('tab-google');
+  const tabTwitter = document.getElementById('tab-twitter');
+  const tabFacebook = document.getElementById('tab-facebook');
+  const tabLinkedin = document.getElementById('tab-linkedin');
+  const tabDiscord = document.getElementById('tab-discord');
 
   const cardGoogle = document.getElementById('card-google');
   const cardTwitter = document.getElementById('card-twitter');
   const cardFacebook = document.getElementById('card-facebook');
   const cardLinkedin = document.getElementById('card-linkedin');
+  const cardDiscord = document.getElementById('card-discord');
 
-  function setPlatform(platform: 'google' | 'twitter' | 'facebook' | 'linkedin') {
-    [btnGoogle, btnTwitter, btnFacebook, btnLinkedin].forEach((b) => (b!.className = 'sharedStyles_button'));
-    [cardGoogle, cardTwitter, cardFacebook, cardLinkedin].forEach((c) => (c!.style.display = 'none'));
+  // Preset Handlers
+  document.getElementById('preset-iqverse')?.addEventListener('click', () => {
+    if (titleInput) titleInput.value = 'IQVerse - Free Developer & AI Agent Tools';
+    if (descInput) descInput.value = 'Fast, private, client-side browser tools for developers, AI engineers and security researchers.';
+    if (urlInput) urlInput.value = 'https://iqverse.net';
+    if (imgInput) imgInput.value = 'https://iqverse.net/og-banner.png';
+    if (siteNameInput) siteNameInput.value = 'IQVerse';
+    if (twHandleInput) twHandleInput.value = '@iqverse';
+    update();
+  });
 
-    if (platform === 'google') {
-      btnGoogle!.className = 'sharedStyles_button sharedStyles_buttonPrimary button-primary';
-      cardGoogle!.style.display = 'block';
-    } else if (platform === 'twitter') {
-      btnTwitter!.className = 'sharedStyles_button sharedStyles_buttonPrimary button-primary';
-      cardTwitter!.style.display = 'block';
-    } else if (platform === 'facebook') {
-      btnFacebook!.className = 'sharedStyles_button sharedStyles_buttonPrimary button-primary';
-      cardFacebook!.style.display = 'block';
-    } else {
-      btnLinkedin!.className = 'sharedStyles_button sharedStyles_buttonPrimary button-primary';
-      cardLinkedin!.style.display = 'block';
-    }
-  }
+  document.getElementById('preset-blog')?.addEventListener('click', () => {
+    if (titleInput) titleInput.value = 'How to Secure Browser APIs with CORS & CSP';
+    if (descInput) descInput.value = 'A deep dive into cross-origin resource sharing, preflight caching, and modern content security policies for production web apps.';
+    if (urlInput) urlInput.value = 'https://iqverse.net/blog/cors-csp-security';
+    if (imgInput) imgInput.value = 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&h=630&fit=crop';
+    if (siteNameInput) siteNameInput.value = 'IQVerse Engineering';
+    if (twHandleInput) twHandleInput.value = '@iqverse';
+    update();
+  });
 
-  btnGoogle?.addEventListener('click', () => setPlatform('google'));
-  btnTwitter?.addEventListener('click', () => setPlatform('twitter'));
-  btnFacebook?.addEventListener('click', () => setPlatform('facebook'));
-  btnLinkedin?.addEventListener('click', () => setPlatform('linkedin'));
+  document.getElementById('preset-saas')?.addEventListener('click', () => {
+    if (titleInput) titleInput.value = 'Supercharge Your Developer Workflow in 2026';
+    if (descInput) descInput.value = 'The all-in-one developer productivity hub with zero setup, local processing, and instant debugging tools.';
+    if (urlInput) urlInput.value = 'https://iqverse.net';
+    if (imgInput) imgInput.value = 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=630&fit=crop';
+    if (siteNameInput) siteNameInput.value = 'IQVerse Platform';
+    if (twHandleInput) twHandleInput.value = '@iqverse';
+    update();
+  });
+
+  document.getElementById('preset-ecommerce')?.addEventListener('click', () => {
+    if (titleInput) titleInput.value = 'Developer Pro Kit — Hardware & Tools';
+    if (descInput) descInput.value = 'Curated gear and open-source utilities built specifically for full-stack software engineers and DevOps architects.';
+    if (urlInput) urlInput.value = 'https://iqverse.net/store/pro-kit';
+    if (imgInput) imgInput.value = 'https://images.unsplash.com/photo-1526738549149-8e07eca6c147?w=1200&h=630&fit=crop';
+    if (siteNameInput) siteNameInput.value = 'IQVerse Store';
+    if (twHandleInput) twHandleInput.value = '@iqverse';
+    update();
+  });
+
+  // Tab switching
+  const tabs = [
+    { btn: tabGoogle, card: cardGoogle },
+    { btn: tabTwitter, card: cardTwitter },
+    { btn: tabFacebook, card: cardFacebook },
+    { btn: tabLinkedin, card: cardLinkedin },
+    { btn: tabDiscord, card: cardDiscord },
+  ];
+
+  tabs.forEach(({ btn, card }) => {
+    btn?.addEventListener('click', () => {
+      tabs.forEach((t) => {
+        t.btn?.setAttribute('data-active', 'false');
+        if (t.card) t.card.style.display = 'none';
+      });
+      btn.setAttribute('data-active', 'true');
+      if (card) card.style.display = 'block';
+    });
+  });
 
   function update() {
     const title = titleInput?.value.trim() || '';
     const description = descInput?.value.trim() || '';
-    const url = urlInput?.value.trim() || '';
+    const url = urlInput?.value.trim() || 'https://iqverse.net';
     const imageUrl = imgInput?.value.trim() || '';
-    const siteName = siteNameInput?.value.trim() || '';
-    const twitterHandle = twHandleInput?.value.trim() || '';
+    const siteName = siteNameInput?.value.trim() || 'IQVerse';
+    const twitterHandle = twHandleInput?.value.trim() || '@iqverse';
 
-    if (titleCount) titleCount.textContent = String(title.length);
-    if (descCount) descCount.textContent = String(description.length);
+    // Character meter counters
+    const titleLen = title.length;
+    if (titleCount) titleCount.textContent = String(titleLen);
+    if (titleBadge) {
+      if (titleLen > 60) {
+        titleBadge.className = `${styles.charMeter} ${styles.charMeterDanger}`;
+      } else if (titleLen >= 50) {
+        titleBadge.className = `${styles.charMeter} ${styles.charMeterOptimal}`;
+      } else {
+        titleBadge.className = `${styles.charMeter}`;
+      }
+    }
 
-    // Google card
+    const descLen = description.length;
+    if (descCount) descCount.textContent = String(descLen);
+    if (descBadge) {
+      if (descLen > 160) {
+        descBadge.className = `${styles.charMeter} ${styles.charMeterDanger}`;
+      } else if (descLen >= 120) {
+        descBadge.className = `${styles.charMeter} ${styles.charMeterOptimal}`;
+      } else {
+        descBadge.className = `${styles.charMeter}`;
+      }
+    }
+
+    // Thumbnail preview
+    if (imgThumb) {
+      imgThumb.src = imageUrl || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="%23666"%3E%3Crect width="40" height="40" fill="%23222"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23888"%3ENo Img%3C/text%3E%3C/svg%3E';
+    }
+
+    let domain = 'iqverse.net';
+    try {
+      domain = new URL(url).hostname;
+    } catch {
+      domain = url.replace(/https?:\/\//, '').split('/')[0] || 'iqverse.net';
+    }
+
+    // Google Card
+    const gSite = document.getElementById('google-sitename');
     const gUrl = document.getElementById('google-preview-url');
     const gTitle = document.getElementById('google-preview-title');
     const gDesc = document.getElementById('google-preview-desc');
+    if (gSite) gSite.textContent = siteName;
     if (gUrl) gUrl.textContent = url;
-    if (gTitle) gTitle.textContent = title;
-    if (gDesc) gDesc.textContent = description;
+    if (gTitle) gTitle.textContent = title || 'Page Title';
+    if (gDesc) gDesc.textContent = description || 'Page description will appear here in search engine results.';
 
-    // Twitter card
+    // Twitter Card
     const twImg = document.getElementById('tw-preview-img-box');
-    const twUrl = document.getElementById('tw-preview-url');
+    const twDomain = document.getElementById('tw-preview-domain');
     const twTitle = document.getElementById('tw-preview-title');
     const twDesc = document.getElementById('tw-preview-desc');
-    if (twImg) twImg.style.backgroundImage = imageUrl ? `url(${imageUrl})` : 'none';
-    if (twUrl) twUrl.textContent = url.replace(/https?:\/\//, '');
-    if (twTitle) twTitle.textContent = title;
-    if (twDesc) twDesc.textContent = description;
+    if (twImg) twImg.style.backgroundImage = imageUrl ? `url("${imageUrl}")` : 'none';
+    if (twDomain) twDomain.textContent = domain;
+    if (twTitle) twTitle.textContent = title || 'Page Title';
+    if (twDesc) twDesc.textContent = description || 'Description';
 
-    // Facebook card
+    // Facebook Card
     const fbImg = document.getElementById('fb-preview-img-box');
     const fbUrl = document.getElementById('fb-preview-url');
     const fbTitle = document.getElementById('fb-preview-title');
     const fbDesc = document.getElementById('fb-preview-desc');
-    if (fbImg) fbImg.style.backgroundImage = imageUrl ? `url(${imageUrl})` : 'none';
-    if (fbUrl) fbUrl.textContent = url.replace(/https?:\/\//, '').split('/')[0].toUpperCase();
-    if (fbTitle) fbTitle.textContent = title;
-    if (fbDesc) fbDesc.textContent = description;
+    if (fbImg) fbImg.style.backgroundImage = imageUrl ? `url("${imageUrl}")` : 'none';
+    if (fbUrl) fbUrl.textContent = domain.toUpperCase();
+    if (fbTitle) fbTitle.textContent = title || 'Page Title';
+    if (fbDesc) fbDesc.textContent = description || 'Description';
 
-    // LinkedIn card
+    // LinkedIn Card
     const liImg = document.getElementById('li-preview-img-box');
     const liTitle = document.getElementById('li-preview-title');
     const liUrl = document.getElementById('li-preview-url');
-    if (liImg) liImg.style.backgroundImage = imageUrl ? `url(${imageUrl})` : 'none';
-    if (liTitle) liTitle.textContent = title;
-    if (liUrl) liUrl.textContent = url.replace(/https?:\/\//, '');
+    if (liImg) liImg.style.backgroundImage = imageUrl ? `url("${imageUrl}")` : 'none';
+    if (liTitle) liTitle.textContent = title || 'Page Title';
+    if (liUrl) liUrl.textContent = domain;
 
-    // Generate Meta HTML
-    let html = `<!-- Primary Meta Tags -->\n`;
+    // Discord Card
+    const dSite = document.getElementById('discord-sitename');
+    const dTitle = document.getElementById('discord-preview-title');
+    const dDesc = document.getElementById('discord-preview-desc');
+    const dImg = document.getElementById('discord-preview-img');
+    if (dSite) dSite.textContent = siteName;
+    if (dTitle) dTitle.textContent = title || 'Page Title';
+    if (dDesc) dDesc.textContent = description || 'Description';
+    if (dImg) {
+      dImg.style.backgroundImage = imageUrl ? `url("${imageUrl}")` : 'none';
+      dImg.style.display = imageUrl ? 'block' : 'none';
+    }
+
+    // HTML Output Generator
+    let html = `<!-- HTML Meta Tags -->\n`;
     html += `<title>${title}</title>\n`;
-    html += `<meta name="title" content="${title}">\n`;
     html += `<meta name="description" content="${description}">\n\n`;
 
-    html += `<!-- Open Graph / Facebook -->\n`;
-    html += `<meta property="og:type" content="website">\n`;
+    html += `<!-- Facebook Meta Tags (Open Graph) -->\n`;
     html += `<meta property="og:url" content="${url}">\n`;
+    html += `<meta property="og:type" content="website">\n`;
     html += `<meta property="og:title" content="${title}">\n`;
     html += `<meta property="og:description" content="${description}">\n`;
     if (imageUrl) html += `<meta property="og:image" content="${imageUrl}">\n`;
     if (siteName) html += `<meta property="og:site_name" content="${siteName}">\n\n`;
 
-    html += `<!-- Twitter / X -->\n`;
-    html += `<meta property="twitter:card" content="summary_large_image">\n`;
+    html += `<!-- Twitter Meta Tags -->\n`;
+    html += `<meta name="twitter:card" content="summary_large_image">\n`;
+    html += `<meta property="twitter:domain" content="${domain}">\n`;
     html += `<meta property="twitter:url" content="${url}">\n`;
-    html += `<meta property="twitter:title" content="${title}">\n`;
-    html += `<meta property="twitter:description" content="${description}">\n`;
-    if (imageUrl) html += `<meta property="twitter:image" content="${imageUrl}">\n`;
-    if (twitterHandle) html += `<meta property="twitter:site" content="${twitterHandle}">\n`;
+    html += `<meta name="twitter:title" content="${title}">\n`;
+    html += `<meta name="twitter:description" content="${description}">\n`;
+    if (imageUrl) html += `<meta name="twitter:image" content="${imageUrl}">\n`;
+    if (twitterHandle) html += `<meta name="twitter:creator" content="${twitterHandle}">\n`;
 
     if (metaOut) metaOut.value = html.trim();
   }
@@ -326,11 +479,11 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   });
 
   btnCopy?.addEventListener('click', async () => {
-    if (metaOut?.value && btnCopy) {
+    if (metaOut?.value && copyBtnText) {
       await navigator.clipboard.writeText(metaOut.value);
-      const prev = btnCopy.textContent;
-      btnCopy.textContent = 'Copied!';
-      setTimeout(() => (btnCopy.textContent = prev), 1500);
+      const prev = copyBtnText.textContent;
+      copyBtnText.textContent = 'Copied!';
+      setTimeout(() => (copyBtnText.textContent = prev), 1500);
     }
   });
 

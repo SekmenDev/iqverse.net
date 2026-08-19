@@ -160,13 +160,21 @@ import styles from '@/styles/favicongen.module.css';
         </div>
 
         <div class={styles.actionRow}>
-          <button type="button" id="btn-download-ico" class={styles.btnPrimary}>
+          <button type="button" id="btn-download-all" class={styles.btnPrimary}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span id="btn-download-all-text">Download All (ZIP)</span>
+          </button>
+          <button type="button" id="btn-download-ico" class={styles.btnSecondary}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
-            Download Favicon (32×32 PNG)
+            Download Favicon (32×32)
           </button>
           <button type="button" id="btn-download-apple" class={styles.btnSecondary}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -227,11 +235,14 @@ import styles from '@/styles/favicongen.module.css';
               id="html-output-code"
               readonly
               class={styles.codeTextarea}
-              rows="11"
+              rows="14"
               spellcheck="false"
             >&lt;!-- Standard Favicons --&gt;
-&lt;link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" /&gt;
 &lt;link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" /&gt;
+&lt;link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" /&gt;
+&lt;link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" /&gt;
+&lt;link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png" /&gt;
+&lt;link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png" /&gt;
 
 &lt;!-- Apple Touch Icon --&gt;
 &lt;link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" /&gt;
@@ -247,6 +258,8 @@ import styles from '@/styles/favicongen.module.css';
 </ToolLayout>
 
 <script>
+  import JSZip from 'jszip';
+
   const fileInput = document.getElementById('favicon-file-input') as HTMLInputElement;
   const dropzone = document.getElementById('dropzone');
   const infoBar = document.getElementById('image-info-bar');
@@ -257,6 +270,8 @@ import styles from '@/styles/favicongen.module.css';
   const btnClear = document.getElementById('btn-clear-img');
   const previewSection = document.getElementById('preview-section');
 
+  const btnDownloadAll = document.getElementById('btn-download-all');
+  const btnDownloadAllText = document.getElementById('btn-download-all-text');
   const btnDownloadIco = document.getElementById('btn-download-ico');
   const btnDownloadApple = document.getElementById('btn-download-apple');
   const btnDownloadManifest = document.getElementById('btn-download-manifest-file');
@@ -270,8 +285,11 @@ import styles from '@/styles/favicongen.module.css';
   let activeTab: 'html' | 'manifest' = 'html';
 
   const htmlSnippet = `<!-- Standard Favicons -->
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png" />
 
 <!-- Apple Touch Icon -->
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -424,6 +442,54 @@ import styles from '@/styles/favicongen.module.css';
     URL.revokeObjectURL(url);
   }
 
+  async function downloadAllZip() {
+    if (!btnDownloadAll) return;
+    const originalText = btnDownloadAllText?.textContent || 'Download All (ZIP)';
+    if (btnDownloadAllText) btnDownloadAllText.textContent = 'Generating ZIP...';
+
+    try {
+      const zip = new JSZip();
+      const items = [
+        { id: 'prev16', filename: 'favicon-16x16.png' },
+        { id: 'prev32', filename: 'favicon-32x32.png' },
+        { id: 'prev48', filename: 'favicon-48x48.png' },
+        { id: 'prev180', filename: 'apple-touch-icon.png' },
+        { id: 'prev192', filename: 'android-chrome-192x192.png' },
+        { id: 'prev512', filename: 'android-chrome-512x512.png' },
+      ];
+
+      for (const item of items) {
+        const c = document.getElementById(item.id) as HTMLCanvasElement | null;
+        if (c) {
+          const blob = await new Promise<Blob | null>((resolve) => c.toBlob(resolve, 'image/png'));
+          if (blob) {
+            zip.file(item.filename, blob);
+          }
+        }
+      }
+
+      zip.file('site.webmanifest', manifestSnippet);
+
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      const url = URL.createObjectURL(zipBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'favicons-package.zip';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      if (btnDownloadAllText) btnDownloadAllText.textContent = 'Downloaded!';
+      setTimeout(() => {
+        if (btnDownloadAllText) btnDownloadAllText.textContent = originalText;
+      }, 1500);
+    } catch (err) {
+      console.error('Error generating favicon zip package:', err);
+      if (btnDownloadAllText) btnDownloadAllText.textContent = originalText;
+    }
+  }
+
   // Setup individual preview card download buttons
   document.querySelectorAll('.dl-btn').forEach((btn) => {
     btn.addEventListener('click', (e) => {
@@ -437,6 +503,7 @@ import styles from '@/styles/favicongen.module.css';
     });
   });
 
+  btnDownloadAll?.addEventListener('click', downloadAllZip);
   btnDownloadIco?.addEventListener('click', () => downloadCanvas('prev32', 'favicon-32x32.png'));
   btnDownloadApple?.addEventListener('click', () => downloadCanvas('prev180', 'apple-touch-icon.png'));
   btnDownloadManifest?.addEventListener('click', () => downloadText('site.webmanifest', manifestSnippet));

@@ -13,19 +13,24 @@
 }
 
 .card {
-  background: var(--bg-card);
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg, 16px);
   padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .field {
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .fieldLabel {
-  display: block;
-  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
   font-weight: 600;
   color: var(--text-muted);
   margin-bottom: 0.5rem;
@@ -33,129 +38,209 @@
   letter-spacing: 0.05em;
 }
 
+.input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.75rem 1rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 8px);
+  color: var(--text);
+  font-size: 0.92rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+.select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.75rem 1rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 8px);
+  color: var(--text);
+  font-size: 0.92rem;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
 .textarea {
   width: 100%;
-  min-height: 200px;
-  padding: 1rem;
-  background: var(--surface);
+  box-sizing: border-box;
+  min-height: 140px;
+  padding: 0.85rem 1rem;
+  background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-sm, 8px);
   color: var(--text);
   font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   line-height: 1.6;
   resize: vertical;
   font-weight: 400;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .textarea:focus {
-  outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 12px rgba(0, 200, 150, 0.1);
+  box-shadow: 0 0 0 3px var(--accent-dim);
 }
 
 .outputArea {
   width: 100%;
-  min-height: 250px;
+  box-sizing: border-box;
+  min-height: 200px;
   padding: 1rem;
-  background: var(--surface);
+  background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-sm, 8px);
   color: var(--text);
   font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-size: 0.86rem;
   line-height: 1.6;
   resize: vertical;
+  outline: none;
+}
+
+.outputArea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
 }
 
 .buttonGroup {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
+  align-items: center;
   margin-top: 1rem;
 }
 
 .button {
-  border: none;
-  border-radius: var(--radius-sm);
-  padding: 0.75rem 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 8px);
+  padding: 0.65rem 1.15rem;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   cursor: pointer;
-  transition: all 200ms ease;
+  transition: all 0.2s ease;
   font-family: inherit;
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.button:hover {
+  background: var(--card-hover);
+  border-color: var(--border-acc);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.button:active {
+  transform: translateY(0);
 }
 
 .buttonPrimary {
   background: var(--accent);
-  color: #ffffff;
+  color: #0c0e14 !important;
+  border-color: var(--accent);
 }
 
 .buttonPrimary:hover {
-  background: var(--accent-dark);
-  transform: translateY(-2px);
-}
-
-.buttonPrimary:active {
-  transform: translateY(0);
+  background: #9aa4fc;
+  border-color: #9aa4fc;
+  color: #0c0e14 !important;
+  box-shadow: 0 4px 12px rgba(129, 140, 248, 0.3);
 }
 
 .buttonSecondary {
   background: transparent;
   color: var(--accent);
-  border: 1px solid var(--accent);
+  border: 1px solid var(--border-acc);
 }
 
 .buttonSecondary:hover {
-  background: rgba(0, 200, 150, 0.1);
+  background: var(--accent-dim);
+  border-color: var(--accent);
+}
+
+.buttonGhost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-muted);
+}
+
+.buttonGhost:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+}
+
+.buttonDanger {
+  background: transparent;
+  color: var(--red);
+  border-color: rgba(248, 113, 113, 0.3);
+}
+
+.buttonDanger:hover {
+  background: rgba(248, 113, 113, 0.1);
+  border-color: var(--red);
 }
 
 .buttonSmall {
-  background: var(--accent-dim);
-  color: var(--accent);
-  border: 1px solid var(--accent);
-  padding: 0.5rem 1rem;
-  font-size: 0.85rem;
-  margin-top: 1rem;
-}
-
-.buttonSmall:hover {
-  background: rgba(0, 200, 150, 0.2);
+  padding: 0.45rem 0.85rem;
+  font-size: 0.8rem;
+  border-radius: 6px;
 }
 
 .errorCard {
-  background: rgba(255, 100, 100, 0.05);
-  border: 1px solid rgba(255, 100, 100, 0.3);
-  border-radius: var(--radius);
-  padding: 1.5rem;
+  background: rgba(248, 113, 113, 0.08);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  border-radius: var(--radius-sm, 8px);
+  padding: 1.25rem;
 }
 
 .errorMessage {
-  color: #ff6464;
+  color: var(--red);
   font-family: var(--font-mono);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   line-height: 1.6;
 }
 
 .successCard {
-  background: rgba(0, 200, 150, 0.05);
-  border: 1px solid rgba(0, 200, 150, 0.3);
-  border-radius: var(--radius);
-  padding: 1.5rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  border-radius: var(--radius-sm, 8px);
+  padding: 1.25rem;
 }
 
 .successMessage {
-  color: var(--accent);
+  color: var(--green);
   font-family: var(--font-mono);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   line-height: 1.6;
 }
 
 @media (max-width: 768px) {
   .textarea,
   .outputArea {
-    min-height: 150px;
-    font-size: 0.8rem;
+    min-height: 140px;
+    font-size: 0.82rem;
   }
 
   .buttonGroup {
@@ -163,8 +248,8 @@
   }
 
   .button {
-    padding: 0.65rem 1rem;
-    font-size: 0.85rem;
+    padding: 0.6rem 1rem;
+    font-size: 0.84rem;
   }
 }
 
@@ -191,4 +276,3 @@
 .customScrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.45);
 }
-
