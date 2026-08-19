@@ -16,6 +16,7 @@
 
 [![Total Tools](https://img.shields.io/badge/Total_Tools-50%2B_Live_Tools-8B5CF6?style=for-the-badge&logo=tools&logoColor=white)](https://iqverse.net)
 [![Client Side](https://img.shields.io/badge/Architecture-100%25_Browser--Processed-06B6D4?style=for-the-badge&logo=shield&logoColor=white)](https://iqverse.net)
+[![SonarQube Cloud](https://sonarcloud.io/images/project_badges/sonarcloud-light.svg)](https://sonarcloud.io/summary/new_code?id=SekmenDev_iqverse.net)
 
 [🚀 **Launch Live App**](https://iqverse.net) • [📚 **Explore Tools**](#-tool-catalog) • [🛠️ **Local Setup**](#-getting-started) • [🤝 **Contribute**](#-contributing)
 
