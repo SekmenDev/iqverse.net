@@ -328,6 +328,19 @@
   box-shadow: 0 4px 12px rgba(129, 140, 248, 0.3);
 }
 
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .btnSecondary {
   display: inline-flex;
   align-items: center;
