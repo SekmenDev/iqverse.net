@@ -99,81 +99,7 @@ const PRESETS = [
 </ToolLayout>
 
 <script>
-  function translateCronField(val: string, fieldName: string): string {
-    if (val === '*') return `every ${fieldName}`;
-    if (val.startsWith('*/')) return `every ${val.slice(2)} ${fieldName}s`;
-    return `${fieldName} ${val}`;
-  }
-
-  function getHumanDescription(expr: string): string {
-    const parts = expr.trim().split(/\s+/);
-    if (parts.length !== 5) {
-      return 'Invalid cron format (must be 5 space-separated parts: minute hour day-of-month month day-of-week)';
-    }
-
-    const [min, hour, dom, mon, dow] = parts;
-
-    let timeDesc = '';
-    if (min === '*' && hour === '*') {
-      timeDesc = 'Every minute';
-    } else if (min.startsWith('*/') && hour === '*') {
-      timeDesc = `Every ${min.slice(2)} minutes`;
-    } else if (min === '0' && hour === '*') {
-      timeDesc = 'At minute 0 of every hour';
-    } else if (!isNaN(Number(min)) && !isNaN(Number(hour))) {
-      const formattedHour = Number(hour).toString().padStart(2, '0');
-      const formattedMin = Number(min).toString().padStart(2, '0');
-      timeDesc = `At ${formattedHour}:${formattedMin}`;
-    } else {
-      timeDesc = `At ${translateCronField(min, 'minute')}, ${translateCronField(hour, 'hour')}`;
-    }
-
-    let dateDesc = '';
-    if (dom === '*' && mon === '*' && dow === '*') {
-      dateDesc = 'every day';
-    } else {
-      const details = [];
-      if (dom !== '*') details.push(`on day ${dom} of the month`);
-      if (mon !== '*') details.push(`in month ${mon}`);
-      if (dow !== '*') {
-        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const dNum = Number(dow);
-        details.push(`on ${days[dNum] || `day-of-week ${dow}`}`);
-      }
-      dateDesc = details.join(', ');
-    }
-
-    return `${timeDesc}, ${dateDesc}`;
-  }
-
-  function calculateNextRuns(expr: string, count: number = 5): string[] {
-    const parts = expr.trim().split(/\s+/);
-    if (parts.length !== 5) return [];
-
-    const [minStr, hourStr] = parts;
-    const runs: string[] = [];
-    let current = new Date();
-
-    let stepMinutes = 1;
-    if (minStr.startsWith('*/')) {
-      stepMinutes = parseInt(minStr.slice(2), 10) || 1;
-    }
-
-    for (let i = 0; i < count * 60 && runs.length < count; i++) {
-      current = new Date(current.getTime() + stepMinutes * 60 * 1000);
-      const m = current.getMinutes();
-      const h = current.getHours();
-
-      const minMatch = minStr === '*' || (minStr.startsWith('*/') && m % stepMinutes === 0) || Number(minStr) === m;
-      const hourMatch = hourStr === '*' || (hourStr.startsWith('*/') && h % (parseInt(hourStr.slice(2), 10) || 1) === 0) || Number(hourStr) === h;
-
-      if (minMatch && hourMatch) {
-        runs.push(current.toLocaleString());
-      }
-    }
-
-    return runs;
-  }
+  import { describeCronExpression, calculateCronNextRuns } from '@/lib/cron';
 
   const cronInput = document.getElementById('cronExprInput') as HTMLInputElement;
   const partMin = document.getElementById('part-min') as HTMLInputElement;
@@ -213,9 +139,9 @@ const PRESETS = [
   }
 
   function updateOutputs(expr: string) {
-    if (humanDesc) humanDesc.textContent = getHumanDescription(expr);
+    if (humanDesc) humanDesc.textContent = describeCronExpression(expr);
     if (nextRunsOut) {
-      const runs = calculateNextRuns(expr, 5);
+      const runs = calculateCronNextRuns(expr, 5);
       nextRunsOut.innerHTML = runs.length > 0
         ? runs.map((t, idx) => `<div style="padding: 4px 0;">${idx + 1}. ${t}</div>`).join('')
         : '<div>Unable to calculate upcoming run times.</div>';
