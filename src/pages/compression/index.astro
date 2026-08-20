@@ -67,6 +67,8 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 </ToolLayout>
 
 <script>
+  import { compressText, decompressText } from '@/lib/compression';
+
   let mode: 'compress' | 'decompress' = 'compress';
 
   const btnComp = document.getElementById('btn-mode-compress');
@@ -93,22 +95,6 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
       btnDecomp.setAttribute('aria-pressed', 'true');
       btnComp.setAttribute('aria-pressed', 'false');
     };
-  }
-
-  async function compressText(text: string): Promise<string> {
-    const encoder = new TextEncoder();
-    const compressed = await new Response(
-      new Blob([await new Response(encoder.encode(text)).arrayBuffer()]).stream().pipeThrough(new CompressionStream('deflate'))
-    ).arrayBuffer();
-    return btoa(String.fromCodePoint(...new Uint8Array(compressed)));
-  }
-
-  async function decompressText(base64: string): Promise<string> {
-    const binary = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
-    const decompressed = await new Response(
-      new Blob([await new Response(binary).arrayBuffer()]).stream().pipeThrough(new DecompressionStream('deflate'))
-    ).arrayBuffer();
-    return new TextDecoder().decode(decompressed);
   }
 
   btnRun?.addEventListener('click', async () => {
