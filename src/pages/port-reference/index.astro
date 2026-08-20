@@ -1,25 +1,7 @@
 ---
 import ToolLayout from '@/layouts/ToolLayout.astro';
 import sharedStyles from '@/styles/shared-tool-styles.module.css';
-
-const COMMON_PORTS = [
-  { port: 21, protocol: 'TCP', name: 'FTP', category: 'Remote Access', desc: 'File Transfer Protocol for transferring files between host and client.', securityNote: 'Insecure plaintext transmission. Prefer SFTP (SSH port 22).' },
-  { port: 22, protocol: 'TCP', name: 'SSH / SFTP', category: 'Remote Access', desc: 'Secure Shell for encrypted remote command line shell sessions and SFTP file transfers.', securityNote: 'Use key-based authentication and disable root login.' },
-  { port: 25, protocol: 'TCP', name: 'SMTP', category: 'Email', desc: 'Simple Mail Transfer Protocol for mail server-to-server routing.', securityNote: 'Often blocked by ISPs to prevent spam relays.' },
-  { port: 53, protocol: 'TCP/UDP', name: 'DNS', category: 'Infrastructure', desc: 'Domain Name System for resolving hostname to IP addresses.', securityNote: 'Ensure DNS amplification DDoS protections are enabled.' },
-  { port: 80, protocol: 'TCP', name: 'HTTP', category: 'Web', desc: 'Hypertext Transfer Protocol for unencrypted web page delivery.', securityNote: 'Redirect all HTTP traffic to HTTPS (port 443).' },
-  { port: 110, protocol: 'TCP', name: 'POP3', category: 'Email', desc: 'Post Office Protocol for retrieving email from mail servers.', securityNote: 'Prefer POP3S (port 995 with SSL/TLS encryption).' },
-  { port: 143, protocol: 'TCP', name: 'IMAP', category: 'Email', desc: 'Internet Message Access Protocol for syncing mailbox folders across devices.', securityNote: 'Prefer IMAPS (port 993 with SSL/TLS encryption).' },
-  { port: 443, protocol: 'TCP', name: 'HTTPS', category: 'Web', desc: 'Hypertext Transfer Protocol Secure (TLS/SSL encrypted web traffic).', securityNote: 'Standard secure port for modern web traffic.' },
-  { port: 465, protocol: 'TCP', name: 'SMTPS', category: 'Email', desc: 'SMTP over SSL/TLS for secure mail submission.', securityNote: 'Recommended secure SMTP port alongside 587.' },
-  { port: 1433, protocol: 'TCP', name: 'MS SQL Server', category: 'Database', desc: 'Microsoft SQL Server database engine listener.', securityNote: 'Do not expose directly to public internet; restrict via firewall/VPC.' },
-  { port: 3306, protocol: 'TCP', name: 'MySQL / MariaDB', category: 'Database', desc: 'MySQL and MariaDB relational database server listener.', securityNote: 'Bind to 127.0.0.1 or internal private subnet.' },
-  { port: 3389, protocol: 'TCP/UDP', name: 'RDP', category: 'Remote Access', desc: 'Remote Desktop Protocol for graphical Windows Desktop administration.', securityNote: 'High target for brute-force ransomware attacks. Require VPN or Bastion.' },
-  { port: 5432, protocol: 'TCP', name: 'PostgreSQL', category: 'Database', desc: 'PostgreSQL object-relational database server listener.', securityNote: 'Configure pg_hba.conf for strict IP restriction.' },
-  { port: 6379, protocol: 'TCP', name: 'Redis', category: 'Database', desc: 'In-memory key-value data store and cache.', securityNote: 'Default installation lacks password authentication. Never expose to public internet.' },
-  { port: 8080, protocol: 'TCP', name: 'HTTP Alternate / Proxy', category: 'Web', desc: 'Common alternate port for web dev servers (Vite, Next.js) and proxy servers.', securityNote: 'Check dev server configuration before deploying to production.' },
-  { port: 27017, protocol: 'TCP', name: 'MongoDB', category: 'Database', desc: 'MongoDB NoSQL database engine default instance.', securityNote: 'Enable MongoDB authentication and TLS.' },
-];
+import { COMMON_PORTS } from '@/lib/ports';
 ---
 
 <ToolLayout
