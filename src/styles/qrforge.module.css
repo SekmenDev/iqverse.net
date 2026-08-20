@@ -73,6 +73,7 @@
   transition: color 0.2s;
 }
 
+.step[data-active='true'] .stepNum,
 .stepActive .stepNum {
   background: var(--accent, #00c896);
   border-color: var(--accent, #00c896);
@@ -80,16 +81,19 @@
   font-weight: 700;
 }
 
+.step[data-active='true'] .stepLabel,
 .stepActive .stepLabel {
   color: var(--accent, #00c896);
 }
 
+.step[data-done='true'] .stepNum,
 .stepDone .stepNum {
   background: rgba(0, 200, 150, 0.12);
   border-color: var(--accent, #00c896);
   color: var(--accent, #00c896);
 }
 
+.step[data-done='true'] .stepLabel,
 .stepDone .stepLabel {
   color: var(--text-muted, #999);
 }
@@ -141,6 +145,7 @@
   color: var(--text, #fff);
 }
 
+.typeBtn[data-active='true'],
 .typeBtnActive {
   background: rgba(0, 200, 150, 0.15);
   border-color: var(--accent, #00c896);
@@ -243,6 +248,7 @@
   color: var(--text, #fff);
 }
 
+.shapeBtn[data-active='true'],
 .shapeBtnActive {
   background: rgba(0, 200, 150, 0.15);
   border-color: var(--accent, #00c896);
@@ -552,6 +558,7 @@
   border-color: rgba(255, 255, 255, 0.2);
 }
 
+.exportBtn[data-active='true'],
 .exportBtnActive {
   background: rgba(0, 200, 150, 0.15);
   border-color: var(--accent, #00c896);
@@ -564,6 +571,7 @@
   color: var(--text, #fff);
 }
 
+.exportBtn[data-active='true'] .fmtBadge,
 .exportBtnActive .fmtBadge {
   color: var(--accent, #00c896);
 }
