@@ -16,6 +16,22 @@ describe('CSP Engine (lib/csp)', () => {
     expect(meta).toBe(`<meta http-equiv="Content-Security-Policy" content="${header}">`);
   });
 
+  it('builds CSP header string from directive config array with upgradeInsecureRequests', () => {
+    const configs = [
+      { name: 'default-src', values: ["'self'"] },
+      { name: 'script-src', values: ["'self'", 'https://cdn.jsdelivr.net'] },
+    ];
+
+    const header = buildCspHeader(configs, true);
+    expect(header).toBe("upgrade-insecure-requests; default-src 'self'; script-src 'self' https://cdn.jsdelivr.net");
+
+    const meta = generateCspMetaTag(header);
+    expect(meta).toBe(`<meta http-equiv="Content-Security-Policy" content="${header}">`);
+
+    const metaFromConfigs = generateCspMetaTag(configs);
+    expect(metaFromConfigs).toBe(`<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net">`);
+  });
+
   it('analyzes CSP security risk levels', () => {
     const safeDirectives: Record<string, string[]> = {
       'default-src': ["'self'"],

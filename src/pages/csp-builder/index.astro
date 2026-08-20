@@ -1,18 +1,7 @@
 ---
 import ToolLayout from '@/layouts/ToolLayout.astro';
 import sharedStyles from '@/styles/shared-tool-styles.module.css';
-
-const INITIAL_DIRECTIVES = [
-  { name: 'default-src', self: true, unsafeInline: false, unsafeEval: false, https: false, data: false, custom: '' },
-  { name: 'script-src', self: true, unsafeInline: false, unsafeEval: false, https: false, data: false, custom: 'https://cdn.jsdelivr.net' },
-  { name: 'style-src', self: true, unsafeInline: true, unsafeEval: false, https: false, data: false, custom: 'https://fonts.googleapis.com' },
-  { name: 'img-src', self: true, unsafeInline: false, unsafeEval: false, https: true, data: true, custom: '' },
-  { name: 'connect-src', self: true, unsafeInline: false, unsafeEval: false, https: true, data: false, custom: 'https://api.iqverse.net' },
-  { name: 'font-src', self: true, unsafeInline: false, unsafeEval: false, https: false, data: true, custom: 'https://fonts.gstatic.com' },
-  { name: 'object-src', self: false, unsafeInline: false, unsafeEval: false, https: false, data: false, custom: "'none'" },
-  { name: 'base-uri', self: true, unsafeInline: false, unsafeEval: false, https: false, data: false, custom: '' },
-  { name: 'form-action', self: true, unsafeInline: false, unsafeEval: false, https: false, data: false, custom: '' },
-];
+import { INITIAL_CSP_DIRECTIVES } from '@/lib/csp';
 ---
 
 <ToolLayout
@@ -37,7 +26,7 @@ const INITIAL_DIRECTIVES = [
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-bottom: 24px;">
-          {INITIAL_DIRECTIVES.map((d) => (
+          {INITIAL_CSP_DIRECTIVES.map((d) => (
             <div
               class="directive-card"
               data-directive={d.name}

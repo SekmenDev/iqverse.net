@@ -30,9 +30,8 @@ export interface CspBuildResult {
 export function buildCspHeader(
   directives: CspDirectiveConfig[] | Record<string, string[]>,
   upgradeInsecureRequests: boolean = false
-): any {
+): string {
   const parts: string[] = [];
-  const warnings: string[] = [];
 
   if (upgradeInsecureRequests) {
     parts.push('upgrade-insecure-requests');
@@ -55,43 +54,16 @@ export function buildCspHeader(
       if (tokens.length > 0) {
         parts.push(`${d.name} ${tokens.join(' ')}`);
       }
-
-      if (d.name === 'script-src' && (d.unsafeInline || tokens.includes("'unsafe-inline'"))) {
-        warnings.push("⚠️ 'unsafe-inline' in script-src allows inline scripts (increases vulnerability to XSS attacks).");
-      }
-      if (d.name === 'script-src' && (d.unsafeEval || tokens.includes("'unsafe-eval'"))) {
-        warnings.push("⚠️ 'unsafe-eval' in script-src allows eval() execution (increases vulnerability to injection).");
-      }
-      if (d.name === 'object-src' && d.custom?.trim() !== "'none'" && !tokens.includes("'none'")) {
-        warnings.push("💡 Recommended: Set object-src to 'none' to block legacy Flash/Java plugins.");
-      }
     });
   } else {
     Object.entries(directives).forEach(([name, tokens]) => {
       if (tokens.length > 0) {
         parts.push(`${name} ${tokens.join(' ')}`);
       }
-      if (name === 'script-src' && tokens.includes("'unsafe-inline'")) {
-        warnings.push("⚠️ 'unsafe-inline' in script-src allows inline scripts.");
-      }
-      if (name === 'script-src' && tokens.includes("'unsafe-eval'")) {
-        warnings.push("⚠️ 'unsafe-eval' in script-src allows eval().");
-      }
     });
   }
 
-  const headerValue = parts.join('; ');
-  const metaTag = `<meta http-equiv="Content-Security-Policy" content="${headerValue}">`;
-
-  if (!Array.isArray(directives)) {
-    return headerValue;
-  }
-
-  return {
-    headerValue,
-    metaTag,
-    warnings,
-  };
+  return parts.join('; ');
 }
 
 export function generateCspMetaTag(
@@ -99,9 +71,7 @@ export function generateCspMetaTag(
 ): string {
   const header = typeof directivesOrHeader === 'string'
     ? directivesOrHeader
-    : typeof directivesOrHeader === 'object' && !Array.isArray(directivesOrHeader)
-    ? buildCspHeader(directivesOrHeader, false)
-    : (buildCspHeader(directivesOrHeader, false) as any).headerValue;
+    : buildCspHeader(directivesOrHeader, false);
   return `<meta http-equiv="Content-Security-Policy" content="${header}">`;
 }
 
