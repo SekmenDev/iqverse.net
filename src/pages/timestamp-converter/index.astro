@@ -98,16 +98,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 </ToolLayout>
 
 <script>
-  function getRelativeTimeString(date: Date, currentTimeSec: number): string {
-    const deltaSec = currentTimeSec - Math.floor(date.getTime() / 1000);
-    if (Math.abs(deltaSec) < 60) return `${deltaSec >= 0 ? deltaSec : -deltaSec} seconds ${deltaSec >= 0 ? 'ago' : 'from now'}`;
-    const min = Math.floor(Math.abs(deltaSec) / 60);
-    if (min < 60) return `${min} minutes ${deltaSec >= 0 ? 'ago' : 'from now'}`;
-    const hr = Math.floor(min / 60);
-    if (hr < 24) return `${hr} hours ${deltaSec >= 0 ? 'ago' : 'from now'}`;
-    const days = Math.floor(hr / 24);
-    return `${days} days ${deltaSec >= 0 ? 'ago' : 'from now'}`;
-  }
+  import { parseTimestamp, convertDateToEpoch } from '@/lib/timestamp';
 
   const liveClock = document.getElementById('live-epoch-clock');
   const btnUseCurrent = document.getElementById('btn-use-current-time');
@@ -136,17 +127,9 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
   function updateFromTimestamp() {
     const raw = tsInput?.value.trim() || '';
-    const num = Number(raw);
-    if (isNaN(num) || raw === '') {
-      if (tsResults) tsResults.style.display = 'none';
-      if (tsInvalid) tsInvalid.style.display = 'block';
-      return;
-    }
+    const parsed = parseTimestamp(raw, currentNowSec);
 
-    const isMs = num > 30000000000;
-    const dateObj = new Date(isMs ? num : num * 1000);
-
-    if (isNaN(dateObj.getTime())) {
+    if (!parsed || !parsed.valid) {
       if (tsResults) tsResults.style.display = 'none';
       if (tsInvalid) tsInvalid.style.display = 'block';
       return;
@@ -155,19 +138,19 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
     if (tsResults) tsResults.style.display = 'grid';
     if (tsInvalid) tsInvalid.style.display = 'none';
 
-    if (tsIso) tsIso.textContent = dateObj.toISOString();
-    if (tsUtc) tsUtc.textContent = dateObj.toUTCString();
-    if (tsRel) tsRel.textContent = getRelativeTimeString(dateObj, currentNowSec);
+    if (tsIso) tsIso.textContent = parsed.iso;
+    if (tsUtc) tsUtc.textContent = parsed.utc;
+    if (tsRel) tsRel.textContent = parsed.relative;
   }
 
   function updateFromDate() {
     const val = dtInput?.value;
     if (!val) return;
-    const d = new Date(val);
-    if (isNaN(d.getTime())) return;
+    const epoch = convertDateToEpoch(val);
+    if (!epoch) return;
 
-    if (dateSec) dateSec.textContent = String(Math.floor(d.getTime() / 1000));
-    if (dateMs) dateMs.textContent = String(d.getTime());
+    if (dateSec) dateSec.textContent = String(epoch.sec);
+    if (dateMs) dateMs.textContent = String(epoch.ms);
   }
 
   btnUseCurrent?.addEventListener('click', () => {
