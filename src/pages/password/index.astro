@@ -161,14 +161,7 @@ const AMBIGUOUS = '{}[]()/\\\'"`~,;:.<>?';
 </ToolLayout>
 
 <script>
-  import { pickRandom, shuffle } from '@/lib/random';
-
-  const DEFAULT_SYMBOLS = '!@#$%^&*()-_=+[]{}|;:,.<>?';
-  const UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  const LOWER = 'abcdefghijklmnopqrstuvwxyz';
-  const DIGITS = '0123456789';
-  const SIMILAR = '0Oo1IlL';
-  const AMBIGUOUS = '{}[]()/\\\'"`~,;:.<>?';
+  import { generatePassword } from '@/lib/password';
 
   const lengthInput = document.getElementById('pwdLength') as HTMLInputElement;
   const lengthLabel = document.getElementById('pwdLengthLabel');
@@ -200,22 +193,6 @@ const AMBIGUOUS = '{}[]()/\\\'"`~,;:.<>?';
     });
   }
 
-  function buildPool() {
-    let pool = '';
-    if (upperCb?.checked) pool += UPPER;
-    if (lowerCb?.checked) pool += LOWER;
-    if (digitsCb?.checked) pool += DIGITS;
-    if (symbolsCb?.checked) pool += customSymInput?.value.trim() || DEFAULT_SYMBOLS;
-
-    if (simCb?.checked) {
-      pool = [...pool].filter((char) => !SIMILAR.includes(char)).join('');
-    }
-    if (ambCb?.checked) {
-      pool = [...pool].filter((char) => !AMBIGUOUS.includes(char)).join('');
-    }
-    return pool;
-  }
-
   function showError(msg: string) {
     if (errorSection && errorMsg && outputSection) {
       errorMsg.textContent = msg;
@@ -230,81 +207,36 @@ const AMBIGUOUS = '{}[]()/\\\'"`~,;:.<>?';
     }
   }
 
-  function generatePassword() {
+  function handleGeneratePassword() {
     hideError();
-    const length = Number(lengthInput?.value || 20);
-    const prefix = prefixInput?.value || '';
-    const suffix = suffixInput?.value || '';
-    const minUpper = Number(minUpperInput?.value || 0);
-    const minLower = Number(minLowerInput?.value || 0);
-    const minDigits = Number(minDigitsInput?.value || 0);
-    const minSymbols = Number(minSymbolsInput?.value || 0);
+    try {
+      const result = generatePassword({
+        length: Number(lengthInput?.value || 20),
+        useUpper: upperCb?.checked || false,
+        useLower: lowerCb?.checked || false,
+        useDigits: digitsCb?.checked || false,
+        useSymbols: symbolsCb?.checked || false,
+        excludeSimilar: simCb?.checked || false,
+        excludeAmbiguous: ambCb?.checked || false,
+        customSymbols: customSymInput?.value.trim() || undefined,
+        prefix: prefixInput?.value || '',
+        suffix: suffixInput?.value || '',
+        minUpper: Number(minUpperInput?.value || 0),
+        minLower: Number(minLowerInput?.value || 0),
+        minDigits: Number(minDigitsInput?.value || 0),
+        minSymbols: Number(minSymbolsInput?.value || 0),
+      });
 
-    const pool = buildPool();
-
-    if (!upperCb?.checked && !lowerCb?.checked && !digitsCb?.checked && !symbolsCb?.checked) {
-      showError('Select at least one character set.');
-      return;
-    }
-
-    if (!pool.length) {
-      showError('Character pool is empty after filters.');
-      return;
-    }
-
-    const coreLength = length - prefix.length - suffix.length;
-    if (coreLength < 1) {
-      showError('Length is too short for the selected prefix and suffix.');
-      return;
-    }
-
-    const required: string[] = [];
-    if (upperCb?.checked) {
-      for (let i = 0; i < minUpper; i += 1) {
-        const chars = [...UPPER].filter((char) => pool.includes(char));
-        if (chars.length) required.push(pickRandom(chars));
+      if (pwdOutput && outputSection) {
+        pwdOutput.value = result;
+        outputSection.style.display = 'block';
       }
-    }
-    if (lowerCb?.checked) {
-      for (let i = 0; i < minLower; i += 1) {
-        const chars = [...LOWER].filter((char) => pool.includes(char));
-        if (chars.length) required.push(pickRandom(chars));
-      }
-    }
-    if (digitsCb?.checked) {
-      for (let i = 0; i < minDigits; i += 1) {
-        const chars = [...DIGITS].filter((char) => pool.includes(char));
-        if (chars.length) required.push(pickRandom(chars));
-      }
-    }
-    if (symbolsCb?.checked) {
-      const symbols = customSymInput?.value.trim() || DEFAULT_SYMBOLS;
-      for (let i = 0; i < minSymbols; i += 1) {
-        const chars = [...symbols].filter((char) => pool.includes(char));
-        if (chars.length) required.push(pickRandom(chars));
-      }
-    }
-
-    const remaining = coreLength - required.length;
-    if (remaining < 0) {
-      showError('Minimum counts exceed password length.');
-      return;
-    }
-
-    const passwordChars = [...required];
-    const poolChars = [...pool];
-    for (let i = 0; i < remaining; i += 1) {
-      passwordChars.push(pickRandom(poolChars));
-    }
-
-    const result = prefix + shuffle(passwordChars).join('') + suffix;
-    if (pwdOutput && outputSection) {
-      pwdOutput.value = result;
-      outputSection.style.display = 'block';
+    } catch (err: any) {
+      showError(err.message || 'Unable to generate password.');
     }
   }
 
-  btnGenerate?.addEventListener('click', generatePassword);
+  btnGenerate?.addEventListener('click', handleGeneratePassword);
 
   btnClear?.addEventListener('click', () => {
     hideError();
