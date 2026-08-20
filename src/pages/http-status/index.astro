@@ -1,41 +1,7 @@
 ---
 import ToolLayout from '@/layouts/ToolLayout.astro';
 import sharedStyles from '@/styles/shared-tool-styles.module.css';
-
-const HTTP_STATUS_CODES = [
-  // 1xx
-  { code: 100, phrase: 'Continue', category: '1xx', spec: 'RFC 9110 §15.2.1', summary: 'Interim response indicating client should continue request or ignore if finished.', details: 'Used with Expect: 100-continue request header.' },
-  { code: 101, phrase: 'Switching Protocols', category: '1xx', spec: 'RFC 9110 §15.2.2', summary: 'Server agrees to switch protocols specified in Upgrade header (e.g. WebSocket).', details: 'Sent in response to an Upgrade request header from the client.' },
-  { code: 103, phrase: 'Early Hints', category: '1xx', spec: 'RFC 8297', summary: 'Allows server to return response headers before final HTTP message for preload optimization.', details: 'Mainly used for Link header preload hints.' },
-
-  // 2xx
-  { code: 200, phrase: 'OK', category: '2xx', spec: 'RFC 9110 §15.3.1', summary: 'Standard successful HTTP response for GET, POST, PUT, DELETE requests.', details: 'The payload contains the requested resource representation.' },
-  { code: 201, phrase: 'Created', category: '2xx', spec: 'RFC 9110 §15.3.2', summary: 'Request succeeded and a new resource was created.', details: 'Typically includes a Location header pointing to the new resource.' },
-  { code: 202, phrase: 'Accepted', category: '2xx', spec: 'RFC 9110 §15.3.3', summary: 'Request accepted for background asynchronous processing but not yet completed.', details: 'Useful for queue jobs and batch tasks.' },
-  { code: 204, phrase: 'No Content', category: '2xx', spec: 'RFC 9110 §15.3.5', summary: 'Request succeeded but response body is intentionally empty.', details: 'Commonly returned after DELETE or preflight OPTIONS requests.' },
-
-  // 3xx
-  { code: 301, phrase: 'Moved Permanently', category: '3xx', spec: 'RFC 9110 §15.4.2', summary: 'Resource permanently moved to a new URI given in Location header.', details: 'Search engines transfer SEO rank to the target URL.' },
-  { code: 302, phrase: 'Found (Temporary Redirect)', category: '3xx', spec: 'RFC 9110 §15.4.3', summary: 'Resource temporarily resides under a different URI.', details: 'Client should keep using the original URI for future requests.' },
-  { code: 304, phrase: 'Not Modified', category: '3xx', spec: 'RFC 9110 §15.4.5', summary: 'Resource unchanged since last fetch based on If-Modified-Since or If-None-Match headers.', details: 'Client should load representation from local browser cache.' },
-  { code: 307, phrase: 'Temporary Redirect', category: '3xx', spec: 'RFC 9110 §15.4.8', summary: 'Temporary redirect preserving original HTTP method and body.', details: 'Unlike 302, guarantees POST requests will not be converted to GET.' },
-  { code: 308, phrase: 'Permanent Redirect', category: '3xx', spec: 'RFC 9110 §15.4.9', summary: 'Permanent redirect preserving original HTTP method and body.', details: 'Guarantees POST method is preserved during permanent redirection.' },
-
-  // 4xx
-  { code: 400, phrase: 'Bad Request', category: '4xx', spec: 'RFC 9110 §15.5.1', summary: 'Server cannot process request due to malformed syntax or invalid payload.', details: 'Client must fix invalid body, parameters or headers before retrying.' },
-  { code: 401, phrase: 'Unauthorized', category: '4xx', spec: 'RFC 9110 §15.5.2', summary: 'Authentication is required and has failed or not been provided.', details: 'Response includes WWW-Authenticate header with auth scheme.' },
-  { code: 403, phrase: 'Forbidden', category: '4xx', spec: 'RFC 9110 §15.5.4', summary: 'Server understands request but refuses to authorize access regardless of credentials.', details: 'Indicates insufficient permissions (e.g. role-based access control).' },
-  { code: 404, phrase: 'Not Found', category: '4xx', spec: 'RFC 9110 §15.5.5', summary: 'Target resource does not exist on the server.', details: 'Can be returned to hide confidential resources from unauthorized users.' },
-  { code: 405, phrase: 'Method Not Allowed', category: '4xx', spec: 'RFC 9110 §15.5.6', summary: 'HTTP method used is not supported for target resource.', details: 'Response must include Allow header specifying valid methods.' },
-  { code: 409, phrase: 'Conflict', category: '4xx', spec: 'RFC 9110 §15.5.10', summary: 'Request conflicts with current state of server resource (e.g. duplicate key).', details: 'Common in version control conflicts or unique constraint violations.' },
-  { code: 429, phrase: 'Too Many Requests', category: '4xx', spec: 'RFC 6585 §4', summary: 'User sent too many requests in a given time window (Rate Limited).', details: 'Response often includes Retry-After header indicating wait duration.' },
-
-  // 5xx
-  { code: 500, phrase: 'Internal Server Error', category: '5xx', spec: 'RFC 9110 §15.6.1', summary: 'Server encountered an unexpected condition that prevented request completion.', details: 'Generic error code indicating unhandled server-side exceptions.' },
-  { code: 502, phrase: 'Bad Gateway', category: '5xx', spec: 'RFC 9110 §15.6.3', summary: 'Server acting as gateway/proxy received invalid response from upstream server.', details: 'Common with reverse proxies like Nginx or Cloudflare when backend fails.' },
-  { code: 503, phrase: 'Service Unavailable', category: '5xx', spec: 'RFC 9110 §15.6.4', summary: 'Server temporarily unable to handle request due to overload or maintenance.', details: 'Includes optional Retry-After header indicating backoff estimate.' },
-  { code: 504, phrase: 'Gateway Timeout', category: '5xx', spec: 'RFC 9110 §15.6.5', summary: 'Server acting as gateway did not receive timely response from upstream server.', details: 'Occurs when backend application takes longer to execute than proxy timeout.' },
-];
+import { HTTP_STATUS_CODES } from '@/lib/http-status';
 ---
 
 <ToolLayout
