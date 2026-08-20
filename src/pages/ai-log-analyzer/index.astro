@@ -50,88 +50,29 @@ const SAMPLE_LOG = `192.168.1.10 - - [15/Jan/2026:10:14:32 +0000] "GET /robots.t
 </ToolLayout>
 
 <script>
-  const AI_BOT_PATTERNS = [
-    { name: 'GPTBot', regex: /GPTBot/i, vendor: 'OpenAI' },
-    { name: 'ChatGPT-User', regex: /ChatGPT-User/i, vendor: 'OpenAI' },
-    { name: 'ClaudeBot', regex: /ClaudeBot|Claude-Web/i, vendor: 'Anthropic' },
-    { name: 'PerplexityBot', regex: /PerplexityBot/i, vendor: 'Perplexity' },
-    { name: 'Bytespider', regex: /Bytespider/i, vendor: 'ByteDance' },
-    { name: 'CCBot', regex: /CCBot/i, vendor: 'Common Crawl' },
-    { name: 'Google-Extended', regex: /Google-Extended|GoogleOther/i, vendor: 'Google' },
-    { name: 'Amazonbot', regex: /Amazonbot/i, vendor: 'Amazon' },
-    { name: 'Cohere-ai', regex: /Cohere-ai/i, vendor: 'Cohere' },
-    { name: 'Applebot-Extended', regex: /Applebot-Extended/i, vendor: 'Apple' },
-  ];
-
-  interface HitItem {
-    path: string;
-    status: string;
-    botMatch: { name: string; vendor: string };
-    userAgent: string;
-  }
+  import { parseAccessLogs, type AiLogHit } from '@/lib/ai-log';
 
   const logInput = document.getElementById('logInput') as HTMLTextAreaElement;
   const btnParse = document.getElementById('btn-parse-logs');
   const resultsContainer = document.getElementById('log-results-container');
 
-  const logRegex = /^(\S+)\s+-\s+-\s+\[([^\]]+)\]\s+"(\S+)\s+(\S+)\s+[^"]*"\s+(\d{3})\s+(\d+|-)\s*(?:"[^"]*"\s*"([^"]*)")?/;
-
-  let parsedHits: HitItem[] = [];
+  let parsedHits: AiLogHit[] = [];
   let activeBotFilter = 'all';
 
   function parseLogs() {
     if (!logInput || !resultsContainer) return;
     const content = logInput.value;
-    const lines = content.split('\n').filter((l) => l.trim().length > 0);
-
-    const botCounts: Record<string, { count: number; vendor: string }> = {};
-    const pathCounts: Record<string, number> = {};
-    let aiHitsCount = 0;
-    const hits: HitItem[] = [];
-
-    lines.forEach((line) => {
-      let path = '/';
-      let status = '200';
-      let userAgent = line;
-
-      const match = line.match(logRegex);
-      if (match) {
-        path = match[4];
-        status = match[5];
-        userAgent = match[7] || line;
-      }
-
-      let botMatch: { name: string; vendor: string } | null = null;
-      for (const b of AI_BOT_PATTERNS) {
-        if (b.regex.test(userAgent)) {
-          botMatch = { name: b.name, vendor: b.vendor };
-          break;
-        }
-      }
-
-      if (botMatch) {
-        aiHitsCount++;
-        botCounts[botMatch.name] = botCounts[botMatch.name] || { count: 0, vendor: botMatch.vendor };
-        botCounts[botMatch.name].count++;
-
-        pathCounts[path] = (pathCounts[path] || 0) + 1;
-        hits.push({ path, status, botMatch, userAgent });
-      }
-    });
+    const { totalLines, aiHitsCount, botCounts, topPaths, hits } = parseAccessLogs(content);
 
     parsedHits = hits;
     resultsContainer.style.display = 'block';
-
-    const topPaths = Object.entries(pathCounts)
-      .map(([path, count]) => ({ path, count }))
-      .sort((a, b) => b.count - a.count);
 
     resultsContainer.innerHTML = `
       <!-- Stats Overview -->
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
         <div style="padding: 16px; border-radius: 12px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
           <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Total Log Lines</div>
-          <div style="font-size: 1.8rem; font-weight: bold; margin-top: 4px;">${lines.length}</div>
+          <div style="font-size: 1.8rem; font-weight: bold; margin-top: 4px;">${totalLines}</div>
         </div>
 
         <div style="padding: 16px; border-radius: 12px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
