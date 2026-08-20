@@ -259,6 +259,11 @@ import styles from '@/styles/favicongen.module.css';
 
 <script>
   import JSZip from 'jszip';
+  import {
+    FAVICON_SIZES,
+    generateFaviconHtmlSnippet,
+    generateWebManifest,
+  } from '@/lib/favicon';
 
   const fileInput = document.getElementById('favicon-file-input') as HTMLInputElement;
   const dropzone = document.getElementById('dropzone');
@@ -284,39 +289,8 @@ import styles from '@/styles/favicongen.module.css';
 
   let activeTab: 'html' | 'manifest' = 'html';
 
-  const htmlSnippet = `<!-- Standard Favicons -->
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
-<link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png" />
-<link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png" />
-
-<!-- Apple Touch Icon -->
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-
-<!-- Web App Manifest -->
-<link rel="manifest" href="/site.webmanifest" />
-<meta name="theme-color" content="#13161F" />`;
-
-  const manifestSnippet = `{
-  "name": "My App",
-  "short_name": "App",
-  "icons": [
-    {
-      "src": "/android-chrome-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/android-chrome-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ],
-  "theme_color": "#13161F",
-  "background_color": "#0C0E14",
-  "display": "standalone"
-}`;
+  const htmlSnippet = generateFaviconHtmlSnippet();
+  const manifestSnippet = generateWebManifest();
 
   function updateSnippet() {
     if (!codeOutput) return;
@@ -394,26 +368,17 @@ import styles from '@/styles/favicongen.module.css';
   }
 
   function renderPreviews(img: HTMLImageElement) {
-    const sizes = [
-      { id: 'prev16', s: 16 },
-      { id: 'prev32', s: 32 },
-      { id: 'prev48', s: 48 },
-      { id: 'prev180', s: 180 },
-      { id: 'prev192', s: 192 },
-      { id: 'prev512', s: 512 },
-    ];
-
-    sizes.forEach(({ id, s }) => {
+    FAVICON_SIZES.forEach(({ id, size }) => {
       const c = document.getElementById(id) as HTMLCanvasElement | null;
       if (c) {
-        c.width = s;
-        c.height = s;
+        c.width = size;
+        c.height = size;
         const ctx = c.getContext('2d');
         if (ctx) {
           ctx.imageSmoothingEnabled = true;
           ctx.imageSmoothingQuality = 'high';
-          ctx.clearRect(0, 0, s, s);
-          ctx.drawImage(img, 0, 0, s, s);
+          ctx.clearRect(0, 0, size, size);
+          ctx.drawImage(img, 0, 0, size, size);
         }
       }
     });
@@ -449,14 +414,7 @@ import styles from '@/styles/favicongen.module.css';
 
     try {
       const zip = new JSZip();
-      const items = [
-        { id: 'prev16', filename: 'favicon-16x16.png' },
-        { id: 'prev32', filename: 'favicon-32x32.png' },
-        { id: 'prev48', filename: 'favicon-48x48.png' },
-        { id: 'prev180', filename: 'apple-touch-icon.png' },
-        { id: 'prev192', filename: 'android-chrome-192x192.png' },
-        { id: 'prev512', filename: 'android-chrome-512x512.png' },
-      ];
+      const items = FAVICON_SIZES.map((s) => ({ id: s.id, filename: s.filename }));
 
       for (const item of items) {
         const c = document.getElementById(item.id) as HTMLCanvasElement | null;

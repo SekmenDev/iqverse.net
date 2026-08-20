@@ -371,31 +371,14 @@ const FAQS = [
 </ToolLayout>
 
 <script>
-  interface DnsAnswer {
-    name: string;
-    type: number;
-    TTL: number;
-    data: string;
-  }
-
-  interface DnsResponse {
-    Status: number;
-    TC?: boolean;
-    RD?: boolean;
-    RA?: boolean;
-    AD?: boolean;
-    CD?: boolean;
-    Question?: { name: string; type: number }[];
-    Answer?: DnsAnswer[];
-    Authority?: DnsAnswer[];
-    Additional?: DnsAnswer[];
-    Comment?: string;
-  }
-
-  interface GroupedRecord {
-    type: string;
-    answers: DnsAnswer[];
-  }
+  import {
+    formatTtl,
+    groupDnsAnswers,
+    escapeHtml,
+    type DnsResponse,
+    type GroupedRecord,
+    type DnsAnswer,
+  } from '@/lib/dns';
 
   const QUERY_TYPES = ['A', 'AAAA', 'MX', 'TXT', 'NS', 'CNAME', 'SOA', 'CAA', 'PTR', 'SRV'];
 
@@ -531,21 +514,6 @@ const FAQS = [
     }
   }
 
-  function formatTtl(seconds: number): string {
-    if (seconds < 60) return `${seconds}s`;
-    if (seconds < 3600) return `${seconds}s (${Math.round(seconds / 60)}m)`;
-    return `${seconds}s (${Math.round(seconds / 3600)}h)`;
-  }
-
-  function escapeHtml(str: string): string {
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  }
-
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const rawDomain = domainInput?.value.trim().replace(/^https?:\/\//, '').split('/')[0].split('?')[0];
@@ -621,17 +589,7 @@ const FAQS = [
       }
 
       // Group records by type
-      const groups: GroupedRecord[] = [];
-      let totalCount = 0;
-
-      responses.forEach(({ type, data }) => {
-        const answers = data?.Answer || [];
-        if (answers.length > 0) {
-          groups.push({ type, answers });
-          totalCount += answers.length;
-        }
-      });
-
+      const { groups, totalCount } = groupDnsAnswers(responses);
       currentGroupedRecords = groups;
 
       if (totalCountEl) totalCountEl.textContent = String(totalCount);
@@ -722,7 +680,7 @@ const FAQS = [
     const finalGroups = typeFilteredGroups
       .map((g) => {
         const filteredAnswers = query
-          ? g.answers.filter((a) => {
+          ? g.answers.filter((a: DnsAnswer) => {
               return (
                 a.data.toLowerCase().includes(query) ||
                 a.name.toLowerCase().includes(query) ||
@@ -771,7 +729,7 @@ const FAQS = [
           <div class="dns-entries-list">
             ${answers
               .map(
-                (a) => `
+                (a: DnsAnswer) => `
               <div class="dns-entry-row">
                 <div class="dns-entry-data">${escapeHtml(a.data)}</div>
                 <div class="dns-entry-ttl">TTL: ${formatTtl(a.TTL)}</div>
@@ -811,7 +769,7 @@ const FAQS = [
         const type = (btn as HTMLElement).dataset.type;
         const group = finalGroups.find((g) => g.type === type);
         if (group) {
-          const text = group.answers.map((a) => `${currentDomain} ${a.TTL} IN ${group.type} ${a.data}`).join('\n');
+          const text = group.answers.map((a: DnsAnswer) => `${currentDomain} ${a.TTL} IN ${group.type} ${a.data}`).join('\n');
           try {
             await navigator.clipboard.writeText(text);
             showToast(`Copied ${group.type} records to clipboard!`);

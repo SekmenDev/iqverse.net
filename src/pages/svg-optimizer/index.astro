@@ -109,32 +109,7 @@ const SAMPLE_SVG = `<?xml version="1.0" encoding="utf-8"?>
 </ToolLayout>
 
 <script>
-  function optimizeSvgCode(
-    svg: string,
-    options: { removeComments: boolean; removeMetadata: boolean; removeDoctype: boolean; minifyWhitespace: boolean }
-  ): string {
-    let res = svg;
-
-    if (options.removeDoctype) {
-      res = res.replace(/<\?xml[^>]*\?>/gi, '').replace(/<!DOCTYPE[^>]*>/gi, '');
-    }
-    if (options.removeComments) {
-      res = res.replace(/<!--[\s\S]*?-->/g, '');
-    }
-    if (options.removeMetadata) {
-      res = res.replace(/<metadata[\s\S]*?<\/metadata>/gi, '');
-    }
-
-    res = res
-      .replace(/\s*(enable-background|xml:space)="[^"]*"/gi, '')
-      .replace(/\s*(x|y)="0(px)?"/gi, '');
-
-    if (options.minifyWhitespace) {
-      res = res.replace(/>\s+</g, '><').trim();
-    }
-
-    return res;
-  }
+  import { optimizeSvgCode, calculateSvgSavings } from '@/lib/svg';
 
   const svgInput = document.getElementById('svgInput') as HTMLTextAreaElement;
   const svgOptOutput = document.getElementById('svgOptOutput') as HTMLTextAreaElement;
@@ -162,14 +137,11 @@ const SAMPLE_SVG = `<?xml version="1.0" encoding="utf-8"?>
     if (svgOptOutput) svgOptOutput.value = opt;
     if (previewBox) previewBox.innerHTML = opt;
 
-    const origSize = new TextEncoder().encode(raw).length;
-    const optSize = new TextEncoder().encode(opt).length;
-    const saved = origSize - optSize;
-    const ratio = origSize > 0 ? ((saved / origSize) * 100).toFixed(1) : '0';
+    const { origSize, optSize, savedBytes, savedPercent } = calculateSvgSavings(raw, opt);
 
     if (statOrig) statOrig.textContent = `${origSize} bytes`;
     if (statOpt) statOpt.textContent = `${optSize} bytes`;
-    if (statSaved) statSaved.textContent = `${saved} bytes (${ratio}%)`;
+    if (statSaved) statSaved.textContent = `${savedBytes} bytes (${savedPercent}%)`;
   }
 
   [svgInput, cbComments, cbMetadata, cbDoctype, cbWhitespace].forEach((el) => {

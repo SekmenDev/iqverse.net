@@ -138,14 +138,17 @@ import styles from '@/styles/robots-generator.module.css';
 
 <script>
   import styles from '@/styles/robots-generator.module.css';
+  import {
+    type RobotsRuleGroup,
+    generateRobotsTxt,
+    testRobotsPathAccess,
+    STANDARD_ROBOTS_PRESET,
+    BLOCK_AI_ROBOTS_PRESET,
+    ALLOW_ALL_ROBOTS_PRESET,
+    BLOCK_ALL_ROBOTS_PRESET,
+  } from '@/lib/robots';
 
-  interface RuleGroup {
-    userAgent: string;
-    disallows: string[];
-    allows: string[];
-  }
-
-  let groups: RuleGroup[] = [
+  let groups: RobotsRuleGroup[] = [
     {
       userAgent: '*',
       disallows: ['/admin/', '/private/'],
@@ -173,84 +176,25 @@ import styles from '@/styles/robots-generator.module.css';
 
   // Preset buttons
   document.getElementById('preset-standard')?.addEventListener('click', () => {
-    groups = [
-      {
-        userAgent: '*',
-        disallows: ['/admin/', '/private/', '/tmp/'],
-        allows: ['/'],
-      },
-      {
-        userAgent: 'Googlebot',
-        disallows: ['/no-google/'],
-        allows: ['/'],
-      },
-    ];
+    groups = JSON.parse(JSON.stringify(STANDARD_ROBOTS_PRESET));
     renderGroups();
     updateRobots();
   });
 
   document.getElementById('preset-block-ai')?.addEventListener('click', () => {
-    groups = [
-      {
-        userAgent: '*',
-        disallows: ['/admin/'],
-        allows: ['/'],
-      },
-      {
-        userAgent: 'GPTBot',
-        disallows: ['/'],
-        allows: [],
-      },
-      {
-        userAgent: 'ChatGPT-User',
-        disallows: ['/'],
-        allows: [],
-      },
-      {
-        userAgent: 'Anthropic-ai',
-        disallows: ['/'],
-        allows: [],
-      },
-      {
-        userAgent: 'Claude-Web',
-        disallows: ['/'],
-        allows: [],
-      },
-      {
-        userAgent: 'CCBot',
-        disallows: ['/'],
-        allows: [],
-      },
-      {
-        userAgent: 'Bytespider',
-        disallows: ['/'],
-        allows: [],
-      },
-    ];
+    groups = JSON.parse(JSON.stringify(BLOCK_AI_ROBOTS_PRESET));
     renderGroups();
     updateRobots();
   });
 
   document.getElementById('preset-allow-all')?.addEventListener('click', () => {
-    groups = [
-      {
-        userAgent: '*',
-        disallows: [],
-        allows: ['/'],
-      },
-    ];
+    groups = JSON.parse(JSON.stringify(ALLOW_ALL_ROBOTS_PRESET));
     renderGroups();
     updateRobots();
   });
 
   document.getElementById('preset-block-all')?.addEventListener('click', () => {
-    groups = [
-      {
-        userAgent: '*',
-        disallows: ['/'],
-        allows: [],
-      },
-    ];
+    groups = JSON.parse(JSON.stringify(BLOCK_ALL_ROBOTS_PRESET));
     renderGroups();
     updateRobots();
   });
@@ -287,7 +231,7 @@ import styles from '@/styles/robots-generator.module.css';
               <span style="color: var(--red);">●</span> Disallow Paths
             </div>
             <div class="${styles.ruleList}">
-              ${group.disallows
+              ${(group.disallows || [])
                 .map(
                   (d, dIdx) => `
                 <div class="${styles.ruleRow}">
@@ -315,7 +259,7 @@ import styles from '@/styles/robots-generator.module.css';
               <span style="color: var(--green);">●</span> Allow Paths
             </div>
             <div class="${styles.ruleList}">
-              ${group.allows
+              ${(group.allows || [])
                 .map(
                   (a, aIdx) => `
                 <div class="${styles.ruleRow}">
@@ -347,8 +291,10 @@ import styles from '@/styles/robots-generator.module.css';
     document.querySelectorAll('.ua-input').forEach((el) => {
       el.addEventListener('input', (e) => {
         const gIdx = Number((e.target as HTMLElement).dataset.gidx);
-        groups[gIdx].userAgent = (e.target as HTMLInputElement).value;
-        updateRobots();
+        if (groups[gIdx]) {
+          groups[gIdx].userAgent = (e.target as HTMLInputElement).value;
+          updateRobots();
+        }
       });
     });
 
@@ -365,8 +311,10 @@ import styles from '@/styles/robots-generator.module.css';
       el.addEventListener('input', (e) => {
         const gIdx = Number((e.target as HTMLElement).dataset.gidx);
         const dIdx = Number((e.target as HTMLElement).dataset.didx);
-        groups[gIdx].disallows[dIdx] = (e.target as HTMLInputElement).value;
-        updateRobots();
+        if (groups[gIdx]?.disallows) {
+          groups[gIdx].disallows[dIdx] = (e.target as HTMLInputElement).value;
+          updateRobots();
+        }
       });
     });
 
@@ -374,18 +322,23 @@ import styles from '@/styles/robots-generator.module.css';
       el.addEventListener('click', (e) => {
         const gIdx = Number((e.currentTarget as HTMLElement).dataset.gidx);
         const dIdx = Number((e.currentTarget as HTMLElement).dataset.didx);
-        groups[gIdx].disallows = groups[gIdx].disallows.filter((_, i) => i !== dIdx);
-        renderGroups();
-        updateRobots();
+        if (groups[gIdx]?.disallows) {
+          groups[gIdx].disallows = groups[gIdx].disallows.filter((_, i) => i !== dIdx);
+          renderGroups();
+          updateRobots();
+        }
       });
     });
 
     document.querySelectorAll('.btn-add-disallow').forEach((el) => {
       el.addEventListener('click', (e) => {
         const gIdx = Number((e.currentTarget as HTMLElement).dataset.gidx);
-        groups[gIdx].disallows.push('/admin/');
-        renderGroups();
-        updateRobots();
+        if (groups[gIdx]) {
+          groups[gIdx].disallows = groups[gIdx].disallows || [];
+          groups[gIdx].disallows.push('/admin/');
+          renderGroups();
+          updateRobots();
+        }
       });
     });
 
@@ -393,8 +346,10 @@ import styles from '@/styles/robots-generator.module.css';
       el.addEventListener('input', (e) => {
         const gIdx = Number((e.target as HTMLElement).dataset.gidx);
         const aIdx = Number((e.target as HTMLElement).dataset.aidx);
-        groups[gIdx].allows[aIdx] = (e.target as HTMLInputElement).value;
-        updateRobots();
+        if (groups[gIdx]?.allows) {
+          groups[gIdx].allows[aIdx] = (e.target as HTMLInputElement).value;
+          updateRobots();
+        }
       });
     });
 
@@ -402,49 +357,38 @@ import styles from '@/styles/robots-generator.module.css';
       el.addEventListener('click', (e) => {
         const gIdx = Number((e.currentTarget as HTMLElement).dataset.gidx);
         const aIdx = Number((e.currentTarget as HTMLElement).dataset.aidx);
-        groups[gIdx].allows = groups[gIdx].allows.filter((_, i) => i !== aIdx);
-        renderGroups();
-        updateRobots();
+        if (groups[gIdx]?.allows) {
+          groups[gIdx].allows = groups[gIdx].allows.filter((_, i) => i !== aIdx);
+          renderGroups();
+          updateRobots();
+        }
       });
     });
 
     document.querySelectorAll('.btn-add-allow').forEach((el) => {
       el.addEventListener('click', (e) => {
         const gIdx = Number((e.currentTarget as HTMLElement).dataset.gidx);
-        groups[gIdx].allows.push('/');
-        renderGroups();
-        updateRobots();
+        if (groups[gIdx]) {
+          groups[gIdx].allows = groups[gIdx].allows || [];
+          groups[gIdx].allows.push('/');
+          renderGroups();
+          updateRobots();
+        }
       });
     });
-  }
-
-  function generateRobots(): string {
-    let txt = '';
-    groups.forEach((g) => {
-      txt += `User-agent: ${g.userAgent.trim() || '*'}\n`;
-      g.disallows.forEach((d) => {
-        if (d.trim()) txt += `Disallow: ${d.trim()}\n`;
-      });
-      g.allows.forEach((a) => {
-        if (a.trim()) txt += `Allow: ${a.trim()}\n`;
-      });
-      txt += '\n';
-    });
-
-    const sitemap = sitemapInput?.value.trim() || '';
-    if (sitemap) {
-      txt += `Sitemap: ${sitemap}\n`;
-    }
-
-    return txt.trim();
   }
 
   function updateRobots() {
-    if (robotsOutput) robotsOutput.value = generateRobots();
+    const sitemap = sitemapInput?.value.trim() || '';
+    if (robotsOutput) robotsOutput.value = generateRobotsTxt(groups, sitemap);
   }
 
   btnAddGroup?.addEventListener('click', () => {
-    groups.push({ userAgent: 'Bingbot', disallows: ['/internal/'], allows: ['/'] });
+    groups.push({
+      userAgent: 'NewBot',
+      disallows: ['/'],
+      allows: [],
+    });
     renderGroups();
     updateRobots();
   });
@@ -452,16 +396,18 @@ import styles from '@/styles/robots-generator.module.css';
   sitemapInput?.addEventListener('input', updateRobots);
 
   btnCopy?.addEventListener('click', async () => {
-    if (robotsOutput?.value && copyBtnText) {
+    if (robotsOutput?.value) {
       await navigator.clipboard.writeText(robotsOutput.value);
-      const prev = copyBtnText.textContent;
-      copyBtnText.textContent = 'Copied!';
-      setTimeout(() => (copyBtnText.textContent = prev), 1500);
+      if (copyBtnText) copyBtnText.textContent = 'Copied!';
+      setTimeout(() => {
+        if (copyBtnText) copyBtnText.textContent = 'Copy robots.txt';
+      }, 1500);
     }
   });
 
   btnDownload?.addEventListener('click', () => {
-    const blob = new Blob([generateRobots()], { type: 'text/plain;charset=utf-8' });
+    if (!robotsOutput?.value) return;
+    const blob = new Blob([robotsOutput.value], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -475,29 +421,17 @@ import styles from '@/styles/robots-generator.module.css';
     const testAgent = testAgentInput?.value.trim() || '*';
     const testPath = testPathInput?.value.trim() || '/';
 
-    const targetGroup =
-      groups.find((g) => g.userAgent.toLowerCase() === testAgent.toLowerCase()) ||
-      groups.find((g) => g.userAgent === '*');
+    const test = testRobotsPathAccess(groups, testAgent, testPath);
 
     testResult.style.display = 'block';
-
-    if (!targetGroup) {
-      testResult.className = `${styles.testerResult} ${styles.testerResultAllowed}`;
-      testResult.innerHTML = `<strong>✓ Allowed</strong>: No specific rule blocks <code>${testAgent}</code> for <code>${testPath}</code>.`;
-      return;
-    }
-
-    const disallowedMatch = targetGroup.disallows.find((d) => d.trim() && testPath.startsWith(d.trim()));
-    const allowedMatch = targetGroup.allows.find((a) => a.trim() && testPath.startsWith(a.trim()));
-
-    if (disallowedMatch && (!allowedMatch || disallowedMatch.length >= allowedMatch.length)) {
-      testResult.className = `${styles.testerResult} ${styles.testerResultBlocked}`;
-      testResult.innerHTML = `<strong>✕ Blocked</strong>: Matched directive <code>Disallow: ${disallowedMatch}</code> under User-agent: <code>${targetGroup.userAgent}</code>.`;
+    if (test.allowed) {
+      testResult.style.borderColor = 'var(--green)';
+      testResult.style.background = 'rgba(74, 222, 128, 0.1)';
+      testResult.innerHTML = `<strong>✓ Allowed</strong>: ${test.reason}`;
     } else {
-      testResult.className = `${styles.testerResult} ${styles.testerResultAllowed}`;
-      testResult.innerHTML = `<strong>✓ Allowed</strong>: ${
-        allowedMatch ? `Matched <code>Allow: ${allowedMatch}</code>` : 'Default crawling allowed'
-      } for User-agent: <code>${targetGroup.userAgent}</code>.`;
+      testResult.style.borderColor = 'var(--red)';
+      testResult.style.background = 'rgba(248, 113, 113, 0.1)';
+      testResult.innerHTML = `<strong>✕ Blocked</strong>: ${test.reason}`;
     }
   });
 

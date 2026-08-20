@@ -128,18 +128,14 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 </ToolLayout>
 
 <script>
-  interface LinkItem {
-    title: string;
-    url: string;
-    desc: string;
-  }
+  import {
+    generateLlmsTxt,
+    validateLlmsTxt,
+    type LlmsSection,
+    type LlmsLinkItem,
+  } from '@/lib/llmstxt';
 
-  interface Section {
-    title: string;
-    links: LinkItem[];
-  }
-
-  let sections: Section[] = [
+  let sections: LlmsSection[] = [
     {
       title: 'Core Tools',
       links: [
@@ -214,7 +210,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
             <div style="display: grid; grid-template-columns: 1fr 1fr 1.5fr auto; gap: 8px; align-items: center; margin-bottom: 8px;">
               <input type="text" class="link-field" data-sidx="${sIdx}" data-lidx="${lIdx}" data-field="title" placeholder="Title" value="${l.title}" style="padding: 6px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.85rem;" />
               <input type="url" class="link-field" data-sidx="${sIdx}" data-lidx="${lIdx}" data-field="url" placeholder="https://..." value="${l.url}" style="padding: 6px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.85rem;" />
-              <input type="text" class="link-field" data-sidx="${sIdx}" data-lidx="${lIdx}" data-field="desc" placeholder="Description (optional)" value="${l.desc}" style="padding: 6px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.85rem;" />
+              <input type="text" class="link-field" data-sidx="${sIdx}" data-lidx="${lIdx}" data-field="desc" placeholder="Description (optional)" value="${l.desc || ''}" style="padding: 6px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.85rem;" />
               <button type="button" class="btn-remove-link" data-sidx="${sIdx}" data-lidx="${lIdx}" style="background: transparent; color: #888; border: none; font-size: 1rem; cursor: pointer;">✕</button>
             </div>
           `
@@ -252,7 +248,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
       input.addEventListener('input', (e) => {
         const sIdx = Number((e.target as HTMLElement).dataset.sidx);
         const lIdx = Number((e.target as HTMLElement).dataset.lidx);
-        const field = (e.target as HTMLElement).dataset.field as keyof LinkItem;
+        const field = (e.target as HTMLElement).dataset.field as keyof LlmsLinkItem;
         sections[sIdx].links[lIdx][field] = (e.target as HTMLInputElement).value;
         updateMarkdown();
       });
@@ -279,27 +275,13 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   }
 
   function updateMarkdown() {
-    let md = `# ${siteTitleInput?.value.trim() || ''}\n\n`;
-    if (siteSummaryInput?.value.trim()) {
-      md += `> ${siteSummaryInput.value.trim()}\n\n`;
-    }
-    if (siteDetailsInput?.value.trim()) {
-      md += `${siteDetailsInput.value.trim()}\n\n`;
-    }
-
-    sections.forEach((sec) => {
-      if (sec.title.trim()) {
-        md += `## ${sec.title.trim()}\n\n`;
-      }
-      sec.links.forEach((l) => {
-        if (l.title.trim() && l.url.trim()) {
-          md += `- [${l.title.trim()}](${l.url.trim()})${l.desc.trim() ? `: ${l.desc.trim()}` : ''}\n`;
-        }
-      });
-      md += '\n';
+    const md = generateLlmsTxt({
+      title: siteTitleInput?.value || '',
+      summary: siteSummaryInput?.value || '',
+      details: siteDetailsInput?.value || '',
+      sections,
     });
-
-    if (llmsOutput) llmsOutput.value = md.trim();
+    if (llmsOutput) llmsOutput.value = md;
   }
 
   siteTitleInput?.addEventListener('input', updateMarkdown);
@@ -326,32 +308,22 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
     const text = valInput?.value.trim() || '';
     if (!valResults) return;
 
+    const res = validateLlmsTxt(text);
+    valResults.style.display = 'block';
+
     if (!text) {
-      valResults.style.display = 'block';
       valResults.innerHTML = '<div style="color: #ff4d4f;">Please paste some llms.txt content to validate.</div>';
       return;
     }
 
-    const hasH1 = /^#\s+.+/m.test(text);
-    const hasSummary = /^>\s+.+/m.test(text);
-    const links = text.match(/- \[[^\]]+\]\([^)]+\)/g) || [];
-
-    const errors: string[] = [];
-    const warnings: string[] = [];
-
-    if (!hasH1) errors.push('Missing H1 heading (# Title).');
-    if (!hasSummary) warnings.push('Missing recommended blockquote summary (> Summary).');
-    if (links.length === 0) warnings.push('No standard markdown bullet links found (- [Title](url)).');
-
-    valResults.style.display = 'block';
     valResults.innerHTML = `
-      <div style="padding: 16px; border-radius: 8px; background: ${errors.length === 0 ? 'rgba(76, 175, 80, 0.1)' : 'rgba(255, 77, 79, 0.1)'}; border: 1px solid ${errors.length === 0 ? '#4caf50' : '#ff4d4f'};">
-        <h4 style="color: ${errors.length === 0 ? '#4caf50' : '#ff4d4f'}; margin-bottom: 8px;">
-          ${errors.length === 0 ? '✓ Valid llms.txt Specification' : '✕ Specification Issues Found'}
+      <div style="padding: 16px; border-radius: 8px; background: ${res.isValid ? 'rgba(76, 175, 80, 0.1)' : 'rgba(255, 77, 79, 0.1)'}; border: 1px solid ${res.isValid ? '#4caf50' : '#ff4d4f'};">
+        <h4 style="color: ${res.isValid ? '#4caf50' : '#ff4d4f'}; margin-bottom: 8px;">
+          ${res.isValid ? '✓ Valid llms.txt Specification' : '✕ Specification Issues Found'}
         </h4>
-        <div style="font-size: 0.9rem; margin-bottom: 6px;">Total Structured Links Found: <strong>${links.length}</strong></div>
-        ${errors.length > 0 ? `<div style="color: #ff4d4f; font-size: 0.85rem;"><strong>Errors:</strong> ${errors.join(', ')}</div>` : ''}
-        ${warnings.length > 0 ? `<div style="color: #faad14; font-size: 0.85rem; margin-top: 4px;"><strong>Warnings:</strong> ${warnings.join(', ')}</div>` : ''}
+        <div style="font-size: 0.9rem; margin-bottom: 6px;">Total Structured Links Found: <strong>${res.linksCount}</strong></div>
+        ${res.errors.length > 0 ? `<div style="color: #ff4d4f; font-size: 0.85rem;"><strong>Errors:</strong> ${res.errors.join(', ')}</div>` : ''}
+        ${res.warnings.length > 0 ? `<div style="color: #faad14; font-size: 0.85rem; margin-top: 4px;"><strong>Warnings:</strong> ${res.warnings.join(', ')}</div>` : ''}
       </div>
     `;
   });

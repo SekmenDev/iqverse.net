@@ -81,87 +81,7 @@ const DEFAULT_COOKIES = `Set-Cookie: session_id=xyz12345; Path=/; Domain=iqverse
 </ToolLayout>
 
 <script>
-  interface ParsedCookie {
-    name: string;
-    value: string;
-    domain?: string;
-    path?: string;
-    expires?: string;
-    maxAge?: string;
-    sameSite?: string;
-    secure: boolean;
-    httpOnly: boolean;
-    partitioned: boolean;
-    warnings: string[];
-  }
-
-  function parseSetCookieHeader(input: string): ParsedCookie[] {
-    const lines = input.split('\n').filter((l) => l.trim().length > 0);
-    const cookies: ParsedCookie[] = [];
-
-    lines.forEach((line) => {
-      let clean = line.trim();
-      if (clean.toLowerCase().startsWith('set-cookie:')) {
-        clean = clean.slice(11).trim();
-      }
-
-      const parts = clean.split(';').map((p) => p.trim());
-      if (parts.length === 0 || !parts[0].includes('=')) return;
-
-      const firstEq = parts[0].indexOf('=');
-      const name = parts[0].slice(0, firstEq).trim();
-      const value = parts[0].slice(firstEq + 1).trim();
-
-      let domain: string | undefined;
-      let path: string | undefined;
-      let expires: string | undefined;
-      let maxAge: string | undefined;
-      let sameSite: string | undefined;
-      let secure = false;
-      let httpOnly = false;
-      let partitioned = false;
-      const warnings: string[] = [];
-
-      for (let i = 1; i < parts.length; i++) {
-        const part = parts[i];
-        const lower = part.toLowerCase();
-        if (lower.startsWith('domain=')) domain = part.slice(7).trim();
-        else if (lower.startsWith('path=')) path = part.slice(5).trim();
-        else if (lower.startsWith('expires=')) expires = part.slice(8).trim();
-        else if (lower.startsWith('max-age=')) maxAge = part.slice(8).trim();
-        else if (lower.startsWith('samesite=')) sameSite = part.slice(9).trim();
-        else if (lower === 'secure') secure = true;
-        else if (lower === 'httponly') httpOnly = true;
-        else if (lower === 'partitioned') partitioned = true;
-      }
-
-      if (sameSite?.toLowerCase() === 'none' && !secure) {
-        warnings.push('SameSite=None requires Secure flag to prevent browser rejection.');
-      }
-      if (!httpOnly && (name.toLowerCase().includes('session') || name.toLowerCase().includes('token') || name.toLowerCase().includes('auth'))) {
-        warnings.push('Sensitive session token missing HttpOnly flag (vulnerable to XSS theft).');
-      }
-      if (!secure) {
-        warnings.push('Cookie missing Secure flag (transmitted over insecure HTTP connection).');
-      }
-
-      cookies.push({
-        name,
-        value,
-        domain,
-        path,
-        expires,
-        maxAge,
-        sameSite,
-        secure,
-        httpOnly,
-        partitioned,
-        warnings,
-      });
-    });
-
-    return cookies;
-  }
+  import { parseSetCookieHeader } from '@/lib/cookies';
 
   const cookieInput = document.getElementById('cookieInput') as HTMLTextAreaElement;
   const cookiesList = document.getElementById('cookies-list');
@@ -204,7 +124,7 @@ const DEFAULT_COOKIES = `Set-Cookie: session_id=xyz12345; Path=/; Domain=iqverse
 
   function render() {
     if (!cookieInput || !cookiesList) return;
-    const allCookies = parseSetCookieHeader(cookieInput.value);
+    const allCookies = parseSetCookieHeader(cookieInput.value) || [];
     const query = (searchInput?.value || '').toLowerCase().trim();
 
     const secCount = allCookies.filter((c) => c.secure).length;

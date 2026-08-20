@@ -103,6 +103,8 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 </ToolLayout>
 
 <script>
+  import { calculatePingStats, SAMPLE_HOPS } from '@/lib/ping';
+
   let mode: 'ping' | 'traceroute' = 'ping';
   let running = false;
 
@@ -158,10 +160,12 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
         pings.push(latency);
         count++;
 
+        const stats = calculatePingStats(pings);
+
         if (statCount) statCount.textContent = `${count} / 10`;
-        if (statMin) statMin.textContent = `${Math.min(...pings)} ms`;
-        if (statMax) statMax.textContent = `${Math.max(...pings)} ms`;
-        if (statAvg) statAvg.textContent = `${Math.round(pings.reduce((a, b) => a + b, 0) / pings.length)} ms`;
+        if (statMin) statMin.textContent = `${stats.min} ms`;
+        if (statMax) statMax.textContent = `${stats.max} ms`;
+        if (statAvg) statAvg.textContent = `${stats.avg} ms`;
 
         if (barsWrap) {
           barsWrap.innerHTML = pings
@@ -182,19 +186,11 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
         }
       }, 200);
     } else {
-      const sampleHops = [
-        { hop: 1, host: 'gateway.local', ip: '192.168.1.1', rtt1: 1.2, rtt2: 1.1, rtt3: 1.4 },
-        { hop: 2, host: 'isp-core-node-1.net', ip: '10.240.0.1', rtt1: 4.8, rtt2: 5.1, rtt3: 4.6 },
-        { hop: 3, host: 'backbone-transit.net', ip: '172.16.84.12', rtt1: 11.2, rtt2: 10.9, rtt3: 11.5 },
-        { hop: 4, host: 'eqix-sjo-google.com', ip: '142.250.214.34', rtt1: 14.1, rtt2: 13.8, rtt3: 14.5 },
-        { hop: 5, host: 'one.one.one.one', ip: '1.1.1.1', rtt1: 15.2, rtt2: 15.0, rtt3: 15.4 },
-      ];
-
       if (traceTbody) traceTbody.innerHTML = '';
       let current = 0;
       const interval = setInterval(() => {
-        if (current < sampleHops.length) {
-          const h = sampleHops[current];
+        if (current < SAMPLE_HOPS.length) {
+          const h = SAMPLE_HOPS[current];
           if (traceTbody) {
             traceTbody.innerHTML += `
               <tr style="border-top: 1px solid rgba(255,255,255,0.05);">

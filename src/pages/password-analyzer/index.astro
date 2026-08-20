@@ -98,40 +98,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 </ToolLayout>
 
 <script>
-  function calculateEntropy(pwd: string) {
-    let charsetSize = 0;
-    const hasLower = /[a-z]/.test(pwd);
-    const hasUpper = /[A-Z]/.test(pwd);
-    const hasDigit = /[0-9]/.test(pwd);
-    const hasSymbol = /[^a-zA-Z0-9]/.test(pwd);
-
-    if (hasLower) charsetSize += 26;
-    if (hasUpper) charsetSize += 26;
-    if (hasDigit) charsetSize += 10;
-    if (hasSymbol) charsetSize += 32;
-
-    if (pwd.length === 0 || charsetSize === 0) {
-      return { entropy: 0, charsetSize: 0, hasLower, hasUpper, hasDigit, hasSymbol };
-    }
-
-    const entropy = Math.round(pwd.length * Math.log2(charsetSize) * 10) / 10;
-    return { entropy, charsetSize, hasLower, hasUpper, hasDigit, hasSymbol };
-  }
-
-  function formatCrackTime(seconds: number): string {
-    if (seconds < 1) return 'Instant';
-    if (seconds < 60) return `${Math.round(seconds)} seconds`;
-    const mins = Math.round(seconds / 60);
-    if (mins < 60) return `${mins} minutes`;
-    const hours = Math.round(mins / 60);
-    if (hours < 24) return `${hours} hours`;
-    const days = Math.round(hours / 24);
-    if (days < 365) return `${days} days`;
-    const years = Math.round(days / 365);
-    if (years < 1000) return `${years} years`;
-    if (years < 1000000) return `${Math.round(years / 1000)} thousand years`;
-    return `${Math.round(years / 1000000)} million years`;
-  }
+  import { analyzePasswordStrength } from '@/lib/password-analyzer';
 
   const pwdInput = document.getElementById('pwdInput') as HTMLInputElement;
   const pwdInputLabel = document.getElementById('pwdInputLabel');
@@ -160,68 +127,43 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
     const password = pwdInput?.value || '';
     if (pwdInputLabel) pwdInputLabel.textContent = `Password Input (${password.length} characters)`;
 
-    const stats = calculateEntropy(password);
-    const combinations = Math.pow(stats.charsetSize, password.length);
+    const res = analyzePasswordStrength(password);
 
-    const offlineSec = combinations / 1e11;
-    const onlineFastSec = combinations / 1000;
-    const onlineSlowSec = combinations / 10;
-
-    let rating = 'Weak';
-    let color = '#ff4d4f';
-
-    if (stats.entropy >= 80) {
-      rating = 'Very Strong';
-      color = '#4caf50';
-    } else if (stats.entropy >= 60) {
-      rating = 'Strong';
-      color = '#8bc34a';
-    } else if (stats.entropy >= 40) {
-      rating = 'Medium';
-      color = '#faad14';
-    } else if (stats.entropy >= 20) {
-      rating = 'Weak';
-      color = '#ff9800';
-    } else {
-      rating = 'Very Weak';
-      color = '#ff4d4f';
-    }
-
-    if (scoreBox) scoreBox.style.borderColor = color;
+    if (scoreBox) scoreBox.style.borderColor = res.color;
     if (entropyVal) {
-      entropyVal.innerHTML = `${stats.entropy} <span style="font-size: 1rem;">bits</span>`;
-      entropyVal.style.color = color;
+      entropyVal.innerHTML = `${res.entropy} <span style="font-size: 1rem;">bits</span>`;
+      entropyVal.style.color = res.color;
     }
     if (ratingBadge) {
-      ratingBadge.textContent = rating;
-      ratingBadge.style.color = color;
-      ratingBadge.style.borderColor = color;
-      ratingBadge.style.background = `${color}22`;
+      ratingBadge.textContent = res.rating;
+      ratingBadge.style.color = res.color;
+      ratingBadge.style.borderColor = res.color;
+      ratingBadge.style.background = `${res.color}22`;
     }
 
     if (checkLower) {
-      checkLower.textContent = `${stats.hasLower ? '✓' : '✕'} Lowercase (a-z)`;
-      checkLower.style.color = stats.hasLower ? '#4caf50' : '#888';
+      checkLower.textContent = `${res.hasLower ? '✓' : '✕'} Lowercase (a-z)`;
+      checkLower.style.color = res.hasLower ? '#4caf50' : '#888';
     }
     if (checkUpper) {
-      checkUpper.textContent = `${stats.hasUpper ? '✓' : '✕'} Uppercase (A-Z)`;
-      checkUpper.style.color = stats.hasUpper ? '#4caf50' : '#888';
+      checkUpper.textContent = `${res.hasUpper ? '✓' : '✕'} Uppercase (A-Z)`;
+      checkUpper.style.color = res.hasUpper ? '#4caf50' : '#888';
     }
     if (checkDigit) {
-      checkDigit.textContent = `${stats.hasDigit ? '✓' : '✕'} Digits (0-9)`;
-      checkDigit.style.color = stats.hasDigit ? '#4caf50' : '#888';
+      checkDigit.textContent = `${res.hasDigit ? '✓' : '✕'} Digits (0-9)`;
+      checkDigit.style.color = res.hasDigit ? '#4caf50' : '#888';
     }
     if (checkSymbol) {
-      checkSymbol.textContent = `${stats.hasSymbol ? '✓' : '✕'} Symbols (!@#$)`;
-      checkSymbol.style.color = stats.hasSymbol ? '#4caf50' : '#888';
+      checkSymbol.textContent = `${res.hasSymbol ? '✓' : '✕'} Symbols (!@#$)`;
+      checkSymbol.style.color = res.hasSymbol ? '#4caf50' : '#888';
     }
 
     if (offlineTime) {
-      offlineTime.textContent = formatCrackTime(offlineSec);
-      offlineTime.style.color = color;
+      offlineTime.textContent = res.crackTimeOffline;
+      offlineTime.style.color = res.color;
     }
-    if (onlineFastTime) onlineFastTime.textContent = formatCrackTime(onlineFastSec);
-    if (onlineSlowTime) onlineSlowTime.textContent = formatCrackTime(onlineSlowSec);
+    if (onlineFastTime) onlineFastTime.textContent = res.crackTimeOnlineFast;
+    if (onlineSlowTime) onlineSlowTime.textContent = res.crackTimeOnlineSlow;
   }
 
   pwdInput?.addEventListener('input', analyze);

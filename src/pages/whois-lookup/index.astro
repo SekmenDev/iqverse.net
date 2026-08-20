@@ -117,6 +117,8 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 </ToolLayout>
 
 <script>
+  import { cleanDomainInput, parseRdapResponse } from '@/lib/whois';
+
   const domainInput = document.getElementById('rdapDomainInput') as HTMLInputElement;
   const btnLookup = document.getElementById('btn-lookup-rdap');
   const loading = document.getElementById('rdap-loading');
@@ -134,41 +136,30 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
   async function lookup(target: string) {
     if (loading) loading.style.display = 'block';
-    const clean = target.trim().toLowerCase().replace(/^https?:\/\//, '').split('/')[0];
+    const clean = cleanDomainInput(target);
 
     try {
       const res = await fetch(`https://rdap.org/domain/${clean}`);
       if (res.ok) {
         const json = await res.json();
-        const events = json.events || [];
-        const registrationEv = events.find((e: any) => e.eventAction === 'registration');
-        const expirationEv = events.find((e: any) => e.eventAction === 'expiration');
-        const lastChangedEv = events.find((e: any) => e.eventAction === 'last changed');
+        const parsed = parseRdapResponse(json, clean);
 
-        const expDateStr = expirationEv?.eventDate ? expirationEv.eventDate.split('T')[0] : '2027-03-15';
-        const expDate = new Date(expDateStr);
-        const daysLeft = Math.floor((expDate.getTime() - Date.now()) / (86400 * 1000));
-        const nameservers = json.nameservers?.map((ns: any) => ns.ldhName) || ['ns1.example.com', 'ns2.example.com'];
-
-        if (domainName) domainName.textContent = clean;
+        if (domainName) domainName.textContent = parsed.domainName;
         if (statusBadge) {
-          statusBadge.textContent = `✓ Registered (${daysLeft > 0 ? daysLeft : 0} days remaining)`;
-          statusBadge.style.color = daysLeft > 30 ? '#4caf50' : '#ff4d4f';
-          statusBadge.style.borderColor = daysLeft > 30 ? '#4caf50' : '#ff4d4f';
+          statusBadge.textContent = `✓ Registered (${parsed.daysLeft > 0 ? parsed.daysLeft : 0} days remaining)`;
+          statusBadge.style.color = parsed.daysLeft > 30 ? '#4caf50' : '#ff4d4f';
+          statusBadge.style.borderColor = parsed.daysLeft > 30 ? '#4caf50' : '#ff4d4f';
         }
 
-        if (registrar) {
-          registrar.textContent =
-            json.entities?.[0]?.vcardArray?.[1]?.find((v: any) => v[0] === 'fn')?.[3] || 'Registrar Domain Services';
-        }
-        if (iana) iana.textContent = json.entities?.[0]?.publicIds?.[0]?.identifier || '1068';
-        if (created) created.textContent = registrationEv?.eventDate ? registrationEv.eventDate.split('T')[0] : '2024-01-01';
-        if (expires) expires.textContent = expDateStr;
-        if (updated) updated.textContent = lastChangedEv?.eventDate ? lastChangedEv.eventDate.split('T')[0] : '2025-01-01';
-        if (dnssec) dnssec.textContent = json.secureDNS?.delegationSigned ? 'Signed (Active)' : 'Unsigned';
+        if (registrar) registrar.textContent = parsed.registrar;
+        if (iana) iana.textContent = parsed.iana;
+        if (created) created.textContent = parsed.created;
+        if (expires) expires.textContent = parsed.expires;
+        if (updated) updated.textContent = parsed.updated;
+        if (dnssec) dnssec.textContent = parsed.dnssec;
 
         if (nsList) {
-          nsList.innerHTML = nameservers
+          nsList.innerHTML = parsed.nameservers
             .map(
               (ns: string) => `
             <span style="padding: 4px 10px; border-radius: 4px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border); font-family: monospace; font-size: 0.85rem;">
@@ -179,8 +170,8 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
             .join('');
         }
 
-        if (flagsList && json.status) {
-          flagsList.innerHTML = json.status
+        if (flagsList && parsed.statusFlags) {
+          flagsList.innerHTML = parsed.statusFlags
             .map(
               (st: string) => `
             <span style="padding: 2px 8px; border-radius: 4px; background: rgba(33, 150, 243, 0.1); color: #2196f3; font-size: 0.75rem; font-family: monospace;">

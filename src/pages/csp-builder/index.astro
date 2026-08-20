@@ -1,18 +1,7 @@
 ---
 import ToolLayout from '@/layouts/ToolLayout.astro';
 import sharedStyles from '@/styles/shared-tool-styles.module.css';
-
-const INITIAL_DIRECTIVES = [
-  { name: 'default-src', self: true, unsafeInline: false, unsafeEval: false, https: false, data: false, custom: '' },
-  { name: 'script-src', self: true, unsafeInline: false, unsafeEval: false, https: false, data: false, custom: 'https://cdn.jsdelivr.net' },
-  { name: 'style-src', self: true, unsafeInline: true, unsafeEval: false, https: false, data: false, custom: 'https://fonts.googleapis.com' },
-  { name: 'img-src', self: true, unsafeInline: false, unsafeEval: false, https: true, data: true, custom: '' },
-  { name: 'connect-src', self: true, unsafeInline: false, unsafeEval: false, https: true, data: false, custom: 'https://api.iqverse.net' },
-  { name: 'font-src', self: true, unsafeInline: false, unsafeEval: false, https: false, data: true, custom: 'https://fonts.gstatic.com' },
-  { name: 'object-src', self: false, unsafeInline: false, unsafeEval: false, https: false, data: false, custom: "'none'" },
-  { name: 'base-uri', self: true, unsafeInline: false, unsafeEval: false, https: false, data: false, custom: '' },
-  { name: 'form-action', self: true, unsafeInline: false, unsafeEval: false, https: false, data: false, custom: '' },
-];
+import { INITIAL_CSP_DIRECTIVES } from '@/lib/csp';
 ---
 
 <ToolLayout
@@ -37,7 +26,7 @@ const INITIAL_DIRECTIVES = [
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-bottom: 24px;">
-          {INITIAL_DIRECTIVES.map((d) => (
+          {INITIAL_CSP_DIRECTIVES.map((d) => (
             <div
               class="directive-card"
               data-directive={d.name}
@@ -141,6 +130,8 @@ const INITIAL_DIRECTIVES = [
 </ToolLayout>
 
 <script>
+  import { buildCspHeader, generateCspMetaTag, analyzeCspSecurity, type CspDirectiveConfig } from '@/lib/csp';
+
   const upgradeCb = document.getElementById('upgrade-insecure-cb') as HTMLInputElement;
   const cards = Array.from(document.querySelectorAll<HTMLElement>('.directive-card'));
   const headerOut = document.getElementById('cspHeaderOut') as HTMLTextAreaElement;
@@ -151,13 +142,7 @@ const INITIAL_DIRECTIVES = [
   const btnCopyMeta = document.getElementById('btn-copy-csp-meta');
 
   function updateCsp() {
-    const parts: string[] = [];
-
-    if (upgradeCb?.checked) {
-      parts.push('upgrade-insecure-requests');
-    }
-
-    const warnings: string[] = [];
+    const directives: CspDirectiveConfig[] = [];
 
     cards.forEach((card) => {
       const name = card.dataset.directive || '';
@@ -167,29 +152,23 @@ const INITIAL_DIRECTIVES = [
       const dataCb = card.querySelector<HTMLInputElement>('.dir-data');
       const customInput = card.querySelector<HTMLInputElement>('.dir-custom');
 
-      const tokens: string[] = [];
-      if (selfCb?.checked) tokens.push("'self'");
-      if (inlineCb?.checked) tokens.push("'unsafe-inline'");
-      if (httpsCb?.checked) tokens.push('https:');
-      if (dataCb?.checked) tokens.push('data:');
-      if (customInput?.value.trim()) tokens.push(customInput.value.trim());
+      const values: string[] = [];
+      if (selfCb?.checked) values.push("'self'");
+      if (inlineCb?.checked) values.push("'unsafe-inline'");
+      if (httpsCb?.checked) values.push('https:');
+      if (dataCb?.checked) values.push('data:');
+      if (customInput?.value.trim()) values.push(customInput.value.trim());
 
-      if (tokens.length > 0) {
-        parts.push(`${name} ${tokens.join(' ')}`);
-      }
-
-      if (name === 'script-src' && inlineCb?.checked) {
-        warnings.push("⚠️ 'unsafe-inline' in script-src allows inline scripts (increases vulnerability to XSS attacks).");
-      }
-      if (name === 'object-src' && customInput?.value.trim() !== "'none'") {
-        warnings.push("💡 Recommended: Set object-src to 'none' to block legacy Flash/Java plugins.");
+      if (values.length > 0) {
+        directives.push({ name, values });
       }
     });
 
-    const generated = parts.join('; ');
+    const generated = buildCspHeader(directives, upgradeCb?.checked || false);
     if (headerOut) headerOut.value = generated;
-    if (metaOut) metaOut.value = `<meta http-equiv="Content-Security-Policy" content="${generated}">`;
+    if (metaOut) metaOut.value = generateCspMetaTag(generated);
 
+    const warnings = analyzeCspSecurity(directives);
     if (warningsBox && warningsList) {
       if (warnings.length > 0) {
         warningsBox.style.display = 'block';

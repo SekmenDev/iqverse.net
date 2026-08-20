@@ -103,7 +103,7 @@ const options = [
 </ToolLayout>
 
 <script>
-  import { safeRegExp } from '@/lib/utils';
+  import { evaluateRegex } from '@/lib/regex';
 
   const patternInput = document.getElementById('regex-pattern') as HTMLInputElement;
   const flagCheckboxes = document.querySelectorAll<HTMLInputElement>('.flag-checkbox');
@@ -125,31 +125,25 @@ const options = [
     const input = textInput?.value || '';
     const replacement = replacementInput?.value || '';
 
-    const regex = safeRegExp(pattern, flags);
+    const res = evaluateRegex(pattern, flags, input, replacement);
 
-    if (validStatus) validStatus.textContent = regex ? 'Yes' : 'No';
+    if (validStatus) validStatus.textContent = res.isValid ? 'Yes' : 'No';
 
-    if (!regex) {
+    if (!res.isValid) {
       if (countEl) countEl.textContent = '0';
-      if (matchesOut) matchesOut.textContent = 'Invalid regex pattern';
-      if (replacementOut) replacementOut.textContent = 'Invalid regex pattern';
+      if (matchesOut) matchesOut.textContent = res.error || 'Invalid regex pattern';
+      if (replacementOut) replacementOut.textContent = res.error || 'Invalid regex pattern';
       return;
     }
 
-    try {
-      const matches = Array.from(input.matchAll(regex));
-      if (countEl) countEl.textContent = String(matches.length);
-      if (matchesOut) {
-        matchesOut.textContent = matches.length > 0
-          ? matches.map((m, idx) => `${idx + 1}. ${JSON.stringify(m[0])} (Index: ${m.index})`).join('\n')
-          : 'No matches found.';
-      }
-      if (replacementOut) {
-        replacementOut.textContent = input.replace(regex, replacement);
-      }
-    } catch (err: any) {
-      if (matchesOut) matchesOut.textContent = err.message;
-      if (replacementOut) replacementOut.textContent = err.message;
+    if (countEl) countEl.textContent = String(res.matches.length);
+    if (matchesOut) {
+      matchesOut.textContent = res.matches.length > 0
+        ? res.matches.map((m, idx) => `${idx + 1}. ${JSON.stringify(m.match)} (Index: ${m.index})`).join('\n')
+        : 'No matches found.';
+    }
+    if (replacementOut) {
+      replacementOut.textContent = res.replacedText;
     }
   }
 

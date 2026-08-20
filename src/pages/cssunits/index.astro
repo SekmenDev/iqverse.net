@@ -68,24 +68,7 @@ const units = ['px', 'rem', 'em', 'vh', 'vw', '%'];
 </ToolLayout>
 
 <script>
-  type Unit = 'px' | 'rem' | 'em' | 'vh' | 'vw' | '%';
-
-  function convertValue(value: number, from: Unit, to: Unit, rootFontSize: number): number {
-    const viewportWidth = window.innerWidth || 1000;
-    const viewportHeight = window.innerHeight || 800;
-
-    let toPx = value;
-    if (from === 'rem' || from === 'em') toPx = value * rootFontSize;
-    else if (from === 'vh') toPx = value * (viewportHeight / 100);
-    else if (from === 'vw') toPx = value * (viewportWidth / 100);
-    else if (from === '%') toPx = value * 0.01 * viewportWidth;
-
-    if (to === 'rem' || to === 'em') return toPx / rootFontSize;
-    if (to === 'vh') return (toPx / viewportHeight) * 100;
-    if (to === 'vw') return (toPx / viewportWidth) * 100;
-    if (to === '%') return (toPx / viewportWidth) * 100;
-    return toPx;
-  }
+  import { convertCssUnit, type CssUnit } from '@/lib/cssunits';
 
   const valInput = document.getElementById('cssValue') as HTMLInputElement;
   const fromSelect = document.getElementById('cssFrom') as HTMLSelectElement;
@@ -97,8 +80,8 @@ const units = ['px', 'rem', 'em', 'vh', 'vw', '%'];
     if (!resultEl) return;
     const val = Number(valInput?.value || 0);
     const root = Number(rootInput?.value || 16);
-    const fromUnit = (fromSelect?.value || 'px') as Unit;
-    const toUnit = (toSelect?.value || 'rem') as Unit;
+    const fromUnit = (fromSelect?.value || 'px') as CssUnit;
+    const toUnit = (toSelect?.value || 'rem') as CssUnit;
 
     if (isNaN(val)) {
       resultEl.textContent = 'Please enter a valid number.';
@@ -109,7 +92,9 @@ const units = ['px', 'rem', 'em', 'vh', 'vw', '%'];
       return;
     }
 
-    const converted = convertValue(val, fromUnit, toUnit, root);
+    const viewportWidth = window.innerWidth || 1000;
+    const viewportHeight = window.innerHeight || 800;
+    const converted = convertCssUnit(val, fromUnit, toUnit, root, viewportWidth, viewportHeight);
     resultEl.textContent = `${converted.toFixed(3)}${toUnit}`;
   }
 

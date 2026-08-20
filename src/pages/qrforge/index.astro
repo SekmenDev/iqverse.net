@@ -39,28 +39,28 @@ const presets = [
       <!-- Step Navigation -->
       <div class={styles.steps}>
         <div style="display: contents;">
-          <button class={`${styles.step} ${styles.stepActive}`} data-step="content">
+          <button type="button" class={styles.step} data-step="content" data-active="true">
             <span class={styles.stepNum}>01</span>
             <span class={styles.stepLabel}>content</span>
           </button>
           <div class={styles.stepLine}></div>
         </div>
         <div style="display: contents;">
-          <button class={styles.step} data-step="style">
+          <button type="button" class={styles.step} data-step="style" data-active="false">
             <span class={styles.stepNum}>02</span>
             <span class={styles.stepLabel}>style</span>
           </button>
           <div class={styles.stepLine}></div>
         </div>
         <div style="display: contents;">
-          <button class={styles.step} data-step="logo">
+          <button type="button" class={styles.step} data-step="logo" data-active="false">
             <span class={styles.stepNum}>03</span>
             <span class={styles.stepLabel}>logo</span>
           </button>
           <div class={styles.stepLine}></div>
         </div>
         <div style="display: contents;">
-          <button class={styles.step} data-step="export">
+          <button type="button" class={styles.step} data-step="export" data-active="false">
             <span class={styles.stepNum}>04</span>
             <span class={styles.stepLabel}>export</span>
           </button>
@@ -75,8 +75,9 @@ const presets = [
           {typeOptions.map((opt) => (
             <button
               type="button"
-              class={`qr-type-btn ${styles.typeBtn} ${opt.value === 'url' ? styles.typeBtnActive : ''}`}
+              class={`qr-type-btn ${styles.typeBtn}`}
               data-type={opt.value}
+              data-active={opt.value === 'url' ? 'true' : 'false'}
             >
               {opt.label}
             </button>
@@ -177,19 +178,19 @@ const presets = [
 
         <span class={styles.fieldLabel}>Dot style</span>
         <div class={styles.shapePicker}>
-          <button type="button" class={`btn-dot-style ${styles.shapeBtn} ${styles.shapeBtnActive}`} data-dot="square" title="Square">
+          <button type="button" class={`btn-dot-style ${styles.shapeBtn}`} data-dot="square" data-active="true" title="Square">
             <svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" rx="0" fill="currentColor"></rect></svg>
           </button>
-          <button type="button" class={`btn-dot-style ${styles.shapeBtn}`} data-dot="rounded" title="Rounded">
+          <button type="button" class={`btn-dot-style ${styles.shapeBtn}`} data-dot="rounded" data-active="false" title="Rounded">
             <svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" rx="4" fill="currentColor"></rect></svg>
           </button>
-          <button type="button" class={`btn-dot-style ${styles.shapeBtn}`} data-dot="dots" title="Dots">
+          <button type="button" class={`btn-dot-style ${styles.shapeBtn}`} data-dot="dots" data-active="false" title="Dots">
             <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7" fill="currentColor"></circle></svg>
           </button>
-          <button type="button" class={`btn-dot-style ${styles.shapeBtn}`} data-dot="classy" title="Classy">
+          <button type="button" class={`btn-dot-style ${styles.shapeBtn}`} data-dot="classy" data-active="false" title="Classy">
             <svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" rx="2" fill="currentColor"></rect></svg>
           </button>
-          <button type="button" class={`btn-dot-style ${styles.shapeBtn}`} data-dot="extra-rounded" title="Extra rounded">
+          <button type="button" class={`btn-dot-style ${styles.shapeBtn}`} data-dot="extra-rounded" data-active="false" title="Extra rounded">
             <svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" rx="7" fill="currentColor"></rect></svg>
           </button>
         </div>
@@ -198,13 +199,13 @@ const presets = [
           Corner square style
         </span>
         <div class={styles.shapePicker}>
-          <button type="button" class={`btn-corner-style ${styles.shapeBtn} ${styles.shapeBtnActive}`} data-corner="square" title="Square">
+          <button type="button" class={`btn-corner-style ${styles.shapeBtn}`} data-corner="square" data-active="true" title="Square">
             <svg viewBox="0 0 20 20"><rect x="2" y="2" width="16" height="16" rx="0" fill="none" stroke="currentColor" stroke-width="3"></rect></svg>
           </button>
-          <button type="button" class={`btn-corner-style ${styles.shapeBtn}`} data-corner="extra-rounded" title="Rounded">
+          <button type="button" class={`btn-corner-style ${styles.shapeBtn}`} data-corner="extra-rounded" data-active="false" title="Rounded">
             <svg viewBox="0 0 20 20"><rect x="2" y="2" width="16" height="16" rx="6" fill="none" stroke="currentColor" stroke-width="3"></rect></svg>
           </button>
-          <button type="button" class={`btn-corner-style ${styles.shapeBtn}`} data-corner="dot" title="Dot">
+          <button type="button" class={`btn-corner-style ${styles.shapeBtn}`} data-corner="dot" data-active="false" title="Dot">
             <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="3"></circle></svg>
           </button>
         </div>
@@ -300,19 +301,19 @@ const presets = [
         <div class={styles.sectionTitle}>Download</div>
 
         <div class={styles.exportOptions}>
-          <button type="button" class={`btn-export-fmt ${styles.exportBtn} ${styles.exportBtnActive}`} data-fmt="png">
+          <button type="button" class={`btn-export-fmt ${styles.exportBtn}`} data-fmt="png" data-active="true">
             <span class={styles.fmtBadge}>PNG</span>
             <span class={styles.fmtDesc}>Raster: for web & print</span>
           </button>
-          <button type="button" class={`btn-export-fmt ${styles.exportBtn}`} data-fmt="svg">
+          <button type="button" class={`btn-export-fmt ${styles.exportBtn}`} data-fmt="svg" data-active="false">
             <span class={styles.fmtBadge}>SVG</span>
             <span class={styles.fmtDesc}>Vector: infinitely scalable</span>
           </button>
-          <button type="button" class={`btn-export-fmt ${styles.exportBtn}`} data-fmt="jpeg">
+          <button type="button" class={`btn-export-fmt ${styles.exportBtn}`} data-fmt="jpeg" data-active="false">
             <span class={styles.fmtBadge}>JPEG</span>
             <span class={styles.fmtDesc}>Small file size</span>
           </button>
-          <button type="button" class={`btn-export-fmt ${styles.exportBtn}`} data-fmt="webp">
+          <button type="button" class={`btn-export-fmt ${styles.exportBtn}`} data-fmt="webp" data-active="false">
             <span class={styles.fmtBadge}>WEBP</span>
             <span class={styles.fmtDesc}>Modern, compressed</span>
           </button>
@@ -433,20 +434,20 @@ const presets = [
   // Step Switching
   const stepBtns = document.querySelectorAll('.steps button, [data-step]');
   const nextBtns = document.querySelectorAll('.btn-next-step');
+  const stepOrder = ['content', 'style', 'logo', 'export'];
 
   function setStep(step: string) {
-    ['content', 'style', 'logo', 'export'].forEach((s) => {
+    stepOrder.forEach((s) => {
       const p = document.getElementById(`tab-pane-${s}`);
       if (p) p.style.display = s === step ? 'block' : 'none';
     });
 
+    const currentIndex = stepOrder.indexOf(step);
     document.querySelectorAll('[data-step]').forEach((b) => {
-      const btnStep = (b as HTMLElement).dataset.step;
-      if (btnStep === step) {
-        b.className = 'styles_step styles_stepActive active';
-      } else {
-        b.className = 'styles_step';
-      }
+      const btnStep = (b as HTMLElement).dataset.step || '';
+      const idx = stepOrder.indexOf(btnStep);
+      b.setAttribute('data-active', btnStep === step ? 'true' : 'false');
+      b.setAttribute('data-done', idx < currentIndex ? 'true' : 'false');
     });
   }
 
@@ -468,8 +469,8 @@ const presets = [
   const typeBtns = document.querySelectorAll('.qr-type-btn');
   typeBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
-      typeBtns.forEach((b) => b.classList.remove('styles_typeBtnActive', 'active'));
-      btn.classList.add('styles_typeBtnActive', 'active');
+      typeBtns.forEach((b) => b.setAttribute('data-active', 'false'));
+      btn.setAttribute('data-active', 'true');
       qrType = (btn as HTMLElement).dataset.type || 'url';
 
       ['url', 'text', 'email', 'wifi', 'vcard'].forEach((t) => {
@@ -489,8 +490,8 @@ const presets = [
   const dotBtns = document.querySelectorAll('.btn-dot-style');
   dotBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
-      dotBtns.forEach((b) => b.classList.remove('styles_shapeBtnActive', 'active'));
-      btn.classList.add('styles_shapeBtnActive', 'active');
+      dotBtns.forEach((b) => b.setAttribute('data-active', 'false'));
+      btn.setAttribute('data-active', 'true');
       dotStyle = (btn as HTMLElement).dataset.dot || 'square';
       updateQr();
     });
@@ -500,8 +501,8 @@ const presets = [
   const cornerBtns = document.querySelectorAll('.btn-corner-style');
   cornerBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
-      cornerBtns.forEach((b) => b.classList.remove('styles_shapeBtnActive', 'active'));
-      btn.classList.add('styles_shapeBtnActive', 'active');
+      cornerBtns.forEach((b) => b.setAttribute('data-active', 'false'));
+      btn.setAttribute('data-active', 'true');
       cornerStyle = (btn as HTMLElement).dataset.corner || 'square';
       updateQr();
     });
@@ -596,8 +597,8 @@ const presets = [
 
   exportBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
-      exportBtns.forEach((b) => b.classList.remove('styles_exportBtnActive', 'active'));
-      btn.classList.add('styles_exportBtnActive', 'active');
+      exportBtns.forEach((b) => b.setAttribute('data-active', 'false'));
+      btn.setAttribute('data-active', 'true');
       exportFmt = (btn as HTMLElement).dataset.fmt || 'png';
       if (exportExtLabel) exportExtLabel.textContent = `.${exportFmt}`;
     });
@@ -606,7 +607,41 @@ const presets = [
   btnDownload?.addEventListener('click', async () => {
     const { default: QRCodeStyling } = await import('qr-code-styling');
     const payload = buildQRPayload(qrType, getValues());
+    const isSvg = exportFmt === 'svg';
     const exportQr = new QRCodeStyling({
+      width: 1024,
+      height: 1024,
+      type: isSvg ? 'svg' : 'canvas',
+      data: payload || 'https://iqverse.net',
+      image: logoData || '',
+      dotsOptions: { type: dotStyle as any, color: dotColor },
+      cornersSquareOptions: { type: cornerStyle as any, color: cornerColor },
+      backgroundOptions: { color: bgColor },
+      margin: 20,
+      qrOptions: { errorCorrectionLevel: errorLevel as any },
+    });
+
+    const rawData = await exportQr.getRawData(exportFmt as any);
+    if (!rawData) return;
+
+    const baseName = (filenameInput?.value || 'my-qr-code').trim().replace(/\.[^/.]+$/, '') || 'my-qr-code';
+    const fullName = `${baseName}.${exportFmt}`;
+
+    const blob = rawData instanceof Blob ? rawData : new Blob([rawData as any]);
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = fullName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+  });
+
+  btnCopyCanvas?.addEventListener('click', async () => {
+    const { default: QRCodeStyling } = await import('qr-code-styling');
+    const payload = buildQRPayload(qrType, getValues());
+    const copyQr = new QRCodeStyling({
       width: 1024,
       height: 1024,
       type: 'canvas',
@@ -618,20 +653,17 @@ const presets = [
       margin: 20,
       qrOptions: { errorCorrectionLevel: errorLevel as any },
     });
-    exportQr.download({ name: filenameInput?.value || 'my-qr-code', extension: exportFmt as any });
-  });
 
-  btnCopyCanvas?.addEventListener('click', async () => {
-    const canvas = container?.querySelector('canvas');
-    if (canvas && btnCopyCanvas) {
-      canvas.toBlob(async (blob) => {
-        if (blob) {
-          await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-          const prev = btnCopyCanvas.textContent;
-          btnCopyCanvas.textContent = 'Copied!';
-          setTimeout(() => (btnCopyCanvas.textContent = prev), 1500);
-        }
-      });
+    const rawBlob = await copyQr.getRawData('png');
+    if (rawBlob && rawBlob instanceof Blob && btnCopyCanvas) {
+      try {
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': rawBlob })]);
+        const prev = btnCopyCanvas.textContent;
+        btnCopyCanvas.textContent = 'Copied!';
+        setTimeout(() => (btnCopyCanvas.textContent = prev), 1500);
+      } catch (err) {
+        console.error('Clipboard copy failed', err);
+      }
     }
   });
 

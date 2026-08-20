@@ -103,13 +103,7 @@ const SAMPLE_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODk
 </ToolLayout>
 
 <script>
-  function base64UrlDecode(str: string): string {
-    let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
-    while (base64.length % 4) {
-      base64 += '=';
-    }
-    return atob(base64);
-  }
+  import { decodeJwtToken, verifyJwtHmacSignature } from '@/lib/jwt';
 
   const jwtInput = document.getElementById('jwtInput') as HTMLTextAreaElement;
   const secretInput = document.getElementById('secretInput') as HTMLInputElement;
@@ -125,69 +119,35 @@ const SAMPLE_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODk
 
   function decodeJWT() {
     const token = jwtInput?.value.trim() || '';
-    const parts = token.split('.');
+    const decoded = decodeJwtToken(token);
 
-    if (parts.length !== 3) {
+    if (!decoded.valid) {
       if (decodedContainer) decodedContainer.style.display = 'none';
       if (errorBox && errorMsg) {
         errorBox.style.display = 'block';
-        errorMsg.textContent = 'Invalid JWT format. Must contain 3 dot-separated parts (Header.Payload.Signature)';
+        errorMsg.textContent = decoded.errorMessage || 'Invalid JWT token.';
       }
       return;
     }
 
-    try {
-      const headerObj = JSON.parse(base64UrlDecode(parts[0]));
-      const payloadObj = JSON.parse(base64UrlDecode(parts[1]));
+    if (headerOut) headerOut.value = JSON.stringify(decoded.header, null, 2);
+    if (payloadOut) payloadOut.value = JSON.stringify(decoded.payload, null, 2);
+    if (expStatusEl) expStatusEl.innerHTML = `Token Expiry Status: <strong>${decoded.expStatus}</strong>`;
 
-      const nowSec = Math.floor(Date.now() / 1000);
-      let expStatus = 'No expiration claim (exp)';
-      if (payloadObj.exp) {
-        expStatus = payloadObj.exp > nowSec ? `Valid (Expires: ${new Date(payloadObj.exp * 1000).toISOString()})` : `Expired on ${new Date(payloadObj.exp * 1000).toISOString()}`;
-      }
-
-      if (headerOut) headerOut.value = JSON.stringify(headerObj, null, 2);
-      if (payloadOut) payloadOut.value = JSON.stringify(payloadObj, null, 2);
-      if (expStatusEl) expStatusEl.innerHTML = `Token Expiry Status: <strong>${expStatus}</strong>`;
-
-      if (decodedContainer) decodedContainer.style.display = 'block';
-      if (errorBox) errorBox.style.display = 'none';
-    } catch (err: any) {
-      if (decodedContainer) decodedContainer.style.display = 'none';
-      if (errorBox && errorMsg) {
-        errorBox.style.display = 'block';
-        errorMsg.textContent = `Base64 / JSON Decoding Error: ${err.message}`;
-      }
-    }
+    if (decodedContainer) decodedContainer.style.display = 'block';
+    if (errorBox) errorBox.style.display = 'none';
   }
 
   async function verifySignature() {
     const token = jwtInput?.value.trim() || '';
-    const parts = token.split('.');
-    if (parts.length !== 3 || !sigStatusBox) return;
+    const secret = secretInput?.value || '';
+    if (!sigStatusBox) return;
 
     try {
-      const encoder = new TextEncoder();
-      const secret = secretInput?.value || '';
-      const keyData = encoder.encode(secret);
-      const cryptoKey = await crypto.subtle.importKey(
-        'raw',
-        keyData,
-        { name: 'HMAC', hash: 'SHA-256' },
-        false,
-        ['sign']
-      );
-
-      const dataToSign = encoder.encode(`${parts[0]}.${parts[1]}`);
-      const computedBuffer = await crypto.subtle.sign('HMAC', cryptoKey, dataToSign);
-
-      const computedBase64Url = btoa(String.fromCharCode(...new Uint8Array(computedBuffer)))
-        .replace(/=/g, '')
-        .replace(/\+/g, '-')
-        .replace(/\//g, '_');
-
+      const isVerified = await verifyJwtHmacSignature(token, secret);
       sigStatusBox.style.display = 'block';
-      if (computedBase64Url === parts[2]) {
+
+      if (isVerified) {
         sigStatusBox.style.background = 'rgba(76, 175, 80, 0.2)';
         sigStatusBox.style.color = '#4caf50';
         sigStatusBox.textContent = '✓ Signature Verified Successfully!';

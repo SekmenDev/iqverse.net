@@ -122,6 +122,13 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 </ToolLayout>
 
 <script>
+  import {
+    parseUrlComponents,
+    buildUrlString,
+    encodeUrlString,
+    decodeUrlString,
+  } from '@/lib/url';
+
   const urlInput = document.getElementById('urlInput') as HTMLTextAreaElement;
   const protocolInput = document.getElementById('urlProtocol') as HTMLInputElement;
   const hostInput = document.getElementById('urlHost') as HTMLInputElement;
@@ -153,18 +160,15 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
     hideError();
     try {
       const candidate = urlInput?.value.trim() || 'https://example.com';
-      const url = new URL(candidate.startsWith('http') ? candidate : `https://${candidate}`);
-      if (protocolInput) protocolInput.value = url.protocol;
-      if (hostInput) hostInput.value = url.hostname;
-      if (portInput) portInput.value = url.port;
-      if (pathnameInput) pathnameInput.value = url.pathname;
-      if (hashInput) hashInput.value = url.hash;
+      const parsed = parseUrlComponents(candidate);
 
-      const q = Array.from(url.searchParams.entries())
-        .map(([k, v]) => `${k}=${v}`)
-        .join('\n');
-      if (queryParamsInput) queryParamsInput.value = q;
-      if (urlOutput) urlOutput.value = url.href;
+      if (protocolInput) protocolInput.value = parsed.protocol;
+      if (hostInput) hostInput.value = parsed.hostname;
+      if (portInput) portInput.value = parsed.port;
+      if (pathnameInput) pathnameInput.value = parsed.pathname;
+      if (hashInput) hashInput.value = parsed.hash;
+      if (queryParamsInput) queryParamsInput.value = parsed.queryParams;
+      if (urlOutput) urlOutput.value = parsed.href;
     } catch (err: any) {
       showError(err.message || 'Invalid URL.');
       if (urlOutput) urlOutput.value = '';
@@ -174,27 +178,17 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   function buildUrl() {
     hideError();
     try {
-      const protocol = protocolInput?.value || 'https:';
-      const host = hostInput?.value || 'example.com';
-      const port = portInput?.value ? `:${portInput.value}` : '';
-      const base = `${protocol}//${host}${port}`;
-      const url = new URL(pathnameInput?.value || '/', base);
-      const hash = hashInput?.value || '';
-      url.hash = hash.startsWith('#') || hash === '' ? hash : `#${hash}`;
+      const built = buildUrlString({
+        protocol: protocolInput?.value,
+        host: hostInput?.value,
+        port: portInput?.value,
+        pathname: pathnameInput?.value,
+        hash: hashInput?.value,
+        queryParams: queryParamsInput?.value,
+      });
 
-      const params = new URLSearchParams();
-      (queryParamsInput?.value || '')
-        .split(/\r?\n/)
-        .map((l) => l.trim())
-        .filter(Boolean)
-        .forEach((line) => {
-          const [k, ...rest] = line.split('=');
-          if (k) params.append(k.trim(), rest.join('=').trim());
-        });
-      url.search = params.toString();
-
-      if (urlOutput) urlOutput.value = url.href;
-      if (urlInput) urlInput.value = url.href;
+      if (urlOutput) urlOutput.value = built;
+      if (urlInput) urlInput.value = built;
     } catch (err: any) {
       showError(err.message || 'Unable to build URL.');
       if (urlOutput) urlOutput.value = '';
@@ -206,7 +200,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   btnEncode?.addEventListener('click', () => {
     hideError();
     try {
-      if (urlOutput && urlInput) urlOutput.value = encodeURI(urlInput.value.trim());
+      if (urlOutput && urlInput) urlOutput.value = encodeUrlString(urlInput.value.trim());
     } catch {
       showError('Unable to encode the URL.');
     }
@@ -214,7 +208,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   btnDecode?.addEventListener('click', () => {
     hideError();
     try {
-      if (urlOutput && urlInput) urlOutput.value = decodeURI(urlInput.value.trim());
+      if (urlOutput && urlInput) urlOutput.value = decodeUrlString(urlInput.value.trim());
     } catch {
       showError('Unable to decode the URL.');
     }

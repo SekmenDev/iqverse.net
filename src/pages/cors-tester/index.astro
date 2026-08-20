@@ -109,6 +109,7 @@ import styles from '@/styles/cors-tester.module.css';
 
 <script>
   import styles from '@/styles/cors-tester.module.css';
+  import { evaluateCorsResponse, parseCustomHeaders } from '@/lib/cors';
 
   const urlInput = document.getElementById('targetUrl') as HTMLInputElement;
   const methodSelect = document.getElementById('reqMethod') as HTMLSelectElement;
@@ -142,25 +143,7 @@ import styles from '@/styles/cors-tester.module.css';
     if (btnText) btnText.textContent = 'Testing Request...';
     if (resultsBox) resultsBox.style.display = 'none';
 
-    const reqHeaders: Record<string, string> = {
-      Origin: originHeader,
-    };
-
-    if (customHeadersRaw) {
-      if (customHeadersRaw.startsWith('{')) {
-        try {
-          Object.assign(reqHeaders, JSON.parse(customHeadersRaw));
-        } catch {
-          // ignore parse error
-        }
-      } else {
-        customHeadersRaw.split(',').forEach((part) => {
-          const [k, ...v] = part.split(':');
-          if (k && v.length) reqHeaders[k.trim()] = v.join(':').trim();
-        });
-      }
-    }
-
+    const reqHeaders = parseCustomHeaders(customHeadersRaw, originHeader);
     const startTime = performance.now();
 
     try {
@@ -176,94 +159,15 @@ import styles from '@/styles/cors-tester.module.css';
         allHeaders[key.toLowerCase()] = val;
       });
 
-      const allowedOrigin = allHeaders['access-control-allow-origin'];
-      const allowedMethods = allHeaders['access-control-allow-methods'];
-      const allowedHeaders = allHeaders['access-control-allow-headers'];
-      const allowedCredentials = allHeaders['access-control-allow-credentials'];
-      const maxAge = allHeaders['access-control-max-age'];
-      const exposeHeaders = allHeaders['access-control-expose-headers'];
-
-      let isAllowed = false;
-      let isWarning = false;
-      const notes: { icon: string; text: string; type: 'success' | 'danger' | 'info' }[] = [];
-
-      if (allowedOrigin === '*' || allowedOrigin === originHeader) {
-        isAllowed = true;
-        notes.push({
-          icon: '✓',
-          text: `Origin allowed: Server returned Access-Control-Allow-Origin: "${allowedOrigin}".`,
-          type: 'success',
-        });
-      } else if (allowedOrigin) {
-        notes.push({
-          icon: '✕',
-          text: `Origin mismatch: Server returned "${allowedOrigin}", but simulated origin was "${originHeader}".`,
-          type: 'danger',
-        });
-      } else {
-        notes.push({
-          icon: '✕',
-          text: 'Missing Access-Control-Allow-Origin header in response. Cross-origin browser requests will be blocked.',
-          type: 'danger',
-        });
-      }
-
-      if (allowedCredentials === 'true') {
-        notes.push({
-          icon: 'ℹ',
-          text: 'Access-Control-Allow-Credentials is true (Cookies and Authorization headers allowed).',
-          type: 'info',
-        });
-        if (allowedOrigin === '*') {
-          isAllowed = false;
-          isWarning = true;
-          notes.push({
-            icon: '⚠️',
-            text: 'CORS Security Violation: Wildcard origin ("*") cannot be combined with Credentials=true according to the Fetch specification.',
-            type: 'danger',
-          });
-        }
-      }
-
-      if (allowedMethods) {
-        notes.push({
-          icon: '✓',
-          text: `Allowed Methods: ${allowedMethods}`,
-          type: 'info',
-        });
-      }
-
-      if (allowedHeaders) {
-        notes.push({
-          icon: '✓',
-          text: `Allowed Request Headers: ${allowedHeaders}`,
-          type: 'info',
-        });
-      }
-
-      if (maxAge) {
-        notes.push({
-          icon: 'ℹ',
-          text: `Preflight Cache Max-Age: ${maxAge} seconds.`,
-          type: 'info',
-        });
-      }
-
-      if (exposeHeaders) {
-        notes.push({
-          icon: 'ℹ',
-          text: `Exposed Headers to Client JavaScript: ${exposeHeaders}`,
-          type: 'info',
-        });
-      }
+      const evaluation = evaluateCorsResponse(allHeaders, originHeader);
 
       renderSuccessResult({
-        isAllowed,
-        isWarning,
+        isAllowed: evaluation.isAllowed,
+        isWarning: evaluation.isWarning,
         status: response.status,
         statusText: response.statusText || 'OK',
         durationMs,
-        notes,
+        notes: evaluation.notes,
         allHeaders,
       });
     } catch (err: any) {

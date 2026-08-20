@@ -150,14 +150,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
 <script>
   import { validateCaptcha, getCaptchaToken } from '@/lib/captcha';
-
-  interface ResultItem {
-    url: string;
-    sourceUrl?: string;
-    tag?: string;
-    status: number;
-    time?: number;
-  }
+  import { extractLinksFromHtml, aggregateLinkStats, type LinkRadarResult } from '@/lib/linkradar';
 
   const form = document.getElementById('linkradar-form') as HTMLFormElement;
   const urlInput = document.getElementById('targetUrl') as HTMLInputElement;
@@ -185,7 +178,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   let activeFilter = 'all';
   let isScanning = false;
   let abortCtrl: AbortController | null = null;
-  let allResults: ResultItem[] = [];
+  let allResults: (LinkRadarResult & { html?: string })[] = [];
 
   statFilterCards.forEach((card) => {
     card.addEventListener('click', () => {
@@ -297,20 +290,12 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   }
 
   function updateStats() {
-    let s200 = 0;
-    let s300 = 0;
-    let sBroken = 0;
+    const stats = aggregateLinkStats(allResults);
 
-    allResults.forEach((r) => {
-      if (r.status >= 200 && r.status < 300) s200++;
-      else if (r.status >= 300 && r.status < 400) s300++;
-      else sBroken++;
-    });
-
-    if (statTotal) statTotal.textContent = String(allResults.length);
-    if (stat2xx) stat2xx.textContent = String(s200);
-    if (stat3xx) stat3xx.textContent = String(s300);
-    if (statBroken) statBroken.textContent = String(sBroken);
+    if (statTotal) statTotal.textContent = String(stats.total);
+    if (stat2xx) stat2xx.textContent = String(stats.success2xx);
+    if (stat3xx) stat3xx.textContent = String(stats.redirect3xx);
+    if (statBroken) statBroken.textContent = String(stats.broken);
   }
 
   async function checkUrl(url: string, sourceUrl?: string, tag?: string) {
@@ -371,17 +356,10 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
       // If internal page and depth < 2, parse links
       if (optCrawl?.checked && item.depth < 2 && res.html && res.url.startsWith(new URL(origin).origin)) {
-        const matches = res.html.matchAll(/href=["']([^"']+)["']/g);
-        for (const m of matches) {
-          const foundUrl = m[1];
-          if (foundUrl.startsWith('#') || foundUrl.startsWith('javascript:') || foundUrl.startsWith('mailto:')) continue;
-          try {
-            const absolute = new URL(foundUrl, res.url).href;
-            if (!visited.has(absolute)) {
-              queue.push({ url: absolute, depth: item.depth + 1, sourceUrl: res.url, tag: 'A' });
-            }
-          } catch {
-            // ignore malformed URL
+        const foundLinks = extractLinksFromHtml(res.html, res.url);
+        for (const foundItem of foundLinks) {
+          if (!visited.has(foundItem.url)) {
+            queue.push({ url: foundItem.url, depth: item.depth + 1, sourceUrl: res.url, tag: foundItem.tag });
           }
         }
       }

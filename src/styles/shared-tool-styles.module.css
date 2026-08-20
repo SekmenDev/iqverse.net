@@ -127,11 +127,12 @@
   margin-top: 1rem;
 }
 
-.button {
+.button,
+:global(.sharedStyles_button) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 0.5rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm, 8px);
   padding: 0.65rem 1.15rem;
@@ -145,37 +146,45 @@
   text-decoration: none;
 }
 
-.button:hover {
+.button:hover,
+:global(.sharedStyles_button:hover) {
   background: var(--card-hover);
   border-color: var(--border-acc);
   color: var(--accent);
   transform: translateY(-1px);
 }
 
-.button:active {
+.button:active,
+:global(.sharedStyles_button:active) {
   transform: translateY(0);
 }
 
-.buttonPrimary {
+.buttonPrimary,
+:global(.sharedStyles_buttonPrimary),
+:global(.button-primary) {
   background: var(--accent);
   color: #0c0e14 !important;
   border-color: var(--accent);
 }
 
-.buttonPrimary:hover {
+.buttonPrimary:hover,
+:global(.sharedStyles_buttonPrimary:hover),
+:global(.button-primary:hover) {
   background: #9aa4fc;
   border-color: #9aa4fc;
   color: #0c0e14 !important;
   box-shadow: 0 4px 12px rgba(129, 140, 248, 0.3);
 }
 
-.buttonSecondary {
+.buttonSecondary,
+:global(.sharedStyles_buttonSecondary) {
   background: transparent;
   color: var(--accent);
   border: 1px solid var(--border-acc);
 }
 
-.buttonSecondary:hover {
+.buttonSecondary:hover,
+:global(.sharedStyles_buttonSecondary:hover) {
   background: var(--accent-dim);
   border-color: var(--accent);
 }

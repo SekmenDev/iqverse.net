@@ -84,79 +84,7 @@ const SAMPLE_RIGHT = `{\n  "name": "IQVerse",\n  "version": "1.1.0",\n  "status"
 </ToolLayout>
 
 <script>
-  interface DiffLine {
-    type: 'added' | 'removed' | 'unchanged';
-    leftLineNum?: number;
-    rightLineNum?: number;
-    content: string;
-  }
-
-  function computeDiff(leftText: string, rightText: string, ignoreWhitespace: boolean): DiffLine[] {
-    const leftLines = leftText.split('\n');
-    const rightLines = rightText.split('\n');
-    const result: DiffLine[] = [];
-
-    let i = 0;
-    let j = 0;
-    let leftNum = 1;
-    let rightNum = 1;
-
-    while (i < leftLines.length || j < rightLines.length) {
-      const lStr = i < leftLines.length ? leftLines[i] : null;
-      const rStr = j < rightLines.length ? rightLines[j] : null;
-
-      const lNorm = lStr !== null ? (ignoreWhitespace ? lStr.trim() : lStr) : null;
-      const rNorm = rStr !== null ? (ignoreWhitespace ? rStr.trim() : rStr) : null;
-
-      if (lNorm === rNorm && lNorm !== null) {
-        result.push({
-          type: 'unchanged',
-          leftLineNum: leftNum++,
-          rightLineNum: rightNum++,
-          content: lStr!,
-        });
-        i++;
-        j++;
-      } else {
-        const nextLInR = rNorm !== null ? leftLines.slice(i).findIndex((line) => (ignoreWhitespace ? line.trim() : line) === rNorm) : -1;
-        const nextRInL = lNorm !== null ? rightLines.slice(j).findIndex((line) => (ignoreWhitespace ? line.trim() : line) === lNorm) : -1;
-
-        if (nextLInR !== -1 && (nextRInL === -1 || nextLInR <= nextRInL)) {
-          result.push({
-            type: 'removed',
-            leftLineNum: leftNum++,
-            content: lStr!,
-          });
-          i++;
-        } else if (nextRInL !== -1) {
-          result.push({
-            type: 'added',
-            rightLineNum: rightNum++,
-            content: rStr!,
-          });
-          j++;
-        } else {
-          if (lStr !== null) {
-            result.push({
-              type: 'removed',
-              leftLineNum: leftNum++,
-              content: lStr,
-            });
-            i++;
-          }
-          if (rStr !== null) {
-            result.push({
-              type: 'added',
-              rightLineNum: rightNum++,
-              content: rStr,
-            });
-            j++;
-          }
-        }
-      }
-    }
-    return result;
-  }
+  import { computeLineDiff } from '@/lib/diff';
 
   const leftInput = document.getElementById('leftText') as HTMLTextAreaElement;
   const rightInput = document.getElementById('rightText') as HTMLTextAreaElement;
@@ -186,7 +114,7 @@ const SAMPLE_RIGHT = `{\n  "name": "IQVerse",\n  "version": "1.1.0",\n  "status"
 
   function renderDiff() {
     if (!leftInput || !rightInput || !diffContainer) return;
-    const diff = computeDiff(leftInput.value, rightInput.value, cbWhitespace?.checked || false);
+    const diff = computeLineDiff(leftInput.value, rightInput.value, cbWhitespace?.checked || false);
 
     const added = diff.filter((l) => l.type === 'added').length;
     const removed = diff.filter((l) => l.type === 'removed').length;
