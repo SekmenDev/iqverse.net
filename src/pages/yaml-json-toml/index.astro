@@ -85,102 +85,7 @@ const DEFAULT_JSON = `{\n  "title": "IQVerse Config",\n  "version": 1,\n  "enabl
 </ToolLayout>
 
 <script>
-  function objectToYaml(obj: unknown, indentLevel = 0): string {
-    const indent = '  '.repeat(indentLevel);
-    if (obj === null) return 'null';
-    if (typeof obj === 'boolean') return obj ? 'true' : 'false';
-    if (typeof obj === 'number') return obj.toString();
-    if (typeof obj === 'string') {
-      if (obj.includes('\n') || obj.includes(':') || obj.includes('#')) {
-        return `"${obj.replace(/"/g, '\\"')}"`;
-      }
-      return obj || '""';
-    }
-
-    if (Array.isArray(obj)) {
-      if (obj.length === 0) return '[]';
-      return obj
-        .map((item) => {
-          if (typeof item === 'object' && item !== null) {
-            const subYaml = objectToYaml(item, indentLevel + 1).trimStart();
-            return `${indent}- ${subYaml}`;
-          }
-          return `${indent}- ${objectToYaml(item, indentLevel)}`;
-        })
-        .join('\n');
-    }
-
-    if (typeof obj === 'object') {
-      const keys = Object.keys(obj as Record<string, unknown>);
-      if (keys.length === 0) return '{}';
-      return keys
-        .map((key) => {
-          const val = (obj as Record<string, unknown>)[key];
-          if (typeof val === 'object' && val !== null && !Array.isArray(val)) {
-            return `${indent}${key}:\n${objectToYaml(val, indentLevel + 1)}`;
-          }
-          if (Array.isArray(val)) {
-            return `${indent}${key}:\n${objectToYaml(val, indentLevel + 1)}`;
-          }
-          return `${indent}${key}: ${objectToYaml(val, indentLevel)}`;
-        })
-        .join('\n');
-    }
-
-    return String(obj);
-  }
-
-  function yamlToObject(yamlStr: string): unknown {
-    const lines = yamlStr.split('\n').filter((l) => l.trim() && !l.trim().startsWith('#'));
-    const root: Record<string, unknown> = {};
-
-    lines.forEach((line) => {
-      const trimmed = line.trim();
-      const colonIdx = trimmed.indexOf(':');
-      if (colonIdx > 0) {
-        const key = trimmed.slice(0, colonIdx).trim();
-        let valStr = trimmed.slice(colonIdx + 1).trim();
-        if (valStr.startsWith('"') && valStr.endsWith('"')) {
-          valStr = valStr.slice(1, -1);
-        }
-        let val: unknown = valStr;
-        if (valStr === 'true') val = true;
-        else if (valStr === 'false') val = false;
-        else if (valStr === 'null') val = null;
-        else if (!isNaN(Number(valStr)) && valStr !== '') val = Number(valStr);
-
-        root[key] = val;
-      }
-    });
-
-    return Object.keys(root).length > 0 ? root : JSON.parse(yamlStr);
-  }
-
-  function objectToToml(obj: Record<string, unknown>): string {
-    let toml = '';
-    const primitives: string[] = [];
-    const tables: string[] = [];
-
-    Object.entries(obj).forEach(([key, val]) => {
-      if (typeof val === 'object' && val !== null && !Array.isArray(val)) {
-        tables.push(`[${key}]\n${objectToToml(val as Record<string, unknown>)}`);
-      } else if (typeof val === 'string') {
-        primitives.push(`${key} = "${val}"`);
-      } else if (typeof val === 'boolean' || typeof val === 'number') {
-        primitives.push(`${key} = ${val}`);
-      } else if (Array.isArray(val)) {
-        primitives.push(`${key} = ${JSON.stringify(val)}`);
-      }
-    });
-
-    toml = primitives.join('\n');
-    if (tables.length > 0) {
-      if (toml) toml += '\n\n';
-      toml += tables.join('\n\n');
-    }
-
-    return toml;
-  }
+  import { convertDataFormat, type DataFormat } from '@/lib/data-converter';
 
   const srcFmt = document.getElementById('srcFmt') as HTMLSelectElement;
   const tgtFmt = document.getElementById('tgtFmt') as HTMLSelectElement;
@@ -205,30 +110,19 @@ const DEFAULT_JSON = `{\n  "title": "IQVerse Config",\n  "version": 1,\n  "enabl
     if (fmtOutput) fmtOutput.value = '';
 
     try {
-      const source = srcFmt?.value || 'json';
-      const target = tgtFmt?.value || 'yaml';
+      const source = (srcFmt?.value || 'json') as DataFormat;
+      const target = (tgtFmt?.value || 'yaml') as DataFormat;
       const text = fmtInput?.value || '';
 
-      let parsedObj: any = null;
-      if (source === 'json') {
-        parsedObj = JSON.parse(text);
+      const result = convertDataFormat(text, source, target);
+      if (result.success) {
+        if (fmtOutput) fmtOutput.value = result.output;
       } else {
-        parsedObj = yamlToObject(text);
-      }
-
-      let result = '';
-      if (target === 'json') {
-        result = JSON.stringify(parsedObj, null, 2);
-      } else if (target === 'yaml') {
-        result = objectToYaml(parsedObj);
-      } else if (target === 'toml') {
-        if (typeof parsedObj !== 'object' || parsedObj === null || Array.isArray(parsedObj)) {
-          throw new TypeError('TOML root must be an object/table.');
+        if (errorCard && errorMsg) {
+          errorCard.style.display = 'block';
+          errorMsg.textContent = `Parsing Error: ${result.error || 'Invalid input syntax.'}`;
         }
-        result = objectToToml(parsedObj);
       }
-
-      if (fmtOutput) fmtOutput.value = result;
     } catch (err: any) {
       if (errorCard && errorMsg) {
         errorCard.style.display = 'block';
