@@ -607,7 +607,41 @@ const presets = [
   btnDownload?.addEventListener('click', async () => {
     const { default: QRCodeStyling } = await import('qr-code-styling');
     const payload = buildQRPayload(qrType, getValues());
+    const isSvg = exportFmt === 'svg';
     const exportQr = new QRCodeStyling({
+      width: 1024,
+      height: 1024,
+      type: isSvg ? 'svg' : 'canvas',
+      data: payload || 'https://iqverse.net',
+      image: logoData || '',
+      dotsOptions: { type: dotStyle as any, color: dotColor },
+      cornersSquareOptions: { type: cornerStyle as any, color: cornerColor },
+      backgroundOptions: { color: bgColor },
+      margin: 20,
+      qrOptions: { errorCorrectionLevel: errorLevel as any },
+    });
+
+    const rawData = await exportQr.getRawData(exportFmt as any);
+    if (!rawData) return;
+
+    const baseName = (filenameInput?.value || 'my-qr-code').trim().replace(/\.[^/.]+$/, '') || 'my-qr-code';
+    const fullName = `${baseName}.${exportFmt}`;
+
+    const blob = rawData instanceof Blob ? rawData : new Blob([rawData as any]);
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = fullName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+  });
+
+  btnCopyCanvas?.addEventListener('click', async () => {
+    const { default: QRCodeStyling } = await import('qr-code-styling');
+    const payload = buildQRPayload(qrType, getValues());
+    const copyQr = new QRCodeStyling({
       width: 1024,
       height: 1024,
       type: 'canvas',
@@ -619,20 +653,17 @@ const presets = [
       margin: 20,
       qrOptions: { errorCorrectionLevel: errorLevel as any },
     });
-    exportQr.download({ name: filenameInput?.value || 'my-qr-code', extension: exportFmt as any });
-  });
 
-  btnCopyCanvas?.addEventListener('click', async () => {
-    const canvas = container?.querySelector('canvas');
-    if (canvas && btnCopyCanvas) {
-      canvas.toBlob(async (blob) => {
-        if (blob) {
-          await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-          const prev = btnCopyCanvas.textContent;
-          btnCopyCanvas.textContent = 'Copied!';
-          setTimeout(() => (btnCopyCanvas.textContent = prev), 1500);
-        }
-      });
+    const rawBlob = await copyQr.getRawData('png');
+    if (rawBlob && rawBlob instanceof Blob && btnCopyCanvas) {
+      try {
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': rawBlob })]);
+        const prev = btnCopyCanvas.textContent;
+        btnCopyCanvas.textContent = 'Copied!';
+        setTimeout(() => (btnCopyCanvas.textContent = prev), 1500);
+      } catch (err) {
+        console.error('Clipboard copy failed', err);
+      }
     }
   });
 

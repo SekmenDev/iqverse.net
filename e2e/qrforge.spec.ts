@@ -73,4 +73,33 @@ test.describe('QRForge Step Navigation & Style Interactions', () => {
 
     expect(pageErrors).toEqual([]);
   });
+
+  test('Downloading QR code uses the exact user-specified filename and format extension', async ({ page }) => {
+    await page.goto('/qrforge/');
+
+    // Go to export tab
+    await page.locator('button[data-step="export"]').click();
+
+    // Set custom filename
+    const filenameInput = page.locator('#export-filename');
+    await filenameInput.fill('my-custom-test-qr');
+
+    // Select SVG
+    await page.locator('button.btn-export-fmt[data-fmt="svg"]').click();
+
+    // Trigger download and catch event
+    const downloadPromise = page.waitForEvent('download');
+    await page.locator('#btn-download-qr').click();
+    const download = await downloadPromise;
+
+    expect(download.suggestedFilename()).toBe('my-custom-test-qr.svg');
+
+    // Switch to PNG and test PNG download
+    await page.locator('button.btn-export-fmt[data-fmt="png"]').click();
+    const downloadPngPromise = page.waitForEvent('download');
+    await page.locator('#btn-download-qr').click();
+    const downloadPng = await downloadPngPromise;
+
+    expect(downloadPng.suggestedFilename()).toBe('my-custom-test-qr.png');
+  });
 });
