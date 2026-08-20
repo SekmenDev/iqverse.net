@@ -86,15 +86,10 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 </ToolLayout>
 
 <script>
-  interface UrlEntry {
-    loc: string;
-    lastmod: string;
-    changefreq: string;
-    priority: string;
-  }
+  import { generateSitemapXml, parseBulkSitemapPaths, type SitemapUrlEntry } from '@/lib/sitemap';
 
   const today = new Date().toISOString().split('T')[0];
-  let urls: UrlEntry[] = [
+  let urls: SitemapUrlEntry[] = [
     { loc: 'https://iqverse.net/', lastmod: today, changefreq: 'daily', priority: '1.0' },
     { loc: 'https://iqverse.net/agentscan/', lastmod: today, changefreq: 'weekly', priority: '0.8' },
     { loc: 'https://iqverse.net/llmstxt/', lastmod: today, changefreq: 'weekly', priority: '0.8' },
@@ -129,7 +124,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
           type="date"
           class="url-field-lastmod"
           data-idx="${idx}"
-          value="${entry.lastmod}"
+          value="${entry.lastmod || ''}"
           style="padding: 6px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.85rem;"
         />
         <select
@@ -214,27 +209,8 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
     });
   }
 
-  function generateXml(): string {
-    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
-    xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
-
-    urls.forEach((u) => {
-      if (u.loc.trim()) {
-        xml += `  <url>\n`;
-        xml += `    <loc>${u.loc.trim()}</loc>\n`;
-        if (u.lastmod.trim()) xml += `    <lastmod>${u.lastmod.trim()}</lastmod>\n`;
-        if (u.changefreq) xml += `    <changefreq>${u.changefreq}</changefreq>\n`;
-        if (u.priority) xml += `    <priority>${u.priority}</priority>\n`;
-        xml += `  </url>\n`;
-      }
-    });
-
-    xml += `</urlset>`;
-    return xml;
-  }
-
   function updateXml() {
-    if (xmlOutput) xmlOutput.value = generateXml();
+    if (xmlOutput) xmlOutput.value = generateSitemapXml(urls);
   }
 
   btnAddUrl?.addEventListener('click', () => {
@@ -245,12 +221,8 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   });
 
   btnBulkImport?.addEventListener('click', () => {
-    const base = baseUrlInput?.value.trim().replace(/\/$/, '') || 'https://example.com';
-    const lines = (bulkArea?.value || '').split('\n').map((l) => l.trim()).filter(Boolean);
-    const newEntries = lines.map((l) => {
-      const fullLoc = l.startsWith('http') ? l : `${base}${l.startsWith('/') ? '' : '/'}${l}`;
-      return { loc: fullLoc, lastmod: today, changefreq: 'monthly', priority: '0.5' };
-    });
+    const base = baseUrlInput?.value.trim() || 'https://example.com';
+    const newEntries = parseBulkSitemapPaths(bulkArea?.value || '', base);
     urls = [...urls, ...newEntries];
     if (bulkArea) bulkArea.value = '';
     renderList();
@@ -267,7 +239,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   });
 
   btnDownload?.addEventListener('click', () => {
-    const blob = new Blob([generateXml()], { type: 'application/xml;charset=utf-8' });
+    const blob = new Blob([generateSitemapXml(urls)], { type: 'application/xml;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
