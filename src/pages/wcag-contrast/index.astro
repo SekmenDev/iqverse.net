@@ -147,46 +147,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 </ToolLayout>
 
 <script>
-  function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
-    const clean = hex.replace('#', '').trim();
-    if (clean.length === 3) {
-      const r = parseInt(clean[0] + clean[0], 16);
-      const g = parseInt(clean[1] + clean[1], 16);
-      const b = parseInt(clean[2] + clean[2], 16);
-      return { r, g, b };
-    } else if (clean.length === 6) {
-      const r = parseInt(clean.slice(0, 2), 16);
-      const g = parseInt(clean.slice(2, 4), 16);
-      const b = parseInt(clean.slice(4, 6), 16);
-      return { r, g, b };
-    }
-    return null;
-  }
-
-  function relativeLuminance(rgb: { r: number; g: number; b: number }): number {
-    const normalize = (c: number) => {
-      const s = c / 255;
-      return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
-    };
-    const r = normalize(rgb.r);
-    const g = normalize(rgb.g);
-    const b = normalize(rgb.b);
-    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  }
-
-  function calculateContrastRatio(hex1: string, hex2: string): number {
-    const rgb1 = hexToRgb(hex1);
-    const rgb2 = hexToRgb(hex2);
-    if (!rgb1 || !rgb2) return 1;
-
-    const lum1 = relativeLuminance(rgb1);
-    const lum2 = relativeLuminance(rgb2);
-
-    const lighter = Math.max(lum1, lum2);
-    const darker = Math.min(lum1, lum2);
-
-    return (lighter + 0.05) / (darker + 0.05);
-  }
+  import { calculateContrastRatio, evaluateWcagCompliance } from '@/lib/wcag';
 
   const fgPicker = document.getElementById('fgPicker') as HTMLInputElement;
   const fgHex = document.getElementById('fgHex') as HTMLInputElement;
@@ -212,30 +173,25 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
     const bg = bgHex?.value || '#121212';
 
     const ratio = Math.round(calculateContrastRatio(fg, bg) * 100) / 100;
+    const compliance = evaluateWcagCompliance(ratio);
 
     if (ratioDisplay) {
       ratioDisplay.textContent = `${ratio} : 1`;
       ratioDisplay.style.color = ratio >= 4.5 ? '#4caf50' : '#ff4d4f';
     }
 
-    const aaNormal = ratio >= 4.5;
-    const aaLarge = ratio >= 3.0;
-    const aaaNormal = ratio >= 7.0;
-    const aaaLarge = ratio >= 4.5;
-    const uiComp = ratio >= 3.0;
-
     if (badgeAa && badgeAaText) {
-      badgeAaText.textContent = aaNormal ? 'PASS' : 'FAIL';
-      badgeAa.style.color = aaNormal ? '#4caf50' : '#ff4d4f';
-      badgeAa.style.borderColor = aaNormal ? '#4caf50' : '#ff4d4f';
-      badgeAa.style.background = aaNormal ? 'rgba(76, 175, 80, 0.2)' : 'rgba(255, 77, 79, 0.2)';
+      badgeAaText.textContent = compliance.aaNormal ? 'PASS' : 'FAIL';
+      badgeAa.style.color = compliance.aaNormal ? '#4caf50' : '#ff4d4f';
+      badgeAa.style.borderColor = compliance.aaNormal ? '#4caf50' : '#ff4d4f';
+      badgeAa.style.background = compliance.aaNormal ? 'rgba(76, 175, 80, 0.2)' : 'rgba(255, 77, 79, 0.2)';
     }
 
     if (badgeAaa && badgeAaaText) {
-      badgeAaaText.textContent = aaaNormal ? 'PASS' : 'FAIL';
-      badgeAaa.style.color = aaaNormal ? '#4caf50' : '#ff4d4f';
-      badgeAaa.style.borderColor = aaaNormal ? '#4caf50' : '#ff4d4f';
-      badgeAaa.style.background = aaaNormal ? 'rgba(76, 175, 80, 0.2)' : 'rgba(255, 77, 79, 0.2)';
+      badgeAaaText.textContent = compliance.aaaNormal ? 'PASS' : 'FAIL';
+      badgeAaa.style.color = compliance.aaaNormal ? '#4caf50' : '#ff4d4f';
+      badgeAaa.style.borderColor = compliance.aaaNormal ? '#4caf50' : '#ff4d4f';
+      badgeAaa.style.background = compliance.aaaNormal ? 'rgba(76, 175, 80, 0.2)' : 'rgba(255, 77, 79, 0.2)';
     }
 
     const setStatus = (el: HTMLElement | null, pass: boolean) => {
@@ -244,11 +200,11 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
       el.style.color = pass ? '#4caf50' : '#ff4d4f';
     };
 
-    setStatus(statusAaNormal, aaNormal);
-    setStatus(statusAaLarge, aaLarge);
-    setStatus(statusAaaNormal, aaaNormal);
-    setStatus(statusAaaLarge, aaaLarge);
-    setStatus(statusUiComponent, uiComp);
+    setStatus(statusAaNormal, compliance.aaNormal);
+    setStatus(statusAaLarge, compliance.aaLarge);
+    setStatus(statusAaaNormal, compliance.aaaNormal);
+    setStatus(statusAaaLarge, compliance.aaaLarge);
+    setStatus(statusUiComponent, compliance.uiComponent);
 
     if (previewBox) {
       previewBox.style.color = fg;
