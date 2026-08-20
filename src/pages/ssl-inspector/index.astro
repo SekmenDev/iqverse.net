@@ -119,6 +119,8 @@ MIIDdzCCAl+gAwIBAgIUW0jK3bVn1R6+... (PEM Certificate Data)
 </ToolLayout>
 
 <script>
+  import { inspectSslCertificate } from '@/lib/ssl';
+
   let mode: 'domain' | 'pem' = 'domain';
 
   const btnModeDomain = document.getElementById('btn-mode-domain');
@@ -159,22 +161,18 @@ MIIDdzCCAl+gAwIBAgIUW0jK3bVn1R6+... (PEM Certificate Data)
   function runInspect() {
     const isDomainMode = mode === 'domain';
     const targetDomain = domainInput?.value.trim() || 'example.com';
-
-    const validFrom = new Date(Date.now() - 60 * 86400 * 1000).toISOString().split('T')[0];
-    const validToDate = new Date(Date.now() + 300 * 86400 * 1000);
-    const validTo = validToDate.toISOString().split('T')[0];
-    const daysRemaining = Math.floor((validToDate.getTime() - Date.now()) / (86400 * 1000));
+    const cert = inspectSslCertificate(targetDomain, isDomainMode);
 
     if (detailsCard && statusBadge && certSubject && certIssuer && certValidFrom && certValidTo && certSerial && certAlgo && certFingerprint) {
-      certSubject.textContent = isDomainMode ? `CN=${targetDomain}, O=IQVerse Tech` : 'CN=pem-certificate.local';
-      certIssuer.textContent = "CN=Let's Encrypt Authority X3, O=Let's Encrypt, C=US";
-      certSerial.textContent = '03:A4:B9:71:E8:22:90:FD';
-      certValidFrom.textContent = validFrom;
-      certValidTo.textContent = validTo;
-      certAlgo.textContent = 'RSA 2048-bit (e 65537)';
-      certFingerprint.textContent = '9F:8A:1B:2C:3D:4E:5F:6A:7B:8C:9D:0E:1F:2A:3B:4C:5D:6E:7F:8A:9B:0C:1D:2E:3F:4A:5B:6C';
+      certSubject.textContent = cert.subject;
+      certIssuer.textContent = cert.issuer;
+      certSerial.textContent = cert.serial;
+      certValidFrom.textContent = cert.validFrom;
+      certValidTo.textContent = cert.validTo;
+      certAlgo.textContent = cert.algo;
+      certFingerprint.textContent = cert.fingerprint;
 
-      statusBadge.textContent = `✓ Valid Certificate (${daysRemaining} days left)`;
+      statusBadge.textContent = `✓ Valid Certificate (${cert.daysRemaining} days left)`;
       statusBadge.style.background = 'rgba(76, 175, 80, 0.2)';
       statusBadge.style.color = '#4caf50';
 
