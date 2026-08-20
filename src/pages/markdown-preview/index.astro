@@ -130,54 +130,7 @@ const hello = (name: string): string => {
 </ToolLayout>
 
 <script>
-  function markdownToHtml(md: string): string {
-    let html = md;
-    html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-    // Fenced Code Blocks
-    html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
-      return `<pre style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px; overflow-x: auto; margin: 12px 0;"><code class="language-${lang}">${code.trim()}</code></pre>`;
-    });
-
-    // Inline Code
-    html = html.replace(/`([^`]+)`/g, '<code style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">$1</code>');
-
-    // Headings
-    html = html.replace(/^### (.*$)/gim, '<h3 style="margin-top: 16px; margin-bottom: 8px;">$1</h3>');
-    html = html.replace(/^## (.*$)/gim, '<h2 style="margin-top: 20px; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px;">$1</h2>');
-    html = html.replace(/^# (.*$)/gim, '<h1 style="margin-top: 24px; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 6px;">$1</h1>');
-
-    // Blockquotes
-    html = html.replace(/^&gt;\s?(.*$)/gim, '<blockquote style="border-left: 4px solid var(--accent); margin: 12px 0; padding-left: 12px; opacity: 0.9;">$1</blockquote>');
-
-    // Bold & Italic
-    html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-    html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-
-    // Task lists & unordered lists
-    html = html.replace(/^-\s*\[x\]\s*(.*$)/gim, '<li style="list-style: none;">☑ $1</li>');
-    html = html.replace(/^-\s*\[\s*\]\s*(.*$)/gim, '<li style="list-style: none;">☐ $1</li>');
-    html = html.replace(/^-\s*(.*$)/gim, '<li>$1</li>');
-
-    // Paragraphs
-    html = html
-      .split(/\n\n+/)
-      .map((p) => {
-        const trimmed = p.trim();
-        if (
-          trimmed.startsWith('<h') ||
-          trimmed.startsWith('<pre') ||
-          trimmed.startsWith('<blockquote') ||
-          trimmed.startsWith('<li')
-        ) {
-          return trimmed;
-        }
-        return `<p style="margin-bottom: 12px; line-height: 1.6;">${trimmed.replace(/\n/g, '<br/>')}</p>`;
-      })
-      .join('\n');
-
-    return html;
-  }
+  import { parseMarkdownToHtml, calculateMarkdownStats } from '@/lib/markdown';
 
   const editor = document.getElementById('mdEditor') as HTMLTextAreaElement;
   const htmlOut = document.getElementById('htmlOutput') as HTMLTextAreaElement;
@@ -228,18 +181,16 @@ const hello = (name: string): string => {
   function update() {
     if (!editor) return;
     const text = editor.value;
-    const html = markdownToHtml(text);
+    const html = parseMarkdownToHtml(text);
 
     if (htmlOut) htmlOut.value = html;
     if (previewBox) previewBox.innerHTML = html;
 
-    const chars = text.length;
-    const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-    const readTime = Math.max(1, Math.ceil(words / 200));
+    const { chars, words, readingTimeMinutes } = calculateMarkdownStats(text);
 
     if (charsEl) charsEl.textContent = String(chars);
     if (wordsEl) wordsEl.textContent = String(words);
-    if (readTimeEl) readTimeEl.textContent = `~${readTime} min`;
+    if (readTimeEl) readTimeEl.textContent = `~${readingTimeMinutes} min`;
   }
 
   editor?.addEventListener('input', update);
