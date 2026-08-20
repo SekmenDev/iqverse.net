@@ -137,25 +137,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 </ToolLayout>
 
 <script>
-  const FIRST_NAMES = ['Alex', 'Jordan', 'Taylor', 'Morgan', 'Sam', 'Chris', 'Casey', 'Riley', 'Avery', 'Dakota'];
-  const LAST_NAMES = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez'];
-  const DOMAINS = ['gmail.com', 'yahoo.com', 'outlook.com', 'iqverse.net', 'techcorp.io'];
-  const CITIES = ['San Francisco', 'New York', 'London', 'Berlin', 'Tokyo', 'Sydney', 'Toronto', 'Paris'];
-  const ROLES = ['Admin', 'Developer', 'Designer', 'Product Owner', 'QA Engineer', 'Analyst'];
-
-  const LOREM_WORDS = [
-    'lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit', 'sed', 'do',
-    'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore', 'magna', 'aliqua', 'enim',
-    'ad', 'minim', 'veniam', 'quis', 'nostrud', 'exercitation', 'ullamco', 'laboris', 'nisi', 'aliquip',
-  ];
-
-  function getRandomItem<T>(arr: T[]): T {
-    return arr[Math.floor(Math.random() * arr.length)];
-  }
-
-  function getRandomInt(min: number, max: number): number {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
+  import { generateLorem, generateMockDataset } from '@/lib/fake-data';
 
   const tabLoremBtn = document.getElementById('tab-lorem-btn');
   const tabJsonBtn = document.getElementById('tab-json-btn');
@@ -192,41 +174,10 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
     };
   }
 
-  function generateLorem() {
-    const type = loremType?.value || 'paragraphs';
+  function handleGenLorem() {
+    const type = (loremType?.value || 'paragraphs') as 'paragraphs' | 'sentences' | 'words';
     const count = Math.max(1, parseInt(loremCount?.value || '3', 10));
-    let result = '';
-
-    if (type === 'words') {
-      const wordsArr = [];
-      for (let i = 0; i < count; i++) wordsArr.push(getRandomItem(LOREM_WORDS));
-      result = wordsArr.join(' ');
-    } else if (type === 'sentences') {
-      const sentencesArr = [];
-      for (let i = 0; i < count; i++) {
-        const len = getRandomInt(8, 15);
-        const words = [];
-        for (let j = 0; j < len; j++) words.push(getRandomItem(LOREM_WORDS));
-        const s = words.join(' ');
-        sentencesArr.push(s.charAt(0).toUpperCase() + s.slice(1) + '.');
-      }
-      result = sentencesArr.join(' ');
-    } else {
-      const paragraphsArr = [];
-      for (let i = 0; i < count; i++) {
-        const numSentences = getRandomInt(4, 7);
-        const sentences = [];
-        for (let s = 0; s < numSentences; s++) {
-          const len = getRandomInt(8, 15);
-          const words = [];
-          for (let j = 0; j < len; j++) words.push(getRandomItem(LOREM_WORDS));
-          const str = words.join(' ');
-          sentences.push(str.charAt(0).toUpperCase() + str.slice(1) + '.');
-        }
-        paragraphsArr.push(sentences.join(' '));
-      }
-      result = paragraphsArr.join('\n\n');
-    }
+    const result = generateLorem(type, count);
 
     if (loremOutArea && loremOutField) {
       loremOutArea.value = result;
@@ -234,45 +185,10 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
     }
   }
 
-  function generateJsonMock() {
-    const type = schemaType?.value || 'users';
+  function handleGenJsonMock() {
+    const type = (schemaType?.value || 'users') as 'users' | 'products' | 'transactions';
     const count = Math.max(1, parseInt(batchSize?.value || '5', 10));
-    const items: any[] = [];
-
-    for (let i = 1; i <= count; i++) {
-      if (type === 'users') {
-        const firstName = getRandomItem(FIRST_NAMES);
-        const lastName = getRandomItem(LAST_NAMES);
-        items.push({
-          id: `usr_${Math.random().toString(36).slice(2, 11)}`,
-          name: `${firstName} ${lastName}`,
-          email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${getRandomItem(DOMAINS)}`,
-          city: getRandomItem(CITIES),
-          role: getRandomItem(ROLES),
-          active: Math.random() > 0.2,
-          createdAt: new Date(Date.now() - getRandomInt(0, 10000000000)).toISOString(),
-        });
-      } else if (type === 'products') {
-        items.push({
-          id: `prd_${Math.random().toString(36).slice(2, 11)}`,
-          name: `Tech Widget ${getRandomInt(100, 999)}`,
-          sku: `SKU-${getRandomInt(1000, 9999)}`,
-          price: (getRandomInt(10, 500) + 0.99).toFixed(2),
-          stock: getRandomInt(0, 250),
-          category: getRandomItem(['Electronics', 'Developer Tools', 'Office', 'Software']),
-          inStock: Math.random() > 0.15,
-        });
-      } else {
-        items.push({
-          transactionId: `tx_${Math.random().toString(36).slice(2, 12)}`,
-          amount: (getRandomInt(5, 1200) + 0.5).toFixed(2),
-          currency: 'USD',
-          status: getRandomItem(['COMPLETED', 'PENDING', 'PROCESSING', 'REFUNDED']),
-          customerEmail: `${getRandomItem(FIRST_NAMES).toLowerCase()}@${getRandomItem(DOMAINS)}`,
-          timestamp: new Date(Date.now() - getRandomInt(0, 500000000)).toISOString(),
-        });
-      }
-    }
+    const items = generateMockDataset(type, count);
 
     if (jsonOutArea && jsonOutField) {
       jsonOutArea.value = JSON.stringify(items, null, 2);
@@ -280,8 +196,8 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
     }
   }
 
-  btnGenLorem?.addEventListener('click', generateLorem);
-  btnGenJson?.addEventListener('click', generateJsonMock);
+  btnGenLorem?.addEventListener('click', handleGenLorem);
+  btnGenJson?.addEventListener('click', handleGenJsonMock);
 
   btnCopyLorem?.addEventListener('click', async () => {
     if (loremOutArea?.value && btnCopyLorem) {
@@ -301,5 +217,5 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
     }
   });
 
-  generateLorem();
+  handleGenLorem();
 </script>
