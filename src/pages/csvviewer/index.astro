@@ -80,6 +80,8 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 </ToolLayout>
 
 <script>
+  import { parseCsv, exportCsvToJson, exportCsvToMarkdown, exportCsvToSql } from '@/lib/csv';
+
   const csvInput = document.getElementById('csvInput') as HTMLTextAreaElement;
   const searchInput = document.getElementById('csv-table-search') as HTMLInputElement;
   const btnClearSearch = document.getElementById('btn-clear-csv-search');
@@ -97,26 +99,8 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   const btnMd = document.getElementById('btn-export-md');
   const btnSql = document.getElementById('btn-export-sql');
 
-  function parseCSV(text: string) {
-    const rows = text.split(/\r?\n/).filter((row) => row.trim().length > 0);
-    if (rows.length === 0) return { headers: [], rows: [] };
-
-    const [headerRow, ...dataRows] = rows;
-    const headers = headerRow.split(',').map((value) => value.trim());
-
-    const parsedRows = dataRows.map((row) => {
-      const values = row.split(',').map((value) => value.trim());
-      return headers.reduce<Record<string, string>>((acc, header, index) => {
-        acc[header] = values[index] ?? '';
-        return acc;
-      }, {});
-    });
-
-    return { headers, rows: parsedRows };
-  }
-
   function getFilteredRows() {
-    const { headers, rows } = parseCSV(csvInput?.value || '');
+    const { headers, rows } = parseCsv(csvInput?.value || '');
     const query = (searchInput?.value || '').toLowerCase().trim();
 
     if (!query) return { headers, allRows: rows, filteredRows: rows };
@@ -194,7 +178,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   btnJson?.addEventListener('click', () => {
     const { filteredRows } = getFilteredRows();
     if (exportOutput && exportSection) {
-      exportOutput.value = JSON.stringify(filteredRows, null, 2);
+      exportOutput.value = exportCsvToJson(filteredRows);
       exportSection.style.display = 'block';
     }
   });
@@ -202,16 +186,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   btnMd?.addEventListener('click', () => {
     const { headers, filteredRows } = getFilteredRows();
     if (exportOutput && exportSection) {
-      if (filteredRows.length === 0) {
-        exportOutput.value = '';
-      } else {
-        const lines = [
-          `| ${headers.join(' | ')} |`,
-          `| ${headers.map(() => '---').join(' | ')} |`,
-          ...filteredRows.map((row) => `| ${headers.map((h) => row[h]).join(' | ')} |`),
-        ];
-        exportOutput.value = lines.join('\n');
-      }
+      exportOutput.value = exportCsvToMarkdown(headers, filteredRows);
       exportSection.style.display = 'block';
     }
   });
@@ -219,20 +194,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   btnSql?.addEventListener('click', () => {
     const { headers, filteredRows } = getFilteredRows();
     if (exportOutput && exportSection) {
-      if (filteredRows.length === 0) {
-        exportOutput.value = '';
-      } else {
-        const inserts = filteredRows.map((row) => {
-          const values = headers
-            .map((h) => {
-              const escaped = String(row[h]).split("'").join("''");
-              return `'${escaped}'`;
-            })
-            .join(', ');
-          return `INSERT INTO table_name (${headers.join(', ')}) VALUES (${values});`;
-        });
-        exportOutput.value = inserts.join('\n');
-      }
+      exportOutput.value = exportCsvToSql(headers, filteredRows);
       exportSection.style.display = 'block';
     }
   });
