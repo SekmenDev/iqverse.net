@@ -78,14 +78,16 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 </ToolLayout>
 
 <script>
-  interface ColorStop {
-    color: string;
-    stop: number;
-  }
+  import {
+    buildCssGradient,
+    generateGradientCssRule,
+    type GradientColorStop,
+    type GradientType,
+  } from '@/lib/gradient';
 
-  let gradientType = 'linear';
+  let gradientType: GradientType = 'linear';
   let angle = 135;
-  let stops: ColorStop[] = [
+  let stops: GradientColorStop[] = [
     { color: '#2196f3', stop: 0 },
     { color: '#e91e63', stop: 100 },
   ];
@@ -104,18 +106,11 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
     if (angleVal) angleVal.textContent = String(angle);
     if (angleGroup) angleGroup.style.display = gradientType === 'radial' ? 'none' : 'flex';
 
-    const stopString = stops.map((s) => `${s.color} ${s.stop}%`).join(', ');
-    let cssRule = '';
-    if (gradientType === 'linear') {
-      cssRule = `background: linear-gradient(${angle}deg, ${stopString});`;
-    } else if (gradientType === 'radial') {
-      cssRule = `background: radial-gradient(circle at center, ${stopString});`;
-    } else {
-      cssRule = `background: conic-gradient(from ${angle}deg at 50% 50%, ${stopString});`;
-    }
+    const gradientExpr = buildCssGradient(gradientType, stops, angle);
+    const cssRule = generateGradientCssRule(gradientType, stops, angle);
 
     if (previewBox) {
-      previewBox.style.background = cssRule.replace('background: ', '').replace(';', '');
+      previewBox.style.background = gradientExpr;
     }
     if (cssOutput) cssOutput.value = cssRule;
 
@@ -203,7 +198,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   }
 
   typeSelect?.addEventListener('change', () => {
-    gradientType = typeSelect.value;
+    gradientType = typeSelect.value as GradientType;
     render();
   });
 
@@ -214,7 +209,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
   btnAddStop?.addEventListener('click', () => {
     stops.push({ color: '#9c27b0', stop: 50 });
-    stops.sort((a, b) => a.stop - b.stop);
+    stops.sort((a, b) => (a.stop ?? 0) - (b.stop ?? 0));
     render();
   });
 
