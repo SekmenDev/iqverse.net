@@ -105,62 +105,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 </ToolLayout>
 
 <script>
-  const CROCKFORD_BASE32 = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
-
-  function generateRandomBytes(count: number): Uint8Array {
-    const bytes = new Uint8Array(count);
-    if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
-      crypto.getRandomValues(bytes);
-    } else {
-      for (let i = 0; i < count; i++) {
-        bytes[i] = Math.floor(Math.random() * 256);
-      }
-    }
-    return bytes;
-  }
-
-  function generateUuidV4(): string {
-    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-      return crypto.randomUUID();
-    }
-    const bytes = generateRandomBytes(16);
-    bytes[6] = (bytes[6] & 0x0f) | 0x40;
-    bytes[8] = (bytes[8] & 0x3f) | 0x80;
-    const hex = Array.from(bytes).map((b) => b.toString(16).padStart(2, '0')).join('');
-    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
-  }
-
-  function generateUlid(now: number = Date.now()): string {
-    let timeStr = '';
-    let time = now;
-    for (let i = 9; i >= 0; i--) {
-      const mod = time % 32;
-      timeStr = CROCKFORD_BASE32[mod] + timeStr;
-      time = Math.floor(time / 32);
-    }
-
-    const randBytes = generateRandomBytes(10);
-    let randStr = '';
-    for (let i = 0; i < 16; i++) {
-      const charIndex = randBytes[i % 10] % 32;
-      randStr += CROCKFORD_BASE32[charIndex];
-    }
-    return timeStr.padStart(10, '0') + randStr;
-  }
-
-  function decodeUlidTimestamp(ulid: string): string | null {
-    const clean = ulid.trim().toUpperCase();
-    if (clean.length < 10) return null;
-    const timePart = clean.slice(0, 10);
-    let timestamp = 0;
-    for (let i = 0; i < 10; i++) {
-      const char = timePart[i];
-      const val = CROCKFORD_BASE32.indexOf(char);
-      if (val === -1) return null;
-      timestamp = timestamp * 32 + val;
-    }
-    return new Date(timestamp).toISOString();
-  }
+  import { generateBatchIds, decodeUlidTimestamp } from '@/lib/uuid-ulid';
 
   const idType = document.getElementById('idType') as HTMLSelectElement;
   const idCount = document.getElementById('idCount') as HTMLInputElement;
@@ -184,21 +129,19 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   });
 
   function generate() {
-    const type = idType?.value || 'uuid';
+    const type = (idType?.value || 'uuid') as 'uuid' | 'ulid';
     const count = Math.max(1, parseInt(idCount?.value || '5', 10));
     const uppercase = cbUpper?.checked || false;
     const removeHyphens = cbHyphens?.checked || false;
     const braces = cbBraces?.checked || false;
 
-    const list: string[] = [];
-    for (let i = 0; i < count; i++) {
-      let id = type === 'uuid' ? generateUuidV4() : generateUlid();
-      if (type === 'uuid' && removeHyphens) id = id.replace(/-/g, '');
-      if (uppercase) id = id.toUpperCase();
-      else if (type === 'uuid') id = id.toLowerCase();
-      if (braces) id = `{${id}}`;
-      list.push(id);
-    }
+    const list = generateBatchIds({
+      type,
+      count,
+      uppercase,
+      removeHyphens,
+      braces,
+    });
 
     if (outIds && outField) {
       outIds.value = list.join('\n');
