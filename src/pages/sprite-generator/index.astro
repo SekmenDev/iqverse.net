@@ -123,6 +123,8 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 </ToolLayout>
 
 <script>
+  import { calculateSpriteSheet } from '@/lib/sprite';
+
   interface SpriteIcon {
     name: string;
     previewUrl: string;
@@ -215,47 +217,37 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
     const padding = Number(paddingSlider?.value || 8);
     const columns = Number(colSlider?.value || 4);
 
-    const cols = Math.min(columns, icons.length);
-    const rows = Math.ceil(icons.length / cols);
-    const cellWidth = iconSize + padding * 2;
-    const cellHeight = iconSize + padding * 2;
-
-    const canvasWidth = cols * cellWidth;
-    const canvasHeight = rows * cellHeight;
+    const sheet = calculateSpriteSheet(
+      icons.map((i) => i.name),
+      iconSize,
+      padding,
+      columns
+    );
 
     const canvas = document.createElement('canvas');
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
+    canvas.width = sheet.canvasWidth;
+    canvas.height = sheet.canvasHeight;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let cssStr = `.sprite {\n  background-image: url('sprite.png');\n  background-repeat: no-repeat;\n  display: inline-block;\n}\n\n`;
-    const jsonMapping: Record<string, { x: number; y: number; width: number; height: number }> = {};
-
     let loadedCount = 0;
-    icons.forEach((icon, idx) => {
-      const col = idx % cols;
-      const row = Math.floor(idx / cols);
-
-      const x = col * cellWidth + padding;
-      const y = row * cellHeight + padding;
+    icons.forEach((icon) => {
+      const coord = sheet.jsonMapping[icon.name];
+      if (!coord) return;
 
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.src = icon.previewUrl;
 
       img.onload = () => {
-        ctx.drawImage(img, x, y, iconSize, iconSize);
+        ctx.drawImage(img, coord.x, coord.y, iconSize, iconSize);
         loadedCount++;
-
-        cssStr += `.icon-${icon.name} {\n  width: ${iconSize}px;\n  height: ${iconSize}px;\n  background-position: -${x}px -${y}px;\n}\n\n`;
-        jsonMapping[icon.name] = { x, y, width: iconSize, height: iconSize };
 
         if (loadedCount === icons.length) {
           currentDataUrl = canvas.toDataURL('image/png');
           if (spriteImg) spriteImg.src = currentDataUrl;
-          if (spriteCss) spriteCss.value = cssStr.trim();
-          if (spriteJson) spriteJson.value = JSON.stringify(jsonMapping, null, 2);
+          if (spriteCss) spriteCss.value = sheet.css;
+          if (spriteJson) spriteJson.value = JSON.stringify(sheet.jsonMapping, null, 2);
           if (outputArea) outputArea.style.display = 'block';
         }
       };
