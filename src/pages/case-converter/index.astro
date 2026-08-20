@@ -35,50 +35,14 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 </ToolLayout>
 
 <script>
-  function toWords(input: string): string[] {
-    return input
-      .replace(/([a-z])([A-Z])/g, '$1 $2')
-      .replace(/([A-Z])([A-Z][a-z])/g, '$1 $2')
-      .replace(/[^a-zA-Z0-9]+/g, ' ')
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean);
-  }
+  import { convertCases } from '@/lib/case-converter';
 
   const caseInput = document.getElementById('caseInput') as HTMLTextAreaElement;
   const grid = document.getElementById('conversions-grid');
 
   function renderConversions() {
     if (!caseInput || !grid) return;
-    const input = caseInput.value;
-    const words = toWords(input);
-
-    const camelCase = words.map((w, i) => (i === 0 ? w.toLowerCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())).join('');
-    const PascalCase = words.map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join('');
-    const snake_case = words.map((w) => w.toLowerCase()).join('_');
-    const kebabCase = words.map((w) => w.toLowerCase()).join('-');
-    const CONSTANT_CASE = words.map((w) => w.toUpperCase()).join('_');
-    const TitleCase = words.map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
-    const UPPERCASE = input.toUpperCase();
-    const lowercase = input.toLowerCase();
-    const dotCase = words.map((w) => w.toLowerCase()).join('.');
-    const alternatingCase = input
-      .split('')
-      .map((c, i) => (i % 2 === 0 ? c.toLowerCase() : c.toUpperCase()))
-      .join('');
-
-    const list = [
-      { label: 'camelCase', value: camelCase },
-      { label: 'PascalCase', value: PascalCase },
-      { label: 'snake_case', value: snake_case },
-      { label: 'kebab-case', value: kebabCase },
-      { label: 'CONSTANT_CASE', value: CONSTANT_CASE },
-      { label: 'Title Case', value: TitleCase },
-      { label: 'UPPERCASE', value: UPPERCASE },
-      { label: 'lowercase', value: lowercase },
-      { label: 'dot.case', value: dotCase },
-      { label: 'aLtErNaTiNg cAsE', value: alternatingCase },
-    ];
+    const list = convertCases(caseInput.value);
 
     grid.innerHTML = list
       .map(
