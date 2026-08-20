@@ -262,6 +262,7 @@ import styles from '@/styles/og-preview.module.css';
 
 <script>
   import styles from '@/styles/og-preview.module.css';
+  import { generateOgMetaTags } from '@/lib/og';
 
   const titleInput = document.getElementById('ogTitle') as HTMLInputElement;
   const descInput = document.getElementById('ogDesc') as HTMLTextAreaElement;
@@ -450,28 +451,16 @@ import styles from '@/styles/og-preview.module.css';
     }
 
     // HTML Output Generator
-    let html = `<!-- HTML Meta Tags -->\n`;
-    html += `<title>${title}</title>\n`;
-    html += `<meta name="description" content="${description}">\n\n`;
-
-    html += `<!-- Facebook Meta Tags (Open Graph) -->\n`;
-    html += `<meta property="og:url" content="${url}">\n`;
-    html += `<meta property="og:type" content="website">\n`;
-    html += `<meta property="og:title" content="${title}">\n`;
-    html += `<meta property="og:description" content="${description}">\n`;
-    if (imageUrl) html += `<meta property="og:image" content="${imageUrl}">\n`;
-    if (siteName) html += `<meta property="og:site_name" content="${siteName}">\n\n`;
-
-    html += `<!-- Twitter Meta Tags -->\n`;
-    html += `<meta name="twitter:card" content="summary_large_image">\n`;
-    html += `<meta property="twitter:domain" content="${domain}">\n`;
-    html += `<meta property="twitter:url" content="${url}">\n`;
-    html += `<meta name="twitter:title" content="${title}">\n`;
-    html += `<meta name="twitter:description" content="${description}">\n`;
-    if (imageUrl) html += `<meta name="twitter:image" content="${imageUrl}">\n`;
-    if (twitterHandle) html += `<meta name="twitter:creator" content="${twitterHandle}">\n`;
-
-    if (metaOut) metaOut.value = html.trim();
+    if (metaOut) {
+      metaOut.value = generateOgMetaTags({
+        title,
+        description,
+        url,
+        imageUrl,
+        siteName,
+        twitterHandle,
+      });
+    }
   }
 
   [titleInput, descInput, urlInput, imgInput, siteNameInput, twHandleInput].forEach((el) => {
