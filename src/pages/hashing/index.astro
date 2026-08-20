@@ -92,42 +92,7 @@ const outputFormats = [
 </ToolLayout>
 
 <script>
-  function arrayBufferToHex(buffer: ArrayBuffer): string {
-    return Array.from(new Uint8Array(buffer))
-      .map((byte) => byte.toString(16).padStart(2, '0'))
-      .join('');
-  }
-
-  function arrayBufferToBase64(buffer: ArrayBuffer): string {
-    const bytes = new Uint8Array(buffer);
-    let binary = '';
-    for (const byte of bytes) {
-      binary += String.fromCodePoint(byte);
-    }
-    return btoa(binary);
-  }
-
-  async function computeDigest(algorithm: string, text: string, key: string | null): Promise<ArrayBuffer> {
-    const data = new TextEncoder().encode(text);
-
-    if (algorithm.startsWith('HMAC-')) {
-      const hashAlgo = algorithm.slice(5);
-      if (!key) {
-        throw new TypeError('A key is required for HMAC algorithms.');
-      }
-
-      const cryptoKey = await crypto.subtle.importKey(
-        'raw',
-        new TextEncoder().encode(key),
-        { name: 'HMAC', hash: { name: hashAlgo } },
-        false,
-        ['sign']
-      );
-      return crypto.subtle.sign('HMAC', cryptoKey, data);
-    }
-
-    return crypto.subtle.digest(algorithm, data);
-  }
+  import { computeDigest, arrayBufferToHex, arrayBufferToBase64 } from '@/lib/hashing';
 
   const inputEl = document.getElementById('hashInput') as HTMLTextAreaElement;
   const algoSelect = document.getElementById('algorithm-select') as HTMLSelectElement;
