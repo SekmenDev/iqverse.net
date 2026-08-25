@@ -56,7 +56,7 @@ import styles from '@/styles/tool-nav-search.module.css';
 </div>
 
 <script>
-  import { tools, filterTools, type Tool } from '@/lib/tools';
+  import type { Tool } from '@/lib/tools';
 
   function initToolNavSearch() {
     const wrap = document.getElementById('tool-search-wrap');
@@ -71,6 +71,31 @@ import styles from '@/styles/tool-nav-search.module.css';
 
     let currentMatches: Tool[] = [];
     let activeIndex = -1;
+    let cachedTools: Tool[] | null = null;
+    let filterToolsFn: ((query: string, category: string, status: any) => Tool[]) | null = null;
+    let loadPromise: Promise<void> | null = null;
+
+    async function ensureToolsLoaded() {
+      if (cachedTools && filterToolsFn) return;
+      if (!loadPromise) {
+        loadPromise = import('@/lib/tools').then(mod => {
+          cachedTools = mod.tools;
+          filterToolsFn = mod.filterTools;
+        });
+      }
+      await loadPromise;
+    }
+
+    // Preload tools during idle time without blocking the critical rendering path
+    if ('requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(() => {
+        ensureToolsLoaded();
+      }, { timeout: 3000 });
+    } else {
+      setTimeout(() => {
+        ensureToolsLoaded();
+      }, 1500);
+    }
 
     function escapeHtml(str: string): string {
       return (str || '')
@@ -106,9 +131,12 @@ import styles from '@/styles/tool-nav-search.module.css';
       });
     }
 
-    function renderResults() {
+    async function renderResults() {
       const q = input!.value.trim();
-      currentMatches = q ? filterTools(q, 'all', 'all') : tools.slice(0, 8);
+      await ensureToolsLoaded();
+      if (!cachedTools || !filterToolsFn) return;
+
+      currentMatches = q ? filterToolsFn(q, 'all', 'all') : cachedTools.slice(0, 8);
 
       if (clearBtn && kbd) {
         if (q.length > 0) {
@@ -181,6 +209,7 @@ import styles from '@/styles/tool-nav-search.module.css';
 
     // Focus Event
     input.addEventListener('focus', () => {
+      ensureToolsLoaded();
       renderResults();
     });
 
@@ -245,6 +274,7 @@ import styles from '@/styles/tool-nav-search.module.css';
 
       if (e.key === '/' && !e.metaKey && !e.ctrlKey && !e.altKey && !isEditable) {
         e.preventDefault();
+        ensureToolsLoaded();
         input.focus();
         input.select();
         renderResults();
