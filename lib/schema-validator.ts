@@ -39,11 +39,11 @@ const TYPE_RECOMMENDATIONS: Record<string, { recommended: string[]; description:
   },
   Organization: {
     recommended: ['name', 'url', 'logo'],
-    description: 'Companies, non-profits, or institutions',
+    description: 'Companies, non-profits or institutions',
   },
   LocalBusiness: {
     recommended: ['name', 'address', 'telephone', 'image'],
-    description: 'Brick-and-mortar stores, restaurants, or local services',
+    description: 'Brick-and-mortar stores, restaurants or local services',
   },
   WebSite: {
     recommended: ['name', 'url'],

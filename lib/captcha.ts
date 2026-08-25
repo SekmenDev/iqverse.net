@@ -75,7 +75,7 @@ export function isCaptchaLoaded(
 }
 
 /**
- * Extracts a solved CAPTCHA token from a widget, form, or container.
+ * Extracts a solved CAPTCHA token from a widget, form or container.
  */
 export function getCaptchaToken(
   containerOrWidget: HTMLElement | null | undefined
@@ -184,11 +184,11 @@ export function resetCapWidget(
     const form = el.closest('form');
     const hiddenInputs = form
       ? form.querySelectorAll<HTMLInputElement>(
-          'input[name="cap-token"], input[name="c-t"], input[data-cap-token]'
-        )
+        'input[name="cap-token"], input[name="c-t"], input[data-cap-token]'
+      )
       : wrap?.querySelectorAll<HTMLInputElement>(
-          'input[name="cap-token"], input[name="c-t"], input[data-cap-token]'
-        );
+        'input[name="cap-token"], input[name="c-t"], input[data-cap-token]'
+      );
 
     hiddenInputs?.forEach((input) => {
       input.value = '';
@@ -222,7 +222,7 @@ export function resetCapWidget(
 
 /**
  * Validates whether the CAPTCHA is solved within the container/form.
- * If unsolved, unloaded, or errored, displays visual error feedback and prevents submission.
+ * If unsolved, unloaded or errored, displays visual error feedback and prevents submission.
  */
 export function validateCaptcha(
   containerOrForm: HTMLElement | null | undefined,

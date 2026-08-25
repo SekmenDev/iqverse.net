@@ -161,7 +161,7 @@ export function evaluateCorsHeaders(
   } else if (allowedOrigin) {
     notes.push({
       icon: '✕',
-      text: `Origin mismatch: Server returned "${allowedOrigin}", but simulated origin was "${simulatedOrigin}".`,
+      text: `Origin mismatch: Server returned "${allowedOrigin}" but simulated origin was "${simulatedOrigin}".`,
       type: 'danger',
     });
     checks.push({ label: 'Allow-Origin', pass: false, note: 'Origin mismatch' });

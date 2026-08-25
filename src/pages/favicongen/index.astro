@@ -1,6 +1,6 @@
 ---
-import ToolLayout from '@/layouts/ToolLayout.astro';
-import styles from '@/styles/favicongen.module.css';
+import ToolLayout from "@/layouts/ToolLayout.astro";
+import styles from "@/styles/favicongen.module.css";
 ---
 
 <ToolLayout
@@ -20,29 +20,58 @@ import styles from '@/styles/favicongen.module.css';
           <div class={styles.stepNum}>01</div>
           <div>
             <h2 class={styles.sectionTitle}>Upload Source Image</h2>
-            <p class={styles.sectionSub}>Square PNG, SVG, or JPEG recommended (at least 512×512px for best quality)</p>
+            <p class={styles.sectionSub}>
+              Square PNG, SVG or JPEG recommended (at least 512×512px for best
+              quality)
+            </p>
           </div>
         </div>
 
-        <input type="file" id="favicon-file-input" accept="image/png, image/jpeg, image/svg+xml, image/webp" style="display: none;" />
+        <input
+          type="file"
+          id="favicon-file-input"
+          accept="image/png, image/jpeg, image/svg+xml, image/webp"
+          style="display: none;"
+        />
 
         <div id="dropzone" class={styles.dropZone}>
           <div class={styles.dropIcon}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
               <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
               <polyline points="17 8 12 3 7 8"></polyline>
               <line x1="12" y1="12" x2="12" y2="3"></line>
             </svg>
           </div>
           <div class={styles.dropTitle}>
-            Drag and drop your logo here or <span class={styles.dropBrowse}>browse files</span>
+            Drag and drop your logo here or <span class={styles.dropBrowse}
+              >browse files</span
+            >
           </div>
-          <div class={styles.dropSub}>PNG, SVG, JPG, WEBP • Processed 100% locally in your browser</div>
+          <div class={styles.dropSub}>
+            PNG, SVG, JPG, WEBP • Processed 100% locally in your browser
+          </div>
         </div>
 
-        <div id="image-info-bar" class={styles.imageInfo} style="display: none;">
+        <div
+          id="image-info-bar"
+          class={styles.imageInfo}
+          style="display: none;"
+        >
           <div class={styles.imageDetails}>
-            <img id="img-thumb" class={styles.imageThumb} alt="Source thumbnail" />
+            <img
+              id="img-thumb"
+              class={styles.imageThumb}
+              alt="Source thumbnail"
+            />
             <div class={styles.imageMetaBlock}>
               <span id="img-name" class={styles.imageName}>logo.png</span>
               <div class={styles.imageMeta}>
@@ -52,7 +81,14 @@ import styles from '@/styles/favicongen.module.css';
             </div>
           </div>
           <button type="button" id="btn-clear-img" class={styles.btnRemove}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
@@ -69,7 +105,9 @@ import styles from '@/styles/favicongen.module.css';
           <div class={styles.stepNum}>02</div>
           <div>
             <h2 class={styles.sectionTitle}>Multi-Resolution Previews</h2>
-            <p class={styles.sectionSub}>Generated across standard browser, desktop, and mobile formats</p>
+            <p class={styles.sectionSub}>
+              Generated across standard browser, desktop, and mobile formats
+            </p>
           </div>
         </div>
 
@@ -77,13 +115,23 @@ import styles from '@/styles/favicongen.module.css';
           <!-- 16x16 -->
           <div class={styles.previewCard}>
             <div class={styles.canvasContainer}>
-              <canvas id="prev16" width="16" height="16" style="width: 16px; height: 16px; image-rendering: pixelated;"></canvas>
+              <canvas
+                id="prev16"
+                width="16"
+                height="16"
+                style="width: 16px; height: 16px; image-rendering: pixelated;"
+              ></canvas>
             </div>
             <div class={styles.previewCardInfo}>
               <span class={styles.previewLabel}>16×16</span>
               <span class={styles.previewSub}>Browser Tab</span>
             </div>
-            <button type="button" class={`${styles.cardDownloadBtn} dl-btn`} data-target="prev16" data-filename="favicon-16x16.png">
+            <button
+              type="button"
+              class={`${styles.cardDownloadBtn} dl-btn`}
+              data-target="prev16"
+              data-filename="favicon-16x16.png"
+            >
               Download
             </button>
           </div>
@@ -91,13 +139,22 @@ import styles from '@/styles/favicongen.module.css';
           <!-- 32x32 -->
           <div class={styles.previewCard}>
             <div class={styles.canvasContainer}>
-              <canvas id="prev32" width="32" height="32" style="width: 32px; height: 32px;"></canvas>
+              <canvas
+                id="prev32"
+                width="32"
+                height="32"
+                style="width: 32px; height: 32px;"></canvas>
             </div>
             <div class={styles.previewCardInfo}>
               <span class={styles.previewLabel}>32×32</span>
               <span class={styles.previewSub}>Standard Favicon</span>
             </div>
-            <button type="button" class={`${styles.cardDownloadBtn} dl-btn`} data-target="prev32" data-filename="favicon-32x32.png">
+            <button
+              type="button"
+              class={`${styles.cardDownloadBtn} dl-btn`}
+              data-target="prev32"
+              data-filename="favicon-32x32.png"
+            >
               Download
             </button>
           </div>
@@ -105,13 +162,22 @@ import styles from '@/styles/favicongen.module.css';
           <!-- 48x48 -->
           <div class={styles.previewCard}>
             <div class={styles.canvasContainer}>
-              <canvas id="prev48" width="48" height="48" style="width: 48px; height: 48px;"></canvas>
+              <canvas
+                id="prev48"
+                width="48"
+                height="48"
+                style="width: 48px; height: 48px;"></canvas>
             </div>
             <div class={styles.previewCardInfo}>
               <span class={styles.previewLabel}>48×48</span>
               <span class={styles.previewSub}>Desktop Shortcut</span>
             </div>
-            <button type="button" class={`${styles.cardDownloadBtn} dl-btn`} data-target="prev48" data-filename="favicon-48x48.png">
+            <button
+              type="button"
+              class={`${styles.cardDownloadBtn} dl-btn`}
+              data-target="prev48"
+              data-filename="favicon-48x48.png"
+            >
               Download
             </button>
           </div>
@@ -119,13 +185,23 @@ import styles from '@/styles/favicongen.module.css';
           <!-- 180x180 -->
           <div class={styles.previewCard}>
             <div class={styles.canvasContainer}>
-              <canvas id="prev180" width="180" height="180" style="width: 54px; height: 54px; border-radius: 11px;"></canvas>
+              <canvas
+                id="prev180"
+                width="180"
+                height="180"
+                style="width: 54px; height: 54px; border-radius: 11px;"
+              ></canvas>
             </div>
             <div class={styles.previewCardInfo}>
               <span class={styles.previewLabel}>180×180</span>
               <span class={styles.previewSub}>Apple Touch (iOS)</span>
             </div>
-            <button type="button" class={`${styles.cardDownloadBtn} dl-btn`} data-target="prev180" data-filename="apple-touch-icon.png">
+            <button
+              type="button"
+              class={`${styles.cardDownloadBtn} dl-btn`}
+              data-target="prev180"
+              data-filename="apple-touch-icon.png"
+            >
               Download
             </button>
           </div>
@@ -133,13 +209,22 @@ import styles from '@/styles/favicongen.module.css';
           <!-- 192x192 -->
           <div class={styles.previewCard}>
             <div class={styles.canvasContainer}>
-              <canvas id="prev192" width="192" height="192" style="width: 54px; height: 54px;"></canvas>
+              <canvas
+                id="prev192"
+                width="192"
+                height="192"
+                style="width: 54px; height: 54px;"></canvas>
             </div>
             <div class={styles.previewCardInfo}>
               <span class={styles.previewLabel}>192×192</span>
               <span class={styles.previewSub}>Android Chrome</span>
             </div>
-            <button type="button" class={`${styles.cardDownloadBtn} dl-btn`} data-target="prev192" data-filename="android-chrome-192x192.png">
+            <button
+              type="button"
+              class={`${styles.cardDownloadBtn} dl-btn`}
+              data-target="prev192"
+              data-filename="android-chrome-192x192.png"
+            >
               Download
             </button>
           </div>
@@ -147,13 +232,22 @@ import styles from '@/styles/favicongen.module.css';
           <!-- 512x512 -->
           <div class={styles.previewCard}>
             <div class={styles.canvasContainer}>
-              <canvas id="prev512" width="512" height="512" style="width: 54px; height: 54px;"></canvas>
+              <canvas
+                id="prev512"
+                width="512"
+                height="512"
+                style="width: 54px; height: 54px;"></canvas>
             </div>
             <div class={styles.previewCardInfo}>
               <span class={styles.previewLabel}>512×512</span>
               <span class={styles.previewSub}>PWA Splash Icon</span>
             </div>
-            <button type="button" class={`${styles.cardDownloadBtn} dl-btn`} data-target="prev512" data-filename="android-chrome-512x512.png">
+            <button
+              type="button"
+              class={`${styles.cardDownloadBtn} dl-btn`}
+              data-target="prev512"
+              data-filename="android-chrome-512x512.png"
+            >
               Download
             </button>
           </div>
@@ -161,32 +255,75 @@ import styles from '@/styles/favicongen.module.css';
 
         <div class={styles.actionRow}>
           <button type="button" id="btn-download-all" class={styles.btnPrimary}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
               <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
             <span id="btn-download-all-text">Download All (ZIP)</span>
           </button>
-          <button type="button" id="btn-download-ico" class={styles.btnSecondary}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <button
+            type="button"
+            id="btn-download-ico"
+            class={styles.btnSecondary}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
             Download Favicon (32×32)
           </button>
-          <button type="button" id="btn-download-apple" class={styles.btnSecondary}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <button
+            type="button"
+            id="btn-download-apple"
+            class={styles.btnSecondary}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
             Download Apple Touch Icon (180×180)
           </button>
-          <button type="button" id="btn-download-manifest-file" class={styles.btnSecondary}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path>
+          <button
+            type="button"
+            id="btn-download-manifest-file"
+            class={styles.btnSecondary}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
+              ></path>
               <polyline points="14 2 14 8 20 8"></polyline>
               <line x1="16" y1="13" x2="8" y2="13"></line>
               <line x1="16" y1="17" x2="8" y2="17"></line>
@@ -205,25 +342,45 @@ import styles from '@/styles/favicongen.module.css';
           <div class={styles.stepNum}>03</div>
           <div>
             <h2 class={styles.sectionTitle}>HTML &amp; Manifest Code</h2>
-            <p class={styles.sectionSub}>Add these snippets directly to your website codebase</p>
+            <p class={styles.sectionSub}>
+              Add these snippets directly to your website codebase
+            </p>
           </div>
         </div>
 
         <div class={styles.outputBox}>
           <div class={styles.outputHeader}>
             <div class={styles.tabGroup}>
-              <button type="button" id="tab-html" class={styles.tabBtn} data-active="true">
+              <button
+                type="button"
+                id="tab-html"
+                class={styles.tabBtn}
+                data-active="true"
+              >
                 HTML &lt;head&gt; Tags
               </button>
-              <button type="button" id="tab-manifest" class={styles.tabBtn} data-active="false">
+              <button
+                type="button"
+                id="tab-manifest"
+                class={styles.tabBtn}
+                data-active="false"
+              >
                 site.webmanifest
               </button>
             </div>
             <div class={styles.outputActions}>
               <button type="button" id="btn-copy-code" class={styles.btnSmall}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"
+                  ></path>
                 </svg>
                 <span id="copy-btn-text">Copy Code</span>
               </button>
@@ -237,19 +394,20 @@ import styles from '@/styles/favicongen.module.css';
               class={styles.codeTextarea}
               rows="14"
               spellcheck="false"
-            >&lt;!-- Standard Favicons --&gt;
-&lt;link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" /&gt;
-&lt;link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" /&gt;
-&lt;link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" /&gt;
-&lt;link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png" /&gt;
-&lt;link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png" /&gt;
-
-&lt;!-- Apple Touch Icon --&gt;
-&lt;link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" /&gt;
-
-&lt;!-- Web App Manifest --&gt;
-&lt;link rel="manifest" href="/site.webmanifest" /&gt;
-&lt;meta name="theme-color" content="#13161F" /&gt;</textarea>
+              >&lt;!-- Standard Favicons --&gt; &lt;link rel="icon"
+              type="image/png" sizes="16x16" href="/favicon-16x16.png" /&gt;
+              &lt;link rel="icon" type="image/png" sizes="32x32"
+              href="/favicon-32x32.png" /&gt; &lt;link rel="icon"
+              type="image/png" sizes="48x48" href="/favicon-48x48.png" /&gt;
+              &lt;link rel="icon" type="image/png" sizes="192x192"
+              href="/android-chrome-192x192.png" /&gt; &lt;link rel="icon"
+              type="image/png" sizes="512x512"
+              href="/android-chrome-512x512.png" /&gt; &lt;!-- Apple Touch Icon
+              --&gt; &lt;link rel="apple-touch-icon" sizes="180x180"
+              href="/apple-touch-icon.png" /&gt; &lt;!-- Web App Manifest --&gt;
+              &lt;link rel="manifest" href="/site.webmanifest" /&gt; &lt;meta
+              name="theme-color" content="#13161F" /&gt;</textarea
+            >
           </div>
         </div>
       </div>
@@ -258,85 +416,91 @@ import styles from '@/styles/favicongen.module.css';
 </ToolLayout>
 
 <script>
-  import JSZip from 'jszip';
+  import JSZip from "jszip";
   import {
     FAVICON_SIZES,
     generateFaviconHtmlSnippet,
     generateWebManifest,
-  } from '@/lib/favicon';
+  } from "@/lib/favicon";
 
-  const fileInput = document.getElementById('favicon-file-input') as HTMLInputElement;
-  const dropzone = document.getElementById('dropzone');
-  const infoBar = document.getElementById('image-info-bar');
-  const imgThumb = document.getElementById('img-thumb') as HTMLImageElement;
-  const imgName = document.getElementById('img-name');
-  const imgDims = document.getElementById('img-dims');
-  const imgSize = document.getElementById('img-size');
-  const btnClear = document.getElementById('btn-clear-img');
-  const previewSection = document.getElementById('preview-section');
+  const fileInput = document.getElementById(
+    "favicon-file-input",
+  ) as HTMLInputElement;
+  const dropzone = document.getElementById("dropzone");
+  const infoBar = document.getElementById("image-info-bar");
+  const imgThumb = document.getElementById("img-thumb") as HTMLImageElement;
+  const imgName = document.getElementById("img-name");
+  const imgDims = document.getElementById("img-dims");
+  const imgSize = document.getElementById("img-size");
+  const btnClear = document.getElementById("btn-clear-img");
+  const previewSection = document.getElementById("preview-section");
 
-  const btnDownloadAll = document.getElementById('btn-download-all');
-  const btnDownloadAllText = document.getElementById('btn-download-all-text');
-  const btnDownloadIco = document.getElementById('btn-download-ico');
-  const btnDownloadApple = document.getElementById('btn-download-apple');
-  const btnDownloadManifest = document.getElementById('btn-download-manifest-file');
-  const btnCopyCode = document.getElementById('btn-copy-code');
-  const copyBtnText = document.getElementById('copy-btn-text');
-  const codeOutput = document.getElementById('html-output-code') as HTMLTextAreaElement;
+  const btnDownloadAll = document.getElementById("btn-download-all");
+  const btnDownloadAllText = document.getElementById("btn-download-all-text");
+  const btnDownloadIco = document.getElementById("btn-download-ico");
+  const btnDownloadApple = document.getElementById("btn-download-apple");
+  const btnDownloadManifest = document.getElementById(
+    "btn-download-manifest-file",
+  );
+  const btnCopyCode = document.getElementById("btn-copy-code");
+  const copyBtnText = document.getElementById("copy-btn-text");
+  const codeOutput = document.getElementById(
+    "html-output-code",
+  ) as HTMLTextAreaElement;
 
-  const tabHtml = document.getElementById('tab-html');
-  const tabManifest = document.getElementById('tab-manifest');
+  const tabHtml = document.getElementById("tab-html");
+  const tabManifest = document.getElementById("tab-manifest");
 
-  let activeTab: 'html' | 'manifest' = 'html';
+  let activeTab: "html" | "manifest" = "html";
 
   const htmlSnippet = generateFaviconHtmlSnippet();
   const manifestSnippet = generateWebManifest();
 
   function updateSnippet() {
     if (!codeOutput) return;
-    if (activeTab === 'html') {
+    if (activeTab === "html") {
       codeOutput.value = htmlSnippet;
-      tabHtml?.setAttribute('data-active', 'true');
-      tabManifest?.setAttribute('data-active', 'false');
+      tabHtml?.setAttribute("data-active", "true");
+      tabManifest?.setAttribute("data-active", "false");
     } else {
       codeOutput.value = manifestSnippet;
-      tabManifest?.setAttribute('data-active', 'true');
-      tabHtml?.setAttribute('data-active', 'false');
+      tabManifest?.setAttribute("data-active", "true");
+      tabHtml?.setAttribute("data-active", "false");
     }
   }
 
-  tabHtml?.addEventListener('click', () => {
-    activeTab = 'html';
+  tabHtml?.addEventListener("click", () => {
+    activeTab = "html";
     updateSnippet();
   });
 
-  tabManifest?.addEventListener('click', () => {
-    activeTab = 'manifest';
+  tabManifest?.addEventListener("click", () => {
+    activeTab = "manifest";
     updateSnippet();
   });
 
   // Dropzone click & drag-and-drop
-  dropzone?.addEventListener('click', () => fileInput?.click());
+  dropzone?.addEventListener("click", () => fileInput?.click());
 
-  dropzone?.addEventListener('dragover', (e) => {
+  dropzone?.addEventListener("dragover", (e) => {
     e.preventDefault();
-    dropzone.setAttribute('data-dragover', 'true');
+    dropzone.setAttribute("data-dragover", "true");
   });
 
-  dropzone?.addEventListener('dragleave', () => {
-    dropzone.removeAttribute('data-dragover');
+  dropzone?.addEventListener("dragleave", () => {
+    dropzone.removeAttribute("data-dragover");
   });
 
-  dropzone?.addEventListener('drop', (e) => {
+  dropzone?.addEventListener("drop", (e) => {
     e.preventDefault();
-    dropzone.removeAttribute('data-dragover');
+    dropzone.removeAttribute("data-dragover");
     const files = e.dataTransfer?.files;
     if (files && files.length > 0) {
       handleFile(files[0]);
     }
   });
 
-  fileInput?.addEventListener('change', () => {
+  fileInput?.addEventListener("change", () => {
     const file = fileInput.files?.[0];
     if (file) handleFile(file);
   });
@@ -350,15 +514,15 @@ import styles from '@/styles/favicongen.module.css';
         if (imgName) imgName.textContent = file.name;
         if (imgDims) imgDims.textContent = `${img.width} × ${img.height}px`;
         if (imgSize) {
-          const ext = file.name.split('.').pop()?.toUpperCase() || 'IMAGE';
+          const ext = file.name.split(".").pop()?.toUpperCase() || "IMAGE";
           const sizeKb = (file.size / 1024).toFixed(1);
           imgSize.textContent = `${ext} • ${sizeKb} KB`;
         }
         if (imgThumb) imgThumb.src = dataUrl;
 
-        if (dropzone) dropzone.style.display = 'none';
-        if (infoBar) infoBar.style.display = 'flex';
-        if (previewSection) previewSection.style.display = 'block';
+        if (dropzone) dropzone.style.display = "none";
+        if (infoBar) infoBar.style.display = "flex";
+        if (previewSection) previewSection.style.display = "block";
 
         renderPreviews(img);
       };
@@ -373,10 +537,10 @@ import styles from '@/styles/favicongen.module.css';
       if (c) {
         c.width = size;
         c.height = size;
-        const ctx = c.getContext('2d');
+        const ctx = c.getContext("2d");
         if (ctx) {
           ctx.imageSmoothingEnabled = true;
-          ctx.imageSmoothingQuality = 'high';
+          ctx.imageSmoothingQuality = "high";
           ctx.clearRect(0, 0, size, size);
           ctx.drawImage(img, 0, 0, size, size);
         }
@@ -387,8 +551,8 @@ import styles from '@/styles/favicongen.module.css';
   function downloadCanvas(id: string, filename: string) {
     const c = document.getElementById(id) as HTMLCanvasElement | null;
     if (!c) return;
-    const a = document.createElement('a');
-    a.href = c.toDataURL('image/png');
+    const a = document.createElement("a");
+    a.href = c.toDataURL("image/png");
     a.download = filename;
     document.body.appendChild(a);
     a.click();
@@ -396,9 +560,9 @@ import styles from '@/styles/favicongen.module.css';
   }
 
   function downloadText(filename: string, text: string) {
-    const blob = new Blob([text], { type: 'application/json' });
+    const blob = new Blob([text], { type: "application/json" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
     a.download = filename;
     document.body.appendChild(a);
@@ -409,75 +573,88 @@ import styles from '@/styles/favicongen.module.css';
 
   async function downloadAllZip() {
     if (!btnDownloadAll) return;
-    const originalText = btnDownloadAllText?.textContent || 'Download All (ZIP)';
-    if (btnDownloadAllText) btnDownloadAllText.textContent = 'Generating ZIP...';
+    const originalText =
+      btnDownloadAllText?.textContent || "Download All (ZIP)";
+    if (btnDownloadAllText)
+      btnDownloadAllText.textContent = "Generating ZIP...";
 
     try {
       const zip = new JSZip();
-      const items = FAVICON_SIZES.map((s) => ({ id: s.id, filename: s.filename }));
+      const items = FAVICON_SIZES.map((s) => ({
+        id: s.id,
+        filename: s.filename,
+      }));
 
       for (const item of items) {
         const c = document.getElementById(item.id) as HTMLCanvasElement | null;
         if (c) {
-          const blob = await new Promise<Blob | null>((resolve) => c.toBlob(resolve, 'image/png'));
+          const blob = await new Promise<Blob | null>((resolve) =>
+            c.toBlob(resolve, "image/png"),
+          );
           if (blob) {
             zip.file(item.filename, blob);
           }
         }
       }
 
-      zip.file('site.webmanifest', manifestSnippet);
+      zip.file("site.webmanifest", manifestSnippet);
 
-      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      const zipBlob = await zip.generateAsync({ type: "blob" });
       const url = URL.createObjectURL(zipBlob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
-      a.download = 'favicons-package.zip';
+      a.download = "favicons-package.zip";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      if (btnDownloadAllText) btnDownloadAllText.textContent = 'Downloaded!';
+      if (btnDownloadAllText) btnDownloadAllText.textContent = "Downloaded!";
       setTimeout(() => {
         if (btnDownloadAllText) btnDownloadAllText.textContent = originalText;
       }, 1500);
     } catch (err) {
-      console.error('Error generating favicon zip package:', err);
+      console.error("Error generating favicon zip package:", err);
       if (btnDownloadAllText) btnDownloadAllText.textContent = originalText;
     }
   }
 
   // Setup individual preview card download buttons
-  document.querySelectorAll('.dl-btn').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
+  document.querySelectorAll(".dl-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
       e.stopPropagation();
       const el = e.currentTarget as HTMLElement;
-      const targetId = el.getAttribute('data-target');
-      const filename = el.getAttribute('data-filename');
+      const targetId = el.getAttribute("data-target");
+      const filename = el.getAttribute("data-filename");
       if (targetId && filename) {
         downloadCanvas(targetId, filename);
       }
     });
   });
 
-  btnDownloadAll?.addEventListener('click', downloadAllZip);
-  btnDownloadIco?.addEventListener('click', () => downloadCanvas('prev32', 'favicon-32x32.png'));
-  btnDownloadApple?.addEventListener('click', () => downloadCanvas('prev180', 'apple-touch-icon.png'));
-  btnDownloadManifest?.addEventListener('click', () => downloadText('site.webmanifest', manifestSnippet));
+  btnDownloadAll?.addEventListener("click", downloadAllZip);
+  btnDownloadIco?.addEventListener("click", () =>
+    downloadCanvas("prev32", "favicon-32x32.png"),
+  );
+  btnDownloadApple?.addEventListener("click", () =>
+    downloadCanvas("prev180", "apple-touch-icon.png"),
+  );
+  btnDownloadManifest?.addEventListener("click", () =>
+    downloadText("site.webmanifest", manifestSnippet),
+  );
 
-  btnClear?.addEventListener('click', () => {
-    if (fileInput) fileInput.value = '';
-    if (infoBar) infoBar.style.display = 'none';
-    if (dropzone) dropzone.style.display = 'flex';
-    if (previewSection) previewSection.style.display = 'none';
+  btnClear?.addEventListener("click", () => {
+    if (fileInput) fileInput.value = "";
+    if (infoBar) infoBar.style.display = "none";
+    if (dropzone) dropzone.style.display = "flex";
+    if (previewSection) previewSection.style.display = "none";
   });
 
-  btnCopyCode?.addEventListener('click', async () => {
+  btnCopyCode?.addEventListener("click", async () => {
     if (codeOutput?.value && copyBtnText) {
       await navigator.clipboard.writeText(codeOutput.value);
       const prev = copyBtnText.textContent;
-      copyBtnText.textContent = 'Copied!';
+      copyBtnText.textContent = "Copied!";
       setTimeout(() => (copyBtnText.textContent = prev), 1800);
     }
   });

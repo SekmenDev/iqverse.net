@@ -144,7 +144,7 @@ describe('lib/schema-validator.ts', () => {
       });
 
       const res = validateSchema(json);
-      expect(res.valid).toBe(true); // Still valid schema, but has warnings
+      expect(res.valid).toBe(true); // Still valid schema but has warnings
       expect(res.warnings.some((w) => w.includes("'image' is missing"))).toBe(true);
       expect(res.warnings.some((w) => w.includes("'offers' is missing"))).toBe(true);
     });
