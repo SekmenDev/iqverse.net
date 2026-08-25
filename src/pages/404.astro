@@ -179,15 +179,8 @@ const initialTools = tools.slice(0, 6);
       return filterToolsFn;
     }
 
-    if ('requestIdleCallback' in window) {
-      (window as any).requestIdleCallback(() => {
-        ensureTools();
-      }, { timeout: 3000 });
-    } else {
-      setTimeout(() => {
-        ensureTools();
-      }, 1500);
-    }
+    input.addEventListener('focus', () => { ensureTools(); }, { once: true });
+    input.addEventListener('pointerenter', () => { ensureTools(); }, { once: true });
 
     input.addEventListener('input', async () => {
       const q = input.value;
