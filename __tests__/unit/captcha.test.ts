@@ -14,7 +14,7 @@ import {
 
 describe('CapCaptcha utilities & bindings', () => {
   if (typeof customElements !== 'undefined' && !customElements.get('cap-widget')) {
-    customElements.define('cap-widget', class extends HTMLElement {});
+    customElements.define('cap-widget', class extends HTMLElement { });
   }
 
   it('has valid default captcha endpoint', () => {
@@ -90,7 +90,7 @@ describe('CapCaptcha utilities & bindings', () => {
   });
 
   describe('isCaptchaLoaded', () => {
-    it('returns false for null, undefined, or element without cap-widget', () => {
+    it('returns false for null, undefined or element without cap-widget', () => {
       expect(isCaptchaLoaded(null)).toBe(false);
       expect(isCaptchaLoaded(undefined)).toBe(false);
       const div = document.createElement('div');

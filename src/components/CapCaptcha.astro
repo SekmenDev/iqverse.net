@@ -24,6 +24,9 @@ const {
 } = Astro.props;
 ---
 
+<!-- Asynchronously load pinned cap-widget with 1-year immutable caching on pages using CapCaptcha -->
+<script is:inline src="https://cdn.jsdelivr.net/npm/cap-widget@0.1.57" type="module" async></script>
+
 <div class={`cap-captcha-wrap ${className}`.trim()} style={`display: inline-flex; flex-direction: column; align-items: flex-start; margin: 8px 0; ${style}`.trim()}>
   <cap-widget
     id={id}

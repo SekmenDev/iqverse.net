@@ -11,7 +11,7 @@ export const HTTP_STATUS_CODES: HttpStatusCodeItem[] = [
   // 1xx
   { code: 100, phrase: 'Continue', category: '1xx', spec: 'RFC 9110 §15.2.1', summary: 'Interim response indicating client should continue request or ignore if finished.', details: 'Used with Expect: 100-continue request header.' },
   { code: 101, phrase: 'Switching Protocols', category: '1xx', spec: 'RFC 9110 §15.2.2', summary: 'Server agrees to switch protocols specified in Upgrade header (e.g. WebSocket).', details: 'Sent in response to an Upgrade request header from the client.' },
-  { code: 102, phrase: 'Processing', category: '1xx', spec: 'RFC 2518', summary: 'WebDAV server has received and is processing the request, but no response is available yet.', details: 'Prevents client from timing out.' },
+  { code: 102, phrase: 'Processing', category: '1xx', spec: 'RFC 2518', summary: 'WebDAV server has received and is processing the request but no response is available yet.', details: 'Prevents client from timing out.' },
   { code: 103, phrase: 'Early Hints', category: '1xx', spec: 'RFC 8297', summary: 'Allows server to return response headers before final HTTP message for preload optimization.', details: 'Mainly used for Link header preload hints.' },
 
   // 2xx
@@ -42,7 +42,7 @@ export const HTTP_STATUS_CODES: HttpStatusCodeItem[] = [
   { code: 408, phrase: 'Request Timeout', category: '4xx', spec: 'RFC 9110 §15.5.9', summary: 'Server closed connection because client took too long to send full request.', details: 'Client may repeat request at a later time.' },
   { code: 409, phrase: 'Conflict', category: '4xx', spec: 'RFC 9110 §15.5.10', summary: 'Request conflicts with current state of server resource (e.g. duplicate key).', details: 'Common in version control conflicts or unique constraint violations.' },
   { code: 418, phrase: "I'm a teapot", category: '4xx', spec: 'RFC 2324 §2.3.2', summary: 'Hyper Text Coffee Pot Control Protocol easter egg status code.', details: 'Defined in April Fools RFC 2324.' },
-  { code: 422, phrase: 'Unprocessable Entity', category: '4xx', spec: 'RFC 9110 §15.5.21', summary: 'Server understands content type and syntax, but cannot process semantic instructions.', details: 'Standard status code for API validation errors.' },
+  { code: 422, phrase: 'Unprocessable Entity', category: '4xx', spec: 'RFC 9110 §15.5.21', summary: 'Server understands content type and syntax but cannot process semantic instructions.', details: 'Standard status code for API validation errors.' },
   { code: 429, phrase: 'Too Many Requests', category: '4xx', spec: 'RFC 6585 §4', summary: 'User sent too many requests in a given time window (Rate Limited).', details: 'Response often includes Retry-After header indicating wait duration.' },
 
   // 5xx

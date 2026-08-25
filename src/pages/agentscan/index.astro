@@ -1,89 +1,89 @@
 ---
-import ToolLayout from '@/layouts/ToolLayout.astro';
-import CapCaptcha from '@/components/CapCaptcha.astro';
-import styles from '@/styles/agentscan.module.css';
+import ToolLayout from "@/layouts/ToolLayout.astro";
+import CapCaptcha from "@/components/CapCaptcha.astro";
+import styles from "@/styles/agentscan.module.css";
 
 const QUICK_EXAMPLES = [
-  'https://cloudflare.com',
-  'https://github.com',
-  'https://openai.com',
-  'https://stripe.com',
-  'https://anthropic.com',
+  "https://cloudflare.com",
+  "https://github.com",
+  "https://openai.com",
+  "https://stripe.com",
+  "https://anthropic.com",
 ];
 
 const SIGNALS_GUIDE = [
   {
-    name: 'llms.txt Standard',
-    weight: '18 pts (High)',
-    desc: 'Curated markdown map at /llms.txt serving structured, LLM-optimized summary of your site.',
-    why: 'Provides instant site overview for AI agents, cutting down crawling overhead and hallucination.',
+    name: "llms.txt Standard",
+    weight: "18 pts (High)",
+    desc: "Curated markdown map at /llms.txt serving structured, LLM-optimized summary of your site.",
+    why: "Provides instant site overview for AI agents, cutting down crawling overhead and hallucination.",
   },
   {
-    name: 'robots.txt AI Bot Rules',
-    weight: '18 pts (High)',
-    desc: 'Explicit permissions and rules for AI crawlers like GPTBot, ClaudeBot, PerplexityBot, and CCBot.',
-    why: 'Controls and optimizes crawler access so search models index your key knowledge without rate limits.',
+    name: "robots.txt AI Bot Rules",
+    weight: "18 pts (High)",
+    desc: "Explicit permissions and rules for AI crawlers like GPTBot, ClaudeBot, PerplexityBot, and CCBot.",
+    why: "Controls and optimizes crawler access so search models index your key knowledge without rate limits.",
   },
   {
-    name: 'Schema.org JSON-LD',
-    weight: '14 pts (High)',
-    desc: 'Structured JSON-LD schemas describing Organization, WebSite, SoftwareApplication, and FAQs.',
-    why: 'Machine-readable entity graph allows AI engines to identify authority, author, and content semantics.',
+    name: "Schema.org JSON-LD",
+    weight: "14 pts (High)",
+    desc: "Structured JSON-LD schemas describing Organization, WebSite, SoftwareApplication, and FAQs.",
+    why: "Machine-readable entity graph allows AI engines to identify authority, author, and content semantics.",
   },
   {
-    name: 'Sitemap XML',
-    weight: '12 pts (Medium)',
-    desc: 'Reachable sitemap.xml declared at root or referenced in robots.txt.',
-    why: 'Essential for complete URL discovery and fresh content ingestion by automated agents.',
+    name: "Sitemap XML",
+    weight: "12 pts (Medium)",
+    desc: "Reachable sitemap.xml declared at root or referenced in robots.txt.",
+    why: "Essential for complete URL discovery and fresh content ingestion by automated agents.",
   },
   {
-    name: 'Document Title & Meta',
-    weight: '10 pts (Medium)',
+    name: "Document Title & Meta",
+    weight: "10 pts (Medium)",
     desc: 'Clean <title> and descriptive <meta name="description"> tags.',
-    why: 'Primary context anchors used by retrieval models to summarize target pages.',
+    why: "Primary context anchors used by retrieval models to summarize target pages.",
   },
   {
-    name: 'llms-full.txt Extended Docs',
-    weight: '8 pts (Medium)',
-    desc: 'Extended full-text documentation companion at /llms-full.txt.',
-    why: 'Allows deep context retrieval for multi-turn reasoning and agentic workflow integrations.',
+    name: "llms-full.txt Extended Docs",
+    weight: "8 pts (Medium)",
+    desc: "Extended full-text documentation companion at /llms-full.txt.",
+    why: "Allows deep context retrieval for multi-turn reasoning and agentic workflow integrations.",
   },
   {
-    name: 'Canonical URL Tag',
-    weight: '8 pts (Medium)',
+    name: "Canonical URL Tag",
+    weight: "8 pts (Medium)",
     desc: 'Authoritative <link rel="canonical"> pointing to the primary URL.',
-    why: 'Prevents duplicate content confusion when AI systems ingest syndicated or parameterized pages.',
+    why: "Prevents duplicate content confusion when AI systems ingest syndicated or parameterized pages.",
   },
   {
-    name: 'Open Graph Metadata',
-    weight: '6 pts (Low)',
-    desc: 'og:title, og:description, og:image social cards.',
-    why: 'Provides rich preview data for AI chat apps and snippet cards.',
+    name: "Open Graph Metadata",
+    weight: "6 pts (Low)",
+    desc: "og:title, og:description, og:image social cards.",
+    why: "Provides rich preview data for AI chat apps and snippet cards.",
   },
   {
-    name: 'Indexable Page Directives',
-    weight: '6 pts (Low)',
-    desc: 'Ensures the page has no unintended noindex or nofollow robot tags.',
-    why: 'Guarantees AI bots and search agents can index and cite your pages.',
+    name: "Indexable Page Directives",
+    weight: "6 pts (Low)",
+    desc: "Ensures the page has no unintended noindex or nofollow robot tags.",
+    why: "Guarantees AI bots and search agents can index and cite your pages.",
   },
 ];
 
 const FAQS = [
   {
-    q: 'What is an AI Agents Scanner and why does it matter?',
-    a: 'Modern search and workflow engines (like Perplexity, ChatGPT Search, Claude, and Gemini) rely on machine-readable discovery standards. An AI Agent Audit checks if your domain provides structured guidance, permissions, and metadata so AI crawlers index, cite, and integrate your service accurately.',
+    q: "What is an AI Agents Scanner and why does it matter?",
+    a: "Modern search and workflow engines (like Perplexity, ChatGPT Search, Claude, and Gemini) rely on machine-readable discovery standards. An AI Agent Audit checks if your domain provides structured guidance, permissions, and metadata so AI crawlers index, cite, and integrate your service accurately.",
   },
   {
-    q: 'What is /llms.txt?',
-    a: 'llms.txt is an open standard proposed by Jeremy Howard and adopted across the AI ecosystem. It is a concise markdown file hosted at the root of a domain that guides Large Language Models to the most relevant information and documentation on your site.',
+    q: "What is /llms.txt?",
+    a: "llms.txt is an open standard proposed by Jeremy Howard and adopted across the AI ecosystem. It is a concise markdown file hosted at the root of a domain that guides Large Language Models to the most relevant information and documentation on your site.",
   },
   {
-    q: 'How does the Model Context Protocol (MCP) fit in?',
-    a: 'MCP (Model Context Protocol) is Anthropic’s open standard connecting AI models with local or remote tool servers. Publishing an MCP server card at /.well-known/mcp.json lets autonomous AI agents discover and call your APIs natively.',
+    q: "How does the Model Context Protocol (MCP) fit in?",
+    a: "MCP (Model Context Protocol) is Anthropic’s open standard connecting AI models with local or remote tool servers. Publishing an MCP server card at /.well-known/mcp.json lets autonomous AI agents discover and call your APIs natively.",
   },
   {
-    q: 'How is the AI Readiness Score calculated?',
-    a: 'The readiness score is a weighted composite (0-100) based on 9 scored signals, including llms.txt availability (18%), AI crawler rules in robots.txt (18%), Schema.org JSON-LD (14%), sitemap reachable (12%), meta context (10%), llms-full.txt (8%), canonical tags (8%), Open Graph (6%), and indexability (6%). Protocol endpoints like MCP and UCP are audited as informational capabilities.',
+    q: "How is the AI Readiness Score calculated?",
+    a: "The readiness score is a weighted composite (0-100) based on 9 scored signals, including llms.txt availability (18%), AI crawler rules in robots.txt (18%), Schema.org JSON-LD (14%), sitemap reachable (12%), meta context (10%), llms-full.txt (8%), canonical tags (8%), Open Graph (6%), and indexability (6%). Protocol endpoints like MCP and UCP are audited as informational capabilities.",
   },
 ];
 ---
@@ -114,7 +114,9 @@ const FAQS = [
             >
               <circle cx="12" cy="12" r="10"></circle>
               <line x1="2" y1="12" x2="22" y2="12"></line>
-              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              <path
+                d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+              ></path>
             </svg>
             <input
               id="agent-url-input"
@@ -137,39 +139,77 @@ const FAQS = [
 
       <div class={styles.quickExamples}>
         <span class={styles.examplesLabel}>Try an example:</span>
-        {QUICK_EXAMPLES.map((url) => (
-          <button type="button" class={`${styles.exampleBtn} example-btn`} data-url={url}>
-            {url.replace('https://', '')}
-          </button>
-        ))}
+        {
+          QUICK_EXAMPLES.map((url) => (
+            <button
+              type="button"
+              class={`${styles.exampleBtn} example-btn`}
+              data-url={url}
+            >
+              {url.replace("https://", "")}
+            </button>
+          ))
+        }
       </div>
     </section>
 
     <!-- Loading State -->
     <div id="scan-loading-box" class={styles.statusBar} style="display: none;">
-      <div style="display: inline-flex; align-items: center; justify-content: center; gap: 12px;">
-        <div style="width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
-        <span id="loading-message" style="font-size: 0.95rem; font-weight: 500; font-family: var(--font-mono);">
+      <div
+        style="display: inline-flex; align-items: center; justify-content: center; gap: 12px;"
+      >
+        <div
+          style="width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite;"
+        >
+        </div>
+        <span
+          id="loading-message"
+          style="font-size: 0.95rem; font-weight: 500; font-family: var(--font-mono);"
+        >
           Resolving domain and fetching public discovery files…
         </span>
       </div>
     </div>
 
     <!-- Scan Results -->
-    <div id="scan-results-area" class={styles.resultsSection} style="display: none;">
+    <div
+      id="scan-results-area"
+      class={styles.resultsSection}
+      style="display: none;"
+    >
       <!-- Score Overview Card -->
       <div class={styles.scorePanel}>
         <div>
           <div class={styles.scoreLabel}>Audit Target</div>
-          <h2 id="scanned-target-title" style="margin: 6px 0 14px; font-size: 1.4rem; font-weight: 700; word-break: break-all; color: var(--text);">--</h2>
+          <h2
+            id="scanned-target-title"
+            style="margin: 6px 0 14px; font-size: 1.4rem; font-weight: 700; word-break: break-all; color: var(--text);"
+          >
+            --
+          </h2>
           <div class={styles.badges}>
-            <button type="button" class={`${styles.badge} ${styles.badgePass} agent-stat-badge`} data-status="pass" style="cursor: pointer; font-family: inherit;">
+            <button
+              type="button"
+              class={`${styles.badge} ${styles.badgePass} agent-stat-badge`}
+              data-status="pass"
+              style="cursor: pointer; font-family: inherit;"
+            >
               <span id="count-passed">0</span> Passed
             </button>
-            <button type="button" class={`${styles.badge} ${styles.badgeWarning} agent-stat-badge`} data-status="warn" style="cursor: pointer; font-family: inherit;">
+            <button
+              type="button"
+              class={`${styles.badge} ${styles.badgeWarning} agent-stat-badge`}
+              data-status="warn"
+              style="cursor: pointer; font-family: inherit;"
+            >
               <span id="count-warnings">0</span> Warnings
             </button>
-            <button type="button" class={`${styles.badge} ${styles.badgeFail} agent-stat-badge`} data-status="fail" style="cursor: pointer; font-family: inherit;">
+            <button
+              type="button"
+              class={`${styles.badge} ${styles.badgeFail} agent-stat-badge`}
+              data-status="fail"
+              style="cursor: pointer; font-family: inherit;"
+            >
               <span id="count-failed">0</span> Failed
             </button>
           </div>
@@ -183,9 +223,16 @@ const FAQS = [
       </div>
 
       <!-- Navigation & Filter Toolbar (Category Tabs + Inline Search) -->
-      <div class="tool-filter-bar" style="margin-top: 18px; margin-bottom: 12px;">
+      <div
+        class="tool-filter-bar"
+        style="margin-top: 18px; margin-bottom: 12px;"
+      >
         <div id="category-filter-buttons" class={styles.filterPills}>
-          <button type="button" class={`${styles.filterPill} ${styles.activeFilter}`} data-cat="all">
+          <button
+            type="button"
+            class={`${styles.filterPill} ${styles.activeFilter}`}
+            data-cat="all"
+          >
             All Checks (<span id="count-cat-all">17</span>)
           </button>
           <button type="button" class={styles.filterPill} data-cat="scored">
@@ -200,13 +247,25 @@ const FAQS = [
           <button type="button" class={styles.filterPill} data-cat="commerce">
             💳 Commerce (<span id="count-cat-commerce">2</span>)
           </button>
-          <button type="button" class={styles.filterPill} data-cat="performance">
+          <button
+            type="button"
+            class={styles.filterPill}
+            data-cat="performance"
+          >
             ⚡ Security & HTTP (<span id="count-cat-performance">1</span>)
           </button>
         </div>
 
         <div class="search-input-wrap" style="max-width: 340px;">
-          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg
+            class="search-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
@@ -216,24 +275,44 @@ const FAQS = [
             class="tool-search-input"
             placeholder="Search AI signals, protocols..."
           />
-          <button type="button" id="btn-clear-agent-search" class="search-clear-btn" title="Clear search">✕</button>
+          <button
+            type="button"
+            id="btn-clear-agent-search"
+            class="search-clear-btn"
+            title="Clear search">✕</button
+          >
         </div>
       </div>
 
       <!-- Counter -->
       <div id="agent-counter-bar" class="table-results-counter">
-        <span>Showing <strong id="agent-visible-count">0</strong> of <span id="agent-total-count">0</span> signals</span>
+        <span
+          >Showing <strong id="agent-visible-count">0</strong> of <span
+            id="agent-total-count">0</span
+          > signals</span
+        >
       </div>
 
       <!-- Check Results Grid -->
       <div id="checks-grid" class={styles.checksGrid}></div>
 
       <!-- Empty State -->
-      <div id="agent-empty-state" class="tool-empty-state" style="display: none;">
+      <div
+        id="agent-empty-state"
+        class="tool-empty-state"
+        style="display: none;"
+      >
         <div class="tool-empty-state-icon">🔍</div>
         <div class="tool-empty-state-title">No matching AI signals found</div>
-        <div class="tool-empty-state-text">Try adjusting your search query or switching the category/status filter.</div>
-        <button type="button" id="btn-reset-agent-filters" class="tool-empty-state-btn">Reset Filters</button>
+        <div class="tool-empty-state-text">
+          Try adjusting your search query or switching the category/status
+          filter.
+        </div>
+        <button
+          type="button"
+          id="btn-reset-agent-filters"
+          class="tool-empty-state-btn">Reset Filters</button
+        >
       </div>
     </div>
 
@@ -243,7 +322,9 @@ const FAQS = [
         <span class={styles.sectionBadge}>Methodology</span>
         <h2 class={styles.sectionTitle}>How AI Agent Readiness is Evaluated</h2>
         <p class={styles.sectionSub}>
-          Autonomous search agents, LLM browser assistants, and web crawlers query a sequence of machine-readable endpoints to safely understand and cite web content.
+          Autonomous search agents, LLM browser assistants, and web crawlers
+          query a sequence of machine-readable endpoints to safely understand
+          and cite web content.
         </p>
       </div>
 
@@ -252,21 +333,28 @@ const FAQS = [
           <span class={styles.stepNumber}>Step 01</span>
           <h3 class={styles.stepTitle}>Discovery Endpoints</h3>
           <p class={styles.stepText}>
-            AI agents check <code>/llms.txt</code>, <code>/robots.txt</code>, and <code>/sitemap.xml</code> to map available content without parsing megabytes of HTML boilerplate.
+            AI agents check <code>/llms.txt</code>, <code>/robots.txt</code>,
+            and <code>/sitemap.xml</code> to map available content without parsing
+            megabytes of HTML boilerplate.
           </p>
         </div>
         <div class={styles.stepCard}>
           <span class={styles.stepNumber}>Step 02</span>
           <h3 class={styles.stepTitle}>Protocols & MCP</h3>
           <p class={styles.stepText}>
-            Agents look for Model Context Protocol servers (<code>/.well-known/mcp.json</code>) or OpenAPI catalogs to execute programmatic tool calls and dynamic actions.
+            Agents look for Model Context Protocol servers (<code
+              >/.well-known/mcp.json</code
+            >) or OpenAPI catalogs to execute programmatic tool calls and
+            dynamic actions.
           </p>
         </div>
         <div class={styles.stepCard}>
           <span class={styles.stepNumber}>Step 03</span>
           <h3 class={styles.stepTitle}>Schema & Semantics</h3>
           <p class={styles.stepText}>
-            Embedded Schema.org JSON-LD and semantic tags allow neural models to extract structured entities, pricing, authorship, and canonical sources with zero ambiguity.
+            Embedded Schema.org JSON-LD and semantic tags allow neural models to
+            extract structured entities, pricing, authorship, and canonical
+            sources with zero ambiguity.
           </p>
         </div>
       </div>
@@ -278,7 +366,8 @@ const FAQS = [
         <span class={styles.sectionBadge}>Weights & Bands</span>
         <h2 class={styles.sectionTitle}>Signal Weights & Readiness Bands</h2>
         <p class={styles.sectionSub}>
-          The composite readiness score evaluates 9 core signals totaling 100 points, plus optional protocol checks.
+          The composite readiness score evaluates 9 core signals totaling 100
+          points, plus optional protocol checks.
         </p>
       </div>
 
@@ -289,7 +378,8 @@ const FAQS = [
             <span class={styles.bandBadge}>AI Ready</span>
           </div>
           <p class={styles.bandReading}>
-            Optimized for AI search engines, crawler discovery, and machine-readable citations.
+            Optimized for AI search engines, crawler discovery, and
+            machine-readable citations.
           </p>
         </div>
         <div class={`${styles.bandCard} ${styles.bandNeedsWork}`}>
@@ -298,7 +388,8 @@ const FAQS = [
             <span class={styles.bandBadge}>Partial</span>
           </div>
           <p class={styles.bandReading}>
-            Basic SEO present, but missing dedicated AI artifacts (like /llms.txt or AI bot permissions).
+            Basic SEO present but missing dedicated AI artifacts (like /llms.txt
+            or AI bot permissions).
           </p>
         </div>
         <div class={`${styles.bandCard} ${styles.bandAtRisk}`}>
@@ -307,7 +398,8 @@ const FAQS = [
             <span class={styles.bandBadge}>AI Blind Spot</span>
           </div>
           <p class={styles.bandReading}>
-            Inaccessible to LLM crawlers, missing structured schema, or blocked by generic directives.
+            Inaccessible to LLM crawlers, missing structured schema or blocked
+            by generic directives.
           </p>
         </div>
       </div>
@@ -321,18 +413,20 @@ const FAQS = [
       </div>
 
       <div class={styles.signalCardsGrid}>
-        {SIGNALS_GUIDE.map((sig) => (
-          <div class={styles.signalDetailCard}>
-            <div class={styles.signalHeader}>
-              <h3 class={styles.signalName}>{sig.name}</h3>
-              <span class={styles.signalWeightBadge}>{sig.weight}</span>
+        {
+          SIGNALS_GUIDE.map((sig) => (
+            <div class={styles.signalDetailCard}>
+              <div class={styles.signalHeader}>
+                <h3 class={styles.signalName}>{sig.name}</h3>
+                <span class={styles.signalWeightBadge}>{sig.weight}</span>
+              </div>
+              <p class={styles.signalBlock}>{sig.desc}</p>
+              <p class={styles.signalBlock} style="margin-top: 4px;">
+                <strong>Why it matters:</strong> {sig.why}
+              </p>
             </div>
-            <p class={styles.signalBlock}>{sig.desc}</p>
-            <p class={styles.signalBlock} style="margin-top: 4px;">
-              <strong>Why it matters:</strong> {sig.why}
-            </p>
-          </div>
-        ))}
+          ))
+        }
       </div>
     </section>
 
@@ -344,15 +438,20 @@ const FAQS = [
       </div>
 
       <div class={styles.faqList}>
-        {FAQS.map((faq) => (
-          <details class={styles.faqCard}>
-            <summary class={styles.faqQuestionRow} style="list-style: none; cursor: pointer;">
-              <h3 class={styles.faqQuestion}>{faq.q}</h3>
-              <span class={styles.faqIcon}>+</span>
-            </summary>
-            <p class={styles.faqAnswer}>{faq.a}</p>
-          </details>
-        ))}
+        {
+          FAQS.map((faq) => (
+            <details class={styles.faqCard}>
+              <summary
+                class={styles.faqQuestionRow}
+                style="list-style: none; cursor: pointer;"
+              >
+                <h3 class={styles.faqQuestion}>{faq.q}</h3>
+                <span class={styles.faqIcon}>+</span>
+              </summary>
+              <p class={styles.faqAnswer}>{faq.a}</p>
+            </details>
+          ))
+        }
       </div>
     </section>
   </div>
@@ -362,7 +461,7 @@ const FAQS = [
   interface CheckDef {
     id: string;
     name: string;
-    category: 'scored' | 'protocol' | 'content' | 'commerce' | 'performance';
+    category: "scored" | "protocol" | "content" | "commerce" | "performance";
     desc: string;
     weight: number;
     rec: string;
@@ -370,106 +469,235 @@ const FAQS = [
 
   interface ScanResult {
     id: string;
-    status: 'pass' | 'warn' | 'fail' | 'info';
+    status: "pass" | "warn" | "fail" | "info";
     detail: string;
   }
 
   const CHECK_DEFS: CheckDef[] = [
-    { id: 'llms_txt', name: 'llms.txt Standard', category: 'scored', desc: 'A markdown file at /llms.txt that gives AI systems a curated map of your site.', weight: 18, rec: 'Create an /llms.txt file at your website root with links to high-value markdown documentation.' },
-    { id: 'robots_ai_bots', name: 'robots.txt AI Crawlers', category: 'scored', desc: 'Rules in /robots.txt applying to AI crawlers (GPTBot, ClaudeBot, PerplexityBot, etc.).', weight: 18, rec: 'Add explicit crawler directives for GPTBot, ClaudeBot, and PerplexityBot in robots.txt.' },
-    { id: 'structured_data', name: 'Schema.org JSON-LD', category: 'scored', desc: 'Structured data embedded in the page describing organization, website, and entities.', weight: 14, rec: 'Embed JSON-LD schemas like WebSite, Organization, or Article to disambiguate content.' },
-    { id: 'sitemap', name: 'Sitemap XML', category: 'scored', desc: 'A reachable sitemap.xml — either at root or declared in robots.txt.', weight: 12, rec: 'Publish a sitemap.xml and declare Sitemap: https://yourdomain.com/sitemap.xml in robots.txt.' },
-    { id: 'title_meta', name: 'Title & Meta Description', category: 'scored', desc: 'Document title and meta description of the page being scanned.', weight: 10, rec: 'Ensure unique <title> and descriptive <meta name="description"> tags are present on every page.' },
-    { id: 'llms_full_txt', name: 'llms-full.txt Extended Docs', category: 'scored', desc: 'An optional companion to llms.txt carrying extended context and deeper detail.', weight: 8, rec: 'Provide a concatenated /llms-full.txt file for full LLM ingestion without multi-hop requests.' },
-    { id: 'canonical_url', name: 'Canonical URL Tag', category: 'scored', desc: 'A link rel="canonical" declaring the authoritative URL for the page.', weight: 8, rec: 'Include a <link rel="canonical"> tag to prevent duplicate content indexing.' },
-    { id: 'open_graph', name: 'Open Graph Metadata', category: 'scored', desc: 'og:title, og:url, og:image metadata for social and AI snippet rendering.', weight: 6, rec: 'Add Open Graph tags so AI previews and social embeds display proper rich cards.' },
-    { id: 'indexable_page', name: 'Indexable Page Directives', category: 'scored', desc: 'Verifies the page does not carry an unintended noindex directive.', weight: 6, rec: 'Ensure public pages do not contain <meta name="robots" content="noindex"> tags.' },
+    {
+      id: "llms_txt",
+      name: "llms.txt Standard",
+      category: "scored",
+      desc: "A markdown file at /llms.txt that gives AI systems a curated map of your site.",
+      weight: 18,
+      rec: "Create an /llms.txt file at your website root with links to high-value markdown documentation.",
+    },
+    {
+      id: "robots_ai_bots",
+      name: "robots.txt AI Crawlers",
+      category: "scored",
+      desc: "Rules in /robots.txt applying to AI crawlers (GPTBot, ClaudeBot, PerplexityBot, etc.).",
+      weight: 18,
+      rec: "Add explicit crawler directives for GPTBot, ClaudeBot, and PerplexityBot in robots.txt.",
+    },
+    {
+      id: "structured_data",
+      name: "Schema.org JSON-LD",
+      category: "scored",
+      desc: "Structured data embedded in the page describing organization, website, and entities.",
+      weight: 14,
+      rec: "Embed JSON-LD schemas like WebSite, Organization or Article to disambiguate content.",
+    },
+    {
+      id: "sitemap",
+      name: "Sitemap XML",
+      category: "scored",
+      desc: "A reachable sitemap.xml — either at root or declared in robots.txt.",
+      weight: 12,
+      rec: "Publish a sitemap.xml and declare Sitemap: https://yourdomain.com/sitemap.xml in robots.txt.",
+    },
+    {
+      id: "title_meta",
+      name: "Title & Meta Description",
+      category: "scored",
+      desc: "Document title and meta description of the page being scanned.",
+      weight: 10,
+      rec: 'Ensure unique <title> and descriptive <meta name="description"> tags are present on every page.',
+    },
+    {
+      id: "llms_full_txt",
+      name: "llms-full.txt Extended Docs",
+      category: "scored",
+      desc: "An optional companion to llms.txt carrying extended context and deeper detail.",
+      weight: 8,
+      rec: "Provide a concatenated /llms-full.txt file for full LLM ingestion without multi-hop requests.",
+    },
+    {
+      id: "canonical_url",
+      name: "Canonical URL Tag",
+      category: "scored",
+      desc: 'A link rel="canonical" declaring the authoritative URL for the page.',
+      weight: 8,
+      rec: 'Include a <link rel="canonical"> tag to prevent duplicate content indexing.',
+    },
+    {
+      id: "open_graph",
+      name: "Open Graph Metadata",
+      category: "scored",
+      desc: "og:title, og:url, og:image metadata for social and AI snippet rendering.",
+      weight: 6,
+      rec: "Add Open Graph tags so AI previews and social embeds display proper rich cards.",
+    },
+    {
+      id: "indexable_page",
+      name: "Indexable Page Directives",
+      category: "scored",
+      desc: "Verifies the page does not carry an unintended noindex directive.",
+      weight: 6,
+      rec: 'Ensure public pages do not contain <meta name="robots" content="noindex"> tags.',
+    },
 
     // Protocol & Informational
-    { id: 'mcp_server_card', name: 'MCP Server Card', category: 'protocol', desc: 'Model Context Protocol server configuration at /.well-known/mcp.json.', weight: 0, rec: 'Deploy an MCP server at /.well-known/mcp.json to allow autonomous tools integration.' },
-    { id: 'a2a_agent_card', name: 'A2A Agent Card', category: 'protocol', desc: 'Agent-to-Agent discovery manifest at /.well-known/agent.json.', weight: 0, rec: 'Publish /.well-known/agent.json to expose agent communication capabilities.' },
-    { id: 'oauth_discovery', name: 'OAuth Discovery', category: 'protocol', desc: 'OAuth 2.0 authorization server metadata at /.well-known/oauth-authorization-server.', weight: 0, rec: 'Expose standard OAuth 2.0 authorization metadata if APIs require authenticated agent tokens.' },
-    { id: 'api_catalog', name: 'OpenAPI Catalog', category: 'protocol', desc: 'OpenAPI / Swagger spec at /openapi.json, /swagger.json, or /api-docs.', weight: 0, rec: 'Host an OpenAPI specification at /openapi.json for automated tool calling.' },
-    { id: 'markdown_negotiation', name: 'Markdown Content Negotiation', category: 'content', desc: 'Content negotiation support for text/markdown via HTTP Accept headers.', weight: 0, rec: 'Support Accept: text/markdown header for direct LLM markdown responses.' },
-    { id: 'x402', name: 'x402 Micropayments Protocol', category: 'commerce', desc: 'HTTP 402 responses or x402 headers enabling AI agent micropayments.', weight: 0, rec: 'Implement HTTP 402 or x402 headers for pay-per-query agent APIs.' },
-    { id: 'ucp', name: 'Universal Commerce Protocol (UCP)', category: 'commerce', desc: 'UCP commerce discovery card at /.well-known/ucp.json.', weight: 0, rec: 'Publish /.well-known/ucp.json for automated commerce and purchasing discovery.' },
-    { id: 'https', name: 'Secure HTTPS', category: 'performance', desc: 'Confirms the website is served over secure, encrypted HTTPS.', weight: 0, rec: 'Enforce HTTPS for all web crawler and API traffic.' },
+    {
+      id: "mcp_server_card",
+      name: "MCP Server Card",
+      category: "protocol",
+      desc: "Model Context Protocol server configuration at /.well-known/mcp.json.",
+      weight: 0,
+      rec: "Deploy an MCP server at /.well-known/mcp.json to allow autonomous tools integration.",
+    },
+    {
+      id: "a2a_agent_card",
+      name: "A2A Agent Card",
+      category: "protocol",
+      desc: "Agent-to-Agent discovery manifest at /.well-known/agent.json.",
+      weight: 0,
+      rec: "Publish /.well-known/agent.json to expose agent communication capabilities.",
+    },
+    {
+      id: "oauth_discovery",
+      name: "OAuth Discovery",
+      category: "protocol",
+      desc: "OAuth 2.0 authorization server metadata at /.well-known/oauth-authorization-server.",
+      weight: 0,
+      rec: "Expose standard OAuth 2.0 authorization metadata if APIs require authenticated agent tokens.",
+    },
+    {
+      id: "api_catalog",
+      name: "OpenAPI Catalog",
+      category: "protocol",
+      desc: "OpenAPI / Swagger spec at /openapi.json, /swagger.json or /api-docs.",
+      weight: 0,
+      rec: "Host an OpenAPI specification at /openapi.json for automated tool calling.",
+    },
+    {
+      id: "markdown_negotiation",
+      name: "Markdown Content Negotiation",
+      category: "content",
+      desc: "Content negotiation support for text/markdown via HTTP Accept headers.",
+      weight: 0,
+      rec: "Support Accept: text/markdown header for direct LLM markdown responses.",
+    },
+    {
+      id: "x402",
+      name: "x402 Micropayments Protocol",
+      category: "commerce",
+      desc: "HTTP 402 responses or x402 headers enabling AI agent micropayments.",
+      weight: 0,
+      rec: "Implement HTTP 402 or x402 headers for pay-per-query agent APIs.",
+    },
+    {
+      id: "ucp",
+      name: "Universal Commerce Protocol (UCP)",
+      category: "commerce",
+      desc: "UCP commerce discovery card at /.well-known/ucp.json.",
+      weight: 0,
+      rec: "Publish /.well-known/ucp.json for automated commerce and purchasing discovery.",
+    },
+    {
+      id: "https",
+      name: "Secure HTTPS",
+      category: "performance",
+      desc: "Confirms the website is served over secure, encrypted HTTPS.",
+      weight: 0,
+      rec: "Enforce HTTPS for all web crawler and API traffic.",
+    },
   ];
 
-  import { validateCaptcha, getCaptchaToken } from '@/lib/captcha';
+  import { validateCaptcha, getCaptchaToken } from "@/lib/captcha";
 
-  const form = document.getElementById('agent-scan-form') as HTMLFormElement;
-  const urlInput = document.getElementById('agent-url-input') as HTMLInputElement;
-  const exampleBtns = document.querySelectorAll('.example-btn');
-  const loadingBox = document.getElementById('scan-loading-box');
-  const resultsArea = document.getElementById('scan-results-area');
-  const scoreNum = document.getElementById('score-number');
-  const scoreSubtitle = document.getElementById('score-subtitle');
-  const targetTitle = document.getElementById('scanned-target-title');
-  const countPassed = document.getElementById('count-passed');
-  const countWarnings = document.getElementById('count-warnings');
-  const countFailed = document.getElementById('count-failed');
+  const form = document.getElementById("agent-scan-form") as HTMLFormElement;
+  const urlInput = document.getElementById(
+    "agent-url-input",
+  ) as HTMLInputElement;
+  const exampleBtns = document.querySelectorAll(".example-btn");
+  const loadingBox = document.getElementById("scan-loading-box");
+  const resultsArea = document.getElementById("scan-results-area");
+  const scoreNum = document.getElementById("score-number");
+  const scoreSubtitle = document.getElementById("score-subtitle");
+  const targetTitle = document.getElementById("scanned-target-title");
+  const countPassed = document.getElementById("count-passed");
+  const countWarnings = document.getElementById("count-warnings");
+  const countFailed = document.getElementById("count-failed");
 
-  const agentPillPass = document.getElementById('agent-pill-pass');
-  const agentPillWarn = document.getElementById('agent-pill-warn');
-  const agentPillFail = document.getElementById('agent-pill-fail');
-  const agentPillInfo = document.getElementById('agent-pill-info');
+  const agentPillPass = document.getElementById("agent-pill-pass");
+  const agentPillWarn = document.getElementById("agent-pill-warn");
+  const agentPillFail = document.getElementById("agent-pill-fail");
+  const agentPillInfo = document.getElementById("agent-pill-info");
 
-  const agentVisibleCount = document.getElementById('agent-visible-count');
-  const agentTotalCount = document.getElementById('agent-total-count');
-  const agentEmptyState = document.getElementById('agent-empty-state');
-  const agentSearchInput = document.getElementById('agent-search-input') as HTMLInputElement;
-  const btnClearAgentSearch = document.getElementById('btn-clear-agent-search');
-  const btnResetAgentFilters = document.getElementById('btn-reset-agent-filters');
-  const agentStatBadges = document.querySelectorAll('.agent-stat-badge');
+  const agentVisibleCount = document.getElementById("agent-visible-count");
+  const agentTotalCount = document.getElementById("agent-total-count");
+  const agentEmptyState = document.getElementById("agent-empty-state");
+  const agentSearchInput = document.getElementById(
+    "agent-search-input",
+  ) as HTMLInputElement;
+  const btnClearAgentSearch = document.getElementById("btn-clear-agent-search");
+  const btnResetAgentFilters = document.getElementById(
+    "btn-reset-agent-filters",
+  );
+  const agentStatBadges = document.querySelectorAll(".agent-stat-badge");
 
-  const checksGrid = document.getElementById('checks-grid');
-  const catFilterBtns = document.querySelectorAll('#category-filter-buttons button');
+  const checksGrid = document.getElementById("checks-grid");
+  const catFilterBtns = document.querySelectorAll(
+    "#category-filter-buttons button",
+  );
 
-  let currentCategory = 'all';
-  let currentStatus = 'all';
+  let currentCategory = "all";
+  let currentStatus = "all";
   let allScanResults: ScanResult[] = [];
 
   exampleBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener("click", () => {
       if (urlInput) {
-        urlInput.value = (btn as HTMLElement).dataset.url || '';
+        urlInput.value = (btn as HTMLElement).dataset.url || "";
         const { valid } = validateCaptcha(form);
         if (valid) {
-          form?.dispatchEvent(new Event('submit'));
+          form?.dispatchEvent(new Event("submit"));
         }
       }
     });
   });
 
   catFilterBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener("click", () => {
       catFilterBtns.forEach((b) => {
-        b.classList.remove('active');
-        b.removeAttribute('data-active');
+        b.classList.remove("active");
+        b.removeAttribute("data-active");
       });
-      btn.classList.add('active');
-      btn.setAttribute('data-active', 'true');
-      currentCategory = (btn as HTMLElement).dataset.cat || 'all';
+      btn.classList.add("active");
+      btn.setAttribute("data-active", "true");
+      currentCategory = (btn as HTMLElement).dataset.cat || "all";
       renderChecks();
     });
   });
 
   agentStatBadges.forEach((badge) => {
-    badge.addEventListener('click', () => {
-      const clickedStatus = (badge as HTMLElement).dataset.status || 'all';
+    badge.addEventListener("click", () => {
+      const clickedStatus = (badge as HTMLElement).dataset.status || "all";
       if (currentStatus === clickedStatus) {
-        currentStatus = 'all';
-        agentStatBadges.forEach((b) => ((b as HTMLElement).style.opacity = '1'));
+        currentStatus = "all";
+        agentStatBadges.forEach(
+          (b) => ((b as HTMLElement).style.opacity = "1"),
+        );
       } else {
         currentStatus = clickedStatus;
         agentStatBadges.forEach((b) => {
           if ((b as HTMLElement).dataset.status === clickedStatus) {
-            (b as HTMLElement).style.opacity = '1';
-            (b as HTMLElement).style.boxShadow = '0 0 0 2px var(--accent)';
+            (b as HTMLElement).style.opacity = "1";
+            (b as HTMLElement).style.boxShadow = "0 0 0 2px var(--accent)";
           } else {
-            (b as HTMLElement).style.opacity = '0.55';
-            (b as HTMLElement).style.boxShadow = 'none';
+            (b as HTMLElement).style.opacity = "0.55";
+            (b as HTMLElement).style.boxShadow = "none";
           }
         });
       }
@@ -477,31 +705,33 @@ const FAQS = [
     });
   });
 
-  agentSearchInput?.addEventListener('input', () => {
+  agentSearchInput?.addEventListener("input", () => {
     if (btnClearAgentSearch) {
-      btnClearAgentSearch.style.display = agentSearchInput.value ? 'inline-block' : 'none';
+      btnClearAgentSearch.style.display = agentSearchInput.value
+        ? "inline-block"
+        : "none";
     }
     renderChecks();
   });
 
-  btnClearAgentSearch?.addEventListener('click', () => {
+  btnClearAgentSearch?.addEventListener("click", () => {
     if (agentSearchInput) {
-      agentSearchInput.value = '';
-      btnClearAgentSearch.style.display = 'none';
+      agentSearchInput.value = "";
+      btnClearAgentSearch.style.display = "none";
       renderChecks();
       agentSearchInput.focus();
     }
   });
 
-  btnResetAgentFilters?.addEventListener('click', () => {
-    currentStatus = 'all';
+  btnResetAgentFilters?.addEventListener("click", () => {
+    currentStatus = "all";
     agentStatBadges.forEach((b) => {
-      (b as HTMLElement).style.opacity = '1';
-      (b as HTMLElement).style.boxShadow = 'none';
+      (b as HTMLElement).style.opacity = "1";
+      (b as HTMLElement).style.boxShadow = "none";
     });
     if (agentSearchInput) {
-      agentSearchInput.value = '';
-      if (btnClearAgentSearch) btnClearAgentSearch.style.display = 'none';
+      agentSearchInput.value = "";
+      if (btnClearAgentSearch) btnClearAgentSearch.style.display = "none";
     }
     renderChecks();
   });
@@ -509,21 +739,23 @@ const FAQS = [
   async function proxyFetch(targetUrl: string) {
     try {
       const token = getCaptchaToken(form);
-      const tokenParam = token ? `&token=${encodeURIComponent(token)}` : '';
-      const res = await fetch(`/api/check-url?url=${encodeURIComponent(targetUrl)}${tokenParam}`);
+      const tokenParam = token ? `&token=${encodeURIComponent(token)}` : "";
+      const res = await fetch(
+        `/api/check-url?url=${encodeURIComponent(targetUrl)}${tokenParam}`,
+      );
       const json = await res.json();
       return {
         ok: json.status >= 200 && json.status < 400,
         status: json.status || 0,
-        body: json.body || json.html || '',
+        body: json.body || json.html || "",
         headers: json.headers || {},
       };
     } catch {
-      return { ok: false, status: 0, body: '', headers: {} };
+      return { ok: false, status: 0, body: "", headers: {} };
     }
   }
 
-  form?.addEventListener('submit', async (e) => {
+  form?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const raw = urlInput?.value.trim();
     if (!raw) return;
@@ -531,19 +763,31 @@ const FAQS = [
     const { valid } = validateCaptcha(form);
     if (!valid) return;
 
-    const normalized = raw.startsWith('http://') || raw.startsWith('https://') ? raw : `https://${raw}`;
-    let origin = '';
+    const normalized =
+      raw.startsWith("http://") || raw.startsWith("https://")
+        ? raw
+        : `https://${raw}`;
+    let origin = "";
     try {
       origin = new URL(normalized).origin;
     } catch {
       origin = normalized;
     }
 
-    if (loadingBox) loadingBox.style.display = 'block';
-    if (resultsArea) resultsArea.style.display = 'none';
+    if (loadingBox) loadingBox.style.display = "block";
+    if (resultsArea) resultsArea.style.display = "none";
 
     try {
-      const [homeRes, robotsRes, sitemapRes, llmsRes, llmsFullRes, mcpRes, ucpRes, x402Res] = await Promise.all([
+      const [
+        homeRes,
+        robotsRes,
+        sitemapRes,
+        llmsRes,
+        llmsFullRes,
+        mcpRes,
+        ucpRes,
+        x402Res,
+      ] = await Promise.all([
         proxyFetch(origin),
         proxyFetch(`${origin}/robots.txt`),
         proxyFetch(`${origin}/sitemap.xml`),
@@ -554,11 +798,12 @@ const FAQS = [
         proxyFetch(`${origin}/.well-known/x402.json`),
       ]);
 
-      const robots = robotsRes.body || '';
-      const html = homeRes.body || '';
+      const robots = robotsRes.body || "";
+      const html = homeRes.body || "";
 
       const hasLlms = llmsRes.ok && llmsRes.body.trim().length > 10;
-      const hasRobotsAi = /gptbot|claudebot|perplexitybot|ccbot|applebot-extended/i.test(robots);
+      const hasRobotsAi =
+        /gptbot|claudebot|perplexitybot|ccbot|applebot-extended/i.test(robots);
       const hasSchema = /application\/ld\+json/i.test(html);
       const hasSitemap = sitemapRes.ok || /sitemap:\s*http/i.test(robots);
       const hasTitle = /<title[^>]*>(.*?)<\/title>/i.test(html);
@@ -567,29 +812,117 @@ const FAQS = [
       const hasOg = /property=["']og:/i.test(html);
       const isIndexable = !/content=["'][^"']*noindex/i.test(html);
 
-      const hasMcp = mcpRes.ok && mcpRes.body.includes('{');
+      const hasMcp = mcpRes.ok && mcpRes.body.includes("{");
       const hasUcp = ucpRes.ok;
       const hasX402 = x402Res.ok;
-      const isHttps = origin.startsWith('https://');
+      const isHttps = origin.startsWith("https://");
 
       allScanResults = [
-        { id: 'llms_txt', status: hasLlms ? 'pass' : 'fail', detail: hasLlms ? '/llms.txt found and verified.' : 'Missing /llms.txt' },
-        { id: 'robots_ai_bots', status: hasRobotsAi ? 'pass' : 'warn', detail: hasRobotsAi ? 'AI agent directives declared in robots.txt.' : 'No explicit AI crawler rules in robots.txt.' },
-        { id: 'structured_data', status: hasSchema ? 'pass' : 'warn', detail: hasSchema ? 'Schema.org JSON-LD structured data detected.' : 'No JSON-LD structured data detected.' },
-        { id: 'sitemap', status: hasSitemap ? 'pass' : 'fail', detail: hasSitemap ? 'Valid sitemap reachable.' : 'No sitemap discovered.' },
-        { id: 'title_meta', status: hasTitle && hasMetaDesc ? 'pass' : 'warn', detail: 'Title and meta description tags verified.' },
-        { id: 'llms_full_txt', status: llmsFullRes.ok ? 'pass' : 'info', detail: llmsFullRes.ok ? '/llms-full.txt available.' : 'Optional /llms-full.txt not published.' },
-        { id: 'canonical_url', status: hasCanonical ? 'pass' : 'warn', detail: hasCanonical ? 'Canonical URL tag present.' : 'Missing canonical link.' },
-        { id: 'open_graph', status: hasOg ? 'pass' : 'warn', detail: hasOg ? 'Open Graph preview tags present.' : 'No Open Graph metadata found.' },
-        { id: 'indexable_page', status: isIndexable ? 'pass' : 'fail', detail: isIndexable ? 'Page is indexable by crawlers.' : 'noindex tag detected.' },
-        { id: 'mcp_server_card', status: hasMcp ? 'pass' : 'info', detail: hasMcp ? 'MCP server card discovered.' : 'No MCP endpoint at /.well-known/mcp.json.' },
-        { id: 'a2a_agent_card', status: 'info', detail: 'Agent-to-Agent discovery (Optional).' },
-        { id: 'oauth_discovery', status: 'info', detail: 'OAuth 2.0 authorization server check.' },
-        { id: 'api_catalog', status: 'info', detail: 'OpenAPI catalog check.' },
-        { id: 'markdown_negotiation', status: 'info', detail: 'Accept: text/markdown negotiation check.' },
-        { id: 'x402', status: hasX402 ? 'pass' : 'info', detail: hasX402 ? 'x402 micropayments protocol active.' : 'No x402 payment headers detected.' },
-        { id: 'ucp', status: hasUcp ? 'pass' : 'info', detail: hasUcp ? 'UCP discovery card active.' : 'No UCP endpoint at /.well-known/ucp.json.' },
-        { id: 'https', status: isHttps ? 'pass' : 'fail', detail: isHttps ? 'Served over secure HTTPS.' : 'Insecure plain HTTP.' },
+        {
+          id: "llms_txt",
+          status: hasLlms ? "pass" : "fail",
+          detail: hasLlms
+            ? "/llms.txt found and verified."
+            : "Missing /llms.txt",
+        },
+        {
+          id: "robots_ai_bots",
+          status: hasRobotsAi ? "pass" : "warn",
+          detail: hasRobotsAi
+            ? "AI agent directives declared in robots.txt."
+            : "No explicit AI crawler rules in robots.txt.",
+        },
+        {
+          id: "structured_data",
+          status: hasSchema ? "pass" : "warn",
+          detail: hasSchema
+            ? "Schema.org JSON-LD structured data detected."
+            : "No JSON-LD structured data detected.",
+        },
+        {
+          id: "sitemap",
+          status: hasSitemap ? "pass" : "fail",
+          detail: hasSitemap
+            ? "Valid sitemap reachable."
+            : "No sitemap discovered.",
+        },
+        {
+          id: "title_meta",
+          status: hasTitle && hasMetaDesc ? "pass" : "warn",
+          detail: "Title and meta description tags verified.",
+        },
+        {
+          id: "llms_full_txt",
+          status: llmsFullRes.ok ? "pass" : "info",
+          detail: llmsFullRes.ok
+            ? "/llms-full.txt available."
+            : "Optional /llms-full.txt not published.",
+        },
+        {
+          id: "canonical_url",
+          status: hasCanonical ? "pass" : "warn",
+          detail: hasCanonical
+            ? "Canonical URL tag present."
+            : "Missing canonical link.",
+        },
+        {
+          id: "open_graph",
+          status: hasOg ? "pass" : "warn",
+          detail: hasOg
+            ? "Open Graph preview tags present."
+            : "No Open Graph metadata found.",
+        },
+        {
+          id: "indexable_page",
+          status: isIndexable ? "pass" : "fail",
+          detail: isIndexable
+            ? "Page is indexable by crawlers."
+            : "noindex tag detected.",
+        },
+        {
+          id: "mcp_server_card",
+          status: hasMcp ? "pass" : "info",
+          detail: hasMcp
+            ? "MCP server card discovered."
+            : "No MCP endpoint at /.well-known/mcp.json.",
+        },
+        {
+          id: "a2a_agent_card",
+          status: "info",
+          detail: "Agent-to-Agent discovery (Optional).",
+        },
+        {
+          id: "oauth_discovery",
+          status: "info",
+          detail: "OAuth 2.0 authorization server check.",
+        },
+        { id: "api_catalog", status: "info", detail: "OpenAPI catalog check." },
+        {
+          id: "markdown_negotiation",
+          status: "info",
+          detail: "Accept: text/markdown negotiation check.",
+        },
+        {
+          id: "x402",
+          status: hasX402 ? "pass" : "info",
+          detail: hasX402
+            ? "x402 micropayments protocol active."
+            : "No x402 payment headers detected.",
+        },
+        {
+          id: "ucp",
+          status: hasUcp ? "pass" : "info",
+          detail: hasUcp
+            ? "UCP discovery card active."
+            : "No UCP endpoint at /.well-known/ucp.json.",
+        },
+        {
+          id: "https",
+          status: isHttps ? "pass" : "fail",
+          detail: isHttps
+            ? "Served over secure HTTPS."
+            : "Insecure plain HTTP.",
+        },
       ];
 
       // Calculate Score
@@ -603,15 +936,15 @@ const FAQS = [
       CHECK_DEFS.forEach((def) => {
         const res = allScanResults.find((r) => r.id === def.id);
         if (res) {
-          if (res.status === 'pass') pCount++;
-          else if (res.status === 'warn') wCount++;
-          else if (res.status === 'fail') fCount++;
-          else if (res.status === 'info') iCount++;
+          if (res.status === "pass") pCount++;
+          else if (res.status === "warn") wCount++;
+          else if (res.status === "fail") fCount++;
+          else if (res.status === "info") iCount++;
 
           if (def.weight > 0) {
             totalMax += def.weight;
-            if (res.status === 'pass') totalEarned += def.weight;
-            else if (res.status === 'warn') totalEarned += def.weight * 0.5;
+            if (res.status === "pass") totalEarned += def.weight;
+            else if (res.status === "warn") totalEarned += def.weight * 0.5;
           }
         }
       });
@@ -621,10 +954,20 @@ const FAQS = [
       if (targetTitle) targetTitle.textContent = origin;
       if (scoreNum) {
         scoreNum.textContent = String(score);
-        scoreNum.style.color = score >= 80 ? 'var(--green)' : score >= 50 ? 'var(--yellow)' : 'var(--red)';
+        scoreNum.style.color =
+          score >= 80
+            ? "var(--green)"
+            : score >= 50
+              ? "var(--yellow)"
+              : "var(--red)";
       }
       if (scoreSubtitle) {
-        scoreSubtitle.textContent = score >= 80 ? 'AI Ready' : score >= 50 ? 'Partial Optimization' : 'AI Blind Spot';
+        scoreSubtitle.textContent =
+          score >= 80
+            ? "AI Ready"
+            : score >= 50
+              ? "Partial Optimization"
+              : "AI Blind Spot";
       }
       if (countPassed) countPassed.textContent = String(pCount);
       if (countWarnings) countWarnings.textContent = String(wCount);
@@ -636,83 +979,92 @@ const FAQS = [
       if (agentPillInfo) agentPillInfo.textContent = String(iCount);
 
       renderChecks();
-      if (resultsArea) resultsArea.style.display = 'block';
+      if (resultsArea) resultsArea.style.display = "block";
     } catch (err) {
       console.error(err);
     } finally {
-      if (loadingBox) loadingBox.style.display = 'none';
+      if (loadingBox) loadingBox.style.display = "none";
     }
   });
 
   function renderChecks() {
     if (!checksGrid) return;
 
-    const query = (agentSearchInput?.value || '').toLowerCase().trim();
+    const query = (agentSearchInput?.value || "").toLowerCase().trim();
 
     const categoryFiltered = allScanResults.filter((r) => {
       const def = CHECK_DEFS.find((d) => d.id === r.id);
-      if (currentCategory !== 'all' && def?.category !== currentCategory) return false;
+      if (currentCategory !== "all" && def?.category !== currentCategory)
+        return false;
       return true;
     });
 
     const filtered = categoryFiltered.filter((r) => {
-      if (currentStatus !== 'all' && r.status !== currentStatus) return false;
+      if (currentStatus !== "all" && r.status !== currentStatus) return false;
       if (query) {
         const def = CHECK_DEFS.find((d) => d.id === r.id);
         const name = (def?.name || r.id).toLowerCase();
-        const desc = (def?.desc || '').toLowerCase();
+        const desc = (def?.desc || "").toLowerCase();
         const detail = r.detail.toLowerCase();
-        const rec = (def?.rec || '').toLowerCase();
-        if (!name.includes(query) && !desc.includes(query) && !detail.includes(query) && !rec.includes(query)) {
+        const rec = (def?.rec || "").toLowerCase();
+        if (
+          !name.includes(query) &&
+          !desc.includes(query) &&
+          !detail.includes(query) &&
+          !rec.includes(query)
+        ) {
           return false;
         }
       }
       return true;
     });
 
-    if (agentVisibleCount) agentVisibleCount.textContent = String(filtered.length);
-    if (agentTotalCount) agentTotalCount.textContent = String(categoryFiltered.length);
+    if (agentVisibleCount)
+      agentVisibleCount.textContent = String(filtered.length);
+    if (agentTotalCount)
+      agentTotalCount.textContent = String(categoryFiltered.length);
 
     if (filtered.length === 0) {
-      checksGrid.style.display = 'none';
-      if (agentEmptyState) agentEmptyState.style.display = 'flex';
+      checksGrid.style.display = "none";
+      if (agentEmptyState) agentEmptyState.style.display = "flex";
       return;
     }
 
-    if (agentEmptyState) agentEmptyState.style.display = 'none';
-    checksGrid.style.display = 'grid';
+    if (agentEmptyState) agentEmptyState.style.display = "none";
+    checksGrid.style.display = "grid";
 
     checksGrid.innerHTML = filtered
       .map((r) => {
         const def = CHECK_DEFS.find((d) => d.id === r.id);
         const statusClass =
-          r.status === 'pass'
-            ? 'agent-check-card-pass'
-            : r.status === 'warn'
-            ? 'agent-check-card-warn'
-            : r.status === 'fail'
-            ? 'agent-check-card-fail'
-            : 'agent-check-card-info';
+          r.status === "pass"
+            ? "agent-check-card-pass"
+            : r.status === "warn"
+              ? "agent-check-card-warn"
+              : r.status === "fail"
+                ? "agent-check-card-fail"
+                : "agent-check-card-info";
 
         const statusPillClass =
-          r.status === 'pass'
-            ? 'agent-status-pill-pass'
-            : r.status === 'warn'
-            ? 'agent-status-pill-warn'
-            : r.status === 'fail'
-            ? 'agent-status-pill-fail'
-            : 'agent-status-pill-info';
+          r.status === "pass"
+            ? "agent-status-pill-pass"
+            : r.status === "warn"
+              ? "agent-status-pill-warn"
+              : r.status === "fail"
+                ? "agent-status-pill-fail"
+                : "agent-status-pill-info";
 
         const statusIcon =
-          r.status === 'pass'
-            ? '✓'
-            : r.status === 'warn'
-            ? '⚠️'
-            : r.status === 'fail'
-            ? '✕'
-            : 'ℹ';
+          r.status === "pass"
+            ? "✓"
+            : r.status === "warn"
+              ? "⚠️"
+              : r.status === "fail"
+                ? "✕"
+                : "ℹ";
 
-        const weightText = def && def.weight > 0 ? `+${def.weight} pts` : 'Info';
+        const weightText =
+          def && def.weight > 0 ? `+${def.weight} pts` : "Info";
 
         return `
         <div class="agent-check-card ${statusClass}">
@@ -725,22 +1077,22 @@ const FAQS = [
               <span class="agent-status-pill ${statusPillClass}">${r.status}</span>
             </div>
           </div>
-          <p class="agent-check-desc">${def?.desc || ''}</p>
+          <p class="agent-check-desc">${def?.desc || ""}</p>
           <div class="agent-check-result-box">
             <span>${statusIcon}</span>
             <span><strong>Result:</strong> ${r.detail}</span>
           </div>
           ${
-            r.status !== 'pass' && def?.rec
+            r.status !== "pass" && def?.rec
               ? `<div class="agent-rec-box">
                   <span class="agent-rec-highlight">💡 Recommendation:</span>
                   <span>${def.rec}</span>
                 </div>`
-              : ''
+              : ""
           }
         </div>
       `;
       })
-      .join('');
+      .join("");
   }
 </script>
