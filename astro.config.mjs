@@ -7,6 +7,12 @@ export default defineConfig({
   output: 'static',
   build: {
     format: 'directory',
+    inlineStylesheets: 'always',
+  },
+  vite: {
+    build: {
+      modulePreload: false,
+    },
   },
   trailingSlash: 'always',
 });

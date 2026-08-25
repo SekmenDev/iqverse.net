@@ -86,16 +86,8 @@ import styles from '@/styles/tool-nav-search.module.css';
       await loadPromise;
     }
 
-    // Preload tools during idle time without blocking the critical rendering path
-    if ('requestIdleCallback' in window) {
-      (window as any).requestIdleCallback(() => {
-        ensureToolsLoaded();
-      }, { timeout: 3000 });
-    } else {
-      setTimeout(() => {
-        ensureToolsLoaded();
-      }, 1500);
-    }
+    // Warm up tools cache on first interaction/hover
+    wrap.addEventListener('pointerenter', () => ensureToolsLoaded(), { once: true });
 
     function escapeHtml(str: string): string {
       return (str || '')
