@@ -250,8 +250,6 @@ const jsonLdData = getToolsCollectionJsonLd();
 </Layout>
 
 <script>
-  import { filterTools, sortTools } from '@/lib/tools';
-
   function initCatalog() {
     let activeQuery = '';
     let activeCat = 'all';
@@ -300,12 +298,6 @@ const jsonLdData = getToolsCollectionJsonLd();
 
     // Tool Cards and Category structures
     const cardItems = Array.from(document.querySelectorAll<HTMLElement>('.tool-card-item'));
-    const cardsByName = new Map<string, HTMLElement>();
-    cardItems.forEach(card => {
-      const name = card.dataset.name || '';
-      if (name) cardsByName.set(name, card);
-    });
-
     const categoryGroups = Array.from(document.querySelectorAll<HTMLElement>('.category-group'));
     const categoryGrids = new Map<string, HTMLElement>();
     const defaultCategoryCards = new Map<string, HTMLElement[]>();
@@ -320,21 +312,39 @@ const jsonLdData = getToolsCollectionJsonLd();
     });
 
     function applyFilters() {
-      const items = filterTools(activeQuery, activeCat, activeStatus);
-      const sorted = sortTools(items, activeSort);
-      const sortedNames = new Set(sorted.map(t => t.name));
-      const visibleCount = sorted.length;
+      const q = activeQuery.toLowerCase().trim();
+      const visibleCards: HTMLElement[] = [];
+      const visibleNames = new Set<string>();
+
+      cardItems.forEach(card => {
+        const name = (card.dataset.name || '').toLowerCase();
+        const desc = (card.dataset.desc || '').toLowerCase();
+        const tags = (card.dataset.tags || '').toLowerCase();
+        const cat = card.dataset.cat || '';
+        const type = card.dataset.type || '';
+
+        const matchesCat = activeCat === 'all' || cat === activeCat;
+        const matchesStatus = activeStatus === 'all' || type === activeStatus;
+        const matchesQuery = !q || name.includes(q) || desc.includes(q) || tags.includes(q) || cat.toLowerCase().includes(q);
+
+        if (matchesCat && matchesStatus && matchesQuery) {
+          visibleCards.push(card);
+          visibleNames.add(card.dataset.name || '');
+        }
+      });
+
+      const visibleCount = visibleCards.length;
 
       if (activeSort === 'az' && activeCat === 'all') {
         if (categoryGroupsContainer) categoryGroupsContainer.style.display = 'none';
         if (azGrid) {
           azGrid.style.display = visibleCount > 0 ? '' : 'none';
-          sorted.forEach(tool => {
-            const card = cardsByName.get(tool.name);
-            if (card) {
-              card.style.display = '';
-              azGrid.appendChild(card);
-            }
+          const azSorted = [...visibleCards].sort((a, b) =>
+            (a.dataset.name || '').localeCompare(b.dataset.name || '')
+          );
+          azSorted.forEach(card => {
+            card.style.display = '';
+            azGrid.appendChild(card);
           });
         }
       } else {
@@ -355,13 +365,13 @@ const jsonLdData = getToolsCollectionJsonLd();
                 (a.dataset.name || '').localeCompare(b.dataset.name || '')
               );
             }
+            let hasVisible = false;
             cardsToAppend.forEach(card => {
               grid?.appendChild(card);
-              const isVisible = sortedNames.has(card.dataset.name || '');
+              const isVisible = visibleNames.has(card.dataset.name || '');
               card.style.display = isVisible ? '' : 'none';
+              if (isVisible) hasVisible = true;
             });
-
-            const hasVisible = originalCards.some(card => sortedNames.has(card.dataset.name || ''));
             group.style.display = hasVisible ? '' : 'none';
           }
         });

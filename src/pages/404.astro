@@ -158,17 +158,43 @@ const initialTools = tools.slice(0, 6);
 </Layout>
 
 <script>
-  import { filterTools } from '@/lib/tools';
+  import type { Tool } from '@/lib/tools';
 
   const input = document.getElementById('404-search') as HTMLInputElement | null;
   const grid = document.getElementById('results-grid');
   const label = document.getElementById('results-label');
 
   if (input && grid && label) {
-    input.addEventListener('input', () => {
+    let filterToolsFn: ((query: string, category: string, status: any) => Tool[]) | null = null;
+    let loadPromise: Promise<void> | null = null;
+
+    async function ensureTools() {
+      if (filterToolsFn) return filterToolsFn;
+      if (!loadPromise) {
+        loadPromise = import('@/lib/tools').then(mod => {
+          filterToolsFn = mod.filterTools;
+        });
+      }
+      await loadPromise;
+      return filterToolsFn;
+    }
+
+    if ('requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(() => {
+        ensureTools();
+      }, { timeout: 3000 });
+    } else {
+      setTimeout(() => {
+        ensureTools();
+      }, 1500);
+    }
+
+    input.addEventListener('input', async () => {
       const q = input.value;
       label.textContent = q ? 'Search results' : 'Popular picks';
-      const results = filterTools(q, 'all', 'all').slice(0, 6);
+      const fn = await ensureTools();
+      if (!fn) return;
+      const results = fn(q, 'all', 'all').slice(0, 6);
 
       grid.innerHTML = results.map(t => {
         const href = t.url || '/';
