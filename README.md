@@ -150,8 +150,8 @@ IQVerse organizes tools into intuitive categories. Below is the full directory o
 
 ```text
 iqverse.net/
-├── 📂 __tests__/                # Vitest unit & component test suites
-│   ├── 📂 components/          # React tool component integration tests
+├── 📂 __tests__/                # Vitest & Playwright test suites
+│   ├── 📂 e2e/                 # Playwright end-to-end page & navigation tests
 │   └── 📂 unit/                # Core lib utility function tests
 ├── 📂 app/                      # Next.js App Router routes & tools (50+ Live Tools)
 │   ├── 📂 agentscan/           # AI Agents Scanner route
@@ -217,7 +217,6 @@ iqverse.net/
 ├── 📂 components/              # Modular UI & Tool React components
 │   ├── 📂 layout/              # Header, Footer, Navigation bars
 │   └── 📂 tools/               # Isolated tool UI component implementations
-├── 📂 e2e/                      # Playwright end-to-end page & navigation tests
 ├── 📂 lib/                     # Core business logic & registries
 │   └── 📄 tools.ts             # Central tool catalog registry, filters & metadata
 ├── 📂 public/                  # Static assets, tool icons, manifest & favicons
