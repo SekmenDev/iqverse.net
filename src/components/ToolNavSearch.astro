@@ -57,6 +57,7 @@ import styles from '@/styles/tool-nav-search.module.css';
 
 <script>
   import type { Tool } from '@/lib/tools';
+  import { escapeHtml } from '@/lib/utils';
 
   function initToolNavSearch() {
     const wrap = document.getElementById('tool-search-wrap');
@@ -89,14 +90,6 @@ import styles from '@/styles/tool-nav-search.module.css';
     // Warm up tools cache on first interaction/hover
     wrap.addEventListener('pointerenter', () => ensureToolsLoaded(), { once: true });
 
-    function escapeHtml(str: string): string {
-      return (str || '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
 
     function showDropdown() {
       dropdown!.style.display = 'flex';

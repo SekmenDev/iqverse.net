@@ -13,9 +13,15 @@ import {
 describe('lib/utils.ts - Common Utility Functions', () => {
   describe('escapeHtml', () => {
     it('should escape HTML characters safely', () => {
-      expect(escapeHtml('<script>alert("xss")&</script>')).toBe(
-        '&lt;script&gt;alert(&quot;xss&quot;)&amp;&lt;/script&gt;'
+      expect(escapeHtml('<script>alert("xss" & \'test\')</script>')).toBe(
+        '&lt;script&gt;alert(&quot;xss&quot; &amp; &#039;test&#039;)&lt;/script&gt;'
       );
+    });
+
+    it('should handle empty or falsy strings gracefully', () => {
+      expect(escapeHtml('')).toBe('');
+      expect(escapeHtml(null as unknown as string)).toBe('');
+      expect(escapeHtml(undefined as unknown as string)).toBe('');
     });
   });
 

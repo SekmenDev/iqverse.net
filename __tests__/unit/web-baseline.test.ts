@@ -278,4 +278,35 @@ describe('lib/web-baseline.ts - Baseline Audit Evaluation', () => {
     expect(md).toContain('## Audit Findings');
     expect(md).toContain('Web Baseline Checker');
   });
+
+  it('correctly handles document with no title or empty title tag', () => {
+    const noTitleHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+      </head>
+      <body><h1>Content</h1></body>
+      </html>
+    `;
+    const signalsNoTitle = extractHtmlSignals(noTitleHtml);
+    expect(signalsNoTitle.title).toBeNull();
+
+    const reportNoTitle = evaluateBaselineAudit('https://nakshibendi-ks.com', {
+      home: { ok: true, status: 200, body: noTitleHtml, headers: {} },
+    });
+    const titleCheck = reportNoTitle.results.find((r) => r.id === 'page_title');
+    expect(titleCheck?.status).toBe('fail');
+    expect(titleCheck?.found).toBe('Missing <title> tag in HTML document.');
+
+    const emptyTitleHtml = `<html><head><title>   </title></head><body><h1>Content</h1></body></html>`;
+    const signalsEmptyTitle = extractHtmlSignals(emptyTitleHtml);
+    expect(signalsEmptyTitle.title).toBe('');
+
+    const reportEmptyTitle = evaluateBaselineAudit('https://nakshibendi-ks.com', {
+      home: { ok: true, status: 200, body: emptyTitleHtml, headers: {} },
+    });
+    const emptyTitleCheck = reportEmptyTitle.results.find((r) => r.id === 'page_title');
+    expect(emptyTitleCheck?.status).toBe('fail');
+  });
 });

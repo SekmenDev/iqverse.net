@@ -52,14 +52,7 @@ export function formatTtl(seconds: number): string {
   return `${seconds}s (${hours}h ${remainderMinutes}m)`;
 }
 
-export function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
+export { escapeHtml } from './utils';
 
 export function groupDnsAnswers(
   input: DnsAnswer[] | { type: string; data: DnsResponse | null }[]
