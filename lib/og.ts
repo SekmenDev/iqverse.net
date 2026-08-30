@@ -25,7 +25,7 @@ export const OG_TEMPLATES = {
   },
   blog: {
     title: 'How to Secure Browser APIs with CORS & CSP',
-    description: 'A deep dive into cross-origin resource sharing, preflight caching, and modern content security policies for production web apps.',
+    description: 'A deep dive into cross-origin resource sharing, preflight caching and modern content security policies for production web apps.',
     url: 'https://iqverse.net/blog/cors-csp-security',
     imageUrl: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&h=630&fit=crop',
     siteName: 'IQVerse Engineering',
@@ -33,7 +33,7 @@ export const OG_TEMPLATES = {
   },
   saas: {
     title: 'Supercharge Your Developer Workflow in 2026',
-    description: 'The all-in-one developer productivity hub with zero setup, local processing, and instant debugging tools.',
+    description: 'The all-in-one developer productivity hub with zero setup, local processing and instant debugging tools.',
     url: 'https://iqverse.net',
     imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=630&fit=crop',
     siteName: 'IQVerse Platform',

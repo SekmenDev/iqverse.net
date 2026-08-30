@@ -29,7 +29,7 @@ test.describe('E2E Navigation & Layout Integration', () => {
     await expect(githubLink).toBeVisible();
   });
 
-  test('Tool page search bar renders, filters tools, and navigates', async ({ page }) => {
+  test('Tool page search bar renders, filters tools and navigates', async ({ page }) => {
     await page.goto('/agentscan/');
     const toolSearchInput = page.locator('#tool-nav-search');
     await expect(toolSearchInput).toBeVisible();

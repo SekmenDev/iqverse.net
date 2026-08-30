@@ -23,7 +23,7 @@ describe('lib/tools.ts - Tools Registry Integrity', () => {
     });
   });
 
-  it('filterTools should match query against name, desc, tags, and cat case-insensitively', () => {
+  it('filterTools should match query against name, desc, tags and cat case-insensitively', () => {
     const qrResults = filterTools('qr', 'all', 'all');
     expect(qrResults.length).toBeGreaterThan(0);
     expect(qrResults.some((t: any) => t.name.toLowerCase().includes('qr'))).toBe(true);

@@ -31,17 +31,17 @@
 Unlike traditional web tools that send your input data to remote API endpoints, **IQVerse executes 100% of its computations directly inside your web browser**. Your secrets, tokens, passwords, image files and code payloads never leave your client machine.
 
 > [!IMPORTANT]
-> **🔒 100% Client-Side Privacy**: Zero server requests for tool computations. Your passwords, Base64 strings, JSON payloads, file hashes, and regex inputs stay exclusively on your hardware.
+> **🔒 100% Client-Side Privacy**: Zero server requests for tool computations. Your passwords, Base64 strings, JSON payloads, file hashes and regex inputs stay exclusively on your hardware.
 
 > [!TIP]
 > **⚡ Keyboard-Driven Efficiency**: Press the `/` key from anywhere on the platform to instantly focus the global search engine and jump between any of the 50+ developer tools.
 
 ### ✨ Key Highlights
 
-- 🔒 **100% Privacy & Client-Side Processing**: Zero telemetry, no user tracking, no analytics cookies, and no hidden logins.
-- 🚀 **50+ Instant Developer Utilities**: Web compression, security analysis, AI agent readiness audits, network lookups, design helpers, and data converters.
+- 🔒 **100% Privacy & Client-Side Processing**: Zero telemetry, no user tracking, no analytics cookies and no hidden logins.
+- 🚀 **50+ Instant Developer Utilities**: Web compression, security analysis, AI agent readiness audits, network lookups, design helpers and data converters.
 - ⚡ **Blazing Fast Next.js Architecture**: Built with Next.js 16 App Router, React 19, TypeScript, pre-rendered as a static export for edge deployment on Cloudflare Pages.
-- 🎨 **Rich Vibrant Aesthetics**: Modern dark mode with glowing accents, glassmorphic containers, crisp typography, and fluid micro-animations.
+- 🎨 **Rich Vibrant Aesthetics**: Modern dark mode with glowing accents, glassmorphic containers, crisp typography and fluid micro-animations.
 
 ---
 

@@ -91,7 +91,7 @@ describe('lib/web-baseline.ts - HTML Signals Extraction', () => {
     expect(signals.imgsWithoutAlt).toBe(1);
   });
 
-  it('audits anchor links for valid, empty, and unsafe target=_blank hrefs', () => {
+  it('audits anchor links for valid, empty and unsafe target=_blank hrefs', () => {
     const html = `
       <a href="https://example.com">Valid</a>
       <a href="/docs">Docs</a>

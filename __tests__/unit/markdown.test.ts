@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { parseMarkdownToHtml, calculateMarkdownStats } from '@/lib/markdown';
 
 describe('Markdown Engine (lib/markdown)', () => {
-  it('converts markdown headers, bold, links, and code blocks to HTML', () => {
+  it('converts markdown headers, bold, links and code blocks to HTML', () => {
     const md = '# Title\n\nThis is **bold** and [Link](https://iqverse.net).\n\n```js\nconsole.log("hi");\n```';
     const html = parseMarkdownToHtml(md);
 

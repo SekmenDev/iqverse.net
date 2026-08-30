@@ -25,7 +25,7 @@ Project-specific rules. Read alongside the root AGENTS.md, which covers cross-pr
 
 ## Environment
 - Secrets/env vars documented in: [path, e.g. .env.example]
-- Required services running locally: [list, or "none"]
+- Required services running locally: [list or "none"]
 
 ## Security notes
 - [Anything specific to this project: auth model, rate limits, data handled]

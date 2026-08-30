@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { convertAllCases } from '@/lib/case-converter';
 
 describe('Case Converter Engine (lib/case-converter)', () => {
-  it('converts camelCase, kebab-case, snake_case, PascalCase, and CONSTANT_CASE correctly', () => {
+  it('converts camelCase, kebab-case, snake_case, PascalCase and CONSTANT_CASE correctly', () => {
     const input = 'hello-world_foo bar';
     const cases = convertAllCases(input);
 

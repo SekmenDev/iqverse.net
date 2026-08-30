@@ -7,7 +7,7 @@ describe('RegExp Engine (lib/regex)', () => {
     expect(safeCompileRegex('[unclosed group', '')).toBeNull();
   });
 
-  it('evaluates matches, captures, and replacements', () => {
+  it('evaluates matches, captures and replacements', () => {
     const res = evaluateRegex('(\\w+)@(\\w+\\.\\w+)', 'g', 'Contact us at info@iqverse.net or support@iqverse.net', '[$1]');
     expect(res.isValid).toBe(true);
     expect(res.matches).toHaveLength(2);

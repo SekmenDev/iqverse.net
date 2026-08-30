@@ -23,7 +23,7 @@ export interface ExtractedSchemaItem {
 const TYPE_RECOMMENDATIONS: Record<string, { recommended: string[]; description: string }> = {
   Article: {
     recommended: ['headline', 'image', 'datePublished', 'author'],
-    description: 'News, blog posts, and informational articles',
+    description: 'News, blog posts and informational articles',
   },
   NewsArticle: {
     recommended: ['headline', 'image', 'datePublished', 'dateModified', 'author', 'publisher'],

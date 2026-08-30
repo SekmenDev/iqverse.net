@@ -1,5 +1,5 @@
 # Cloudflare Pages Redirects - Security Honeypot Rules
-# Redirect common WordPress, admin, environment, and exploit probes to /hacker/
+# Redirect common WordPress, admin, environment and exploit probes to /hacker/
 
 # WordPress Probes
 /wp-admin/*          /hacker/ 302

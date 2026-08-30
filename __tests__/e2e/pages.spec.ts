@@ -11,7 +11,7 @@ const internalRoutes = Array.from(
 
 test.describe('E2E Page Health, Metadata & SEO Validation', () => {
   for (const route of internalRoutes) {
-    test(`Page ${route} verifies status, title, metadata, canonical, H1, and JSON-LD`, async ({ page }) => {
+    test(`Page ${route} verifies status, title, metadata, canonical, H1 and JSON-LD`, async ({ page }) => {
       const pageErrors: string[] = [];
       page.on('pageerror', (exception) => {
         pageErrors.push(exception.message);
