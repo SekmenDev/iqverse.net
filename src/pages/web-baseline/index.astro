@@ -50,7 +50,7 @@ const FAQS = [
   },
   {
     q: "How does the Baseline Score calculation work?",
-    a: "The audit evaluates 22 core checks categorized into 5 functional areas. Each check has a severity weight (Critical, High, Medium, Low). Passing checks receive 100% of their weight, warnings receive 40%, and failing checks receive 0%. The composite score produces letter grades from A+ (90+) down to F (<50).",
+    a: "The audit evaluates 30 core checks categorized into 5 functional areas. Each check has a severity weight (Critical, High, Medium, Low). Passing checks receive 100% of their weight, warnings receive 40%, and failing checks receive 0%. The composite score produces letter grades from A+ (90+) down to F (<50).",
   },
   {
     q: "Can I export or share the audit findings?",
@@ -387,11 +387,13 @@ const FAQS = [
     if (resultsArea) resultsArea.style.display = "none";
 
     try {
-      const [homeRes, robotsRes, sitemapRes, llmsRes] = await Promise.all([
+      const [homeRes, robotsRes, sitemapRes, llmsRes, humansRes, securityTxtRes] = await Promise.all([
         proxyFetch(origin),
         proxyFetch(`${origin}/robots.txt`),
         proxyFetch(`${origin}/sitemap.xml`),
         proxyFetch(`${origin}/llms.txt`),
+        proxyFetch(`${origin}/humans.txt`),
+        proxyFetch(`${origin}/.well-known/security.txt`),
       ]);
 
       currentReport = evaluateBaselineAudit(origin, {
@@ -399,6 +401,8 @@ const FAQS = [
         robots: robotsRes,
         sitemap: sitemapRes,
         llms: llmsRes,
+        humans: humansRes,
+        securityTxt: securityTxtRes,
       });
 
       renderOverview(currentReport);
