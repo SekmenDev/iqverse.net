@@ -7,7 +7,7 @@ import {
 } from '@/lib/web-baseline';
 
 describe('lib/web-baseline.ts - HTML Signals Extraction', () => {
-  it('extracts head metadata: title, description, viewport, charset, canonical, htmlLang, favicon', () => {
+  it('extracts head metadata: title, description, viewport, charset, canonical, htmlLang, favicon, author, doctype', () => {
     const html = `
       <!DOCTYPE html>
       <html lang="en-US">
@@ -16,9 +16,11 @@ describe('lib/web-baseline.ts - HTML Signals Extraction', () => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>IQVerse — Developer Tools</title>
         <meta name="description" content="Free open-source tools for developers and creators." />
+        <meta name="author" content="IQVerse Core Team" />
         <link rel="canonical" href="https://iqverse.net/" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
+        <link rel="author" href="/humans.txt" />
         <meta name="theme-color" content="#4f46e5" />
         <link rel="manifest" href="/manifest.json" />
       </head>
@@ -29,11 +31,14 @@ describe('lib/web-baseline.ts - HTML Signals Extraction', () => {
     `;
 
     const signals = extractHtmlSignals(html);
+    expect(signals.hasDoctype).toBe(true);
     expect(signals.htmlLang).toBe('en-US');
     expect(signals.charset).toBe('utf-8');
     expect(signals.viewport).toBe('width=device-width, initial-scale=1.0');
     expect(signals.title).toBe('IQVerse — Developer Tools');
     expect(signals.metaDescription).toBe('Free open-source tools for developers and creators.');
+    expect(signals.author).toBe('IQVerse Core Team');
+    expect(signals.authorLink).toBe('/humans.txt');
     expect(signals.canonical).toBe('https://iqverse.net/');
     expect(signals.favicons).toContain('/favicon.svg');
     expect(signals.favicons).toContain('/icon-192.png');
@@ -86,17 +91,20 @@ describe('lib/web-baseline.ts - HTML Signals Extraction', () => {
     expect(signals.imgsWithoutAlt).toBe(1);
   });
 
-  it('audits anchor links for valid and empty hrefs', () => {
+  it('audits anchor links for valid, empty, and unsafe target=_blank hrefs', () => {
     const html = `
       <a href="https://example.com">Valid</a>
       <a href="/docs">Docs</a>
       <a href="#">Placeholder</a>
       <a href="">Empty</a>
+      <a href="https://external.com" target="_blank" rel="noopener noreferrer">Safe external</a>
+      <a href="https://insecure.com" target="_blank">Unsafe external</a>
     `;
 
     const signals = extractHtmlSignals(html);
-    expect(signals.linksCount).toBe(4);
+    expect(signals.linksCount).toBe(6);
     expect(signals.emptyLinksCount).toBe(2);
+    expect(signals.unsafeBlankLinksCount).toBe(1);
   });
 
   it('extracts and parses Schema.org JSON-LD structured data', () => {
@@ -146,10 +154,18 @@ describe('lib/web-baseline.ts - HTML Signals Extraction', () => {
     expect(signals.twitterCard).toBe('summary_large_image');
   });
 
-  it('identifies robots noindex directive', () => {
-    const html = `<meta name="robots" content="noindex, nofollow" />`;
-    const signals = extractHtmlSignals(html);
-    expect(signals.isNoindex).toBe(true);
+  it('identifies robots directives: index, noindex, nofollow', () => {
+    const noindexHtml = `<meta name="robots" content="noindex, nofollow" />`;
+    const signalsNoindex = extractHtmlSignals(noindexHtml);
+    expect(signalsNoindex.isNoindex).toBe(true);
+    expect(signalsNoindex.isNofollow).toBe(true);
+    expect(signalsNoindex.robotsMeta).toBe('noindex, nofollow');
+
+    const indexHtml = `<meta name="robots" content="INDEX, FOLLOW" />`;
+    const signalsIndex = extractHtmlSignals(indexHtml);
+    expect(signalsIndex.isNoindex).toBe(false);
+    expect(signalsIndex.isNofollow).toBe(false);
+    expect(signalsIndex.robotsMeta).toBe('INDEX, FOLLOW');
   });
 });
 
@@ -174,8 +190,11 @@ describe('lib/web-baseline.ts - Baseline Audit Evaluation', () => {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>IQVerse — Modern Open Source Developer Platform</title>
             <meta name="description" content="Fast, browser-native developer tools with zero data tracking.">
+            <meta name="author" content="IQVerse Team">
+            <meta name="robots" content="index, follow">
             <link rel="canonical" href="https://iqverse.net/">
             <link rel="icon" href="/favicon.svg">
+            <link rel="author" href="/humans.txt">
             <meta property="og:title" content="IQVerse">
             <meta property="og:description" content="Developer platform">
             <meta property="og:image" content="https://iqverse.net/og.jpg">
@@ -194,6 +213,7 @@ describe('lib/web-baseline.ts - Baseline Audit Evaluation', () => {
             <main>
               <h1>Fast Developer Tools</h1>
               <img src="/logo.svg" alt="IQVerse Logo">
+              <a href="https://github.com/iqverse" target="_blank" rel="noopener noreferrer">GitHub</a>
             </main>
             <footer><p>© 2026</p></footer>
           </body>
@@ -215,13 +235,42 @@ describe('lib/web-baseline.ts - Baseline Audit Evaluation', () => {
         status: 200,
         body: '# IQVerse Docs\n> LLM summary for AI crawlers.',
       },
+      humans: {
+        ok: true,
+        status: 200,
+        body: '/* TEAM */\nDeveloper: IQVerse\nSite: https://iqverse.net',
+      },
+      securityTxt: {
+        ok: true,
+        status: 200,
+        body: 'Contact: mailto:security@iqverse.net\nExpires: 2027-12-31T23:59:59.000Z',
+      },
     };
 
     const report = evaluateBaselineAudit('https://iqverse.net', endpoints);
     expect(report.score).toBeGreaterThanOrEqual(90);
     expect(report.grade).toBe('A+');
-    expect(report.passedCount).toBeGreaterThanOrEqual(18);
+    expect(report.passedCount).toBeGreaterThanOrEqual(23);
     expect(report.failCount).toBe(0);
+
+    const authorCheck = report.results.find((r) => r.id === 'meta_author');
+    expect(authorCheck?.status).toBe('pass');
+
+    const humansCheck = report.results.find((r) => r.id === 'humans_txt');
+    expect(humansCheck?.status).toBe('pass');
+
+    const robotsCheck = report.results.find((r) => r.id === 'robots_meta_indexable');
+    expect(robotsCheck?.status).toBe('pass');
+    expect(robotsCheck?.found).toContain('Explicit crawler directives declared');
+
+    const doctypeCheck = report.results.find((r) => r.id === 'html_doctype');
+    expect(doctypeCheck?.status).toBe('pass');
+
+    const secTxtCheck = report.results.find((r) => r.id === 'security_txt');
+    expect(secTxtCheck?.status).toBe('pass');
+
+    const blankCheck = report.results.find((r) => r.id === 'target_blank_security');
+    expect(blankCheck?.status).toBe('pass');
   });
 
   it('evaluates deficient website with low score and appropriate warnings/failures', () => {
@@ -245,6 +294,9 @@ describe('lib/web-baseline.ts - Baseline Audit Evaluation', () => {
 
     const viewportCheck = report.results.find((r) => r.id === 'viewport_meta');
     expect(viewportCheck?.status).toBe('fail');
+
+    const doctypeCheck = report.results.find((r) => r.id === 'html_doctype');
+    expect(doctypeCheck?.status).toBe('fail');
   });
 
   it('generates a formatted markdown report', () => {

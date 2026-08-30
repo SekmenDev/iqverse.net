@@ -32,6 +32,8 @@ export interface EndpointResponses {
   robots?: { ok: boolean; status: number; body: string; headers?: Record<string, string> };
   sitemap?: { ok: boolean; status: number; body: string; headers?: Record<string, string> };
   llms?: { ok: boolean; status: number; body: string; headers?: Record<string, string> };
+  humans?: { ok: boolean; status: number; body: string; headers?: Record<string, string> };
+  securityTxt?: { ok: boolean; status: number; body: string; headers?: Record<string, string> };
 }
 
 export interface BaselineAuditReport {
@@ -91,6 +93,26 @@ export const BASELINE_CHECKS: BaselineCheckDefinition[] = [
     description: 'Checks for basic defense-in-depth headers (X-Content-Type-Options, X-Frame-Options, Referrer-Policy).',
     recommendation: 'Configure X-Content-Type-Options: nosniff and Referrer-Policy.',
     codeExample: 'X-Content-Type-Options: nosniff\nReferrer-Policy: strict-origin-when-cross-origin',
+  },
+  {
+    id: 'security_txt',
+    name: 'Security Vulnerability Policy (/.well-known/security.txt)',
+    category: 'security',
+    severity: 'low',
+    weight: 3,
+    description: 'Provides standard security contact and vulnerability disclosure guidelines (RFC 9116).',
+    recommendation: 'Publish a valid /.well-known/security.txt file with Contact and Expires fields.',
+    codeExample: 'Contact: mailto:security@example.com\nExpires: 2027-12-31T23:59:59.000Z',
+  },
+  {
+    id: 'target_blank_security',
+    name: 'External Link Security (rel="noopener")',
+    category: 'security',
+    severity: 'medium',
+    weight: 4,
+    description: 'Protects against reverse tabnabbing attacks on outgoing links opening in new tabs.',
+    recommendation: 'Add rel="noopener" or rel="noreferrer" to any <a> tag with target="_blank".',
+    codeExample: '<a href="https://external.com" target="_blank" rel="noopener noreferrer">External</a>',
   },
 
   // 2. SEO & Document Essentials
@@ -177,6 +199,16 @@ export const BASELINE_CHECKS: BaselineCheckDefinition[] = [
 
   // 3. Content Structure & Semantic DOM
   {
+    id: 'html_doctype',
+    name: 'HTML5 Doctype Declaration (<!DOCTYPE html>)',
+    category: 'dom',
+    severity: 'high',
+    weight: 5,
+    description: 'Ensures browsers render the document in modern standards mode instead of legacy quirks mode.',
+    recommendation: 'Place <!DOCTYPE html> on the very first line of the HTML document.',
+    codeExample: '<!DOCTYPE html>\n<html lang="en">',
+  },
+  {
     id: 'h1_heading',
     name: 'Primary Heading (<h1>)',
     category: 'dom',
@@ -239,6 +271,16 @@ export const BASELINE_CHECKS: BaselineCheckDefinition[] = [
 
   // 4. Structured Data & Social Metadata
   {
+    id: 'meta_author',
+    name: 'Author & Creator Metadata (<meta name="author">)',
+    category: 'metadata',
+    severity: 'low',
+    weight: 3,
+    description: 'Credits the document creator or organization for search engines, LLM attribution, and content licensing.',
+    recommendation: 'Add <meta name="author" content="..."> or <link rel="author"> in <head>.',
+    codeExample: '<meta name="author" content="Jane Doe">\n<link rel="author" href="https://example.com/about">',
+  },
+  {
     id: 'schema_jsonld',
     name: 'Schema.org JSON-LD Structured Data',
     category: 'metadata',
@@ -292,13 +334,23 @@ export const BASELINE_CHECKS: BaselineCheckDefinition[] = [
   },
   {
     id: 'robots_meta_indexable',
-    name: 'Page Indexability Directives',
+    name: 'Search Crawler Directives (<meta name="robots">)',
     category: 'crawl',
     severity: 'high',
     weight: 5,
-    description: 'Confirms public landing pages do not contain accidental noindex directives.',
-    recommendation: 'Remove unintentional <meta name="robots" content="noindex"> from public indexable pages.',
-    codeExample: '<meta name="robots" content="index, follow">',
+    description: 'Directs search engine indexing and link following behavior (e.g. index, follow).',
+    recommendation: 'Ensure <meta name="robots" content="index, follow"> is present without unintentional noindex or nofollow.',
+    codeExample: '<meta name="robots" content="index, follow, max-image-preview:large">',
+  },
+  {
+    id: 'humans_txt',
+    name: 'Humans.txt Colophon (/humans.txt)',
+    category: 'crawl',
+    severity: 'low',
+    weight: 3,
+    description: 'Credits the humans, developers, designers, and tech stack behind the site.',
+    recommendation: 'Host a /humans.txt file at root and optionally link it via <link rel="author" href="/humans.txt">.',
+    codeExample: '/* TEAM */\nDeveloper: Jane Doe\nSite: https://example.com\n\n/* SITE */\nStandards: HTML5, CSS3',
   },
   {
     id: 'llms_txt',
@@ -322,6 +374,9 @@ export interface ExtractedHtmlSignals {
   favicons: string[];
   themeColor: string | null;
   manifest: string | null;
+  author: string | null;
+  authorLink: string | null;
+  hasDoctype: boolean;
   h1s: string[];
   hasHeader: boolean;
   hasNav: boolean;
@@ -332,6 +387,7 @@ export interface ExtractedHtmlSignals {
   imgsWithoutAlt: number;
   linksCount: number;
   emptyLinksCount: number;
+  unsafeBlankLinksCount: number;
   hasSchemaJsonLd: boolean;
   schemaTypes: string[];
   schemaIsValidJson: boolean;
@@ -342,6 +398,7 @@ export interface ExtractedHtmlSignals {
   twitterCard: string | null;
   robotsMeta: string | null;
   isNoindex: boolean;
+  isNofollow: boolean;
 }
 
 export function extractHtmlSignals(html: string): ExtractedHtmlSignals {
@@ -355,6 +412,9 @@ export function extractHtmlSignals(html: string): ExtractedHtmlSignals {
     favicons: [],
     themeColor: null,
     manifest: null,
+    author: null,
+    authorLink: null,
+    hasDoctype: false,
     h1s: [],
     hasHeader: false,
     hasNav: false,
@@ -365,6 +425,7 @@ export function extractHtmlSignals(html: string): ExtractedHtmlSignals {
     imgsWithoutAlt: 0,
     linksCount: 0,
     emptyLinksCount: 0,
+    unsafeBlankLinksCount: 0,
     hasSchemaJsonLd: false,
     schemaTypes: [],
     schemaIsValidJson: false,
@@ -375,11 +436,14 @@ export function extractHtmlSignals(html: string): ExtractedHtmlSignals {
     twitterCard: null,
     robotsMeta: null,
     isNoindex: false,
+    isNofollow: false,
   };
 
   if (!html || typeof html !== 'string') {
     return result;
   }
+
+  result.hasDoctype = /^\s*<!doctype\s+html/i.test(html);
 
   const langMatch = html.match(/<html[^>]*\blang=["']([^"']+)["']/i);
   if (langMatch) {
@@ -422,10 +486,16 @@ export function extractHtmlSignals(html: string): ExtractedHtmlSignals {
     if (name === 'theme-color' && !result.themeColor) {
       result.themeColor = content;
     }
+    if (name === 'author' && !result.author) {
+      result.author = content;
+    }
     if (name === 'robots') {
       result.robotsMeta = content;
       if (/noindex/i.test(content)) {
         result.isNoindex = true;
+      }
+      if (/nofollow/i.test(content)) {
+        result.isNofollow = true;
       }
     }
     if (name === 'twitter:card' || name === 'twitter:title') {
@@ -456,6 +526,9 @@ export function extractHtmlSignals(html: string): ExtractedHtmlSignals {
     }
     if (rel.includes('manifest') && href) {
       result.manifest = href;
+    }
+    if (rel.includes('author') && !result.authorLink && href) {
+      result.authorLink = href;
     }
   }
 
@@ -494,6 +567,15 @@ export function extractHtmlSignals(html: string): ExtractedHtmlSignals {
     const hrefMatch = attrs.match(/\bhref=["']([^"']*)["']/i);
     if (!hrefMatch || !hrefMatch[1].trim() || hrefMatch[1].trim() === '#') {
       result.emptyLinksCount++;
+    }
+
+    const targetMatch = attrs.match(/\btarget=["']?([^"' >]+)/i);
+    if (targetMatch && targetMatch[1].toLowerCase() === '_blank') {
+      const relMatch = attrs.match(/\brel=["']([^"']*)["']/i);
+      const relValue = relMatch ? relMatch[1].toLowerCase() : '';
+      if (!relValue.includes('noopener') && !relValue.includes('noreferrer')) {
+        result.unsafeBlankLinksCount++;
+      }
     }
   }
 
@@ -616,6 +698,36 @@ export function evaluateBaselineAudit(targetUrl: string, endpoints: EndpointResp
         break;
       }
 
+      case 'security_txt': {
+        const hasSecTxt = Boolean(
+          endpoints.securityTxt?.ok &&
+            (endpoints.securityTxt.body || '').trim().length > 10 &&
+            /contact:/i.test(endpoints.securityTxt.body || '')
+        );
+        if (hasSecTxt) {
+          checkStatus = 'pass';
+          foundText = 'Standard security vulnerability disclosure policy discovered at /.well-known/security.txt.';
+          valueFound = 'RFC 9116 (200 OK)';
+        } else {
+          checkStatus = 'info';
+          foundText = 'No /.well-known/security.txt file found (optional RFC 9116 vulnerability disclosure standard).';
+        }
+        break;
+      }
+
+      case 'target_blank_security': {
+        if (signals.unsafeBlankLinksCount === 0) {
+          checkStatus = 'pass';
+          foundText = 'All target="_blank" links include safe rel="noopener" or rel="noreferrer" attributes.';
+          valueFound = 'Secure external links';
+        } else {
+          checkStatus = 'warn';
+          foundText = `Found ${signals.unsafeBlankLinksCount} link(s) with target="_blank" missing rel="noopener" or rel="noreferrer".`;
+          valueFound = `${signals.unsafeBlankLinksCount} unsafe target="_blank" link(s)`;
+        }
+        break;
+      }
+
       case 'page_title': {
         if (signals.title) {
           const len = signals.title.length;
@@ -733,6 +845,19 @@ export function evaluateBaselineAudit(targetUrl: string, endpoints: EndpointResp
         break;
       }
 
+      case 'html_doctype': {
+        if (signals.hasDoctype) {
+          checkStatus = 'pass';
+          foundText = 'Document declares HTML5 standards mode <!DOCTYPE html>.';
+          valueFound = '<!DOCTYPE html>';
+        } else {
+          checkStatus = 'fail';
+          foundText = 'Missing <!DOCTYPE html> declaration. Page may trigger browser quirks mode.';
+          valueFound = 'Missing doctype';
+        }
+        break;
+      }
+
       case 'h1_heading': {
         if (signals.h1s.length === 1) {
           checkStatus = 'pass';
@@ -815,6 +940,20 @@ export function evaluateBaselineAudit(targetUrl: string, endpoints: EndpointResp
           checkStatus = 'warn';
           foundText = `Found ${signals.emptyLinksCount} placeholder or empty link(s) out of ${signals.linksCount} total.`;
           valueFound = `${signals.emptyLinksCount} placeholder hrefs`;
+        }
+        break;
+      }
+
+      case 'meta_author': {
+        if (signals.author || signals.authorLink) {
+          checkStatus = 'pass';
+          foundText = signals.author
+            ? `Author meta tag declared: "${signals.author}".`
+            : `Author link declared: <link rel="author" href="${signals.authorLink}">.`;
+          valueFound = signals.author || signals.authorLink || 'Author declared';
+        } else {
+          checkStatus = 'info';
+          foundText = 'No author meta tag (<meta name="author">) or author link found.';
         }
         break;
       }
@@ -902,10 +1041,35 @@ export function evaluateBaselineAudit(targetUrl: string, endpoints: EndpointResp
           checkStatus = 'warn';
           foundText = `Page specifies noindex directive: "${signals.robotsMeta}". Search engines will not index this page.`;
           valueFound = 'noindex';
+        } else if (signals.isNofollow) {
+          checkStatus = 'warn';
+          foundText = `Page specifies nofollow directive: "${signals.robotsMeta}". Search engines will not follow outbound links.`;
+          valueFound = 'nofollow';
+        } else if (signals.robotsMeta) {
+          checkStatus = 'pass';
+          foundText = `Explicit crawler directives declared: "${signals.robotsMeta}".`;
+          valueFound = signals.robotsMeta;
         } else {
           checkStatus = 'pass';
-          foundText = 'Page is indexable (no blocking noindex meta tags).';
-          valueFound = 'Indexable';
+          foundText = 'Page is indexable by default (no restrictive robots meta tag detected).';
+          valueFound = 'Default (index, follow)';
+        }
+        break;
+      }
+
+      case 'humans_txt': {
+        const hasHumansFile = Boolean(endpoints.humans?.ok && (endpoints.humans.body || '').trim().length > 5);
+        const hasHumansLink = Boolean(signals.authorLink && /humans\.txt/i.test(signals.authorLink));
+
+        if (hasHumansFile || hasHumansLink) {
+          checkStatus = 'pass';
+          foundText = hasHumansFile
+            ? 'Discovered reachable /humans.txt at domain root.'
+            : 'Discovered humans.txt referenced via <link rel="author">.';
+          valueFound = hasHumansFile ? '/humans.txt (200 OK)' : 'humans.txt link';
+        } else {
+          checkStatus = 'info';
+          foundText = 'No /humans.txt file found (optional site team colophon standard).';
         }
         break;
       }
