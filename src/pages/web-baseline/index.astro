@@ -1,0 +1,591 @@
+---
+import ToolLayout from "@/layouts/ToolLayout.astro";
+import CapCaptcha from "@/components/CapCaptcha.astro";
+import styles from "@/styles/web-baseline.module.css";
+
+const QUICK_EXAMPLES = [
+  "https://iqverse.net",
+  "https://github.com",
+  "https://cloudflare.com",
+  "https://stripe.com",
+  "https://openai.com",
+];
+
+const METHODOLOGY_ITEMS = [
+  {
+    icon: "🔒",
+    title: "1. Security & Protocol Baseline",
+    desc: "Checks for strict HTTPS encryption, clean HTTP 200 responses, HSTS enforcement, and essential MIME and clickjacking security headers.",
+  },
+  {
+    icon: "📄",
+    title: "2. Document & SEO Essentials",
+    desc: "Validates crucial HTML head tags: accurate <title>, meta descriptions, responsive <meta viewport>, character encoding, canonical URLs, and favicons.",
+  },
+  {
+    icon: "🏗️",
+    title: "3. Semantic DOM & Accessibility",
+    desc: "Audits page structure for a single authoritative <h1> heading, semantic HTML5 landmarks (<header>, <main>, <footer>), and image alt accessibility.",
+  },
+  {
+    icon: "🏷️",
+    title: "4. Structured Data & Social Cards",
+    desc: "Ensures rich snippet eligibility via Schema.org JSON-LD and verifies Open Graph / Twitter Card tags for high-converting social link shares.",
+  },
+  {
+    icon: "🤖",
+    title: "5. Search & Agent Crawlability",
+    desc: "Inspects discovery files (/robots.txt, /sitemap.xml, /llms.txt) and ensures search bots and AI models can index your content without obstruction.",
+  },
+];
+
+const FAQS = [
+  {
+    q: "What is the Website Baseline Checker and why was it created?",
+    a: "The Website Baseline Checker functions like an OWASP checklist for baseline website hygiene. It systematically verifies all core requirements that every modern website must implement — from SSL and viewport configuration to semantic landmarks, Schema markup, robots.txt, and sitemaps.",
+  },
+  {
+    q: "Why is having exactly one <h1> heading important?",
+    a: "The <h1> tag represents the primary topic of the document. Having exactly one <h1> provides a clear semantic anchor for screen readers, search engine indexers, and AI summarizers.",
+  },
+  {
+    q: "How does the Baseline Score calculation work?",
+    a: "The audit evaluates 22 core checks categorized into 5 functional areas. Each check has a severity weight (Critical, High, Medium, Low). Passing checks receive 100% of their weight, warnings receive 40%, and failing checks receive 0%. The composite score produces letter grades from A+ (90+) down to F (<50).",
+  },
+  {
+    q: "Can I export or share the audit findings?",
+    a: "Yes. Once an audit completes, you can click 'Copy Markdown Report' to get a formatted markdown summary for GitHub issues/PRs or 'Export JSON' to download the raw audit payload.",
+  },
+];
+---
+
+<ToolLayout
+  title="Web Baseline Checker"
+  subtitle="Website Standards, SEO & Hygiene Auditor"
+  pill="BROWSER TOOLS"
+  toolSlug="web-baseline"
+  description="Audit any website against core web standards and baseline hygiene: HTTPS, favicon, title, viewport, H1, header, footer, schema, robots.txt, sitemap.xml, and security headers."
+>
+  <div class={styles.baselineContainer}>
+    <!-- Scanner Form Card -->
+    <section class={styles.scannerCard}>
+      <form id="baseline-form">
+        <div class={styles.inputRow}>
+          <div class={styles.inputWrapper}>
+            <svg
+              class={styles.inputIcon}
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path
+                d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+              ></path>
+            </svg>
+            <input
+              id="baseline-url-input"
+              type="text"
+              class={styles.urlInput}
+              placeholder="https://example.com"
+              value="https://iqverse.net"
+              required
+            />
+          </div>
+          <button type="submit" id="btn-run-baseline" class={styles.scanButton}>
+            Audit Website
+          </button>
+        </div>
+
+        <div style="margin-top: 14px;">
+          <CapCaptcha />
+        </div>
+      </form>
+
+      <div class={styles.quickExamples}>
+        <span class={styles.examplesLabel}>Quick Test:</span>
+        {
+          QUICK_EXAMPLES.map((url) => (
+            <button
+              type="button"
+              class={`${styles.exampleBtn} example-url-btn`}
+              data-url={url}
+            >
+              {url.replace("https://", "")}
+            </button>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- Loading Box -->
+    <div id="baseline-loading-box" class={styles.statusBar} style="display: none;">
+      <div class={styles.loadingSpinner}></div>
+      <div style="font-weight: 600;">Auditing Website Baseline Standards...</div>
+      <div style="font-size: 0.85rem; color: var(--text-muted);">
+        Inspecting HTTPS, headers, head metadata, DOM landmarks, robots.txt, and sitemaps...
+      </div>
+    </div>
+
+    <!-- Results Area -->
+    <div id="baseline-results-area" class={styles.resultsSection} style="display: none;">
+      <!-- Overview Card -->
+      <section class={styles.scoreOverviewCard}>
+        <div class={styles.gradeGauge} id="grade-gauge">
+          <span class={styles.gradeLetter} id="grade-letter">A+</span>
+          <span class={styles.gradeScore} id="grade-score">95/100</span>
+        </div>
+
+        <div class={styles.overviewMeta}>
+          <div class={styles.targetUrlTitle} id="target-title">https://iqverse.net</div>
+          <div class={styles.overviewSub} id="overview-sub">
+            Audited in <span id="scan-duration">120ms</span> • <span id="total-checks-count">22</span> standards verified
+          </div>
+          <div class={styles.statBadges}>
+            <span class={`${styles.statBadge} ${styles.badgePass}`} data-status="pass" id="badge-pass-count">
+              ✓ <strong id="count-pass">0</strong> Passed
+            </span>
+            <span class={`${styles.statBadge} ${styles.badgeWarn}`} data-status="warn" id="badge-warn-count">
+              ⚠️ <strong id="count-warn">0</strong> Warnings
+            </span>
+            <span class={`${styles.statBadge} ${styles.badgeFail}`} data-status="fail" id="badge-fail-count">
+              ✕ <strong id="count-fail">0</strong> Failed
+            </span>
+            <span class={`${styles.statBadge} ${styles.badgeInfo}`} data-status="info" id="badge-info-count">
+              ℹ️ <strong id="count-info">0</strong> Info
+            </span>
+          </div>
+        </div>
+
+        <div class={styles.overviewActions}>
+          <button type="button" class={styles.actionBtn} id="btn-copy-report">
+            📋 Copy Markdown
+          </button>
+          <button type="button" class={styles.actionBtn} id="btn-export-json">
+            💾 Export JSON
+          </button>
+        </div>
+      </section>
+
+      <!-- Toolbar & Filters -->
+      <section class={styles.resultsToolbar}>
+        <div class={styles.toolbarRow}>
+          <div class={styles.catFilterGroup} id="category-filters">
+            <button type="button" class={`${styles.catBtn} ${styles.catBtnActive}`} data-cat="all">All Categories</button>
+            <button type="button" class={styles.catBtn} data-cat="security">Security & Transport</button>
+            <button type="button" class={styles.catBtn} data-cat="seo">SEO & Head</button>
+            <button type="button" class={styles.catBtn} data-cat="dom">DOM & Content</button>
+            <button type="button" class={styles.catBtn} data-cat="metadata">Schema & Social</button>
+            <button type="button" class={styles.catBtn} data-cat="crawl">Crawl & Discovery</button>
+          </div>
+
+          <div class={styles.searchBoxWrapper}>
+            <svg
+              class={styles.searchIcon}
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input
+              type="text"
+              id="baseline-search-input"
+              class={styles.searchInput}
+              placeholder="Search checks..."
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- Checks List -->
+      <div class={styles.checksGrid} id="checks-container">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- Educational Methodology Section -->
+    <section class={styles.infoSection}>
+      <div class={styles.sectionHeader}>
+        <span class={styles.sectionBadge}>Standards Framework</span>
+        <h2 class={styles.sectionTitle}>The Core Website Baseline Standards</h2>
+        <p class={styles.sectionSub}>
+          Just as the OWASP ASVS establishes baseline security criteria, modern web applications require a foundational baseline for crawlability, accessibility, document structure, and transport integrity.
+        </p>
+      </div>
+
+      <div class={styles.methodologyGrid}>
+        {
+          METHODOLOGY_ITEMS.map((item) => (
+            <div class={styles.methodCard}>
+              <div class={styles.methodIcon}>{item.icon}</div>
+              <h3 class={styles.methodTitle}>{item.title}</h3>
+              <p class={styles.methodDesc}>{item.desc}</p>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class={styles.infoSection}>
+      <div class={styles.sectionHeader}>
+        <span class={styles.sectionBadge}>FAQ</span>
+        <h2 class={styles.sectionTitle}>Frequently Asked Questions</h2>
+      </div>
+
+      <div class={styles.faqList}>
+        {
+          FAQS.map((faq) => (
+            <details class={styles.faqCard}>
+              <summary class={styles.faqQuestionRow}>
+                <h3 class={styles.faqQuestion}>{faq.q}</h3>
+                <span class={styles.faqIcon}>+</span>
+              </summary>
+              <p class={styles.faqAnswer}>{faq.a}</p>
+            </details>
+          ))
+        }
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  import {
+    evaluateBaselineAudit,
+    generateMarkdownReport,
+    type BaselineAuditReport,
+  } from "@/lib/web-baseline";
+  import { validateCaptcha, getCaptchaToken } from "@/lib/captcha";
+  import styles from "@/styles/web-baseline.module.css";
+
+  const form = document.getElementById("baseline-form") as HTMLFormElement;
+  const urlInput = document.getElementById("baseline-url-input") as HTMLInputElement;
+  const exampleBtns = document.querySelectorAll(".example-url-btn");
+  const loadingBox = document.getElementById("baseline-loading-box");
+  const resultsArea = document.getElementById("baseline-results-area");
+
+  const gradeGauge = document.getElementById("grade-gauge");
+  const gradeLetter = document.getElementById("grade-letter");
+  const gradeScore = document.getElementById("grade-score");
+  const targetTitle = document.getElementById("target-title");
+  const scanDuration = document.getElementById("scan-duration");
+  const totalChecksCount = document.getElementById("total-checks-count");
+
+  const countPass = document.getElementById("count-pass");
+  const countWarn = document.getElementById("count-warn");
+  const countFail = document.getElementById("count-fail");
+  const countInfo = document.getElementById("count-info");
+
+  const statBadges = document.querySelectorAll(`.${styles.statBadge}`);
+  const catBtns = document.querySelectorAll(`.${styles.catBtn}`);
+  const searchInput = document.getElementById("baseline-search-input") as HTMLInputElement;
+  const checksContainer = document.getElementById("checks-container");
+  const btnCopyReport = document.getElementById("btn-copy-report");
+  const btnExportJson = document.getElementById("btn-export-json");
+
+  let currentReport: BaselineAuditReport | null = null;
+  let activeCategory = "all";
+  let activeStatus = "all";
+  let searchQuery = "";
+
+  exampleBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (urlInput) {
+        urlInput.value = (btn as HTMLElement).dataset.url || "";
+        const { valid } = validateCaptcha(form);
+        if (valid) {
+          form?.dispatchEvent(new Event("submit"));
+        }
+      }
+    });
+  });
+
+  catBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      catBtns.forEach((b) => b.classList.remove(styles.catBtnActive));
+      btn.classList.add(styles.catBtnActive);
+      activeCategory = (btn as HTMLElement).dataset.cat || "all";
+      renderChecks();
+    });
+  });
+
+  statBadges.forEach((badge) => {
+    badge.addEventListener("click", () => {
+      const clicked = (badge as HTMLElement).dataset.status || "all";
+      if (activeStatus === clicked) {
+        activeStatus = "all";
+        statBadges.forEach((b) => ((b as HTMLElement).style.opacity = "1"));
+      } else {
+        activeStatus = clicked;
+        statBadges.forEach((b) => {
+          if ((b as HTMLElement).dataset.status === clicked) {
+            (b as HTMLElement).style.opacity = "1";
+            (b as HTMLElement).style.boxShadow = "0 0 0 2px var(--accent)";
+          } else {
+            (b as HTMLElement).style.opacity = "0.45";
+            (b as HTMLElement).style.boxShadow = "none";
+          }
+        });
+      }
+      renderChecks();
+    });
+  });
+
+  searchInput?.addEventListener("input", () => {
+    searchQuery = (searchInput.value || "").toLowerCase().trim();
+    renderChecks();
+  });
+
+  async function proxyFetch(targetUrl: string) {
+    try {
+      const token = getCaptchaToken(form);
+      const tokenParam = token ? `&token=${encodeURIComponent(token)}` : "";
+      const res = await fetch(`/api/check-url?url=${encodeURIComponent(targetUrl)}${tokenParam}`);
+      const json = await res.json();
+      return {
+        ok: json.status >= 200 && json.status < 400,
+        status: json.status || 0,
+        body: json.body || json.html || "",
+        headers: (json.headers || {}) as Record<string, string>,
+        time: json.time || 0,
+      };
+    } catch {
+      return { ok: false, status: 0, body: "", headers: {}, time: 0 };
+    }
+  }
+
+  form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const raw = urlInput?.value.trim();
+    if (!raw) return;
+
+    const { valid } = validateCaptcha(form);
+    if (!valid) return;
+
+    const normalized = raw.startsWith("http://") || raw.startsWith("https://") ? raw : `https://${raw}`;
+    let origin = normalized;
+    try {
+      origin = new URL(normalized).origin;
+    } catch {
+      origin = normalized;
+    }
+
+    if (loadingBox) loadingBox.style.display = "flex";
+    if (resultsArea) resultsArea.style.display = "none";
+
+    try {
+      const [homeRes, robotsRes, sitemapRes, llmsRes] = await Promise.all([
+        proxyFetch(origin),
+        proxyFetch(`${origin}/robots.txt`),
+        proxyFetch(`${origin}/sitemap.xml`),
+        proxyFetch(`${origin}/llms.txt`),
+      ]);
+
+      currentReport = evaluateBaselineAudit(origin, {
+        home: homeRes,
+        robots: robotsRes,
+        sitemap: sitemapRes,
+        llms: llmsRes,
+      });
+
+      renderOverview(currentReport);
+      renderChecks();
+
+      if (loadingBox) loadingBox.style.display = "none";
+      if (resultsArea) resultsArea.style.display = "flex";
+    } catch {
+      if (loadingBox) loadingBox.style.display = "none";
+      alert("Failed to audit website. Please check the URL and try again.");
+    }
+  });
+
+  function renderOverview(report: BaselineAuditReport) {
+    if (gradeLetter) gradeLetter.textContent = report.grade;
+    if (gradeScore) gradeScore.textContent = `${report.score}/100`;
+    if (targetTitle) targetTitle.textContent = report.url;
+    if (scanDuration) scanDuration.textContent = `${report.scanTimeMs}ms`;
+    if (totalChecksCount) totalChecksCount.textContent = `${report.totalChecks}`;
+
+    if (countPass) countPass.textContent = `${report.passedCount}`;
+    if (countWarn) countWarn.textContent = `${report.warnCount}`;
+    if (countFail) countFail.textContent = `${report.failCount}`;
+    if (countInfo) countInfo.textContent = `${report.infoCount}`;
+
+    if (gradeGauge) {
+      if (report.score >= 80) {
+        gradeGauge.style.borderColor = "var(--green)";
+        gradeGauge.style.boxShadow = "0 0 24px rgba(52, 211, 153, 0.3)";
+      } else if (report.score >= 60) {
+        gradeGauge.style.borderColor = "var(--yellow)";
+        gradeGauge.style.boxShadow = "0 0 24px rgba(251, 191, 36, 0.3)";
+      } else {
+        gradeGauge.style.borderColor = "var(--red)";
+        gradeGauge.style.boxShadow = "0 0 24px rgba(248, 113, 113, 0.3)";
+      }
+    }
+  }
+
+  function renderChecks() {
+    if (!checksContainer || !currentReport) return;
+
+    let items = currentReport.results;
+
+    if (activeCategory !== "all") {
+      items = items.filter((i) => i.category === activeCategory);
+    }
+
+    if (activeStatus !== "all") {
+      items = items.filter((i) => i.status === activeStatus);
+    }
+
+    if (searchQuery) {
+      items = items.filter(
+        (i) =>
+          i.name.toLowerCase().includes(searchQuery) ||
+          i.description.toLowerCase().includes(searchQuery) ||
+          i.found.toLowerCase().includes(searchQuery) ||
+          i.recommendation.toLowerCase().includes(searchQuery) ||
+          i.category.toLowerCase().includes(searchQuery)
+      );
+    }
+
+    if (items.length === 0) {
+      checksContainer.innerHTML = `
+        <div style="text-align: center; padding: 40px; color: var(--text-muted); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);">
+          <div style="font-size: 2rem; margin-bottom: 8px;">🔍</div>
+          <div style="font-weight: 600; font-size: 1.1rem; color: var(--text);">No matching baseline standards found</div>
+          <div style="font-size: 0.85rem; margin-top: 4px;">Try clearing your search keyword or resetting category/status filters.</div>
+        </div>
+      `;
+      return;
+    }
+
+    checksContainer.innerHTML = items
+      .map((check) => {
+        let statusPillClass = styles.badgePass;
+        let statusIcon = "✓";
+        let statusLabel = "PASS";
+
+        if (check.status === "warn") {
+          statusPillClass = styles.badgeWarn;
+          statusIcon = "⚠️";
+          statusLabel = "WARNING";
+        } else if (check.status === "fail") {
+          statusPillClass = styles.badgeFail;
+          statusIcon = "✕";
+          statusLabel = "FAIL";
+        } else if (check.status === "info") {
+          statusPillClass = styles.badgeInfo;
+          statusIcon = "ℹ️";
+          statusLabel = "INFO";
+        }
+
+        let severityClass = styles.severityLow;
+        if (check.severity === "critical") severityClass = styles.severityCritical;
+        else if (check.severity === "high") severityClass = styles.severityHigh;
+        else if (check.severity === "medium") severityClass = styles.severityMedium;
+
+        const codeSnippetHtml = check.codeExample
+          ? `
+          <div class="${styles.codeBox}">
+            <code>${escapeHtml(check.codeExample)}</code>
+            <button type="button" class="${styles.copyCodeBtn} btn-copy-snippet" data-code="${escapeHtml(check.codeExample)}">Copy</button>
+          </div>
+        `
+          : "";
+
+        return `
+          <div class="${styles.checkCard}">
+            <div class="${styles.checkHeader}">
+              <div class="${styles.checkTitleArea}">
+                <h3 class="${styles.checkName}">${check.name}</h3>
+                <span class="${styles.categoryTag}">${check.category}</span>
+                <span class="${styles.severityTag} ${severityClass}">${check.severity}</span>
+              </div>
+              <span class="${styles.statusPill} ${statusPillClass}">
+                ${statusIcon} ${statusLabel}
+              </span>
+            </div>
+
+            <p class="${styles.checkDescription}">${check.description}</p>
+
+            <div class="${styles.findingBox}">
+              <span class="${styles.findingLabel}">Finding:</span>
+              <span class="${styles.findingText}">${check.found}</span>
+            </div>
+
+            ${
+              check.status !== "pass"
+                ? `
+              <div class="${styles.recommendationBox}">
+                <strong>Recommendation:</strong> ${check.recommendation}
+              </div>
+            `
+                : ""
+            }
+
+            ${codeSnippetHtml}
+          </div>
+        `;
+      })
+      .join("");
+
+    // Bind copy buttons for code snippets
+    document.querySelectorAll(".btn-copy-snippet").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const code = (btn as HTMLElement).dataset.code || "";
+        if (code) {
+          navigator.clipboard.writeText(code);
+          const original = btn.textContent;
+          btn.textContent = "Copied!";
+          setTimeout(() => {
+            btn.textContent = original;
+          }, 1500);
+        }
+      });
+    });
+  }
+
+  function escapeHtml(text: string): string {
+    return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  btnCopyReport?.addEventListener("click", () => {
+    if (!currentReport) return;
+    const md = generateMarkdownReport(currentReport);
+    navigator.clipboard.writeText(md);
+    const original = btnCopyReport.textContent;
+    btnCopyReport.textContent = "✓ Report Copied!";
+    setTimeout(() => {
+      btnCopyReport.textContent = original;
+    }, 2000);
+  });
+
+  btnExportJson?.addEventListener("click", () => {
+    if (!currentReport) return;
+    const blob = new Blob([JSON.stringify(currentReport, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `baseline-audit-${currentReport.hostname}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+</script>

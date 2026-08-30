@@ -62,6 +62,7 @@ IQVerse organizes tools into intuitive categories. Below is the full directory o
 
 | Tool Name | Route / Link | Status | Description |
 | :--- | :--- | :--- | :--- |
+| **Web Baseline Checker** | [`/web-baseline/`](https://iqverse.net/web-baseline/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Audit website hygiene: HTTPS, favicon, title, viewport, H1, header, footer, schema, robots.txt & sitemaps |
 | **QR Forge** | [`/qrforge/`](https://iqverse.net/qrforge/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Vector QR code generator for URLs, Wi-Fi credentials, vCards & plain text |
 | **Link Radar** | [`/linkradar/`](https://iqverse.net/linkradar/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Find broken links and 404s in any webpage instantly |
 | **Favicon Generator** | [`/favicongen/`](https://iqverse.net/favicongen/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Create favicons in all required sizes plus `manifest.json` |
