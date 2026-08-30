@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { tools } from '../lib/tools';
+import { tools } from '../../lib/tools';
 
 // Derive all internal routes dynamically from tools definition + root homepage
 const internalRoutes = Array.from(
