@@ -552,6 +552,7 @@ const FAQS = [
     type HeaderAnalysisResult,
   } from "@/lib/headers";
   import { validateCaptcha } from "@/lib/captcha";
+  import { escapeHtml } from "@/lib/utils";
 
   const form = document.getElementById("header-scan-form") as HTMLFormElement;
   const urlInput = document.getElementById("url-input") as HTMLInputElement;
@@ -912,24 +913,24 @@ const FAQS = [
           <div class="header-check-card ${statusClass}">
             <div class="header-check-head">
               <div class="header-check-title-wrap">
-                <h3 class="header-check-name">${item.name}</h3>
-                ${item.short ? `<span class="header-short-badge">${item.short}</span>` : ""}
-                <span class="header-category-badge">${item.category}</span>
+                <h3 class="header-check-name">${escapeHtml(item.name)}</h3>
+                ${item.short ? `<span class="header-short-badge">${escapeHtml(item.short)}</span>` : ""}
+                <span class="header-category-badge">${escapeHtml(item.category)}</span>
               </div>
               <div class="header-check-meta-badges">
-                <span class="header-status-pill ${statusPillClass}">${item.status}</span>
+                <span class="header-status-pill ${statusPillClass}">${escapeHtml(item.status)}</span>
               </div>
             </div>
-            <p class="header-check-desc">${item.description}</p>
+            <p class="header-check-desc">${escapeHtml(item.description)}</p>
             <div class="header-check-result-box">
               <span>${statusIcon}</span>
-              <span><strong>Result:</strong> ${item.message}</span>
+              <span><strong>Result:</strong> ${escapeHtml(item.message)}</span>
             </div>
             ${
               item.recommendation && item.status !== "pass"
                 ? `<div class="header-rec-box">
                     <span class="header-rec-highlight">💡 Recommendation:</span>
-                    <span>${item.recommendation}</span>
+                    <span>${escapeHtml(item.recommendation)}</span>
                   </div>`
                 : ""
             }
