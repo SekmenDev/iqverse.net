@@ -1,0 +1,300 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+import { SHADOW_PRESETS } from '@/lib/box-shadow';
+---
+
+<ToolLayout
+  title="CSS Box Shadow Builder"
+  subtitle="Stack, Tune & Copy Layered CSS Shadows"
+  pill="DESIGN"
+  toolSlug="box-shadow"
+  description="Build layered CSS box-shadow values visually. Adjust offset, blur, spread, colour and inset per layer, preview the result live and copy production-ready CSS."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 260px;">
+            <div style="font-size: 0.72rem; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">
+              Preview
+            </div>
+            <div
+              id="preview-stage"
+              style="display: flex; align-items: center; justify-content: center; padding: 48px 24px; border-radius: 8px; border: 1px solid var(--border); background: #f8fafc;"
+            >
+              <div
+                id="preview-box"
+                style="width: 150px; height: 110px; border-radius: 12px; background: #ffffff;"
+              ></div>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap;">
+              <label style="font-size: 0.78rem; display: flex; align-items: center; gap: 6px;">
+                Stage
+                <input id="stage-color" type="color" value="#f8fafc" style="width: 34px; height: 26px; padding: 0; border: 1px solid var(--border); border-radius: 4px; background: none;" />
+              </label>
+              <label style="font-size: 0.78rem; display: flex; align-items: center; gap: 6px;">
+                Box
+                <input id="box-color" type="color" value="#ffffff" style="width: 34px; height: 26px; padding: 0; border: 1px solid var(--border); border-radius: 4px; background: none;" />
+              </label>
+              <label style="font-size: 0.78rem; display: flex; align-items: center; gap: 6px;">
+                Radius
+                <input id="box-radius" type="range" min="0" max="60" value="12" style="width: 90px;" />
+                <span id="radius-label" style="font-family: monospace;">12px</span>
+              </label>
+            </div>
+          </div>
+
+          <div style="flex: 1; min-width: 280px;">
+            <div style="font-size: 0.72rem; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">
+              Generated CSS
+            </div>
+            <pre
+              id="css-output"
+              class={sharedStyles.outputArea}
+              style="font-family: monospace; font-size: 0.82rem; white-space: pre-wrap; word-break: break-all; min-height: 120px; margin: 0;"
+            ></pre>
+
+            <div class={sharedStyles.buttonGroup} style="margin-top: 12px;">
+              <button type="button" id="btn-copy" class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}>
+                Copy CSS
+              </button>
+              <button type="button" id="btn-add" class={sharedStyles.button}>
+                Add layer
+              </button>
+            </div>
+
+            <div class={sharedStyles.field} style="margin-top: 16px;">
+              <label class={sharedStyles.fieldLabel} for="importInput">
+                Paste an existing box-shadow to edit it
+              </label>
+              <textarea
+                id="importInput"
+                class={sharedStyles.textarea}
+                rows="2"
+                style="font-family: monospace; font-size: 0.8rem;"
+                placeholder="0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08)"
+              ></textarea>
+            </div>
+            <div id="import-error" class={sharedStyles.errorMessage} style="display: none;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class={sharedStyles.card} style="margin-top: 20px;">
+        <h3 style="margin: 0 0 16px 0; font-size: 1.1rem;">Layers</h3>
+        <div id="layer-list" style="display: flex; flex-direction: column; gap: 14px;"></div>
+      </div>
+
+      <div class={sharedStyles.card} style="margin-top: 20px;">
+        <h3 style="margin: 0 0 16px 0; font-size: 1.1rem;">Presets</h3>
+        <div class={sharedStyles.buttonGroup} style="flex-wrap: wrap;">
+          {SHADOW_PRESETS.map(preset => (
+            <button
+              type="button"
+              class={`${sharedStyles.button} ${sharedStyles.buttonSmall}`}
+              data-preset={preset.name}
+            >
+              {preset.name}
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  import {
+    SHADOW_PRESETS,
+    createLayer,
+    formatBoxShadow,
+    formatBoxShadowCss,
+    parseBoxShadow,
+    type ShadowLayer,
+  } from '@/lib/box-shadow';
+
+  const previewStage = document.getElementById('preview-stage');
+  const previewBox = document.getElementById('preview-box');
+  const cssOutput = document.getElementById('css-output');
+  const layerList = document.getElementById('layer-list');
+  const importInput = document.getElementById('importInput') as HTMLTextAreaElement | null;
+  const importError = document.getElementById('import-error');
+  const stageColor = document.getElementById('stage-color') as HTMLInputElement | null;
+  const boxColor = document.getElementById('box-color') as HTMLInputElement | null;
+  const boxRadius = document.getElementById('box-radius') as HTMLInputElement | null;
+  const radiusLabel = document.getElementById('radius-label');
+  const btnCopy = document.getElementById('btn-copy');
+  const btnAdd = document.getElementById('btn-add');
+
+  const SLIDERS: Array<{ key: keyof ShadowLayer; label: string; min: number; max: number; step: number }> = [
+    { key: 'offsetX', label: 'Offset X', min: -80, max: 80, step: 1 },
+    { key: 'offsetY', label: 'Offset Y', min: -80, max: 80, step: 1 },
+    { key: 'blur', label: 'Blur', min: 0, max: 120, step: 1 },
+    { key: 'spread', label: 'Spread', min: -40, max: 60, step: 1 },
+    { key: 'opacity', label: 'Opacity', min: 0, max: 1, step: 0.01 },
+  ];
+
+  let layers: ShadowLayer[] = SHADOW_PRESETS[1].layers.map(layer => ({ ...layer }));
+
+  function renderPreview() {
+    const shadow = formatBoxShadow(layers);
+    if (previewBox) previewBox.style.boxShadow = shadow;
+    if (cssOutput) cssOutput.textContent = formatBoxShadowCss(layers);
+  }
+
+  function buildSlider(layer: ShadowLayer, index: number, spec: (typeof SLIDERS)[number]): HTMLElement {
+    const value = layer[spec.key] as number;
+    const wrap = document.createElement('label');
+    wrap.style.cssText = 'display: flex; align-items: center; gap: 8px; font-size: 0.75rem;';
+
+    const name = document.createElement('span');
+    name.textContent = spec.label;
+    name.style.cssText = 'flex: 0 0 62px; opacity: 0.75;';
+
+    const slider = document.createElement('input');
+    slider.type = 'range';
+    slider.min = String(spec.min);
+    slider.max = String(spec.max);
+    slider.step = String(spec.step);
+    slider.value = String(value);
+    slider.style.cssText = 'flex: 1; min-width: 90px;';
+
+    const readout = document.createElement('span');
+    readout.textContent = spec.key === 'opacity' ? value.toFixed(2) : `${value}px`;
+    readout.style.cssText = 'flex: 0 0 48px; text-align: right; font-family: monospace;';
+
+    slider.addEventListener('input', () => {
+      const next = Number(slider.value);
+      layers[index] = { ...layers[index], [spec.key]: next };
+      readout.textContent = spec.key === 'opacity' ? next.toFixed(2) : `${next}px`;
+      renderPreview();
+    });
+
+    wrap.append(name, slider, readout);
+    return wrap;
+  }
+
+  function buildLayerCard(layer: ShadowLayer, index: number): HTMLElement {
+    const card = document.createElement('div');
+    card.style.cssText =
+      'padding: 14px; border-radius: 8px; border: 1px solid var(--border); background: rgba(255, 255, 255, 0.02);';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;';
+
+    const title = document.createElement('strong');
+    title.textContent = `Layer ${index + 1}`;
+    title.style.cssText = 'font-size: 0.85rem; flex: 1;';
+
+    const color = document.createElement('input');
+    color.type = 'color';
+    color.value = layer.color;
+    color.title = 'Shadow colour';
+    color.style.cssText =
+      'width: 34px; height: 26px; padding: 0; border: 1px solid var(--border); border-radius: 4px; background: none;';
+    color.addEventListener('input', () => {
+      layers[index] = { ...layers[index], color: color.value };
+      renderPreview();
+    });
+
+    const insetWrap = document.createElement('label');
+    insetWrap.style.cssText = 'display: flex; align-items: center; gap: 5px; font-size: 0.75rem;';
+    const inset = document.createElement('input');
+    inset.type = 'checkbox';
+    inset.checked = layer.inset;
+    inset.addEventListener('change', () => {
+      layers[index] = { ...layers[index], inset: inset.checked };
+      renderPreview();
+    });
+    insetWrap.append(inset, document.createTextNode('inset'));
+
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.textContent = 'Remove';
+    remove.style.cssText =
+      'font-size: 0.72rem; padding: 3px 9px; border-radius: 4px; border: 1px solid var(--border); background: none; color: var(--muted); cursor: pointer;';
+    remove.disabled = layers.length === 1;
+    remove.style.opacity = layers.length === 1 ? '0.4' : '1';
+    remove.addEventListener('click', () => {
+      layers.splice(index, 1);
+      renderLayers();
+    });
+
+    header.append(title, color, insetWrap, remove);
+    card.appendChild(header);
+
+    const grid = document.createElement('div');
+    grid.style.cssText = 'display: grid; gap: 6px;';
+    SLIDERS.forEach(spec => grid.appendChild(buildSlider(layer, index, spec)));
+    card.appendChild(grid);
+
+    return card;
+  }
+
+  function renderLayers() {
+    if (!layerList) return;
+    layerList.replaceChildren(...layers.map((layer, index) => buildLayerCard(layer, index)));
+    renderPreview();
+  }
+
+  btnAdd?.addEventListener('click', () => {
+    layers.push(createLayer());
+    renderLayers();
+  });
+
+  btnCopy?.addEventListener('click', async () => {
+    await navigator.clipboard.writeText(formatBoxShadowCss(layers));
+    const original = btnCopy.textContent;
+    btnCopy.textContent = 'Copied!';
+    setTimeout(() => {
+      btnCopy.textContent = original;
+    }, 1500);
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const preset = SHADOW_PRESETS.find(entry => entry.name === btn.dataset.preset);
+      if (!preset) return;
+      layers = preset.layers.map(layer => ({ ...layer }));
+      renderLayers();
+    });
+  });
+
+  importInput?.addEventListener('input', () => {
+    const raw = importInput.value.trim();
+    if (!raw) {
+      if (importError) importError.style.display = 'none';
+      return;
+    }
+
+    const parsed = parseBoxShadow(raw);
+    if (!parsed || parsed.length === 0) {
+      if (importError) {
+        importError.textContent = 'Could not read that box-shadow value.';
+        importError.style.display = 'block';
+      }
+      return;
+    }
+
+    if (importError) importError.style.display = 'none';
+    layers = parsed;
+    renderLayers();
+  });
+
+  stageColor?.addEventListener('input', () => {
+    if (previewStage) previewStage.style.background = stageColor.value;
+  });
+
+  boxColor?.addEventListener('input', () => {
+    if (previewBox) previewBox.style.background = boxColor.value;
+  });
+
+  boxRadius?.addEventListener('input', () => {
+    if (previewBox) previewBox.style.borderRadius = `${boxRadius.value}px`;
+    if (radiusLabel) radiusLabel.textContent = `${boxRadius.value}px`;
+  });
+
+  renderLayers();
+</script>
