@@ -100,6 +100,7 @@ IQVerse organizes tools into intuitive categories. Below is the full directory o
 | **SSL / TLS Inspector** | [`/ssl-inspector/`](https://iqverse.net/ssl-inspector/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Inspect SSL/TLS certificate validity, issuer details & trust chain |
 | **JWT Debugger & Verifier** | [`/jwt-debugger/`](https://iqverse.net/jwt-debugger/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Decode JWT headers/claims and verify signatures locally |
 | **CSP Header Builder** | [`/csp-builder/`](https://iqverse.net/csp-builder/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Interactive Content-Security-Policy generator & directive validator |
+| **SPF, DKIM & DMARC Checker** | [`/email-auth/`](https://iqverse.net/email-auth/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Validate email auth records, SPF lookup budget and DKIM key strength |
 | **Password Analyzer** | [`/password-analyzer/`](https://iqverse.net/password-analyzer/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Evaluate password strength, bit entropy and crack time offline |
 | **File Hash Verifier** | [`/file-hash/`](https://iqverse.net/file-hash/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Calculate and compare MD5, SHA-1, SHA-256 and SHA-512 file hashes |
 
