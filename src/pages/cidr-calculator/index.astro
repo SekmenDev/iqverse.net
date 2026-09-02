@@ -1,0 +1,296 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+
+const PRESETS = [
+  '192.168.1.0/24',
+  '10.0.0.0/8',
+  '172.16.0.0/12',
+  '203.0.113.42/29',
+  '100.64.0.0/10',
+  '2001:db8::/48',
+];
+
+const FIELDS: Array<{ id: string; label: string; mono: boolean }> = [
+  { id: 'network', label: 'Network address', mono: true },
+  { id: 'broadcast', label: 'Broadcast address', mono: true },
+  { id: 'firstHost', label: 'First usable host', mono: true },
+  { id: 'lastHost', label: 'Last usable host', mono: true },
+  { id: 'netmask', label: 'Subnet mask', mono: true },
+  { id: 'wildcard', label: 'Wildcard mask', mono: true },
+  { id: 'totalAddresses', label: 'Total addresses', mono: true },
+  { id: 'usableHosts', label: 'Usable hosts', mono: true },
+  { id: 'range', label: 'Address range', mono: true },
+  { id: 'scope', label: 'Scope', mono: false },
+];
+---
+
+<ToolLayout
+  title="CIDR & Subnet Calculator"
+  subtitle="Network, Broadcast, Host Range & Subnet Splitting"
+  pill="NETWORK"
+  toolSlug="cidr-calculator"
+  description="Calculate IPv4 and IPv6 subnet ranges, netmasks, wildcard masks, usable host counts and split a block into smaller subnets entirely in your browser."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="cidrInput">
+            IP address or CIDR block
+          </label>
+          <input
+            id="cidrInput"
+            type="text"
+            class={sharedStyles.input}
+            style="font-family: monospace;"
+            placeholder="192.168.1.0/24"
+            autocomplete="off"
+            spellcheck="false"
+            value="192.168.1.0/24"
+          />
+        </div>
+
+        <div class={sharedStyles.buttonGroup} style="margin-top: 12px; flex-wrap: wrap;">
+          {PRESETS.map(preset => (
+            <button type="button" class={`${sharedStyles.button} ${sharedStyles.buttonSmall}`} data-preset={preset}>
+              {preset}
+            </button>
+          ))}
+        </div>
+
+        <div id="cidr-error" class={sharedStyles.errorMessage} style="display: none; margin-top: 12px;"></div>
+
+        <div
+          id="cidr-results"
+          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 20px;"
+        >
+          {FIELDS.map(field => (
+            <div
+              data-result-card={field.id}
+              style="padding: 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);"
+            >
+              <div style="font-size: 0.75rem; opacity: 0.7;">{field.label}</div>
+              <div
+                data-result={field.id}
+                style={`font-size: 0.95rem; font-weight: 600; word-break: break-all; ${field.mono ? 'font-family: monospace;' : ''}`}
+              ></div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class={sharedStyles.card} style="margin-top: 20px;">
+        <h3 style="margin: 0 0 16px 0; font-size: 1.1rem;">Split into smaller subnets</h3>
+
+        <div style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;">
+          <div class={sharedStyles.field} style="flex: 1; min-width: 200px; margin: 0;">
+            <label class={sharedStyles.fieldLabel} for="splitPrefix">
+              New prefix length
+            </label>
+            <input
+              id="splitPrefix"
+              type="number"
+              class={sharedStyles.input}
+              style="font-family: monospace;"
+              min="0"
+              max="128"
+              value="26"
+            />
+          </div>
+          <button type="button" id="btn-split" class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}>
+            Split
+          </button>
+        </div>
+
+        <div id="split-error" class={sharedStyles.errorMessage} style="display: none; margin-top: 12px;"></div>
+        <div id="split-note" style="font-size: 0.8rem; opacity: 0.7; margin-top: 12px; display: none;"></div>
+        <div id="split-results" style="margin-top: 12px; overflow-x: auto;"></div>
+      </div>
+
+      <div class={sharedStyles.card} style="margin-top: 20px;">
+        <h3 style="margin: 0 0 16px 0; font-size: 1.1rem;">Is an address inside the block?</h3>
+
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="containsInput">
+            IP address to check
+          </label>
+          <input
+            id="containsInput"
+            type="text"
+            class={sharedStyles.input}
+            style="font-family: monospace;"
+            placeholder="192.168.1.55"
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </div>
+
+        <div id="contains-result" style="margin-top: 12px; font-weight: 600;"></div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  import { isIpInCidr, parseCidr, splitSubnet, type CidrInfo } from '@/lib/cidr';
+
+  const cidrInput = document.getElementById('cidrInput') as HTMLInputElement | null;
+  const splitPrefix = document.getElementById('splitPrefix') as HTMLInputElement | null;
+  const containsInput = document.getElementById('containsInput') as HTMLInputElement | null;
+  const cidrError = document.getElementById('cidr-error');
+  const cidrResults = document.getElementById('cidr-results');
+  const splitError = document.getElementById('split-error');
+  const splitNote = document.getElementById('split-note');
+  const splitResults = document.getElementById('split-results');
+  const containsResult = document.getElementById('contains-result');
+  const btnSplit = document.getElementById('btn-split');
+
+  // Counts reach 2^128, far past Number.MAX_SAFE_INTEGER, so format as BigInt
+  function formatCount(value: string): string {
+    return BigInt(value).toLocaleString('en-US');
+  }
+
+  function setField(key: keyof CidrInfo, value: string | null) {
+    const card = document.querySelector<HTMLElement>(`[data-result-card="${key}"]`);
+    const slot = document.querySelector<HTMLElement>(`[data-result="${key}"]`);
+    if (!card || !slot) return;
+
+    card.style.display = value === null ? 'none' : '';
+    slot.textContent = value ?? '';
+  }
+
+  function renderInfo(info: CidrInfo) {
+    setField('network', info.network);
+    setField('broadcast', info.broadcast);
+    setField('firstHost', info.firstHost);
+    setField('lastHost', info.lastHost);
+    setField('netmask', info.netmask);
+    setField('wildcard', info.wildcard);
+    setField('totalAddresses', formatCount(info.totalAddresses));
+    setField('usableHosts', formatCount(info.usableHosts));
+    setField('range', info.range);
+    setField('scope', `${info.scope} · IPv${info.version}`);
+  }
+
+  function renderSplit(subnets: CidrInfo[]) {
+    if (!splitResults) return;
+
+    const head = '<tr><th>CIDR</th><th>Network</th><th>First host</th><th>Last host</th><th>Hosts</th></tr>';
+    const rows = subnets
+      .map(subnet => {
+        const cells = [
+          subnet.cidr,
+          subnet.network,
+          subnet.firstHost,
+          subnet.lastHost,
+          formatCount(subnet.usableHosts),
+        ];
+        return `<tr>${cells.map(cell => `<td>${cell}</td>`).join('')}</tr>`;
+      })
+      .join('');
+
+    splitResults.innerHTML = `
+      <table style="width: 100%; border-collapse: collapse; font-family: monospace; font-size: 0.82rem;">
+        <thead style="text-align: left; opacity: 0.7;">${head}</thead>
+        <tbody>${rows}</tbody>
+      </table>
+    `;
+
+    splitResults.querySelectorAll('th, td').forEach(cell => {
+      (cell as HTMLElement).style.padding = '6px 10px';
+      (cell as HTMLElement).style.borderBottom = '1px solid var(--border)';
+      (cell as HTMLElement).style.whiteSpace = 'nowrap';
+    });
+  }
+
+  function clearSplit() {
+    if (splitResults) splitResults.innerHTML = '';
+    if (splitNote) splitNote.style.display = 'none';
+    if (splitError) splitError.style.display = 'none';
+  }
+
+  function updateContains() {
+    if (!containsResult || !containsInput || !cidrInput) return;
+
+    const ip = containsInput.value.trim();
+    if (!ip) {
+      containsResult.textContent = '';
+      return;
+    }
+
+    const inside = isIpInCidr(ip, cidrInput.value);
+    containsResult.textContent = inside
+      ? `✔ ${ip} is inside ${cidrInput.value.trim()}`
+      : `✘ ${ip} is outside ${cidrInput.value.trim()}`;
+    containsResult.style.color = inside ? 'var(--green)' : 'var(--red, #ff4d4f)';
+  }
+
+  function update() {
+    if (!cidrInput) return;
+    const result = parseCidr(cidrInput.value);
+
+    if (!result.ok) {
+      if (cidrError) {
+        cidrError.textContent = result.error;
+        cidrError.style.display = 'block';
+      }
+      if (cidrResults) cidrResults.style.display = 'none';
+      clearSplit();
+      updateContains();
+      return;
+    }
+
+    if (cidrError) cidrError.style.display = 'none';
+    if (cidrResults) cidrResults.style.display = 'grid';
+    renderInfo(result.info);
+
+    if (splitPrefix) {
+      splitPrefix.max = String(result.info.version === 4 ? 32 : 128);
+      splitPrefix.min = String(result.info.prefix);
+    }
+
+    updateContains();
+  }
+
+  function runSplit() {
+    if (!cidrInput || !splitPrefix) return;
+    clearSplit();
+
+    const result = splitSubnet(cidrInput.value, Number(splitPrefix.value));
+
+    if (!result.ok) {
+      if (splitError) {
+        splitError.textContent = result.error;
+        splitError.style.display = 'block';
+      }
+      return;
+    }
+
+    renderSplit(result.subnets);
+
+    if (result.truncated && splitNote) {
+      splitNote.textContent = `Showing the first ${result.subnets.length} subnets. Narrow the prefix for a shorter list.`;
+      splitNote.style.display = 'block';
+    }
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (!cidrInput) return;
+      cidrInput.value = btn.dataset.preset ?? '';
+      clearSplit();
+      update();
+    });
+  });
+
+  cidrInput?.addEventListener('input', () => {
+    clearSplit();
+    update();
+  });
+
+  containsInput?.addEventListener('input', updateContains);
+  btnSplit?.addEventListener('click', runSplit);
+
+  update();
+</script>

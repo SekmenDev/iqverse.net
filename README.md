@@ -119,6 +119,7 @@ IQVerse organizes tools into intuitive categories. Below is the full directory o
 
 | Tool Name | Route / Link | Status | Description |
 | :--- | :--- | :--- | :--- |
+| **CIDR & Subnet Calculator** | [`/cidr-calculator/`](https://iqverse.net/cidr-calculator/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | IPv4/IPv6 subnet ranges, masks, host counts and subnet splitting |
 | **DNS Lookup** | [`/dnslookup/`](https://iqverse.net/dnslookup/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Query A, AAAA, MX, TXT, CNAME and NS records for any domain |
 | **IP Info & Geolocation** | [`/ip-lookup/`](https://iqverse.net/ip-lookup/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Inspect IP address geolocation, ASN, ISP details & routing info |
 | **Ping & Traceroute** | [`/ping-visualizer/`](https://iqverse.net/ping-visualizer/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Visualize network latency and hop trace routes via diagnostic relay |
