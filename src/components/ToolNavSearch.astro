@@ -1,8 +1,14 @@
 ---
 import styles from '@/styles/tool-nav-search.module.css';
+
+export interface Props {
+  mode?: 'dropdown' | 'filter';
+}
+
+const { mode = 'dropdown' } = Astro.props;
 ---
 
-<div class={styles.navSearchWrap} id="tool-search-wrap">
+<div class={styles.navSearchWrap} id="tool-search-wrap" data-search-mode={mode}>
   <span class={styles.navSearchIcon} aria-hidden="true">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
       <circle cx="6.5" cy="6.5" r="4.5" />
@@ -56,8 +62,12 @@ import styles from '@/styles/tool-nav-search.module.css';
 </div>
 
 <script>
-  import type { Tool } from '@/lib/tools';
+  import type { SearchResult } from '@/lib/tool-search';
   import { escapeHtml } from '@/lib/utils';
+
+  const MAX_RESULTS = 8;
+
+  type SearchModule = typeof import('@/lib/tool-search');
 
   function initToolNavSearch() {
     const wrap = document.getElementById('tool-search-wrap');
@@ -69,21 +79,18 @@ import styles from '@/styles/tool-nav-search.module.css';
     const countEl = document.getElementById('tool-search-count');
 
     if (!wrap || !input || !dropdown || !resultsList) return;
+    if (wrap.dataset.searchMode === 'filter') return;
 
-    let currentMatches: Tool[] = [];
+    let currentMatches: SearchResult[] = [];
     let activeIndex = -1;
-    let cachedTools: Tool[] | null = null;
-    let filterToolsFn: ((query: string, category: string, status: any) => Tool[]) | null = null;
+    let search: SearchModule | null = null;
     let loadPromise: Promise<void> | null = null;
 
     async function ensureToolsLoaded() {
-      if (cachedTools && filterToolsFn) return;
-      if (!loadPromise) {
-        loadPromise = import('@/lib/tools').then(mod => {
-          cachedTools = mod.tools;
-          filterToolsFn = mod.filterTools;
-        });
-      }
+      if (search) return;
+      loadPromise ??= import('@/lib/tool-search').then(mod => {
+        search = mod;
+      });
       await loadPromise;
     }
 
@@ -119,9 +126,9 @@ import styles from '@/styles/tool-nav-search.module.css';
     async function renderResults() {
       const q = input!.value.trim();
       await ensureToolsLoaded();
-      if (!cachedTools || !filterToolsFn) return;
+      if (!search) return;
 
-      currentMatches = q ? filterToolsFn(q, 'all', 'all') : cachedTools.slice(0, 8);
+      currentMatches = search.searchTools(q, { limit: MAX_RESULTS });
 
       if (clearBtn && kbd) {
         if (q.length > 0) {
@@ -138,11 +145,18 @@ import styles from '@/styles/tool-nav-search.module.css';
       }
 
       if (currentMatches.length === 0) {
+        const suggestions = search.suggestTools(q);
+        const suggestionHtml = suggestions.length
+          ? `<div class="tool-search-empty-sub">Did you mean ${suggestions
+              .map(tool => `<a href="${escapeHtml(tool.url)}">${escapeHtml(tool.name)}</a>`)
+              .join(', ')}?</div>`
+          : '<div class="tool-search-empty-sub">Try searching for "JSON", "QR", "AI", "Hash", etc.</div>';
+
         resultsList!.innerHTML = `
           <div class="tool-search-empty">
             <div class="tool-search-empty-icon">🔍</div>
             <div class="tool-search-empty-title">No tools found</div>
-            <div class="tool-search-empty-sub">Try searching for "JSON", "QR", "AI", "Hash", etc.</div>
+            ${suggestionHtml}
           </div>
         `;
         activeIndex = -1;
@@ -151,8 +165,8 @@ import styles from '@/styles/tool-nav-search.module.css';
       }
 
       resultsList!.innerHTML = currentMatches
-        .map((tool, idx) => {
-          const isExternal = !!tool.url && /^(https?:\/\/|mailto:)/i.test(tool.url);
+        .map(({ tool, nameRanges, descRanges }, idx) => {
+          const isExternal = /^(https?:\/\/|mailto:)/i.test(tool.url);
           const targetAttr = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
           return `
             <a
@@ -167,10 +181,10 @@ import styles from '@/styles/tool-nav-search.module.css';
               </div>
               <div class="tool-search-content">
                 <div class="tool-search-header">
-                  <span class="tool-search-title">${escapeHtml(tool.name)}</span>
-                  <span class="tool-search-cat">${escapeHtml(tool.cat || 'Tool')}</span>
+                  <span class="tool-search-title">${search!.highlight(tool.name, nameRanges)}</span>
+                  <span class="tool-search-cat">${escapeHtml(tool.cats[0])}</span>
                 </div>
-                <div class="tool-search-desc">${escapeHtml(tool.desc || '')}</div>
+                <div class="tool-search-desc">${search!.highlight(tool.desc, descRanges)}</div>
               </div>
               <div class="tool-search-arrow" aria-hidden="true">
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -227,8 +241,8 @@ import styles from '@/styles/tool-nav-search.module.css';
         if (currentMatches.length > 0) {
           e.preventDefault();
           const targetIndex = activeIndex >= 0 ? activeIndex : 0;
-          const targetTool = currentMatches[targetIndex];
-          if (targetTool && targetTool.url) {
+          const targetTool = currentMatches[targetIndex]?.tool;
+          if (targetTool?.url) {
             window.location.href = targetTool.url;
           }
         }

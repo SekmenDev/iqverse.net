@@ -4,7 +4,7 @@ import { generateLlmsTxt, validateLlmsTxt } from '@/lib/llmstxt';
 describe('llms.txt Engine (lib/llmstxt)', () => {
   const sampleConfig = {
     title: 'IQVerse Developer Tools',
-    summary: 'A curated collection of web, developer, and SEO tools.',
+    summary: 'A curated collection of web, developer and SEO tools.',
     sections: [
       {
         title: 'Core Tools',
@@ -22,7 +22,7 @@ describe('llms.txt Engine (lib/llmstxt)', () => {
   it('generates compliant llms.txt markdown', () => {
     const txt = generateLlmsTxt(sampleConfig);
     expect(txt).toContain('# IQVerse Developer Tools');
-    expect(txt).toContain('> A curated collection of web, developer, and SEO tools.');
+    expect(txt).toContain('> A curated collection of web, developer and SEO tools.');
     expect(txt).toContain('## Core Tools');
     expect(txt).toContain('- [DNS Lookup](https://iqverse.net/dnslookup): Authoritative DoH DNS inspector');
     expect(txt).toContain('## Optional');

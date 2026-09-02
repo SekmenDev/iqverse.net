@@ -16,8 +16,8 @@ const HEADERS_GUIDE = [
     name: "Content-Security-Policy",
     short: "CSP",
     importance: "Critical (Security)",
-    desc: "Restricts the sources from which scripts, styles, images, and frames can be loaded.",
-    why: "Blocks Cross-Site Scripting (XSS), data injection, and malicious external script execution.",
+    desc: "Restricts the sources from which scripts, styles, images and frames can be loaded.",
+    why: "Blocks Cross-Site Scripting (XSS), data injection and malicious external script execution.",
   },
   {
     name: "Strict-Transport-Security",
@@ -45,7 +45,7 @@ const HEADERS_GUIDE = [
     short: "Referrer",
     importance: "Medium (Privacy)",
     desc: "Controls how much referrer information is sent along with navigation and subresource requests.",
-    why: "Prevents sensitive query parameters, user tokens, and internal paths from leaking to third parties.",
+    why: "Prevents sensitive query parameters, user tokens and internal paths from leaking to third parties.",
   },
   {
     name: "Permissions-Policy",
@@ -73,7 +73,7 @@ const HEADERS_GUIDE = [
 const FAQS = [
   {
     q: "What are HTTP security response headers and why are they vital?",
-    a: "HTTP security headers are directives sent by the web server in response to browser requests. They configure built-in browser security mechanisms to prevent critical vulnerabilities like Cross-Site Scripting (XSS), clickjacking, MIME-type confusion, and protocol downgrade attacks.",
+    a: "HTTP security headers are directives sent by the web server in response to browser requests. They configure built-in browser security mechanisms to prevent critical vulnerabilities like Cross-Site Scripting (XSS), clickjacking, MIME-type confusion and protocol downgrade attacks.",
   },
   {
     q: "What does a failing grade or low security score mean?",
@@ -95,7 +95,7 @@ const FAQS = [
   subtitle="HTTP Security & Performance Header Analyzer"
   pill="SECURITY"
   toolSlug="headers"
-  description="Analyze HTTP response headers for any web URL. Inspect security policies, cache directives, server configurations, and CSP."
+  description="Analyze HTTP response headers for any web URL. Inspect security policies, cache directives, server configurations and CSP."
 >
   <div class={styles.headerScanContainer}>
     <!-- Scanner Card -->
@@ -430,7 +430,7 @@ const FAQS = [
           <span class={styles.stepNumber}>Layer 03</span>
           <h3 class={styles.stepTitle}>Framing & Leak Prevention</h3>
           <p class={styles.stepText}>
-            <code>X-Frame-Options</code>, <code>Referrer-Policy</code>, and <code
+            <code>X-Frame-Options</code>, <code>Referrer-Policy</code> and <code
               >Permissions-Policy</code
             > block clickjacking and prevent accidental token leakage.
           </p>

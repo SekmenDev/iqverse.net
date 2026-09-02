@@ -2,46 +2,33 @@
 import Layout from '@/layouts/Layout.astro';
 import ThemeToggle from '@/components/ThemeToggle.astro';
 import ToolNavSearch from '@/components/ToolNavSearch.astro';
-import { tools, getUniqueCategories, getUniqueStatuses } from '@/lib/tools';
+import ToolCard from '@/components/ToolCard.astro';
+import {
+  CATEGORY_ICONS,
+  STATUS_ICONS,
+  STATUS_LABELS,
+  countByCategory,
+  countByStatus,
+  getUniqueCategories,
+  getUniqueStatuses,
+  groupByPrimaryCategory,
+  tools,
+  type ToolType,
+} from '@/lib/tools';
 import { getToolsCollectionJsonLd } from '@/lib/jsonld';
 import styles from '@/styles/catalog.module.css';
 
 const categories = getUniqueCategories();
 const statuses = getUniqueStatuses();
+const catCounts = countByCategory();
+const statusCounts = countByStatus();
+const groups = groupByPrimaryCategory();
 
-const catCounts: Record<string, number> = { all: tools.length };
-categories.forEach(cat => {
-  if (cat !== 'all') {
-    catCounts[cat] = tools.filter(t => t.cat === cat).length;
-  }
-});
-
-const statusCounts: Record<string, number> = { all: tools.length };
-statuses.forEach(s => {
-  if (s !== 'all') {
-    statusCounts[s] = tools.filter(t => t.type === s).length;
-  }
-});
-
-const CAT_ICONS: Record<string, string> = {
-  'AI & Agents': '🤖',
-  'Browser Tools': '🧰',
-  'Security': '🔒',
-  'Design': '🎨',
-  'Network': '🌐',
-  'Desktop': '🖥️',
-  'SaaS': '☁️',
+const DOT_CLASS: Record<ToolType, string> = {
+  open: styles.dotOpen,
+  saas: styles.dotSaas,
+  coming: styles.dotComing,
 };
-
-const STATUS_ICONS: Record<string, string> = { open: '✦', saas: '◈', coming: '◌' };
-const STATUS_LABELS: Record<string, string> = { open: 'Open Source', saas: 'SaaS', coming: 'Coming Soon' };
-const DOT_CLASS: Record<string, string> = { open: styles.dotOpen, saas: styles.dotSaas, coming: styles.dotComing };
-
-const groupedTools: Record<string, typeof tools> = {};
-tools.forEach(t => {
-  if (!groupedTools[t.cat]) groupedTools[t.cat] = [];
-  groupedTools[t.cat].push(t);
-});
 
 const jsonLdData = getToolsCollectionJsonLd();
 ---
@@ -71,7 +58,7 @@ const jsonLdData = getToolsCollectionJsonLd();
         <span>IQVerse</span>
       </a>
 
-      <ToolNavSearch />
+      <ToolNavSearch mode="filter" />
 
       <div class={styles.navRight}>
         <a
@@ -102,7 +89,7 @@ const jsonLdData = getToolsCollectionJsonLd();
               data-cat={cat}
               aria-pressed={cat === 'all' ? 'true' : 'false'}
             >
-              <span class={styles.catIcon}>{cat === 'all' ? '⊞' : (CAT_ICONS[cat] || '○')}</span>
+              <span class={styles.catIcon}>{cat === 'all' ? '⊞' : CATEGORY_ICONS[cat]}</span>
               <span style="flex: 1; text-align: left;">{cat === 'all' ? 'All Tools' : cat}</span>
               <span class={styles.catCount}>{catCounts[cat]}</span>
             </button>
@@ -118,9 +105,7 @@ const jsonLdData = getToolsCollectionJsonLd();
               data-status={s}
               aria-pressed={s === 'all' ? 'true' : 'false'}
             >
-              <span
-                class={`${styles.catIcon} ${s !== 'all' ? DOT_CLASS[s] : ''}`}
-              >
+              <span class={`${styles.catIcon} ${s !== 'all' ? DOT_CLASS[s] : ''}`}>
                 {s === 'all' ? '⊞' : STATUS_ICONS[s]}
               </span>
               <span style="flex: 1; text-align: left;">{s === 'all' ? 'All' : STATUS_LABELS[s]}</span>
@@ -140,7 +125,6 @@ const jsonLdData = getToolsCollectionJsonLd();
           <div class={styles.sortWrap} id="sort-filters" aria-label="Sort options">
             <button
               type="button"
-              id="sort-default-btn"
               class={styles.sortBtn}
               data-sort="default"
               aria-pressed="true"
@@ -149,7 +133,6 @@ const jsonLdData = getToolsCollectionJsonLd();
             </button>
             <button
               type="button"
-              id="sort-az-btn"
               class={styles.sortBtn}
               data-sort="az"
               aria-pressed="false"
@@ -161,88 +144,34 @@ const jsonLdData = getToolsCollectionJsonLd();
 
         <div id="content-area">
           <div id="category-groups-container">
-            {Object.entries(groupedTools).map(([cat, catTools]) => (
-              <div class="category-group" data-group-cat={cat}>
+            {groups.map(({ category, tools: catTools }) => (
+              <div class="category-group" data-group-cat={category}>
                 <p class={styles.sectionHead}>
-                  {CAT_ICONS[cat] || ''} {cat}
+                  {CATEGORY_ICONS[category]} {category}
                 </p>
                 <div class={`card-grid-container ${styles.cardGrid}`}>
-                  {catTools.map(tool => {
-                    const coming = tool.type === 'coming';
-                    const href = tool.url && !coming ? tool.url : '';
-                    const isExternalLink = !!href && /^(https?:\/\/|mailto:)/i.test(href);
-
-                    return (
-                      <div
-                        class={`tool-card-item ${styles.cardLink}`}
-                        data-name={tool.name}
-                        data-desc={tool.desc}
-                        data-tags={tool.tags}
-                        data-cat={tool.cat}
-                        data-type={tool.type}
-                      >
-                        {href && !coming ? (
-                          <a
-                            href={href}
-                            class={`${styles.card} ${coming ? styles.cardComing : ''}`}
-                            {...(isExternalLink ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                          >
-                            <div class={styles.cardTop}>
-                              <div class={styles.cardIcon}>
-                                <span>{tool.icon}</span>
-                              </div>
-                              <div class={styles.cardStatus}>
-                                <span class={`${styles.statusLabel} ${DOT_CLASS[tool.type]}`}>
-                                  {STATUS_LABELS[tool.type]}
-                                </span>
-                              </div>
-                            </div>
-                            <div class={styles.cardName}>{tool.name}</div>
-                            <p class={styles.cardDesc}>{tool.desc}</p>
-                            <div class={styles.cardFooter}>
-                              <div class={styles.cardTags}>
-                                {tool.tags.split(' ').slice(0, 3).map(tag => (
-                                  <span class={styles.tag}>{tag}</span>
-                                ))}
-                              </div>
-                              <span class={styles.cardArrow} aria-hidden="true">
-                                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                  <path d="M3 8h10M8 3l5 5-5 5" />
-                                </svg>
-                              </span>
-                            </div>
-                          </a>
-                        ) : (
-                          <div class={`${styles.card} ${coming ? styles.cardComing : ''}`}>
-                            <div class={styles.cardTop}>
-                              <div class={styles.cardIcon}>
-                                <span>{tool.icon}</span>
-                              </div>
-                              <div class={styles.cardStatus}>
-                                <span class={`${styles.statusLabel} ${DOT_CLASS[tool.type]}`}>
-                                  {STATUS_LABELS[tool.type]}
-                                </span>
-                              </div>
-                            </div>
-                            <div class={styles.cardName}>{tool.name}</div>
-                            <p class={styles.cardDesc}>{tool.desc}</p>
-                            <div class={styles.cardFooter}>
-                              <div class={styles.cardTags}>
-                                {tool.tags.split(' ').slice(0, 3).map(tag => (
-                                  <span class={styles.tag}>{tag}</span>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
+                  {catTools.map(tool => <ToolCard tool={tool} />)}
                 </div>
               </div>
             ))}
           </div>
-          <div id="az-grid" class={styles.cardGrid} style="display: none;"></div>
+
+          <div id="flat-view" hidden>
+            <p class={styles.flatHead}>
+              <span id="flat-head-label"></span>
+              <button type="button" id="clear-filters" class={styles.clearFilters}>
+                Clear
+              </button>
+            </p>
+            <div id="flat-grid" class={styles.cardGrid}></div>
+          </div>
+
+          <div id="catalog-empty-state" class={styles.empty} hidden>
+            <div class={styles.emptyIcon}>🔍</div>
+            <h3>No tools found</h3>
+            <p>Try a different search or filter.</p>
+            <div class={styles.suggestList} id="empty-suggestions"></div>
+          </div>
         </div>
       </main>
     </div>
@@ -250,201 +179,314 @@ const jsonLdData = getToolsCollectionJsonLd();
 </Layout>
 
 <script>
-  function initCatalog() {
-    let activeQuery = '';
-    let activeCat = 'all';
-    let activeStatus: 'all' | 'open' | 'saas' | 'coming' = 'all';
-    let activeSort: 'default' | 'az' = 'default';
+  import { highlight, searchTools, suggestTools, type SearchResult } from '@/lib/tool-search';
+  import { CATEGORIES, STATUS_LABELS, TOOL_TYPES, type Category, type ToolType } from '@/lib/tools';
+  import styles from '@/styles/catalog.module.css';
 
-    const searchInput = (document.getElementById('tool-nav-search') || document.getElementById('search')) as HTMLInputElement | null;
-    const catButtons = document.querySelectorAll<HTMLButtonElement>('#cat-filters button');
-    const statusButtons = document.querySelectorAll<HTMLButtonElement>('#status-filters button');
-    const sortButtons = document.querySelectorAll<HTMLButtonElement>('#sort-filters button, button[data-sort]');
+  type SortMode = 'default' | 'az';
+
+  interface CatalogState {
+    q: string;
+    cat: Category | 'all';
+    status: ToolType | 'all';
+    sort: SortMode;
+  }
+
+  function readState(): CatalogState {
+    const params = new URLSearchParams(window.location.search);
+    const cat = params.get('cat');
+    const status = params.get('status');
+
+    return {
+      q: params.get('q') ?? '',
+      cat: CATEGORIES.includes(cat as Category) ? (cat as Category) : 'all',
+      status: TOOL_TYPES.includes(status as ToolType) ? (status as ToolType) : 'all',
+      sort: params.get('sort') === 'az' ? 'az' : 'default',
+    };
+  }
+
+  function queryView() {
+    const groupsContainer = document.getElementById('category-groups-container');
+    const flatView = document.getElementById('flat-view');
+    const flatGrid = document.getElementById('flat-grid');
+    const emptyState = document.getElementById('catalog-empty-state');
+
+    if (!groupsContainer || !flatView || !flatGrid || !emptyState) return null;
+    return { groupsContainer, flatView, flatGrid, emptyState };
+  }
+
+  function initCatalog() {
+    const input = document.getElementById('tool-nav-search') as HTMLInputElement | null;
+    const kbd = document.getElementById('tool-search-kbd');
+    const searchClearBtn = document.getElementById('tool-search-clear') as HTMLButtonElement | null;
+    const catButtons = document.querySelectorAll<HTMLButtonElement>('#cat-filters button[data-cat]');
+    const statusButtons = document.querySelectorAll<HTMLButtonElement>('#status-filters button[data-status]');
+    const sortButtons = document.querySelectorAll<HTMLButtonElement>('#sort-filters button[data-sort]');
     const resultCountEl = document.getElementById('result-count');
-    const contentArea = document.getElementById('content-area');
-    const categoryGroupsContainer = document.getElementById('category-groups-container');
-    const azGrid = document.getElementById('az-grid');
+    const flatLabel = document.getElementById('flat-head-label');
+    const clearFiltersBtn = document.getElementById('clear-filters');
+    const emptySuggestions = document.getElementById('empty-suggestions');
     const menuToggle = document.getElementById('menu-toggle-btn');
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebar-overlay');
 
-    // Sidebar Mobile Toggle
+    const view = queryView();
+    if (!view) return;
+    const { groupsContainer, flatView, flatGrid, emptyState } = view;
+
+    const cardOrder: string[] = [];
+    const cards = new Map<string, HTMLElement>();
+    const homeGrids = new Map<string, HTMLElement>();
+    const originals = new Map<HTMLElement, { name: string; desc: string }>();
+    const highlighted = new Set<HTMLElement>();
+
+    document.querySelectorAll<HTMLElement>('.tool-card-item').forEach(card => {
+      const key = card.dataset.key;
+      const parent = card.parentElement;
+      if (!key || !parent) return;
+      cardOrder.push(key);
+      cards.set(key, card);
+      homeGrids.set(key, parent);
+      originals.set(card, {
+        name: card.querySelector('[data-field="name"]')?.textContent ?? '',
+        desc: card.querySelector('[data-field="desc"]')?.textContent ?? '',
+      });
+    });
+
+    const categoryGroups = Array.from(document.querySelectorAll<HTMLElement>('.category-group'));
+
+    const state: CatalogState = readState();
+
+    function writeState() {
+      const params = new URLSearchParams();
+      if (state.q) params.set('q', state.q);
+      if (state.cat !== 'all') params.set('cat', state.cat);
+      if (state.status !== 'all') params.set('status', state.status);
+      if (state.sort !== 'default') params.set('sort', state.sort);
+
+      const query = params.toString();
+      window.history.replaceState(null, '', query ? `?${query}` : window.location.pathname);
+    }
+
+    function syncPressed(buttons: NodeListOf<HTMLButtonElement>, attr: string, value: string) {
+      buttons.forEach(btn => {
+        btn.setAttribute('aria-pressed', btn.dataset[attr] === value ? 'true' : 'false');
+      });
+    }
+
+    function resetHighlights() {
+      highlighted.forEach(card => {
+        const plain = originals.get(card);
+        if (!plain) return;
+        const name = card.querySelector<HTMLElement>('[data-field="name"]');
+        const desc = card.querySelector<HTMLElement>('[data-field="desc"]');
+        if (name) name.textContent = plain.name;
+        if (desc) desc.textContent = plain.desc;
+      });
+      highlighted.clear();
+    }
+
+    function paint(result: SearchResult, card: HTMLElement) {
+      const name = card.querySelector<HTMLElement>('[data-field="name"]');
+      const desc = card.querySelector<HTMLElement>('[data-field="desc"]');
+      if (result.nameRanges.length === 0 && result.descRanges.length === 0) return;
+      if (name) name.innerHTML = highlight(result.tool.name, result.nameRanges);
+      if (desc) desc.innerHTML = highlight(result.tool.desc, result.descRanges);
+      highlighted.add(card);
+    }
+
+    function escapeText(value: string): string {
+      const holder = document.createElement('span');
+      holder.textContent = value;
+      return holder.innerHTML;
+    }
+
+    function describe(count: number): string {
+      const noun = `tool${count === 1 ? '' : 's'}`;
+      const parts: string[] = [];
+
+      if (state.q) parts.push(`matching “${escapeText(state.q)}”`);
+      if (state.cat !== 'all') parts.push(`in ${escapeText(state.cat)}`);
+      if (state.status !== 'all') parts.push(STATUS_LABELS[state.status].toLowerCase());
+
+      return `<strong>${count}</strong> ${noun}${parts.length ? ` ${parts.join(' · ')}` : ''}`;
+    }
+
+    function renderSuggestions() {
+      if (!emptySuggestions) return;
+      emptySuggestions.replaceChildren();
+      if (!state.q) return;
+
+      suggestTools(state.q).forEach(tool => {
+        const link = document.createElement('a');
+        link.href = tool.url;
+        link.className = styles.suggestBtn;
+        link.textContent = `${tool.icon} ${tool.name}`;
+        emptySuggestions.appendChild(link);
+      });
+    }
+
+    function render() {
+      const results = searchTools(state.q, {
+        category: state.cat,
+        status: state.status,
+        sort: state.sort,
+      });
+
+      const visible = new Map(results.map(result => [result.tool.url, result]));
+      const grouped =
+        !state.q && state.cat === 'all' && state.status === 'all' && state.sort === 'default';
+
+      resetHighlights();
+
+      if (grouped) {
+        flatView.hidden = true;
+        groupsContainer.hidden = results.length === 0;
+
+        cardOrder.forEach(key => {
+          const card = cards.get(key);
+          const home = homeGrids.get(key);
+          if (!card || !home) return;
+          if (card.parentElement !== home) home.appendChild(card);
+          card.style.display = visible.has(key) ? '' : 'none';
+        });
+
+        categoryGroups.forEach(group => {
+          const hasVisible = Array.from(
+            group.querySelectorAll<HTMLElement>('.tool-card-item')
+          ).some(card => card.style.display !== 'none');
+          group.hidden = !hasVisible;
+        });
+      } else {
+        groupsContainer.hidden = true;
+        flatView.hidden = results.length === 0;
+        flatGrid.replaceChildren();
+
+        results.forEach(result => {
+          const card = cards.get(result.tool.url);
+          if (!card) return;
+          card.style.display = '';
+          paint(result, card);
+          flatGrid.appendChild(card);
+        });
+
+        if (flatLabel) flatLabel.innerHTML = describe(results.length);
+      }
+
+      emptyState.hidden = results.length > 0;
+      if (results.length === 0) renderSuggestions();
+
+      if (resultCountEl) {
+        resultCountEl.innerHTML = `<strong>${results.length}</strong> tool${results.length === 1 ? '' : 's'}`;
+      }
+
+      if (searchClearBtn && kbd) {
+        const hasQuery = state.q.length > 0;
+        searchClearBtn.style.display = hasQuery ? 'inline-flex' : 'none';
+        kbd.style.display = hasQuery ? 'none' : '';
+      }
+
+      syncPressed(catButtons, 'cat', state.cat);
+      syncPressed(statusButtons, 'status', state.status);
+      syncPressed(sortButtons, 'sort', state.sort);
+    }
+
+    function update(patch: Partial<CatalogState>) {
+      Object.assign(state, patch);
+      writeState();
+      render();
+    }
+
+    function setQuery(value: string) {
+      if (input) input.value = value;
+      update({ q: value });
+    }
+
+    // Sidebar mobile toggle
     if (menuToggle && sidebar && overlay) {
       menuToggle.onclick = () => {
-        sidebar.classList.toggle('styles_sidebarOpen');
-        sidebar.classList.toggle('open');
-        overlay.classList.toggle('show');
+        sidebar.classList.toggle(styles.sidebarOpen);
+        overlay.classList.toggle(styles.sidebarOverlayShow);
       };
       overlay.onclick = () => {
-        sidebar.classList.remove('styles_sidebarOpen', 'open');
-        overlay.classList.remove('show');
+        sidebar.classList.remove(styles.sidebarOpen);
+        overlay.classList.remove(styles.sidebarOverlayShow);
       };
     }
 
-    // Keyboard shortcut "/"
-    window.addEventListener('keydown', (event) => {
+    if (input) {
+      input.value = state.q;
+      input.addEventListener('input', () => update({ q: input.value }));
+      input.addEventListener('keydown', event => {
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          setQuery('');
+        }
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          const top = searchTools(state.q, {
+            category: state.cat,
+            status: state.status,
+            sort: state.sort,
+            limit: 1,
+          })[0];
+          if (state.q && top) window.location.href = top.tool.url;
+        }
+      });
+    }
+
+    searchClearBtn?.addEventListener('click', event => {
+      event.preventDefault();
+      setQuery('');
+      input?.focus();
+    });
+
+    window.addEventListener('keydown', event => {
       const target = event.target as HTMLElement | null;
-      const isEditable = !!target && (
-        target.isContentEditable ||
-        ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)
-      );
+      const isEditable =
+        !!target &&
+        (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName));
 
       if (event.key === '/' && !event.metaKey && !event.ctrlKey && !event.altKey && !isEditable) {
         event.preventDefault();
-        searchInput?.focus();
-        searchInput?.select();
+        input?.focus();
+        input?.select();
       }
     });
 
-    // Tool Cards and Category structures
-    const cardItems = Array.from(document.querySelectorAll<HTMLElement>('.tool-card-item'));
-    const categoryGroups = Array.from(document.querySelectorAll<HTMLElement>('.category-group'));
-    const categoryGrids = new Map<string, HTMLElement>();
-    const defaultCategoryCards = new Map<string, HTMLElement[]>();
-
-    categoryGroups.forEach(group => {
-      const cat = group.dataset.groupCat || '';
-      const grid = group.querySelector<HTMLElement>('.card-grid-container');
-      if (cat && grid) {
-        categoryGrids.set(cat, grid);
-        defaultCategoryCards.set(cat, Array.from(grid.querySelectorAll<HTMLElement>('.tool-card-item')));
-      }
-    });
-
-    function applyFilters() {
-      const q = activeQuery.toLowerCase().trim();
-      const visibleCards: HTMLElement[] = [];
-      const visibleNames = new Set<string>();
-
-      cardItems.forEach(card => {
-        const name = (card.dataset.name || '').toLowerCase();
-        const desc = (card.dataset.desc || '').toLowerCase();
-        const tags = (card.dataset.tags || '').toLowerCase();
-        const cat = card.dataset.cat || '';
-        const type = card.dataset.type || '';
-
-        const matchesCat = activeCat === 'all' || cat === activeCat;
-        const matchesStatus = activeStatus === 'all' || type === activeStatus;
-        const matchesQuery = !q || name.includes(q) || desc.includes(q) || tags.includes(q) || cat.toLowerCase().includes(q);
-
-        if (matchesCat && matchesStatus && matchesQuery) {
-          visibleCards.push(card);
-          visibleNames.add(card.dataset.name || '');
-        }
-      });
-
-      const visibleCount = visibleCards.length;
-
-      if (activeSort === 'az' && activeCat === 'all') {
-        if (categoryGroupsContainer) categoryGroupsContainer.style.display = 'none';
-        if (azGrid) {
-          azGrid.style.display = visibleCount > 0 ? '' : 'none';
-          const azSorted = [...visibleCards].sort((a, b) =>
-            (a.dataset.name || '').localeCompare(b.dataset.name || '')
-          );
-          azSorted.forEach(card => {
-            card.style.display = '';
-            azGrid.appendChild(card);
-          });
-        }
-      } else {
-        if (azGrid) azGrid.style.display = 'none';
-        if (categoryGroupsContainer) categoryGroupsContainer.style.display = '';
-
-        categoryGroups.forEach(group => {
-          const cat = group.dataset.groupCat || '';
-          const grid = categoryGrids.get(cat);
-          const originalCards = defaultCategoryCards.get(cat) || [];
-
-          if (activeCat !== 'all' && activeCat !== cat) {
-            group.style.display = 'none';
-          } else {
-            let cardsToAppend = originalCards;
-            if (activeSort === 'az') {
-              cardsToAppend = [...originalCards].sort((a, b) =>
-                (a.dataset.name || '').localeCompare(b.dataset.name || '')
-              );
-            }
-            let hasVisible = false;
-            cardsToAppend.forEach(card => {
-              grid?.appendChild(card);
-              const isVisible = visibleNames.has(card.dataset.name || '');
-              card.style.display = isVisible ? '' : 'none';
-              if (isVisible) hasVisible = true;
-            });
-            group.style.display = hasVisible ? '' : 'none';
-          }
-        });
-      }
-
-      if (resultCountEl) {
-        resultCountEl.innerHTML = `<strong>${visibleCount}</strong> tool${visibleCount !== 1 ? 's' : ''}`;
-      }
-
-      // Empty state
-      let emptyEl = document.getElementById('catalog-empty-state');
-      if (visibleCount === 0) {
-        if (!emptyEl && contentArea) {
-          emptyEl = document.createElement('div');
-          emptyEl.id = 'catalog-empty-state';
-          emptyEl.style.padding = '4rem 1rem';
-          emptyEl.style.textAlign = 'center';
-          emptyEl.style.color = 'var(--text-muted)';
-          emptyEl.innerHTML = `
-            <div style="font-size: 2.5rem; margin-bottom: 1rem;">🔍</div>
-            <h3 style="font-size: 1.25rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">No tools found</h3>
-            <p>Try a different search or filter.</p>
-          `;
-          contentArea.appendChild(emptyEl);
-        }
-      } else if (emptyEl) {
-        emptyEl.remove();
-      }
-    }
-
-    // Search event
-    searchInput?.addEventListener('input', (e) => {
-      activeQuery = (e.target as HTMLInputElement).value;
-      applyFilters();
-    });
-
-    searchInput?.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        searchInput.value = '';
-        activeQuery = '';
-        applyFilters();
-      }
-    });
-
-    // Category button events
     catButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        catButtons.forEach(b => b.setAttribute('aria-pressed', 'false'));
-        btn.setAttribute('aria-pressed', 'true');
-        activeCat = btn.dataset.cat || 'all';
-        applyFilters();
-      });
+      btn.addEventListener('click', () => update({ cat: (btn.dataset.cat ?? 'all') as Category | 'all' }));
     });
 
-    // Status button events
     statusButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        statusButtons.forEach(b => b.setAttribute('aria-pressed', 'false'));
-        btn.setAttribute('aria-pressed', 'true');
-        activeStatus = (btn.dataset.status || 'all') as any;
-        applyFilters();
-      });
+      btn.addEventListener('click', () => update({ status: (btn.dataset.status ?? 'all') as ToolType | 'all' }));
     });
 
-    // Sort button events
     sortButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        sortButtons.forEach(b => b.setAttribute('aria-pressed', 'false'));
-        btn.setAttribute('aria-pressed', 'true');
-        activeSort = (btn.dataset.sort || 'default') as any;
-        applyFilters();
-      });
+      btn.addEventListener('click', () => update({ sort: btn.dataset.sort === 'az' ? 'az' : 'default' }));
     });
+
+    clearFiltersBtn?.addEventListener('click', () => {
+      if (input) input.value = '';
+      update({ q: '', cat: 'all', status: 'all', sort: 'default' });
+    });
+
+    // Card chips: category chip filters, tag chip searches
+    document.addEventListener('click', event => {
+      const chip = (event.target as HTMLElement | null)?.closest<HTMLElement>('[data-filter-cat], [data-filter-tag]');
+      if (!chip) return;
+
+      event.preventDefault();
+      const cat = chip.dataset.filterCat;
+      const tag = chip.dataset.filterTag;
+
+      if (cat) update({ cat: cat as Category });
+      else if (tag) setQuery(tag);
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    render();
   }
 
   initCatalog();

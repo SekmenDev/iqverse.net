@@ -1,52 +1,145 @@
 import { describe, it, expect } from 'vitest';
-import { tools, filterTools, sortTools } from '@/lib/tools';
+import {
+  CATEGORIES,
+  countByCategory,
+  countByStatus,
+  getUniqueCategories,
+  getUniqueStatuses,
+  groupByPrimaryCategory,
+  isExternalUrl,
+  matchesFilters,
+  primaryCategory,
+  sortTools,
+  tools,
+  TOOL_TYPES,
+  type Tool,
+} from '@/lib/tools';
 
-describe('lib/tools.ts - Tools Registry Integrity', () => {
-  it('should contain a list of registered tools', () => {
+function stub(overrides: Partial<Tool> = {}): Tool {
+  return {
+    name: 'Stub',
+    desc: 'Stub description',
+    icon: '🔧',
+    url: '/stub/',
+    type: 'open',
+    tags: 'stub',
+    cats: ['Security'],
+    ...overrides,
+  };
+}
+
+describe('lib/tools.ts - registry integrity', () => {
+  it('contains registered tools', () => {
     expect(tools.length).toBeGreaterThan(0);
   });
 
-  it('every tool should have required properties (name, desc, icon, url, type, tags, cat)', () => {
-    tools.forEach((tool) => {
+  it('gives every tool the required properties', () => {
+    tools.forEach(tool => {
       expect(tool.name).toBeTruthy();
       expect(tool.desc).toBeTruthy();
+      expect(tool.icon).toBeTruthy();
       expect(tool.type).toMatch(/^(open|saas|coming)$/);
-      expect(tool.cat).toBeTruthy();
+      expect(tool.tags).toBeTruthy();
     });
   });
 
-  it('open tools should specify valid page routes or external links', () => {
-    const openTools = tools.filter((t) => t.type === 'open');
+  it('gives every tool at least one known category with no duplicates', () => {
+    tools.forEach(tool => {
+      expect(tool.cats.length).toBeGreaterThan(0);
+      expect(new Set(tool.cats).size).toBe(tool.cats.length);
+      tool.cats.forEach(cat => expect(CATEGORIES).toContain(cat));
+    });
+  });
+
+  it('keeps tool urls unique so they work as registry keys', () => {
+    const urls = tools.map(t => t.url);
+    expect(new Set(urls).size).toBe(urls.length);
+  });
+
+  it('points open tools at valid page routes or external links', () => {
+    const openTools = tools.filter(t => t.type === 'open');
     expect(openTools.length).toBeGreaterThan(0);
-    openTools.forEach((tool) => {
+    openTools.forEach(tool => {
       expect(tool.url).toMatch(/^(\/[a-z0-9_-]+\/|https?:\/\/.+)$/i);
     });
   });
 
-  it('filterTools should match query against name, desc, tags, and cat case-insensitively', () => {
-    const qrResults = filterTools('qr', 'all', 'all');
-    expect(qrResults.length).toBeGreaterThan(0);
-    expect(qrResults.some((t: any) => t.name.toLowerCase().includes('qr'))).toBe(true);
+  it('exposes multi-category tools', () => {
+    expect(tools.some(t => t.cats.length > 1)).toBe(true);
+  });
+});
 
-    const jsonResults = filterTools('JSON', 'all', 'all');
-    expect(jsonResults.length).toBeGreaterThan(0);
-    expect(jsonResults.some((t: any) => t.name.toLowerCase().includes('json'))).toBe(true);
-
-    const nonExistent = filterTools('xyz999nonexistentquery', 'all', 'all');
-    expect(nonExistent.length).toBe(0);
+describe('lib/tools.ts - helpers', () => {
+  it('treats the first category as primary', () => {
+    expect(primaryCategory(stub({ cats: ['Network', 'Security'] }))).toBe('Network');
   });
 
-  it('sortTools should sort tools alphabetically when sortBy is az and preserve order when default', () => {
-    const sample = [
-      { name: 'Zebra', desc: '', icon: '', url: '', type: 'open' as const, tags: '', cat: 'Security' },
-      { name: 'Apple', desc: '', icon: '', url: '', type: 'open' as const, tags: '', cat: 'Security' },
-      { name: 'Mango', desc: '', icon: '', url: '', type: 'open' as const, tags: '', cat: 'Security' },
-    ];
+  it('lists every used category once, prefixed with all', () => {
+    const categories = getUniqueCategories();
+    expect(categories[0]).toBe('all');
+    expect(new Set(categories).size).toBe(categories.length);
+    categories.slice(1).forEach(cat => expect(CATEGORIES).toContain(cat));
+  });
 
-    const defaultSorted = sortTools(sample, 'default');
-    expect(defaultSorted.map(s => s.name)).toEqual(['Zebra', 'Apple', 'Mango']);
+  it('lists only statuses that have tools, prefixed with all', () => {
+    const statuses = getUniqueStatuses();
+    const counts = countByStatus();
 
-    const azSorted = sortTools(sample, 'az');
-    expect(azSorted.map(s => s.name)).toEqual(['Apple', 'Mango', 'Zebra']);
+    expect(statuses[0]).toBe('all');
+    statuses.slice(1).forEach(status => expect(counts[status]).toBeGreaterThan(0));
+    TOOL_TYPES.filter(s => counts[s] === 0).forEach(s => expect(statuses).not.toContain(s));
+  });
+
+  it('counts a tool under every category it declares', () => {
+    const counts = countByCategory();
+    expect(counts.all).toBe(tools.length);
+
+    const total = CATEGORIES.reduce((sum, cat) => sum + counts[cat], 0);
+    const declared = tools.reduce((sum, tool) => sum + tool.cats.length, 0);
+    expect(total).toBe(declared);
+    expect(total).toBeGreaterThan(tools.length);
+  });
+
+  it('counts each tool under exactly one status', () => {
+    const counts = countByStatus();
+    expect(counts.open + counts.saas + counts.coming).toBe(tools.length);
+  });
+
+  it('groups every tool under its primary category exactly once', () => {
+    const groups = groupByPrimaryCategory();
+    const grouped = groups.flatMap(g => g.tools);
+    expect(grouped).toHaveLength(tools.length);
+
+    groups.forEach(group => {
+      group.tools.forEach(tool => expect(primaryCategory(tool)).toBe(group.category));
+    });
+  });
+
+  it('matches a tool on any of its categories, not just the primary', () => {
+    const tool = stub({ cats: ['Security', 'Network'] });
+    expect(matchesFilters(tool, 'Security', 'all')).toBe(true);
+    expect(matchesFilters(tool, 'Network', 'all')).toBe(true);
+    expect(matchesFilters(tool, 'Design', 'all')).toBe(false);
+    expect(matchesFilters(tool, 'all', 'open')).toBe(true);
+    expect(matchesFilters(tool, 'all', 'saas')).toBe(false);
+  });
+
+  it('sorts alphabetically on az and preserves order on default', () => {
+    const sample = [stub({ name: 'Zebra' }), stub({ name: 'Apple' }), stub({ name: 'Mango' })];
+
+    expect(sortTools(sample, 'default').map(s => s.name)).toEqual(['Zebra', 'Apple', 'Mango']);
+    expect(sortTools(sample, 'az').map(s => s.name)).toEqual(['Apple', 'Mango', 'Zebra']);
+  });
+
+  it('does not mutate the input when sorting', () => {
+    const sample = [stub({ name: 'Zebra' }), stub({ name: 'Apple' })];
+    sortTools(sample, 'az');
+    expect(sample.map(s => s.name)).toEqual(['Zebra', 'Apple']);
+  });
+
+  it('detects external urls', () => {
+    expect(isExternalUrl('https://github.com/foo')).toBe(true);
+    expect(isExternalUrl('mailto:a@b.co')).toBe(true);
+    expect(isExternalUrl('/json/')).toBe(false);
   });
 });

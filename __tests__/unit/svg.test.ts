@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { optimizeSvgCode, calculateSvgSavings } from '@/lib/svg';
 
 describe('SVG Optimizer Engine (lib/svg)', () => {
-  it('removes XML prolog, doctype, comments, and extra whitespace', () => {
+  it('removes XML prolog, doctype, comments and extra whitespace', () => {
     const rawSvg = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <!-- Generator: Adobe Illustrator -->

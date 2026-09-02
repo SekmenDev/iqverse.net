@@ -15,17 +15,17 @@ const METHODOLOGY_ITEMS = [
   {
     icon: "🔒",
     title: "1. Security & Protocol Baseline",
-    desc: "Checks for strict HTTPS encryption, clean HTTP 200 responses, HSTS enforcement, and essential MIME and clickjacking security headers.",
+    desc: "Checks for strict HTTPS encryption, clean HTTP 200 responses, HSTS enforcement and essential MIME and clickjacking security headers.",
   },
   {
     icon: "📄",
     title: "2. Document & SEO Essentials",
-    desc: "Validates crucial HTML head tags: accurate <title>, meta descriptions, responsive <meta viewport>, character encoding, canonical URLs, and favicons.",
+    desc: "Validates crucial HTML head tags: accurate <title>, meta descriptions, responsive <meta viewport>, character encoding, canonical URLs and favicons.",
   },
   {
     icon: "🏗️",
     title: "3. Semantic DOM & Accessibility",
-    desc: "Audits page structure for a single authoritative <h1> heading, semantic HTML5 landmarks (<header>, <main>, <footer>), and image alt accessibility.",
+    desc: "Audits page structure for a single authoritative <h1> heading, semantic HTML5 landmarks (<header>, <main>, <footer>) and image alt accessibility.",
   },
   {
     icon: "🏷️",
@@ -42,15 +42,15 @@ const METHODOLOGY_ITEMS = [
 const FAQS = [
   {
     q: "What is the Website Baseline Checker and why was it created?",
-    a: "The Website Baseline Checker functions like an OWASP checklist for baseline website hygiene. It systematically verifies all core requirements that every modern website must implement — from SSL and viewport configuration to semantic landmarks, Schema markup, robots.txt, and sitemaps.",
+    a: "The Website Baseline Checker functions like an OWASP checklist for baseline website hygiene. It systematically verifies all core requirements that every modern website must implement — from SSL and viewport configuration to semantic landmarks, Schema markup, robots.txt and sitemaps.",
   },
   {
     q: "Why is having exactly one <h1> heading important?",
-    a: "The <h1> tag represents the primary topic of the document. Having exactly one <h1> provides a clear semantic anchor for screen readers, search engine indexers, and AI summarizers.",
+    a: "The <h1> tag represents the primary topic of the document. Having exactly one <h1> provides a clear semantic anchor for screen readers, search engine indexers and AI summarizers.",
   },
   {
     q: "How does the Baseline Score calculation work?",
-    a: "The audit evaluates 30 core checks categorized into 5 functional areas. Each check has a severity weight (Critical, High, Medium, Low). Passing checks receive 100% of their weight, warnings receive 40%, and failing checks receive 0%. The composite score produces letter grades from A+ (90+) down to F (<50).",
+    a: "The audit evaluates 30 core checks categorized into 5 functional areas. Each check has a severity weight (Critical, High, Medium, Low). Passing checks receive 100% of their weight, warnings receive 40% and failing checks receive 0%. The composite score produces letter grades from A+ (90+) down to F (<50).",
   },
   {
     q: "Can I export or share the audit findings?",
@@ -64,7 +64,7 @@ const FAQS = [
   subtitle="Website Standards, SEO & Hygiene Auditor"
   pill="BROWSER TOOLS"
   toolSlug="web-baseline"
-  description="Audit any website against core web standards and baseline hygiene: HTTPS, favicon, title, viewport, H1, header, footer, schema, robots.txt, sitemap.xml, and security headers."
+  description="Audit any website against core web standards and baseline hygiene: HTTPS, favicon, title, viewport, H1, header, footer, schema, robots.txt, sitemap.xml and security headers."
 >
   <div class={styles.baselineContainer}>
     <!-- Scanner Form Card -->
@@ -129,7 +129,7 @@ const FAQS = [
       <div class={styles.loadingSpinner}></div>
       <div style="font-weight: 600;">Auditing Website Baseline Standards...</div>
       <div style="font-size: 0.85rem; color: var(--text-muted);">
-        Inspecting HTTPS, headers, head metadata, DOM landmarks, robots.txt, and sitemaps...
+        Inspecting HTTPS, headers, head metadata, DOM landmarks, robots.txt and sitemaps...
       </div>
     </div>
 
@@ -220,7 +220,7 @@ const FAQS = [
         <span class={styles.sectionBadge}>Standards Framework</span>
         <h2 class={styles.sectionTitle}>The Core Website Baseline Standards</h2>
         <p class={styles.sectionSub}>
-          Just as the OWASP ASVS establishes baseline security criteria, modern web applications require a foundational baseline for crawlability, accessibility, document structure, and transport integrity.
+          Just as the OWASP ASVS establishes baseline security criteria, modern web applications require a foundational baseline for crawlability, accessibility, document structure and transport integrity.
         </p>
       </div>
 

@@ -1,0 +1,95 @@
+---
+import {
+  CATEGORY_ICONS,
+  STATUS_LABELS,
+  isExternalUrl,
+  primaryCategory,
+  type Tool,
+  type ToolType,
+} from '@/lib/tools';
+import styles from '@/styles/catalog.module.css';
+
+export interface Props {
+  tool: Tool;
+}
+
+const { tool } = Astro.props;
+
+const DOT_CLASS: Record<ToolType, string> = {
+  open: styles.dotOpen,
+  saas: styles.dotSaas,
+  coming: styles.dotComing,
+};
+
+const coming = tool.type === 'coming';
+const href = coming ? '' : tool.url;
+const external = !!href && isExternalUrl(href);
+const category = primaryCategory(tool);
+const tags = tool.tags.split(' ').filter(Boolean).slice(0, 3);
+---
+
+<div
+  class={`tool-card-item ${styles.cardLink}`}
+  data-key={tool.url}
+  data-name={tool.name}
+  data-cats={tool.cats.join('|')}
+  data-type={tool.type}
+>
+  <div class={`${styles.card} ${coming ? styles.cardComing : ''}`}>
+    <div class={styles.cardTop}>
+      <div class={styles.cardIcon}>
+        <span>{tool.icon}</span>
+      </div>
+      <div class={styles.cardStatus}>
+        <span class={`${styles.statusLabel} ${DOT_CLASS[tool.type]}`}>
+          {STATUS_LABELS[tool.type]}
+        </span>
+      </div>
+    </div>
+
+    {href ? (
+      <a
+        class={`${styles.cardName} ${styles.cardNameLink}`}
+        data-field="name"
+        href={href}
+        {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+      >
+        {tool.name}
+      </a>
+    ) : (
+      <div class={styles.cardName} data-field="name">{tool.name}</div>
+    )}
+
+    <p class={styles.cardDesc} data-field="desc">{tool.desc}</p>
+
+    <div class={styles.cardFooter}>
+      <div class={styles.cardTags}>
+        <button
+          type="button"
+          class={`${styles.tag} ${styles.catTag}`}
+          data-filter-cat={category}
+          title={`Filter by ${category}`}
+        >
+          {CATEGORY_ICONS[category]} {category}
+        </button>
+        {tags.map(tag => (
+          <button
+            type="button"
+            class={styles.tag}
+            data-filter-tag={tag}
+            title={`Search for ${tag}`}
+          >
+            {tag}
+          </button>
+        ))}
+      </div>
+      {href && (
+        <span class={styles.cardArrow} aria-hidden="true">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 8h10M8 3l5 5-5 5" />
+          </svg>
+        </span>
+      )}
+    </div>
+  </div>
+</div>

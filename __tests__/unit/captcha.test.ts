@@ -165,7 +165,7 @@ describe('CapCaptcha utilities & bindings', () => {
   });
 
   describe('validateCaptcha', () => {
-    it('fails validation, applies cap-invalid class, and displays error when token is missing and captcha is loaded', () => {
+    it('fails validation, applies cap-invalid class and displays error when token is missing and captcha is loaded', () => {
       const form = document.createElement('form');
       const wrap = document.createElement('div');
       wrap.className = 'cap-captcha-wrap';
@@ -230,7 +230,7 @@ describe('CapCaptcha utilities & bindings', () => {
       expect(errorEl.textContent).toBe(CAPTCHA_MSG_ERROR);
     });
 
-    it('passes validation, cleans up error state, and returns token when solved', () => {
+    it('passes validation, cleans up error state and returns token when solved', () => {
       const form = document.createElement('form');
       const wrap = document.createElement('div');
       wrap.className = 'cap-captcha-wrap cap-invalid';

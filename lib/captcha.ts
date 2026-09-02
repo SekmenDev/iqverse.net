@@ -32,13 +32,13 @@ export interface CapCaptchaOptions {
 }
 
 export const CAPTCHA_MSG_UNSOLVED = '⚠️ Please complete the CAPTCHA challenge before proceeding.';
-export const CAPTCHA_MSG_NOT_LOADED = '⚠️ Security verification failed to load. Please disable ad blockers, check your network connection, and reload the page.';
+export const CAPTCHA_MSG_NOT_LOADED = '⚠️ Security verification failed to load. Please disable ad blockers, check your network connection and reload the page.';
 export const CAPTCHA_MSG_ERROR = '⚠️ CAPTCHA verification encountered an error. Please try again or reload the page.';
 
 export type CaptchaValidationReason = 'unsolved' | 'not_loaded' | 'error';
 
 /**
- * Checks whether a cap-widget custom element is loaded, registered, and ready.
+ * Checks whether a cap-widget custom element is loaded, registered and ready.
  */
 export function isCaptchaLoaded(
   containerOrWidget: HTMLElement | null | undefined

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { calculateSpriteSheet } from '@/lib/sprite';
 
 describe('Sprite Generator Engine (lib/sprite)', () => {
-  it('calculates grid coordinates, canvas dimension, and CSS mappings', () => {
+  it('calculates grid coordinates, canvas dimension and CSS mappings', () => {
     const iconNames = ['home', 'user', 'settings', 'search', 'mail'];
     const sheet = calculateSpriteSheet(iconNames, 32, 8, 3);
 

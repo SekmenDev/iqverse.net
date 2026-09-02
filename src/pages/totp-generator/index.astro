@@ -1,0 +1,394 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+import { TOTP_ALGORITHMS } from '@/lib/totp';
+---
+
+<ToolLayout
+  title="TOTP Authenticator Code Generator"
+  subtitle="Generate & Verify RFC 6238 Two-Factor Codes"
+  pill="SECURITY"
+  toolSlug="totp-generator"
+  description="Generate time-based one-time passwords from a base32 secret or otpauth URI, watch the countdown, and produce an enrollment QR code. Everything runs locally in your browser."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.errorCard} style="margin-bottom: 20px;">
+        <strong>Use test secrets here, not your real ones.</strong>
+        This page never sends anything to a server, but a shared authenticator secret pasted into any
+        browser tab is a secret you should rotate.
+      </div>
+
+      <div class={sharedStyles.card}>
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="secretInput">
+            Base32 secret or otpauth:// URI
+          </label>
+          <input
+            id="secretInput"
+            type="text"
+            class={sharedStyles.input}
+            style="font-family: monospace;"
+            placeholder="JBSWY3DPEHPK3PXP"
+            autocomplete="off"
+            spellcheck="false"
+            value="JBSWY3DPEHPK3PXP"
+          />
+        </div>
+
+        <div class={sharedStyles.buttonGroup} style="flex-wrap: wrap;">
+          <button type="button" id="btn-random" class={sharedStyles.button}>Random secret</button>
+          <button type="button" id="btn-copy-secret" class={sharedStyles.button}>Copy secret</button>
+        </div>
+
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px;">
+          <label style="font-size: 0.78rem; display: flex; flex-direction: column; gap: 4px;">
+            Algorithm
+            <select id="algorithmSelect" class={sharedStyles.select} style="padding: 6px 10px;">
+              {TOTP_ALGORITHMS.map(algorithm => (
+                <option value={algorithm}>{algorithm}</option>
+              ))}
+            </select>
+          </label>
+          <label style="font-size: 0.78rem; display: flex; flex-direction: column; gap: 4px;">
+            Digits
+            <select id="digitsSelect" class={sharedStyles.select} style="padding: 6px 10px;">
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+            </select>
+          </label>
+          <label style="font-size: 0.78rem; display: flex; flex-direction: column; gap: 4px;">
+            Period (seconds)
+            <select id="periodSelect" class={sharedStyles.select} style="padding: 6px 10px;">
+              <option value="30">30</option>
+              <option value="60">60</option>
+            </select>
+          </label>
+        </div>
+
+        <div id="totp-error" class={sharedStyles.errorMessage} style="display: none; margin-top: 12px;"></div>
+      </div>
+
+      <div id="code-card" class={sharedStyles.card} style="margin-top: 20px;">
+        <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 220px;">
+            <div style="font-size: 0.72rem; opacity: 0.7; margin-bottom: 6px;">Current code</div>
+            <div
+              id="current-code"
+              style="font-family: monospace; font-size: 2.6rem; font-weight: 700; letter-spacing: 0.12em; color: var(--accent);"
+            >------</div>
+            <div id="next-code" style="font-size: 0.8rem; opacity: 0.7; margin-top: 6px; font-family: monospace;"></div>
+          </div>
+
+          <div style="flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+            <svg width="72" height="72" viewBox="0 0 40 40" aria-hidden="true">
+              <circle cx="20" cy="20" r="17" fill="none" stroke="var(--border)" stroke-width="4" />
+              <circle
+                id="countdown-ring"
+                cx="20"
+                cy="20"
+                r="17"
+                fill="none"
+                stroke="var(--accent)"
+                stroke-width="4"
+                stroke-linecap="round"
+                transform="rotate(-90 20 20)"
+              />
+            </svg>
+            <span id="countdown-label" style="font-family: monospace; font-size: 0.85rem;">30s</span>
+          </div>
+
+          <button type="button" id="btn-copy-code" class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}>
+            Copy code
+          </button>
+        </div>
+      </div>
+
+      <div class={sharedStyles.card} style="margin-top: 20px;">
+        <h3 style="margin: 0 0 16px 0; font-size: 1.1rem;">Enrollment QR code</h3>
+
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;">
+          <div class={sharedStyles.field} style="flex: 1; min-width: 160px; margin: 0;">
+            <label class={sharedStyles.fieldLabel} for="issuerInput">Issuer</label>
+            <input id="issuerInput" type="text" class={sharedStyles.input} value="IQVerse" autocomplete="off" />
+          </div>
+          <div class={sharedStyles.field} style="flex: 1; min-width: 160px; margin: 0;">
+            <label class={sharedStyles.fieldLabel} for="accountInput">Account</label>
+            <input id="accountInput" type="text" class={sharedStyles.input} value="test@example.com" autocomplete="off" />
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
+          <div id="qr-target" style="flex: 0 0 auto; padding: 12px; background: #ffffff; border-radius: 8px;"></div>
+          <div style="flex: 1; min-width: 240px;">
+            <div style="font-size: 0.72rem; opacity: 0.7; margin-bottom: 6px;">otpauth URI</div>
+            <pre
+              id="uri-output"
+              class={sharedStyles.outputArea}
+              style="font-family: monospace; font-size: 0.75rem; white-space: pre-wrap; word-break: break-all; margin: 0;"
+            ></pre>
+            <button type="button" id="btn-copy-uri" class={sharedStyles.button} style="margin-top: 12px;">
+              Copy URI
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class={sharedStyles.card} style="margin-top: 20px;">
+        <h3 style="margin: 0 0 16px 0; font-size: 1.1rem;">Verify a code</h3>
+
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="verifyInput">
+            Code from an authenticator app
+          </label>
+          <input
+            id="verifyInput"
+            type="text"
+            class={sharedStyles.input}
+            style="font-family: monospace;"
+            inputmode="numeric"
+            autocomplete="off"
+            placeholder="123456"
+          />
+        </div>
+
+        <div id="verify-result" style="font-size: 0.85rem; font-weight: 600;"></div>
+        <p style="font-size: 0.78rem; opacity: 0.7; margin: 10px 0 0 0;">
+          Checks the previous, current and next window, the same one-step drift most servers allow.
+        </p>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  import {
+    buildOtpAuthUri,
+    counterForTime,
+    generateHotp,
+    generateSecret,
+    isTotpAlgorithm,
+    isValidSecret,
+    parseOtpAuthUri,
+    secondsRemaining,
+    type TotpAlgorithm,
+    type TotpOptions,
+  } from '@/lib/totp';
+
+  const secretInput = document.getElementById('secretInput') as HTMLInputElement | null;
+  const algorithmSelect = document.getElementById('algorithmSelect') as HTMLSelectElement | null;
+  const digitsSelect = document.getElementById('digitsSelect') as HTMLSelectElement | null;
+  const periodSelect = document.getElementById('periodSelect') as HTMLSelectElement | null;
+  const issuerInput = document.getElementById('issuerInput') as HTMLInputElement | null;
+  const accountInput = document.getElementById('accountInput') as HTMLInputElement | null;
+  const verifyInput = document.getElementById('verifyInput') as HTMLInputElement | null;
+  const currentCode = document.getElementById('current-code');
+  const nextCode = document.getElementById('next-code');
+  const countdownRing = document.getElementById('countdown-ring');
+  const countdownLabel = document.getElementById('countdown-label');
+  const errorBox = document.getElementById('totp-error');
+  const uriOutput = document.getElementById('uri-output');
+  const qrTarget = document.getElementById('qr-target');
+  const verifyResult = document.getElementById('verify-result');
+
+  const RING_CIRCUMFERENCE = 2 * Math.PI * 17;
+
+  function currentOptions(): TotpOptions {
+    const algorithm = algorithmSelect?.value ?? 'SHA1';
+
+    return {
+      algorithm: isTotpAlgorithm(algorithm) ? (algorithm.toUpperCase() as TotpAlgorithm) : 'SHA1',
+      digits: Number(digitsSelect?.value ?? 6),
+      period: Number(periodSelect?.value ?? 30),
+    };
+  }
+
+  function cleanSecret(): string {
+    return (secretInput?.value ?? '').replace(/[\s-]/g, '').toUpperCase();
+  }
+
+  function showError(message: string) {
+    if (!errorBox) return;
+    errorBox.textContent = message;
+    errorBox.style.display = 'block';
+  }
+
+  async function renderQr(uri: string) {
+    if (!qrTarget) return;
+
+    try {
+      const { default: QRCodeStyling } = await import('qr-code-styling');
+      qrTarget.replaceChildren();
+
+      const qr = new QRCodeStyling({
+        width: 180,
+        height: 180,
+        data: uri,
+        margin: 0,
+        dotsOptions: { color: '#000000', type: 'square' },
+        backgroundOptions: { color: '#ffffff' },
+      });
+
+      qr.append(qrTarget);
+    } catch {
+      qrTarget.textContent = 'QR rendering unavailable.';
+    }
+  }
+
+  let lastUri = '';
+
+  async function renderUri() {
+    const secret = cleanSecret();
+    if (!isValidSecret(secret) || !uriOutput) return;
+
+    const options = currentOptions();
+    const uri = buildOtpAuthUri({
+      issuer: issuerInput?.value.trim() ?? '',
+      account: accountInput?.value.trim() ?? '',
+      secret,
+      algorithm: options.algorithm,
+      digits: options.digits,
+      period: options.period,
+    });
+
+    uriOutput.textContent = uri;
+
+    if (uri !== lastUri) {
+      lastUri = uri;
+      await renderQr(uri);
+    }
+  }
+
+  async function verify() {
+    if (!verifyResult || !verifyInput) return;
+
+    const entered = verifyInput.value.trim();
+    if (!entered) {
+      verifyResult.textContent = '';
+      return;
+    }
+
+    const secret = cleanSecret();
+    if (!isValidSecret(secret)) return;
+
+    const options = currentOptions();
+    const counter = counterForTime(Date.now(), options.period);
+
+    const codes = await Promise.all(
+      [-1, 0, 1].map(offset => generateHotp(secret, counter + offset, options))
+    );
+
+    const index = codes.indexOf(entered);
+    const labels = ['the previous window', 'the current window', 'the next window'];
+
+    verifyResult.textContent =
+      index === -1 ? '✘ That code does not match.' : `✔ Valid, matched ${labels[index]}.`;
+    verifyResult.style.color = index === -1 ? 'var(--red, #ff4d4f)' : 'var(--green, #10b981)';
+  }
+
+  async function tick() {
+    const secret = cleanSecret();
+
+    if (!isValidSecret(secret)) {
+      showError('Enter a valid base32 secret or an otpauth:// URI.');
+      if (currentCode) currentCode.textContent = '------';
+      if (nextCode) nextCode.textContent = '';
+      return;
+    }
+
+    if (errorBox) errorBox.style.display = 'none';
+
+    const options = currentOptions();
+    const counter = counterForTime(Date.now(), options.period);
+
+    try {
+      const [now, next] = await Promise.all([
+        generateHotp(secret, counter, options),
+        generateHotp(secret, counter + 1, options),
+      ]);
+
+      if (currentCode) currentCode.textContent = now;
+      if (nextCode) nextCode.textContent = `Next: ${next}`;
+    } catch (error) {
+      showError(error instanceof Error ? error.message : 'Could not generate a code.');
+      return;
+    }
+
+    const remaining = secondsRemaining(options.period, Date.now());
+    const fraction = remaining / options.period;
+
+    countdownRing?.setAttribute('stroke-dasharray', String(RING_CIRCUMFERENCE));
+    countdownRing?.setAttribute('stroke-dashoffset', String(RING_CIRCUMFERENCE * (1 - fraction)));
+    countdownRing?.setAttribute('stroke', remaining < 5 ? 'var(--red, #ff4d4f)' : 'var(--accent)');
+
+    if (countdownLabel) countdownLabel.textContent = `${Math.ceil(remaining)}s`;
+  }
+
+  function applyUri(uri: string): boolean {
+    const parsed = parseOtpAuthUri(uri);
+    if (!parsed) return false;
+
+    if (secretInput) secretInput.value = parsed.secret;
+    if (algorithmSelect) algorithmSelect.value = parsed.algorithm;
+    if (digitsSelect && parsed.digits <= 8) digitsSelect.value = String(parsed.digits);
+    if (periodSelect && [30, 60].includes(parsed.period)) periodSelect.value = String(parsed.period);
+    if (issuerInput && parsed.issuer) issuerInput.value = parsed.issuer;
+    if (accountInput && parsed.account) accountInput.value = parsed.account;
+
+    return true;
+  }
+
+  async function refresh() {
+    await tick();
+    await renderUri();
+    await verify();
+  }
+
+  secretInput?.addEventListener('input', () => {
+    const value = secretInput.value.trim();
+    if (value.toLowerCase().startsWith('otpauth://') && applyUri(value)) {
+      refresh();
+      return;
+    }
+    refresh();
+  });
+
+  [algorithmSelect, digitsSelect, periodSelect].forEach(select => {
+    select?.addEventListener('change', refresh);
+  });
+
+  [issuerInput, accountInput].forEach(field => {
+    field?.addEventListener('input', renderUri);
+  });
+
+  verifyInput?.addEventListener('input', verify);
+
+  document.getElementById('btn-random')?.addEventListener('click', () => {
+    if (!secretInput) return;
+    secretInput.value = generateSecret(20);
+    refresh();
+  });
+
+  async function copyFrom(buttonId: string, read: () => string) {
+    const button = document.getElementById(buttonId);
+    button?.addEventListener('click', async () => {
+      const value = read();
+      if (!value) return;
+
+      await navigator.clipboard.writeText(value);
+      const original = button.textContent;
+      button.textContent = 'Copied!';
+      setTimeout(() => {
+        button.textContent = original;
+      }, 1500);
+    });
+  }
+
+  copyFrom('btn-copy-secret', () => cleanSecret());
+  copyFrom('btn-copy-code', () => currentCode?.textContent ?? '');
+  copyFrom('btn-copy-uri', () => uriOutput?.textContent ?? '');
+
+  refresh();
+  setInterval(tick, 1000);
+</script>

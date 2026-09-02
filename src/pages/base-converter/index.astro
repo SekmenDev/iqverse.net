@@ -1,0 +1,236 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+import { BIT_WIDTHS, COMMON_BASES, baseLabel, basePrefix } from '@/lib/base-converter';
+---
+
+<ToolLayout
+  title="Number Base Converter"
+  subtitle="Binary, Octal, Decimal, Hex & Two's Complement"
+  pill="BROWSER TOOLS"
+  toolSlug="base-converter"
+  description="Convert numbers between binary, octal, decimal, hexadecimal and base 36 with arbitrary precision. Inspect 8, 16, 32 and 64-bit two's complement views and flip individual bits."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <p style="font-size: 0.82rem; opacity: 0.75; margin: 0 0 16px 0;">
+          Edit any field. Values are held as arbitrary-precision integers, so numbers well past
+          2<sup>53</sup> stay exact.
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          {COMMON_BASES.map(base => (
+            <div class={sharedStyles.field} style="margin: 0;">
+              <label class={sharedStyles.fieldLabel} for={`base-${base}`}>
+                {baseLabel(base)}
+                {basePrefix(base) && <span style="opacity: 0.6;"> · {basePrefix(base)}</span>}
+              </label>
+              <input
+                id={`base-${base}`}
+                type="text"
+                class={sharedStyles.input}
+                style="font-family: monospace;"
+                data-base={base}
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </div>
+          ))}
+        </div>
+
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-top: 16px;">
+          <div class={sharedStyles.field} style="flex: 0 0 130px; margin: 0;">
+            <label class={sharedStyles.fieldLabel} for="customBase">Custom base</label>
+            <input id="customBase" type="number" class={sharedStyles.input} min="2" max="36" value="7" />
+          </div>
+          <div class={sharedStyles.field} style="flex: 1; min-width: 180px; margin: 0;">
+            <label class={sharedStyles.fieldLabel} for="base-custom">Value</label>
+            <input
+              id="base-custom"
+              type="text"
+              class={sharedStyles.input}
+              style="font-family: monospace;"
+              data-base="custom"
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px;">
+          <label style="font-size: 0.8rem; display: flex; align-items: center; gap: 6px;">
+            <input id="uppercase" type="checkbox" /> uppercase letters
+          </label>
+          <label style="font-size: 0.8rem; display: flex; align-items: center; gap: 6px;">
+            <input id="grouping" type="checkbox" checked /> group digits
+          </label>
+        </div>
+
+        <div id="base-error" class={sharedStyles.errorMessage} style="display: none; margin-top: 12px;"></div>
+        <div id="bit-length" style="font-size: 0.8rem; opacity: 0.75; margin-top: 12px;"></div>
+      </div>
+
+      <div class={sharedStyles.card} style="margin-top: 20px;">
+        <h3 style="margin: 0 0 4px 0; font-size: 1.1rem;">Fixed-width views</h3>
+        <p style="font-size: 0.8rem; opacity: 0.7; margin: 0 0 16px 0;">
+          Click any bit to flip it.
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          {BIT_WIDTHS.map(width => (
+            <div
+              data-width-row={width}
+              style="padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: rgba(255, 255, 255, 0.02);"
+            >
+              <div style="display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; margin-bottom: 8px;">
+                <strong style="font-size: 0.85rem; flex: 0 0 52px;">{width}-bit</strong>
+                <span data-width-meta={width} style="font-size: 0.76rem; opacity: 0.75; font-family: monospace;"></span>
+              </div>
+              <div
+                data-width-bits={width}
+                style="display: flex; flex-wrap: wrap; gap: 3px; font-family: monospace; font-size: 0.72rem;"
+              ></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  import {
+    allWidthViews,
+    bitLength,
+    formatInBase,
+    groupDigits,
+    isValidBase,
+    parseInBase,
+    toggleBit,
+    type BitWidth,
+  } from '@/lib/base-converter';
+
+  const GROUP_SIZES: Record<number, number> = { 2: 4, 8: 3, 10: 3, 16: 4, 36: 4 };
+
+  const inputs = Array.from(document.querySelectorAll<HTMLInputElement>('[data-base]'));
+  const customBase = document.getElementById('customBase') as HTMLInputElement | null;
+  const uppercase = document.getElementById('uppercase') as HTMLInputElement | null;
+  const grouping = document.getElementById('grouping') as HTMLInputElement | null;
+  const errorBox = document.getElementById('base-error');
+  const bitLengthLabel = document.getElementById('bit-length');
+
+  let value = 255n;
+
+  function baseOf(input: HTMLInputElement): number {
+    if (input.dataset.base !== 'custom') return Number(input.dataset.base);
+    const custom = Number(customBase?.value ?? 10);
+    return isValidBase(custom) ? custom : 10;
+  }
+
+  function renderInputs(skip?: HTMLInputElement) {
+    const upper = uppercase?.checked ?? false;
+
+    for (const input of inputs) {
+      if (input === skip) continue;
+
+      const base = baseOf(input);
+      const text = formatInBase(value, base, upper);
+      const size = GROUP_SIZES[base] ?? 0;
+
+      input.value = grouping?.checked && size ? groupDigits(text, size) : text;
+    }
+  }
+
+  function renderWidths() {
+    for (const view of allWidthViews(value)) {
+      const meta = document.querySelector<HTMLElement>(`[data-width-meta="${view.width}"]`);
+      const bits = document.querySelector<HTMLElement>(`[data-width-bits="${view.width}"]`);
+      const row = document.querySelector<HTMLElement>(`[data-width-row="${view.width}"]`);
+      if (!meta || !bits || !row) continue;
+
+      if (!view.fits) {
+        row.style.opacity = '0.45';
+        meta.textContent = 'does not fit in this width';
+        bits.replaceChildren();
+        continue;
+      }
+
+      row.style.opacity = '1';
+      meta.textContent = `0x${view.hex} · signed ${view.signed} · unsigned ${view.unsigned}`;
+
+      const cells = view.binary.split('').map((bit, position) => {
+        const index = view.binary.length - 1 - position;
+        const cell = document.createElement('button');
+
+        cell.type = 'button';
+        cell.textContent = bit;
+        cell.title = `bit ${index}`;
+        cell.style.cssText = `
+          width: 20px; height: 24px; border-radius: 3px; cursor: pointer;
+          border: 1px solid var(--border); font-family: monospace; font-size: 0.72rem;
+          background: ${bit === '1' ? 'var(--accent-dim)' : 'transparent'};
+          color: ${bit === '1' ? 'var(--accent)' : 'var(--muted)'};
+          margin-right: ${index % 4 === 0 && index !== 0 ? '6px' : '0'};
+        `;
+
+        cell.addEventListener('click', () => {
+          value = toggleBit(value, index, view.width as BitWidth);
+          render();
+        });
+
+        return cell;
+      });
+
+      bits.replaceChildren(...cells);
+    }
+  }
+
+  function render(skip?: HTMLInputElement) {
+    renderInputs(skip);
+    renderWidths();
+
+    if (bitLengthLabel) {
+      const bits = bitLength(value);
+      bitLengthLabel.textContent = `${bits} significant bit${bits === 1 ? '' : 's'} · ${value < 0n ? 'negative' : 'non-negative'}`;
+    }
+  }
+
+  function showError(message: string | null) {
+    if (!errorBox) return;
+
+    if (message === null) {
+      errorBox.style.display = 'none';
+      return;
+    }
+
+    errorBox.textContent = message;
+    errorBox.style.display = 'block';
+  }
+
+  for (const input of inputs) {
+    input.addEventListener('input', () => {
+      const base = baseOf(input);
+      const parsed = parseInBase(input.value, base);
+
+      if (parsed === null) {
+        showError(
+          input.value.trim()
+            ? `"${input.value.trim()}" is not a valid base ${base} number.`
+            : 'Enter a number.'
+        );
+        return;
+      }
+
+      showError(null);
+      value = parsed;
+      render(input);
+    });
+  }
+
+  customBase?.addEventListener('input', () => render());
+  uppercase?.addEventListener('change', () => render());
+  grouping?.addEventListener('change', () => render());
+
+  render();
+</script>

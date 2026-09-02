@@ -1,0 +1,319 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+
+const EXAMPLES: Array<{ label: string; record: string }> = [
+  { label: 'SPF', record: 'v=spf1 include:_spf.google.com include:sendgrid.net ip4:192.0.2.0/24 ~all' },
+  { label: 'DMARC', record: 'v=DMARC1; p=quarantine; sp=reject; pct=100; rua=mailto:dmarc@example.com; adkim=s; aspf=s' },
+  { label: 'Risky SPF', record: 'v=spf1 ptr a mx include:one.com include:two.com include:three.com +all' },
+];
+---
+
+<ToolLayout
+  title="SPF, DKIM & DMARC Record Checker"
+  subtitle="Parse & Validate Email Authentication DNS Records"
+  pill="SECURITY"
+  toolSlug="email-auth"
+  description="Parse and validate SPF, DKIM and DMARC records. Counts SPF DNS lookups against the limit of 10, checks DMARC policy strength and estimates DKIM key size."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <h3 style="margin: 0 0 16px 0; font-size: 1.1rem;">Look up a domain</h3>
+
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;">
+          <div class={sharedStyles.field} style="flex: 2; min-width: 200px; margin: 0;">
+            <label class={sharedStyles.fieldLabel} for="domainInput">Domain</label>
+            <input
+              id="domainInput"
+              type="text"
+              class={sharedStyles.input}
+              style="font-family: monospace;"
+              placeholder="example.com"
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
+          <div class={sharedStyles.field} style="flex: 1; min-width: 140px; margin: 0;">
+            <label class={sharedStyles.fieldLabel} for="selectorInput">DKIM selector</label>
+            <input
+              id="selectorInput"
+              type="text"
+              class={sharedStyles.input}
+              style="font-family: monospace;"
+              placeholder="google"
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
+          <button type="button" id="btn-lookup" class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}>
+            Look up
+          </button>
+        </div>
+
+        <p style="font-size: 0.78rem; opacity: 0.7; margin: 12px 0 0 0;">
+          Records are fetched over DNS-over-HTTPS from Cloudflare. Nothing else leaves your browser.
+        </p>
+
+        <div id="lookup-error" class={sharedStyles.errorMessage} style="display: none; margin-top: 12px;"></div>
+        <div id="lookup-results" style="margin-top: 16px;"></div>
+      </div>
+
+      <div class={sharedStyles.card} style="margin-top: 20px;">
+        <h3 style="margin: 0 0 16px 0; font-size: 1.1rem;">Or paste a record</h3>
+
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="recordInput">
+            SPF, DKIM or DMARC TXT record
+          </label>
+          <textarea
+            id="recordInput"
+            class={sharedStyles.textarea}
+            rows="3"
+            style="font-family: monospace; font-size: 0.82rem;"
+            placeholder="v=spf1 include:_spf.google.com ~all"
+          ></textarea>
+        </div>
+
+        <div class={sharedStyles.buttonGroup} style="flex-wrap: wrap;">
+          {EXAMPLES.map(example => (
+            <button
+              type="button"
+              class={`${sharedStyles.button} ${sharedStyles.buttonSmall}`}
+              data-example={example.record}
+            >
+              {example.label} example
+            </button>
+          ))}
+        </div>
+
+        <div id="paste-results" style="margin-top: 16px;"></div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  import {
+    dkimLookupName,
+    dmarcLookupName,
+    parseEmailAuthRecord,
+    type Finding,
+    type ParsedRecord,
+  } from '@/lib/email-auth';
+  import { escapeHtml } from '@/lib/utils';
+
+  const domainInput = document.getElementById('domainInput') as HTMLInputElement | null;
+  const selectorInput = document.getElementById('selectorInput') as HTMLInputElement | null;
+  const recordInput = document.getElementById('recordInput') as HTMLTextAreaElement | null;
+  const lookupError = document.getElementById('lookup-error');
+  const lookupResults = document.getElementById('lookup-results');
+  const pasteResults = document.getElementById('paste-results');
+  const btnLookup = document.getElementById('btn-lookup') as HTMLButtonElement | null;
+
+  const SEVERITY_COLORS: Record<Finding['severity'], string> = {
+    error: 'var(--red, #ff4d4f)',
+    warning: 'var(--yellow, #eab308)',
+    info: 'var(--green, #10b981)',
+  };
+
+  const SEVERITY_ICONS: Record<Finding['severity'], string> = {
+    error: '✘',
+    warning: '▲',
+    info: '✔',
+  };
+
+  function renderFindings(findings: Finding[]): string {
+    return findings
+      .map(
+        finding => `
+          <li style="display: flex; gap: 8px; margin-bottom: 6px; font-size: 0.82rem;">
+            <span style="color: ${SEVERITY_COLORS[finding.severity]};">${SEVERITY_ICONS[finding.severity]}</span>
+            <span>${escapeHtml(finding.message)}</span>
+          </li>`
+      )
+      .join('');
+  }
+
+  function renderRows(rows: Array<[string, string]>): string {
+    return rows
+      .filter(([, value]) => value !== '')
+      .map(
+        ([label, value]) => `
+          <div style="padding: 10px 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+            <div style="font-size: 0.72rem; opacity: 0.7;">${escapeHtml(label)}</div>
+            <div style="font-size: 0.88rem; font-weight: 600; font-family: monospace; word-break: break-all;">${escapeHtml(value)}</div>
+          </div>`
+      )
+      .join('');
+  }
+
+  function renderDetails(parsed: ParsedRecord): string {
+    if (parsed.kind === 'spf') {
+      const mechanisms = parsed.mechanisms
+        .map(
+          mechanism => `
+            <tr>
+              <td>${escapeHtml(mechanism.qualifier)}</td>
+              <td>${escapeHtml(mechanism.type)}</td>
+              <td>${escapeHtml(mechanism.value || '—')}</td>
+              <td>${mechanism.causesLookup ? 'yes' : 'no'}</td>
+            </tr>`
+        )
+        .join('');
+
+      return `
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 14px;">
+          ${renderRows([
+            ['DNS lookups', `${parsed.lookupCount} of 10`],
+            ['All mechanism', parsed.allQualifier ? `${parsed.allQualifier}all` : 'missing'],
+            ['Mechanisms', String(parsed.mechanisms.length)],
+          ])}
+        </div>
+        <table style="width: 100%; border-collapse: collapse; font-family: monospace; font-size: 0.8rem;">
+          <thead style="text-align: left; opacity: 0.7;">
+            <tr><th>Qualifier</th><th>Mechanism</th><th>Value</th><th>Lookup</th></tr>
+          </thead>
+          <tbody>${mechanisms}</tbody>
+        </table>`;
+    }
+
+    if (parsed.kind === 'dmarc') {
+      return `
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px;">
+          ${renderRows([
+            ['Policy', parsed.policy ?? 'missing'],
+            ['Subdomain policy', parsed.subdomainPolicy ?? 'inherits p'],
+            ['Applied to', `${parsed.percentage}%`],
+            ['DKIM alignment', parsed.tags.adkim === 's' ? 'strict' : 'relaxed'],
+            ['SPF alignment', parsed.tags.aspf === 's' ? 'strict' : 'relaxed'],
+            ['Aggregate reports', parsed.reportUris.join(', ') || 'none'],
+            ['Forensic reports', parsed.forensicUris.join(', ') || 'none'],
+          ])}
+        </div>`;
+    }
+
+    if (parsed.kind === 'dkim') {
+      return `
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px;">
+          ${renderRows([
+            ['Key type', parsed.keyType],
+            ['Key size', parsed.keyBits ? `${parsed.keyBits} bits` : 'unknown'],
+            ['Flags', parsed.flags.join(', ') || 'none'],
+            ['Hash algorithms', parsed.tags.h ?? 'all'],
+            ['Service type', parsed.tags.s ?? '*'],
+          ])}
+        </div>`;
+    }
+
+    return '';
+  }
+
+  function renderRecord(heading: string, parsed: ParsedRecord): string {
+    return `
+      <div style="padding: 16px; border-radius: 8px; border: 1px solid var(--border); background: rgba(255, 255, 255, 0.02); margin-bottom: 14px;">
+        <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
+          <strong style="font-size: 0.95rem;">${escapeHtml(heading)}</strong>
+          <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.6;">${escapeHtml(parsed.kind)}</span>
+        </div>
+        <pre style="margin: 0 0 14px 0; padding: 10px; border-radius: 6px; background: var(--surface); font-family: monospace; font-size: 0.78rem; white-space: pre-wrap; word-break: break-all;">${escapeHtml(parsed.raw)}</pre>
+        ${renderDetails(parsed)}
+        <ul style="list-style: none; padding: 0; margin: 14px 0 0 0;">${renderFindings(parsed.findings)}</ul>
+      </div>`;
+  }
+
+  function styleTables(container: HTMLElement) {
+    container.querySelectorAll('th, td').forEach(cell => {
+      (cell as HTMLElement).style.padding = '6px 10px';
+      (cell as HTMLElement).style.borderBottom = '1px solid var(--border)';
+    });
+  }
+
+  async function fetchTxt(name: string): Promise<string[]> {
+    const url = `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(name)}&type=TXT`;
+    const response = await fetch(url, { headers: { Accept: 'application/dns-json' } });
+    if (!response.ok) throw new Error(`DNS query failed with status ${response.status}`);
+
+    const data: { Answer?: Array<{ data: string }> } = await response.json();
+    return (data.Answer ?? []).map(answer => answer.data);
+  }
+
+  async function lookup() {
+    if (!domainInput || !lookupResults || !btnLookup) return;
+
+    const domain = domainInput.value.trim();
+    if (!domain) return;
+
+    btnLookup.disabled = true;
+    btnLookup.textContent = 'Looking up…';
+    lookupResults.innerHTML = '';
+    if (lookupError) lookupError.style.display = 'none';
+
+    const selector = selectorInput?.value.trim() ?? '';
+
+    const targets: Array<{ heading: string; name: string; filter: (record: string) => boolean }> = [
+      { heading: `SPF · ${domain}`, name: domain, filter: record => record.toLowerCase().includes('v=spf1') },
+      { heading: `DMARC · ${dmarcLookupName(domain)}`, name: dmarcLookupName(domain), filter: () => true },
+    ];
+
+    if (selector) {
+      const name = dkimLookupName(domain, selector);
+      targets.push({ heading: `DKIM · ${name}`, name, filter: () => true });
+    }
+
+    try {
+      const sections = await Promise.all(
+        targets.map(async target => {
+          const records = (await fetchTxt(target.name)).filter(target.filter);
+          if (records.length === 0) {
+            return `
+              <div style="padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 14px;">
+                <strong style="font-size: 0.95rem;">${escapeHtml(target.heading)}</strong>
+                <p style="font-size: 0.82rem; opacity: 0.75; margin: 8px 0 0 0;">No record published.</p>
+              </div>`;
+          }
+          return records.map(record => renderRecord(target.heading, parseEmailAuthRecord(record))).join('');
+        })
+      );
+
+      lookupResults.innerHTML = sections.join('');
+      styleTables(lookupResults);
+    } catch (error) {
+      if (lookupError) {
+        lookupError.textContent = error instanceof Error ? error.message : 'DNS lookup failed.';
+        lookupError.style.display = 'block';
+      }
+    } finally {
+      btnLookup.disabled = false;
+      btnLookup.textContent = 'Look up';
+    }
+  }
+
+  function renderPasted() {
+    if (!recordInput || !pasteResults) return;
+
+    const raw = recordInput.value.trim();
+    if (!raw) {
+      pasteResults.innerHTML = '';
+      return;
+    }
+
+    pasteResults.innerHTML = renderRecord('Pasted record', parseEmailAuthRecord(raw));
+    styleTables(pasteResults);
+  }
+
+  btnLookup?.addEventListener('click', lookup);
+  domainInput?.addEventListener('keydown', event => {
+    if (event.key === 'Enter') lookup();
+  });
+
+  recordInput?.addEventListener('input', renderPasted);
+
+  document.querySelectorAll<HTMLButtonElement>('[data-example]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (!recordInput) return;
+      recordInput.value = btn.dataset.example ?? '';
+      renderPasted();
+    });
+  });
+</script>

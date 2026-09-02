@@ -16,7 +16,7 @@ const DNS_GUIDE = [
     type: 'AAAA (IPv6 Address)',
     short: 'AAAA',
     purpose: 'Maps a domain name to a 128-bit next-generation IPv6 address.',
-    why: 'Essential for modern high-speed internet routing, dual-stack networks, and mobile connectivity.',
+    why: 'Essential for modern high-speed internet routing, dual-stack networks and mobile connectivity.',
   },
   {
     type: 'MX (Mail Exchange)',
@@ -27,7 +27,7 @@ const DNS_GUIDE = [
   {
     type: 'TXT (Text & Security Policies)',
     short: 'TXT',
-    purpose: 'Carries arbitrary text metadata, most crucially SPF, DKIM, DMARC, and domain ownership tokens.',
+    purpose: 'Carries arbitrary text metadata, most crucially SPF, DKIM, DMARC and domain ownership tokens.',
     why: 'Critical for email anti-spoofing security (preventing phishing) and third-party SaaS domain validation.',
   },
   {
@@ -45,7 +45,7 @@ const DNS_GUIDE = [
   {
     type: 'SOA (Start of Authority)',
     short: 'SOA',
-    purpose: 'Stores core zone administrative info, including primary nameserver, admin email, serial number, and refresh timers.',
+    purpose: 'Stores core zone administrative info, including primary nameserver, admin email, serial number and refresh timers.',
     why: 'Coordinates secondary DNS synchronization and dictates negative caching (NXDOMAIN TTL) behavior.',
   },
   {
@@ -59,7 +59,7 @@ const DNS_GUIDE = [
 const FAQS = [
   {
     q: 'What is DNS-over-HTTPS (DoH) and why is it safer?',
-    a: 'Traditional DNS queries travel unencrypted over UDP port 53, making them vulnerable to eavesdropping, ISP tracking, and DNS spoofing / cache poisoning attacks. DNS-over-HTTPS (DoH, RFC 8484) encrypts DNS lookups inside standard HTTPS traffic, protecting your privacy and preventing man-in-the-middle manipulation.',
+    a: 'Traditional DNS queries travel unencrypted over UDP port 53, making them vulnerable to eavesdropping, ISP tracking and DNS spoofing / cache poisoning attacks. DNS-over-HTTPS (DoH, RFC 8484) encrypts DNS lookups inside standard HTTPS traffic, protecting your privacy and preventing man-in-the-middle manipulation.',
   },
   {
     q: 'What does TTL (Time to Live) mean in DNS records?',

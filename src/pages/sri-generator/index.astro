@@ -1,0 +1,330 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+import { SRI_ALGORITHMS } from '@/lib/sri';
+---
+
+<ToolLayout
+  title="Subresource Integrity (SRI) Hash Generator"
+  subtitle="Generate & Verify integrity Attributes for Scripts and Styles"
+  pill="SECURITY"
+  toolSlug="sri-generator"
+  description="Generate Subresource Integrity hashes for CDN scripts and stylesheets, build the ready-to-paste tag and verify that an existing integrity attribute still matches the file."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div class={sharedStyles.buttonGroup} style="margin-bottom: 18px;">
+          <button type="button" class={sharedStyles.button} data-tab="url" aria-pressed="true">From URL</button>
+          <button type="button" class={sharedStyles.button} data-tab="file" aria-pressed="false">From file</button>
+          <button type="button" class={sharedStyles.button} data-tab="text" aria-pressed="false">From text</button>
+        </div>
+
+        <div data-panel="url">
+          <div class={sharedStyles.field}>
+            <label class={sharedStyles.fieldLabel} for="urlInput">Resource URL</label>
+            <input
+              id="urlInput"
+              type="url"
+              class={sharedStyles.input}
+              style="font-family: monospace;"
+              placeholder="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
+          <button type="button" id="btn-fetch" class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}>
+            Fetch and hash
+          </button>
+          <p style="font-size: 0.78rem; opacity: 0.7; margin: 12px 0 0 0;">
+            The file is downloaded by your browser, so the CDN must send an
+            <code>Access-Control-Allow-Origin</code> header. Major CDNs do.
+          </p>
+        </div>
+
+        <div data-panel="file" hidden>
+          <div class={sharedStyles.field}>
+            <label class={sharedStyles.fieldLabel} for="fileInput">Local file</label>
+            <input id="fileInput" type="file" class={sharedStyles.input} />
+          </div>
+          <p style="font-size: 0.78rem; opacity: 0.7; margin: 0;">
+            The file is read in your browser and never uploaded.
+          </p>
+        </div>
+
+        <div data-panel="text" hidden>
+          <div class={sharedStyles.field}>
+            <label class={sharedStyles.fieldLabel} for="textInput">Paste file contents</label>
+            <textarea
+              id="textInput"
+              class={sharedStyles.textarea}
+              rows="6"
+              style="font-family: monospace; font-size: 0.8rem;"
+              placeholder="console.log('hello');"
+            ></textarea>
+          </div>
+        </div>
+
+        <div id="sri-error" class={sharedStyles.errorMessage} style="display: none; margin-top: 12px;"></div>
+      </div>
+
+      <div id="sri-output" class={sharedStyles.card} style="margin-top: 20px; display: none;">
+        <h3 style="margin: 0 0 4px 0; font-size: 1.1rem;">Integrity hashes</h3>
+        <p id="source-note" style="font-size: 0.78rem; opacity: 0.7; margin: 0 0 16px 0;"></p>
+
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          {SRI_ALGORITHMS.map(algorithm => (
+            <div
+              data-hash-row={algorithm}
+              style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);"
+            >
+              <span style="flex: 0 0 62px; font-size: 0.75rem; opacity: 0.75; font-family: monospace;">{algorithm}</span>
+              <code data-hash={algorithm} style="flex: 1; font-size: 0.75rem; word-break: break-all;"></code>
+              <button type="button" class={`${sharedStyles.button} ${sharedStyles.buttonSmall}`} data-copy={algorithm}>
+                Copy
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <div style="margin-top: 20px;">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap;">
+            <strong style="font-size: 0.9rem;">HTML tag</strong>
+            <label style="font-size: 0.78rem; display: flex; align-items: center; gap: 6px;">
+              Algorithm
+              <select id="tagAlgorithm" class={sharedStyles.select} style="padding: 4px 8px;">
+                {SRI_ALGORITHMS.map(algorithm => (
+                  <option value={algorithm} selected={algorithm === 'sha384'}>{algorithm}</option>
+                ))}
+              </select>
+            </label>
+            <label style="font-size: 0.78rem; display: flex; align-items: center; gap: 6px;">
+              Kind
+              <select id="tagKind" class={sharedStyles.select} style="padding: 4px 8px;">
+                <option value="script">script</option>
+                <option value="style">stylesheet</option>
+              </select>
+            </label>
+          </div>
+
+          <pre
+            id="tag-output"
+            class={sharedStyles.outputArea}
+            style="font-family: monospace; font-size: 0.78rem; white-space: pre-wrap; word-break: break-all; margin: 0;"
+          ></pre>
+          <button type="button" id="btn-copy-tag" class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`} style="margin-top: 12px;">
+            Copy tag
+          </button>
+        </div>
+      </div>
+
+      <div class={sharedStyles.card} style="margin-top: 20px;">
+        <h3 style="margin: 0 0 16px 0; font-size: 1.1rem;">Verify an existing integrity value</h3>
+
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="verifyInput">integrity attribute</label>
+          <input
+            id="verifyInput"
+            type="text"
+            class={sharedStyles.input}
+            style="font-family: monospace;"
+            placeholder="sha384-..."
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </div>
+
+        <div id="verify-result" style="font-size: 0.85rem; font-weight: 600;"></div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  import {
+    computeAllIntegrity,
+    buildTag,
+    detectResourceKind,
+    isSriAlgorithm,
+    parseIntegrity,
+    type SriAlgorithm,
+  } from '@/lib/sri';
+
+  const urlInput = document.getElementById('urlInput') as HTMLInputElement | null;
+  const fileInput = document.getElementById('fileInput') as HTMLInputElement | null;
+  const textInput = document.getElementById('textInput') as HTMLTextAreaElement | null;
+  const verifyInput = document.getElementById('verifyInput') as HTMLInputElement | null;
+  const tagAlgorithm = document.getElementById('tagAlgorithm') as HTMLSelectElement | null;
+  const tagKind = document.getElementById('tagKind') as HTMLSelectElement | null;
+  const errorBox = document.getElementById('sri-error');
+  const output = document.getElementById('sri-output');
+  const sourceNote = document.getElementById('source-note');
+  const tagOutput = document.getElementById('tag-output');
+  const verifyResult = document.getElementById('verify-result');
+  const btnFetch = document.getElementById('btn-fetch') as HTMLButtonElement | null;
+  const btnCopyTag = document.getElementById('btn-copy-tag');
+
+  let hashes: Record<SriAlgorithm, string> | null = null;
+  let sourceUrl = '';
+
+  function showError(message: string) {
+    if (!errorBox) return;
+    errorBox.textContent = message;
+    errorBox.style.display = 'block';
+  }
+
+  function clearError() {
+    if (errorBox) errorBox.style.display = 'none';
+  }
+
+  function renderTag() {
+    if (!hashes || !tagOutput) return;
+
+    const algorithm = tagAlgorithm?.value ?? 'sha384';
+    if (!isSriAlgorithm(algorithm)) return;
+
+    const kind = tagKind?.value === 'style' ? 'style' : 'script';
+    tagOutput.textContent = buildTag(sourceUrl || 'https://example.com/file', hashes[algorithm], kind);
+  }
+
+  function renderHashes(note: string) {
+    if (!hashes || !output) return;
+
+    output.style.display = 'block';
+    if (sourceNote) sourceNote.textContent = note;
+
+    (Object.keys(hashes) as SriAlgorithm[]).forEach(algorithm => {
+      const slot = document.querySelector<HTMLElement>(`[data-hash="${algorithm}"]`);
+      if (slot) slot.textContent = hashes![algorithm];
+    });
+
+    renderTag();
+    verify();
+  }
+
+  function verify() {
+    if (!verifyResult || !verifyInput) return;
+
+    const value = verifyInput.value.trim();
+    if (!value) {
+      verifyResult.textContent = '';
+      return;
+    }
+
+    const parsed = parseIntegrity(value);
+    if (parsed.length === 0) {
+      verifyResult.textContent = '✘ Not a valid integrity value.';
+      verifyResult.style.color = 'var(--red, #ff4d4f)';
+      return;
+    }
+
+    if (!hashes) {
+      verifyResult.textContent = `Parsed ${parsed.length} hash(es). Load a resource above to compare.`;
+      verifyResult.style.color = 'var(--muted)';
+      return;
+    }
+
+    const matched = parsed.some(entry => hashes![entry.algorithm] === `${entry.algorithm}-${entry.base64}`);
+    verifyResult.textContent = matched
+      ? '✔ The integrity value matches the loaded resource.'
+      : '✘ The integrity value does not match the loaded resource.';
+    verifyResult.style.color = matched ? 'var(--green, #10b981)' : 'var(--red, #ff4d4f)';
+  }
+
+  async function hashData(data: ArrayBuffer | string, note: string, url = '') {
+    try {
+      hashes = await computeAllIntegrity(data);
+      sourceUrl = url;
+      clearError();
+      renderHashes(note);
+    } catch (error) {
+      showError(error instanceof Error ? error.message : 'Could not hash that input.');
+    }
+  }
+
+  btnFetch?.addEventListener('click', async () => {
+    const url = urlInput?.value.trim();
+    if (!url) return;
+
+    btnFetch.disabled = true;
+    btnFetch.textContent = 'Fetching…';
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
+
+      const buffer = await response.arrayBuffer();
+      if (tagKind) tagKind.value = detectResourceKind(url) === 'style' ? 'style' : 'script';
+
+      await hashData(buffer, `${buffer.byteLength.toLocaleString('en-US')} bytes from ${url}`, url);
+    } catch {
+      showError('Could not fetch that URL. The server may not allow cross-origin requests from the browser.');
+    } finally {
+      btnFetch.disabled = false;
+      btnFetch.textContent = 'Fetch and hash';
+    }
+  });
+
+  fileInput?.addEventListener('change', async () => {
+    const file = fileInput.files?.[0];
+    if (!file) return;
+
+    const buffer = await file.arrayBuffer();
+    if (tagKind) tagKind.value = detectResourceKind(file.name) === 'style' ? 'style' : 'script';
+
+    await hashData(buffer, `${file.name} · ${buffer.byteLength.toLocaleString('en-US')} bytes`, file.name);
+  });
+
+  textInput?.addEventListener('input', async () => {
+    const value = textInput.value;
+    if (!value) {
+      if (output) output.style.display = 'none';
+      hashes = null;
+      return;
+    }
+
+    await hashData(value, `${value.length.toLocaleString('en-US')} characters of pasted text`);
+  });
+
+  verifyInput?.addEventListener('input', verify);
+  tagAlgorithm?.addEventListener('change', renderTag);
+  tagKind?.addEventListener('change', renderTag);
+
+  document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const algorithm = btn.dataset.copy;
+      if (!hashes || !algorithm || !isSriAlgorithm(algorithm)) return;
+
+      await navigator.clipboard.writeText(hashes[algorithm]);
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => {
+        btn.textContent = original;
+      }, 1500);
+    });
+  });
+
+  btnCopyTag?.addEventListener('click', async () => {
+    if (!tagOutput?.textContent) return;
+    await navigator.clipboard.writeText(tagOutput.textContent);
+    const original = btnCopyTag.textContent;
+    btnCopyTag.textContent = 'Copied!';
+    setTimeout(() => {
+      btnCopyTag.textContent = original;
+    }, 1500);
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.tab;
+
+      document.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach(other => {
+        other.setAttribute('aria-pressed', other === btn ? 'true' : 'false');
+      });
+
+      document.querySelectorAll<HTMLElement>('[data-panel]').forEach(panel => {
+        panel.hidden = panel.dataset.panel !== target;
+      });
+    });
+  });
+</script>

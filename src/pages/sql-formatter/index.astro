@@ -1,0 +1,213 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+import { SQL_DIALECTS } from '@/lib/sql';
+
+const SAMPLE = `select u.id, u.name, count(o.id) as order_count from users u left join orders o on o.user_id = u.id where u.created_at > '2026-01-01' and u.active = true group by u.id, u.name having count(o.id) > 3 order by order_count desc limit 20;`;
+---
+
+<ToolLayout
+  title="SQL Formatter & Minifier"
+  subtitle="Beautify, Minify & Inspect SQL Across 12 Dialects"
+  pill="BROWSER TOOLS"
+  toolSlug="sql-formatter"
+  description="Format and minify SQL queries for PostgreSQL, MySQL, SQL Server, Oracle, BigQuery, Snowflake and more. Runs entirely in your browser with no query ever leaving the page."
+>
+  <div style="max-width: 1100px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 16px;">
+          <label style="font-size: 0.78rem; display: flex; flex-direction: column; gap: 4px;">
+            Dialect
+            <select id="dialect" class={sharedStyles.select} style="padding: 6px 10px;">
+              {SQL_DIALECTS.map(dialect => (
+                <option value={dialect.value}>{dialect.label}</option>
+              ))}
+            </select>
+          </label>
+
+          <label style="font-size: 0.78rem; display: flex; flex-direction: column; gap: 4px;">
+            Keywords
+            <select id="keywordCase" class={sharedStyles.select} style="padding: 6px 10px;">
+              <option value="upper">UPPERCASE</option>
+              <option value="lower">lowercase</option>
+              <option value="preserve">preserve</option>
+            </select>
+          </label>
+
+          <label style="font-size: 0.78rem; display: flex; flex-direction: column; gap: 4px;">
+            Indent
+            <select id="indent" class={sharedStyles.select} style="padding: 6px 10px;">
+              <option value="2">2 spaces</option>
+              <option value="4">4 spaces</option>
+              <option value="tab">Tabs</option>
+            </select>
+          </label>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
+          <div class={sharedStyles.field} style="margin: 0;">
+            <label class={sharedStyles.fieldLabel} for="sqlInput">SQL input</label>
+            <textarea
+              id="sqlInput"
+              class={sharedStyles.textarea}
+              rows="16"
+              style="font-family: monospace; font-size: 0.8rem;"
+              spellcheck="false"
+            >{SAMPLE}</textarea>
+          </div>
+
+          <div class={sharedStyles.field} style="margin: 0;">
+            <label class={sharedStyles.fieldLabel} for="sqlOutput">Output</label>
+            <pre
+              id="sqlOutput"
+              class={sharedStyles.outputArea}
+              style="font-family: monospace; font-size: 0.8rem; white-space: pre-wrap; word-break: break-word; margin: 0; min-height: 300px; overflow: auto;"
+            ></pre>
+          </div>
+        </div>
+
+        <div id="sql-error" class={sharedStyles.errorMessage} style="display: none; margin-top: 12px;"></div>
+
+        <div class={sharedStyles.buttonGroup} style="margin-top: 16px; flex-wrap: wrap;">
+          <button type="button" id="btn-format" class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}>
+            Format
+          </button>
+          <button type="button" id="btn-minify" class={sharedStyles.button}>Minify</button>
+          <button type="button" id="btn-copy" class={sharedStyles.button}>Copy</button>
+          <button type="button" id="btn-sample" class={sharedStyles.button}>Load sample</button>
+        </div>
+      </div>
+
+      <div class={sharedStyles.card} style="margin-top: 20px;">
+        <h3 style="margin: 0 0 16px 0; font-size: 1.1rem;">Statement summary</h3>
+        <div
+          id="summary-grid"
+          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;"
+        ></div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  import {
+    formatSql,
+    isSqlDialect,
+    minifySql,
+    summarize,
+    type KeywordCase,
+    type SqlFormatOptions,
+  } from '@/lib/sql';
+  import { escapeHtml } from '@/lib/utils';
+
+  const SAMPLE = `select u.id, u.name, count(o.id) as order_count from users u left join orders o on o.user_id = u.id where u.created_at > '2026-01-01' and u.active = true group by u.id, u.name having count(o.id) > 3 order by order_count desc limit 20;`;
+
+  const sqlInput = document.getElementById('sqlInput') as HTMLTextAreaElement | null;
+  const sqlOutput = document.getElementById('sqlOutput');
+  const errorBox = document.getElementById('sql-error');
+  const summaryGrid = document.getElementById('summary-grid');
+  const dialect = document.getElementById('dialect') as HTMLSelectElement | null;
+  const keywordCase = document.getElementById('keywordCase') as HTMLSelectElement | null;
+  const indent = document.getElementById('indent') as HTMLSelectElement | null;
+
+  function options(): Partial<SqlFormatOptions> {
+    const dialectValue = dialect?.value ?? 'sql';
+    const indentValue = indent?.value ?? '2';
+
+    return {
+      dialect: isSqlDialect(dialectValue) ? dialectValue : 'sql',
+      keywordCase: (keywordCase?.value ?? 'upper') as KeywordCase,
+      useTabs: indentValue === 'tab',
+      tabWidth: indentValue === 'tab' ? 2 : Number(indentValue),
+    };
+  }
+
+  function showError(message: string) {
+    if (!errorBox) return;
+    errorBox.textContent = message;
+    errorBox.style.display = 'block';
+  }
+
+  function renderSummary() {
+    if (!summaryGrid || !sqlInput) return;
+
+    const summary = summarize(sqlInput.value);
+    const rows: Array<[string, string]> = [
+      ['Statements', String(summary.statements)],
+      ['Comments', summary.hasComments ? 'yes' : 'no'],
+      ...Object.entries(summary.kinds).map(([kind, count]) => [kind, String(count)] as [string, string]),
+    ];
+
+    summaryGrid.innerHTML = rows
+      .map(
+        ([label, value]) => `
+          <div style="padding: 10px 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+            <div style="font-size: 0.72rem; opacity: 0.7;">${escapeHtml(label)}</div>
+            <div style="font-size: 1rem; font-weight: 600; font-family: monospace;">${escapeHtml(value)}</div>
+          </div>`
+      )
+      .join('');
+  }
+
+  function runFormat() {
+    if (!sqlInput || !sqlOutput) return;
+
+    const result = formatSql(sqlInput.value, options());
+
+    if (!result.ok) {
+      showError(result.error);
+      return;
+    }
+
+    if (errorBox) errorBox.style.display = 'none';
+    sqlOutput.textContent = result.sql;
+  }
+
+  function runMinify() {
+    if (!sqlInput || !sqlOutput) return;
+
+    const value = sqlInput.value.trim();
+    if (!value) {
+      showError('Paste some SQL to minify.');
+      return;
+    }
+
+    if (errorBox) errorBox.style.display = 'none';
+    sqlOutput.textContent = minifySql(value);
+  }
+
+  sqlInput?.addEventListener('input', () => {
+    runFormat();
+    renderSummary();
+  });
+
+  [dialect, keywordCase, indent].forEach(control => {
+    control?.addEventListener('change', runFormat);
+  });
+
+  document.getElementById('btn-format')?.addEventListener('click', runFormat);
+  document.getElementById('btn-minify')?.addEventListener('click', runMinify);
+
+  document.getElementById('btn-sample')?.addEventListener('click', () => {
+    if (!sqlInput) return;
+    sqlInput.value = SAMPLE;
+    runFormat();
+    renderSummary();
+  });
+
+  document.getElementById('btn-copy')?.addEventListener('click', async event => {
+    const button = event.currentTarget as HTMLButtonElement;
+    if (!sqlOutput?.textContent) return;
+
+    await navigator.clipboard.writeText(sqlOutput.textContent);
+    const original = button.textContent;
+    button.textContent = 'Copied!';
+    setTimeout(() => {
+      button.textContent = original;
+    }, 1500);
+  });
+
+  runFormat();
+  renderSummary();
+</script>
