@@ -349,6 +349,13 @@ Every tool is four things: pure logic in `lib/<name>.ts`, a page at `src/pages/<
 
 Search itself lives in `lib/tool-search.ts`. It builds a weighted fuse.js index over name, aliases, tags, description and categories, requires every query token to match, boosts name prefixes and returns literal match ranges for highlighting.
 
+### Register a new Status
+
+- Append 'beta' to TOOL_TYPES in tools.ts:18
+- Add entries to STATUS_ICONS and STATUS_LABELS right below it
+- Add beta: styles.dotBeta to the DOT_CLASS maps in index.astro:27 and ToolCard.astro:18
+- Add a .dotBeta colour rule in catalog.module.css:382
+
 ---
 
 ## 📄 License
