@@ -158,51 +158,56 @@ const initialTools = tools.slice(0, 6);
 </Layout>
 
 <script>
-  import type { Tool } from '@/lib/tools';
+  import styles from '@/styles/not-found.module.css';
+  import { escapeHtml } from '@/lib/utils';
+
+  type SearchModule = typeof import('@/lib/tool-search');
+
+  const MAX_RESULTS = 6;
 
   const input = document.getElementById('404-search') as HTMLInputElement | null;
   const grid = document.getElementById('results-grid');
   const label = document.getElementById('results-label');
 
   if (input && grid && label) {
-    let filterToolsFn: ((query: string, category: string, status: any) => Tool[]) | null = null;
+    let search: SearchModule | null = null;
     let loadPromise: Promise<void> | null = null;
 
-    async function ensureTools() {
-      if (filterToolsFn) return filterToolsFn;
-      if (!loadPromise) {
-        loadPromise = import('@/lib/tools').then(mod => {
-          filterToolsFn = mod.filterTools;
-        });
-      }
+    async function ensureSearch() {
+      loadPromise ??= import('@/lib/tool-search').then(mod => {
+        search = mod;
+      });
       await loadPromise;
-      return filterToolsFn;
+      return search;
     }
 
-    input.addEventListener('focus', () => { ensureTools(); }, { once: true });
-    input.addEventListener('pointerenter', () => { ensureTools(); }, { once: true });
+    input.addEventListener('focus', () => { ensureSearch(); }, { once: true });
+    input.addEventListener('pointerenter', () => { ensureSearch(); }, { once: true });
 
     input.addEventListener('input', async () => {
       const q = input.value;
       label.textContent = q ? 'Search results' : 'Popular picks';
-      const fn = await ensureTools();
-      if (!fn) return;
-      const results = fn(q, 'all', 'all').slice(0, 6);
 
-      grid.innerHTML = results.map(t => {
-        const href = t.url || '/';
-        const isExt = /^(https?:\/\/|mailto:)/i.test(href);
-        return `
-          <a href="${href}" class="resultCard" ${isExt ? 'target="_blank" rel="noopener noreferrer"' : ''}>
-            <h3 class="resultTitle">${t.name}</h3>
-            <p class="resultDesc">${t.desc}</p>
-            <div class="resultMeta">
+      const mod = await ensureSearch();
+      if (!mod) return;
+
+      const results = mod.searchTools(q, { limit: MAX_RESULTS });
+
+      grid.innerHTML = results
+        .map(({ tool, nameRanges, descRanges }) => {
+          const isExt = /^(https?:\/\/|mailto:)/i.test(tool.url);
+          return `
+          <a href="${escapeHtml(tool.url || '/')}" class="${styles.resultCard}" ${isExt ? 'target="_blank" rel="noopener noreferrer"' : ''}>
+            <h3 class="${styles.resultTitle}">${mod.highlight(tool.name, nameRanges)}</h3>
+            <p class="${styles.resultDesc}">${mod.highlight(tool.desc, descRanges)}</p>
+            <div class="${styles.resultMeta}">
               <span>Open</span>
               <span aria-hidden="true">→</span>
             </div>
           </a>
         `;
-      }).join('');
+        })
+        .join('');
     });
 
     input.addEventListener('keydown', (e) => {

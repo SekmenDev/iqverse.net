@@ -3,7 +3,7 @@ import Layout from "@/layouts/Layout.astro";
 import ThemeToggle from "@/components/ThemeToggle.astro";
 import ToolNavSearch from "@/components/ToolNavSearch.astro";
 import { getToolJsonLd } from "@/lib/jsonld";
-import { tools } from "@/lib/tools";
+import { primaryCategory, tools } from "@/lib/tools";
 import styles from "@/styles/tool-layout.module.css";
 
 export interface Props {
@@ -34,7 +34,7 @@ const jsonLdData = getToolJsonLd(
   title,
   description,
   `/${slug}/`,
-  matchedTool?.cat,
+  matchedTool && primaryCategory(matchedTool),
 );
 const canonicalUrl = `https://iqverse.net/${slug}/`;
 const pageTitle = subtitle

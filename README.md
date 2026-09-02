@@ -219,7 +219,8 @@ iqverse.net/
 │   ├── 📂 layout/              # Header, Footer, Navigation bars
 │   └── 📂 tools/               # Isolated tool UI component implementations
 ├── 📂 lib/                     # Core business logic & registries
-│   └── 📄 tools.ts             # Central tool catalog registry, filters & metadata
+│   ├── 📄 tools.ts             # Central tool catalog registry, categories & filters
+│   └── 📄 tool-search.ts       # Ranked fuzzy search, highlighting & suggestions
 ├── 📂 public/                  # Static assets, tool icons, manifest & favicons
 ├── 📂 styles/                  # Supplemental style utilities
 ├── 📄 eslint.config.mjs        # ESLint flat configuration
@@ -341,7 +342,28 @@ If you want to contribute a new tool or fix a bug:
 
 5. **Open a Pull Request**
 
-Please review [`lib/tools.ts`](file:///d:/Projects/iqverse.net/lib/tools.ts) when adding a new tool to ensure proper registration in the live search catalog!
+### Registering a new tool
+
+Every tool is four things: pure logic in `lib/<name>.ts`, a page at `src/pages/<slug>/index.astro` wrapping `ToolLayout`, a unit test in `__tests__/unit/<name>.test.ts` and one entry in the registry at `lib/tools.ts`.
+
+```ts
+{
+  name: "CIDR Calculator",
+  desc: "Calculate subnet ranges, masks, host counts and CIDR splits in your browser.",
+  icon: "🧮",
+  url: "/cidr-calculator/",
+  type: "open",
+  tags: "cidr subnet mask ipv4 ipv6 network range",
+  cats: ["Network", "Security"],
+  aliases: "subnetting netmask slash notation ip range",
+}
+```
+
+- `cats` is ordered. The first entry is the primary category: it drives homepage grouping, the JSON-LD `applicationCategory` and the breadcrumb. Any extra categories only widen filter and search reach, so a tool never appears twice in the grouped view. Categories are checked at compile time against `CATEGORIES`.
+- `aliases` holds the words people search for that the name and tags do not contain (`epoch` for the Timestamp Converter, `guid` for UUID, `beautify` for the JSON Formatter). They are weighted just below the name in search ranking.
+- `url` doubles as the registry key, so it must be unique.
+
+Search itself lives in `lib/tool-search.ts`. It builds a weighted fuse.js index over name, aliases, tags, description and categories, requires every query token to match, boosts name prefixes and returns literal match ranges for highlighting.
 
 ---
 

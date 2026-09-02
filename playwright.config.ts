@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const port = Number(process.env.PREVIEW_PORT ?? 4321);
+
 export default defineConfig({
   testDir: './__tests__/e2e',
   fullyParallel: true,
@@ -8,7 +10,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
-    baseURL: 'http://localhost:4321',
+    baseURL: `http://localhost:${port}`,
     trace: 'on-first-retry',
   },
   projects: [
@@ -18,8 +20,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'yarn vite preview --port 4321 --outDir dist',
-    url: 'http://localhost:4321',
+    command: `yarn vite preview --port ${port} --outDir dist`,
+    url: `http://localhost:${port}`,
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
   },

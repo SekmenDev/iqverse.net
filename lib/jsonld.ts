@@ -1,4 +1,4 @@
-import { tools, type Tool } from './tools';
+import { primaryCategory, tools, type Category } from './tools';
 
 // Utility functions
 function normalizeUrl(path?: string): string {
@@ -8,7 +8,7 @@ function normalizeUrl(path?: string): string {
   return `https://iqverse.net${normalizedPath}`;
 }
 
-export function getApplicationCategory(category: string): string {
+export function getApplicationCategory(category: Category | 'Developer'): string {
   if (category === 'Security') return 'SecurityApplication';
   if (category === 'Design') return 'DesignApplication';
   if (category === 'Network' || category === 'Browser Tools') return 'UtilitiesApplication';
@@ -83,17 +83,17 @@ export function getToolJsonLd(
   name: string,
   description?: string,
   urlPath?: string,
-  category?: string
+  category?: Category
 ): [Record<string, any>, Record<string, any>] {
   const fullUrl = normalizeUrl(urlPath);
   const matchedTool = tools.find(
     t => t.name.toLowerCase() === name.toLowerCase() || (urlPath && t.url === urlPath)
   );
 
-  const catName = category || matchedTool?.cat || matchedTool?.category || 'Developer';
+  const catName = category || (matchedTool && primaryCategory(matchedTool)) || 'Developer';
   const appCategory = getApplicationCategory(catName);
-  const toolDesc = description || matchedTool?.desc || matchedTool?.description || name;
-  const keywords = matchedTool?.tags ? matchedTool.tags.split(' ').join(', ') : undefined;
+  const toolDesc = description || matchedTool?.desc || name;
+  const keywords = matchedTool?.tags ? matchedTool.tags.replaceAll(' ', ', ') : undefined;
 
   const webAppSchema: Record<string, any> = {
     '@context': 'https://schema.org',
@@ -179,10 +179,10 @@ export function getSaasJsonLd(
   if (brand.toLowerCase().includes('goo') || brand.toLowerCase().includes('ges')) {
     appCategory = 'EducationalApplication';
   } else if (matchedTool) {
-    appCategory = getApplicationCategory(matchedTool.cat);
+    appCategory = getApplicationCategory(primaryCategory(matchedTool));
   }
 
-  const saasDesc = description || matchedTool?.desc || matchedTool?.description || brand;
+  const saasDesc = description || matchedTool?.desc || brand;
 
   const saasAppSchema: Record<string, any> = {
     '@context': 'https://schema.org',
@@ -285,64 +285,4 @@ export function getToolsCollectionJsonLd() {
   };
 }
 
-export interface ToolInfo {
-  name: string;
-  description: string;
-  icon: string;
-  url: string;
-  type: 'open' | 'saas' | 'coming';
-  category: string;
-}
-
-export function generateToolThingSchema(tool: ToolInfo | Tool) {
-  const fullUrl = normalizeUrl(tool.url);
-  const isOpen = tool.type === 'open';
-  const isSaas = tool.type === 'saas';
-  const cat = 'cat' in tool ? tool.cat : tool.category;
-  const description = 'desc' in tool ? tool.desc : tool.description;
-  const applicationCategory = getApplicationCategory(cat || 'Developer');
-
-  const schema: Record<string, unknown> = {
-    '@context': 'https://schema.org',
-    '@type': isOpen ? 'WebApplication' : 'SoftwareApplication',
-    '@id': fullUrl,
-    name: tool.name,
-    description: description || tool.name,
-    url: fullUrl,
-    applicationCategory: applicationCategory,
-    operatingSystem: isSaas ? 'Web' : 'All',
-    isAccessibleForFree: true,
-    inLanguage: 'en-US',
-    offers: {
-      '@type': 'Offer',
-      price: '0',
-      priceCurrency: 'USD',
-      availability: 'https://schema.org/InStock',
-      url: fullUrl,
-    },
-    author: {
-      '@type': 'Organization',
-      name: 'Sekmen.Dev',
-      url: 'https://sekmen.dev',
-    },
-    publisher: {
-      '@type': 'Organization',
-      name: 'IQVerse',
-      url: 'https://iqverse.net/',
-      logo: 'https://iqverse.net/favicon-32x32.png',
-    },
-  };
-
-  if (!isSaas) {
-    schema.browserRequirements = 'Requires JavaScript. Requires HTML5.';
-    schema.platformRequirement = 'Requires a modern web browser with JavaScript and HTML5 support.';
-  }
-
-  if (isOpen) {
-    schema.codeRepository = 'https://github.com/SekmenDev/iqverse.net';
-    schema.license = 'https://github.com/SekmenDev/iqverse.net/blob/main/LICENSE';
-  }
-
-  return schema;
-}
 
