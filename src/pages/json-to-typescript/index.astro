@@ -1,0 +1,188 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+
+const SAMPLE = `{
+  "id": 42,
+  "name": "Ada Lovelace",
+  "active": true,
+  "tags": ["engineer", "pioneer"],
+  "profile": {
+    "city": "London",
+    "website": null
+  },
+  "posts": [
+    { "id": 1, "title": "First", "views": 10 },
+    { "id": 2, "title": "Second", "pinned": true }
+  ]
+}`;
+---
+
+<ToolLayout
+  title="JSON to TypeScript Interface Generator"
+  subtitle="Turn Any JSON Payload into Typed Interfaces"
+  pill="BROWSER TOOLS"
+  toolSlug="json-to-typescript"
+  description="Convert JSON into TypeScript interfaces or type aliases. Merges object shapes across array elements, marks missing fields optional and reuses identical shapes."
+>
+  <div style="max-width: 1100px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 16px;">
+          <div class={sharedStyles.field} style="flex: 1; min-width: 160px; margin: 0;">
+            <label class={sharedStyles.fieldLabel} for="rootName">Root type name</label>
+            <input
+              id="rootName"
+              type="text"
+              class={sharedStyles.input}
+              style="font-family: monospace;"
+              value="Root"
+              autocomplete="off"
+            />
+          </div>
+
+          <label style="font-size: 0.78rem; display: flex; flex-direction: column; gap: 4px;">
+            Declaration
+            <select id="declaration" class={sharedStyles.select} style="padding: 6px 10px;">
+              <option value="interface">interface</option>
+              <option value="type">type alias</option>
+            </select>
+          </label>
+        </div>
+
+        <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px;">
+          <label style="font-size: 0.8rem; display: flex; align-items: center; gap: 6px;">
+            <input id="exportTypes" type="checkbox" checked /> export
+          </label>
+          <label style="font-size: 0.8rem; display: flex; align-items: center; gap: 6px;">
+            <input id="readonlyProps" type="checkbox" /> readonly properties
+          </label>
+          <label style="font-size: 0.8rem; display: flex; align-items: center; gap: 6px;">
+            <input id="nullAsOptional" type="checkbox" /> treat null as optional
+          </label>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
+          <div class={sharedStyles.field} style="margin: 0;">
+            <label class={sharedStyles.fieldLabel} for="jsonInput">JSON input</label>
+            <textarea
+              id="jsonInput"
+              class={sharedStyles.textarea}
+              rows="18"
+              style="font-family: monospace; font-size: 0.8rem;"
+              spellcheck="false"
+            >{SAMPLE}</textarea>
+          </div>
+
+          <div class={sharedStyles.field} style="margin: 0;">
+            <label class={sharedStyles.fieldLabel} for="tsOutput">TypeScript output</label>
+            <pre
+              id="tsOutput"
+              class={sharedStyles.outputArea}
+              style="font-family: monospace; font-size: 0.8rem; white-space: pre-wrap; word-break: break-word; margin: 0; min-height: 340px; overflow: auto;"
+            ></pre>
+          </div>
+        </div>
+
+        <div id="ts-error" class={sharedStyles.errorMessage} style="display: none; margin-top: 12px;"></div>
+
+        <div class={sharedStyles.buttonGroup} style="margin-top: 16px;">
+          <button type="button" id="btn-copy" class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}>
+            Copy TypeScript
+          </button>
+          <button type="button" id="btn-sample" class={sharedStyles.button}>Load sample</button>
+          <button type="button" id="btn-clear" class={sharedStyles.button}>Clear</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  import { generateTypes, type GenerateOptions } from '@/lib/json-to-ts';
+
+  const SAMPLE = `{
+  "id": 42,
+  "name": "Ada Lovelace",
+  "active": true,
+  "tags": ["engineer", "pioneer"],
+  "profile": {
+    "city": "London",
+    "website": null
+  },
+  "posts": [
+    { "id": 1, "title": "First", "views": 10 },
+    { "id": 2, "title": "Second", "pinned": true }
+  ]
+}`;
+
+  const jsonInput = document.getElementById('jsonInput') as HTMLTextAreaElement | null;
+  const tsOutput = document.getElementById('tsOutput');
+  const errorBox = document.getElementById('ts-error');
+  const rootName = document.getElementById('rootName') as HTMLInputElement | null;
+  const declaration = document.getElementById('declaration') as HTMLSelectElement | null;
+  const exportTypes = document.getElementById('exportTypes') as HTMLInputElement | null;
+  const readonlyProps = document.getElementById('readonlyProps') as HTMLInputElement | null;
+  const nullAsOptional = document.getElementById('nullAsOptional') as HTMLInputElement | null;
+
+  function options(): Partial<GenerateOptions> {
+    return {
+      rootName: rootName?.value.trim() || 'Root',
+      declaration: declaration?.value === 'type' ? 'type' : 'interface',
+      exportTypes: exportTypes?.checked ?? true,
+      readonlyProps: readonlyProps?.checked ?? false,
+      nullAsOptional: nullAsOptional?.checked ?? false,
+    };
+  }
+
+  function update() {
+    if (!jsonInput || !tsOutput) return;
+
+    const result = generateTypes(jsonInput.value, options());
+
+    if (!result.ok) {
+      if (errorBox) {
+        errorBox.textContent = result.error;
+        errorBox.style.display = 'block';
+      }
+      return;
+    }
+
+    if (errorBox) errorBox.style.display = 'none';
+    tsOutput.textContent = result.code;
+  }
+
+  jsonInput?.addEventListener('input', update);
+
+  [rootName, declaration, exportTypes, readonlyProps, nullAsOptional].forEach(control => {
+    control?.addEventListener('input', update);
+    control?.addEventListener('change', update);
+  });
+
+  document.getElementById('btn-sample')?.addEventListener('click', () => {
+    if (!jsonInput) return;
+    jsonInput.value = SAMPLE;
+    update();
+  });
+
+  document.getElementById('btn-clear')?.addEventListener('click', () => {
+    if (!jsonInput || !tsOutput) return;
+    jsonInput.value = '';
+    tsOutput.textContent = '';
+    if (errorBox) errorBox.style.display = 'none';
+  });
+
+  document.getElementById('btn-copy')?.addEventListener('click', async event => {
+    const button = event.currentTarget as HTMLButtonElement;
+    if (!tsOutput?.textContent) return;
+
+    await navigator.clipboard.writeText(tsOutput.textContent);
+    const original = button.textContent;
+    button.textContent = 'Copied!';
+    setTimeout(() => {
+      button.textContent = original;
+    }, 1500);
+  });
+
+  update();
+</script>

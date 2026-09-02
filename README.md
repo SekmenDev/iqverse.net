@@ -67,6 +67,7 @@ IQVerse organizes tools into intuitive categories. Below is the full directory o
 | **Link Radar** | [`/linkradar/`](https://iqverse.net/linkradar/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Find broken links and 404s in any webpage instantly |
 | **Favicon Generator** | [`/favicongen/`](https://iqverse.net/favicongen/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Create favicons in all required sizes plus `manifest.json` |
 | **JSON Formatter** | [`/json/`](https://iqverse.net/json/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Format, validate, minify and sort keys in your JSON locally |
+| **JSON to TypeScript** | [`/json-to-typescript/`](https://iqverse.net/json-to-typescript/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Generate TypeScript interfaces from any JSON payload |
 | **Base64 & URL Encoder** | [`/encodelab/`](https://iqverse.net/encodelab/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Encode/decode Base64, URL parameters, JWT tokens and Data URIs |
 | **URL Tools** | [`/url/`](https://iqverse.net/url/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Parse, build, encode and decode URLs with query parameter editing |
 | **Compression** | [`/compression/`](https://iqverse.net/compression/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Compress and decompress text using browser-native Deflate support |
