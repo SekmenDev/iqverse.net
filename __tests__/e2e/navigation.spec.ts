@@ -165,7 +165,7 @@ test.describe('E2E Navigation & Layout Integration', () => {
     const names = await cards.evaluateAll(items => items.map(i => i.getAttribute('data-name')));
 
     // Primary Security tool and a tool that only lists Security as a secondary category
-    expect(names).toContain('Password Generator');
+    expect(names).toContain('HeaderScan');
     expect(names).toContain('Cookie Inspector');
 
     for (const card of await cards.all()) {

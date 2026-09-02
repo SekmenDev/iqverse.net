@@ -58,73 +58,83 @@ IQVerse organizes tools into intuitive categories. Below is the full directory o
 | **Structured Data Validator** | [`/schema-validator/`](https://iqverse.net/schema-validator/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Test JSON-LD structured data and Schema.org markup for AI agents & crawlers |
 | **AI Crawler Log Analyzer** | [`/ai-log-analyzer/`](https://iqverse.net/ai-log-analyzer/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Parse server access logs locally to analyze visits from GPTBot, ClaudeBot & PerplexityBot |
 
-### 🛠️ Browser & Developer Utilities
+### 🔍 Web & SEO
 
 | Tool Name | Route / Link | Status | Description |
 | :--- | :--- | :--- | :--- |
 | **Web Baseline Checker** | [`/web-baseline/`](https://iqverse.net/web-baseline/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Audit website hygiene: HTTPS, favicon, title, viewport, H1, header, footer, schema, robots.txt & sitemaps |
-| **QR Forge** | [`/qrforge/`](https://iqverse.net/qrforge/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Vector QR code generator for URLs, Wi-Fi credentials, vCards & plain text |
 | **Link Radar** | [`/linkradar/`](https://iqverse.net/linkradar/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Find broken links and 404s in any webpage instantly |
-| **Favicon Generator** | [`/favicongen/`](https://iqverse.net/favicongen/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Create favicons in all required sizes plus `manifest.json` |
-| **JSON Formatter** | [`/json/`](https://iqverse.net/json/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Format, validate, minify and sort keys in your JSON locally |
-| **Number Base Converter** | [`/base-converter/`](https://iqverse.net/base-converter/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Convert binary, octal, decimal and hex with two's complement bit views |
-| **SQL Formatter & Minifier** | [`/sql-formatter/`](https://iqverse.net/sql-formatter/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Beautify and minify SQL across 12 dialects with a statement summary |
-| **JSON to TypeScript** | [`/json-to-typescript/`](https://iqverse.net/json-to-typescript/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Generate TypeScript interfaces from any JSON payload |
-| **Base64 & URL Encoder** | [`/encodelab/`](https://iqverse.net/encodelab/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Encode/decode Base64, URL parameters, JWT tokens and Data URIs |
-| **URL Tools** | [`/url/`](https://iqverse.net/url/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Parse, build, encode and decode URLs with query parameter editing |
-| **Compression** | [`/compression/`](https://iqverse.net/compression/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Compress and decompress text using browser-native Deflate support |
-| **Data Converter** | [`/dataconverter/`](https://iqverse.net/dataconverter/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Convert JSON, CSV, Hex and Base64 data in the browser locally |
-| **RegEx Forge** | [`/regex/`](https://iqverse.net/regex/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Build and test regular expressions with live highlighting & explanations |
-| **Image Optimizer** | [`/imageoptimizer/`](https://iqverse.net/imageoptimizer/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Compress PNG, JPEG and WebP in-browser while keeping files local |
-| **CSV Viewer & Converter** | [`/csvviewer/`](https://iqverse.net/csvviewer/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | View CSV as a sortable table, export to JSON, Markdown or SQL |
-| **Diff Checker** | [`/diff-checker/`](https://iqverse.net/diff-checker/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Side-by-side text, JSON and code diff viewer with live change highlighting |
-| **Markdown Previewer** | [`/markdown-preview/`](https://iqverse.net/markdown-preview/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Live Markdown to HTML renderer with instant preview and file export |
-| **Lorem Ipsum & Fake Data** | [`/fake-data-generator/`](https://iqverse.net/fake-data-generator/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Generate names, addresses, emails and mock JSON data batches locally |
-| **UUID / ULID Generator** | [`/uuid-ulid-generator/`](https://iqverse.net/uuid-ulid-generator/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Batch generate cryptographically secure UUID v4 and sortable ULIDs |
-| **Cron Expression Builder** | [`/cron-builder/`](https://iqverse.net/cron-builder/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Visual cron schedule generator with human-readable explanations |
-| **Timestamp Converter** | [`/timestamp-converter/`](https://iqverse.net/timestamp-converter/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Convert Unix timestamps to ISO 8601 and human-readable dates |
-| **Text Case Converter** | [`/case-converter/`](https://iqverse.net/case-converter/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Toggle camelCase, snake_case, kebab-case, Title Case & UPPERCASE |
-| **YAML / JSON / TOML** | [`/yaml-json-toml/`](https://iqverse.net/yaml-json-toml/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Convert seamlessly between YAML, JSON and TOML formats |
 | **Sitemap Generator** | [`/sitemap-generator/`](https://iqverse.net/sitemap-generator/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Crawl web pages or paths to build XML sitemaps for search engines |
 | **robots.txt Generator** | [`/robots-generator/`](https://iqverse.net/robots-generator/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Build and test `robots.txt` directives for web crawlers & AI bots |
 | **Meta Tag & Open Graph** | [`/og-preview/`](https://iqverse.net/og-preview/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Preview social card appearance across Google, Twitter, FB & LinkedIn |
+
+### 🗃️ Data & Formats
+
+| Tool Name | Route / Link | Status | Description |
+| :--- | :--- | :--- | :--- |
+| **JSON Formatter** | [`/json/`](https://iqverse.net/json/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Format, validate, minify and sort keys in your JSON locally |
+| **YAML / JSON / TOML** | [`/yaml-json-toml/`](https://iqverse.net/yaml-json-toml/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Convert seamlessly between YAML, JSON and TOML formats |
+| **CSV Viewer & Converter** | [`/csvviewer/`](https://iqverse.net/csvviewer/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | View CSV as a sortable table, export to JSON, Markdown or SQL |
+| **Data Converter** | [`/dataconverter/`](https://iqverse.net/dataconverter/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Convert JSON, CSV, Hex and Base64 data in the browser locally |
+| **JSON to TypeScript** | [`/json-to-typescript/`](https://iqverse.net/json-to-typescript/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Generate TypeScript interfaces from any JSON payload |
+| **SQL Formatter & Minifier** | [`/sql-formatter/`](https://iqverse.net/sql-formatter/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Beautify and minify SQL across 12 dialects with a statement summary |
+| **Number Base Converter** | [`/base-converter/`](https://iqverse.net/base-converter/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Convert binary, octal, decimal and hex with two's complement bit views |
+| **Timestamp Converter** | [`/timestamp-converter/`](https://iqverse.net/timestamp-converter/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Convert Unix timestamps to ISO 8601 and human-readable dates |
+| **Compression** | [`/compression/`](https://iqverse.net/compression/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Compress and decompress text using browser-native Deflate support |
+
+### ✍️ Text & Code
+
+| Tool Name | Route / Link | Status | Description |
+| :--- | :--- | :--- | :--- |
+| **RegEx Forge** | [`/regex/`](https://iqverse.net/regex/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Build and test regular expressions with live highlighting & explanations |
+| **Diff Checker** | [`/diff-checker/`](https://iqverse.net/diff-checker/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Side-by-side text, JSON and code diff viewer with live change highlighting |
+| **Markdown Previewer** | [`/markdown-preview/`](https://iqverse.net/markdown-preview/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Live Markdown to HTML renderer with instant preview and file export |
+| **Text Case Converter** | [`/case-converter/`](https://iqverse.net/case-converter/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Toggle camelCase, snake_case, kebab-case, Title Case & UPPERCASE |
+| **Base64 & URL Encoder** | [`/encodelab/`](https://iqverse.net/encodelab/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Encode/decode Base64, URL parameters, JWT tokens and Data URIs |
+
+### 🎲 Generators
+
+| Tool Name | Route / Link | Status | Description |
+| :--- | :--- | :--- | :--- |
+| **QR Forge** | [`/qrforge/`](https://iqverse.net/qrforge/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Vector QR code generator for URLs, Wi-Fi credentials, vCards & plain text |
+| **Favicon Generator** | [`/favicongen/`](https://iqverse.net/favicongen/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Create favicons in all required sizes plus `manifest.json` |
+| **Lorem Ipsum & Fake Data** | [`/fake-data-generator/`](https://iqverse.net/fake-data-generator/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Generate names, addresses, emails and mock JSON data batches locally |
+| **UUID / ULID Generator** | [`/uuid-ulid-generator/`](https://iqverse.net/uuid-ulid-generator/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Batch generate cryptographically secure UUID v4 and sortable ULIDs |
+| **Cron Expression Builder** | [`/cron-builder/`](https://iqverse.net/cron-builder/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Visual cron schedule generator with human-readable explanations |
+
+### 🔌 APIs & HTTP
+
+| Tool Name | Route / Link | Status | Description |
+| :--- | :--- | :--- | :--- |
+| **URL Tools** | [`/url/`](https://iqverse.net/url/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Parse, build, encode and decode URLs with query parameter editing |
 | **HTTP Status Reference** | [`/http-status/`](https://iqverse.net/http-status/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Searchable reference of HTTP status codes & standard response headers |
 | **CORS Tester** | [`/cors-tester/`](https://iqverse.net/cors-tester/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Test CORS configuration and header response rules for API endpoints |
 | **curl to fetch Converter** | [`/curl-converter/`](https://iqverse.net/curl-converter/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Convert curl commands into JavaScript fetch or Python requests code |
 | **Webhook Inspector** | [`/webhook-inspector/`](https://iqverse.net/webhook-inspector/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Inspect and debug incoming HTTP webhook payloads and request headers |
 | **Cookie Inspector** | [`/cookie-inspector/`](https://iqverse.net/cookie-inspector/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Parse raw Cookie & Set-Cookie headers for SameSite and security flags |
 
-### 🔒 Security Tools
+### 🔒 Security
+
+| Tool Name | Route / Link | Status | Description |
+| :--- | :--- | :--- | :--- |
+| **HeaderScan** | [`/headers/`](https://iqverse.net/headers/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | HTTP response header inspector with security assessment breakdown |
+| **CSP Header Builder** | [`/csp-builder/`](https://iqverse.net/csp-builder/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Interactive Content-Security-Policy generator & directive validator |
+| **SSL / TLS Inspector** | [`/ssl-inspector/`](https://iqverse.net/ssl-inspector/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Inspect SSL/TLS certificate validity, issuer details & trust chain |
+| **SPF, DKIM & DMARC Checker** | [`/email-auth/`](https://iqverse.net/email-auth/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Validate email auth records, SPF lookup budget and DKIM key strength |
+
+### 🔐 Crypto & Hashing
 
 | Tool Name | Route / Link | Status | Description |
 | :--- | :--- | :--- | :--- |
 | **Password Generator** | [`/password/`](https://iqverse.net/password/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Cryptographically secure password & secret generator (WebCrypto API) |
-| **HeaderScan** | [`/headers/`](https://iqverse.net/headers/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | HTTP response header inspector with security assessment breakdown |
-| **Hashing** | [`/hashing/`](https://iqverse.net/hashing/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Compute SHA digests and HMAC values locally in hex or Base64 |
-| **SSL / TLS Inspector** | [`/ssl-inspector/`](https://iqverse.net/ssl-inspector/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Inspect SSL/TLS certificate validity, issuer details & trust chain |
-| **JWT Debugger & Verifier** | [`/jwt-debugger/`](https://iqverse.net/jwt-debugger/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Decode JWT headers/claims and verify signatures locally |
-| **CSP Header Builder** | [`/csp-builder/`](https://iqverse.net/csp-builder/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Interactive Content-Security-Policy generator & directive validator |
-| **SPF, DKIM & DMARC Checker** | [`/email-auth/`](https://iqverse.net/email-auth/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Validate email auth records, SPF lookup budget and DKIM key strength |
 | **Password Analyzer** | [`/password-analyzer/`](https://iqverse.net/password-analyzer/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Evaluate password strength, bit entropy and crack time offline |
-| **TOTP Authenticator Generator** | [`/totp-generator/`](https://iqverse.net/totp-generator/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Generate and verify RFC 6238 2FA codes with QR enrollment, fully offline |
-| **SRI Hash Generator** | [`/sri-generator/`](https://iqverse.net/sri-generator/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Generate and verify Subresource Integrity hashes for CDN scripts and styles |
+| **Hashing** | [`/hashing/`](https://iqverse.net/hashing/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Compute SHA digests and HMAC values locally in hex or Base64 |
 | **File Hash Verifier** | [`/file-hash/`](https://iqverse.net/file-hash/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Calculate and compare MD5, SHA-1, SHA-256 and SHA-512 file hashes |
+| **SRI Hash Generator** | [`/sri-generator/`](https://iqverse.net/sri-generator/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Generate and verify Subresource Integrity hashes for CDN scripts and styles |
+| **JWT Debugger & Verifier** | [`/jwt-debugger/`](https://iqverse.net/jwt-debugger/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Decode JWT headers/claims and verify signatures locally |
+| **TOTP Authenticator Generator** | [`/totp-generator/`](https://iqverse.net/totp-generator/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Generate and verify RFC 6238 2FA codes with QR enrollment, fully offline |
 
-### 🎨 Design Tools
-
-| Tool Name | Route / Link | Status | Description |
-| :--- | :--- | :--- | :--- |
-| **Color Palette Generator** | [`/chromata/`](https://iqverse.net/chromata/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Create harmonious color palettes & extract colors from images |
-| **CSS Units Converter** | [`/cssunits/`](https://iqverse.net/cssunits/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Convert px, rem, em, vw, vh with live browser viewport context |
-| **SVG Optimizer** | [`/svg-optimizer/`](https://iqverse.net/svg-optimizer/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Minify inline SVG markup by stripping redundant metadata |
-| **CSS Box Shadow Builder** | [`/box-shadow/`](https://iqverse.net/box-shadow/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Stack and tune layered CSS shadows with a live preview and paste-to-edit |
-| **Cubic Bezier Easing Editor** | [`/cubic-bezier/`](https://iqverse.net/cubic-bezier/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Drag control points to build CSS timing functions with a live motion preview |
-| **CSS Gradient Builder** | [`/gradient-builder/`](https://iqverse.net/gradient-builder/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Visual linear, radial and conic CSS gradient generator |
-| **Image Format Converter** | [`/image-converter/`](https://iqverse.net/image-converter/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Convert PNG, JPEG, WebP and AVIF with canvas scaling |
-| **Icon & Sprite Generator** | [`/sprite-generator/`](https://iqverse.net/sprite-generator/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Combine icons into a single sprite sheet with CSS/JSON coordinates |
-| **WCAG Contrast Checker** | [`/wcag-contrast/`](https://iqverse.net/wcag-contrast/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Calculate contrast ratios with WCAG AA/AAA compliance badges |
-
-### 🌐 Network Tools
+### 🌐 Network
 
 | Tool Name | Route / Link | Status | Description |
 | :--- | :--- | :--- | :--- |
@@ -134,6 +144,21 @@ IQVerse organizes tools into intuitive categories. Below is the full directory o
 | **Ping & Traceroute** | [`/ping-visualizer/`](https://iqverse.net/ping-visualizer/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Visualize network latency and hop trace routes via diagnostic relay |
 | **Port Reference Guide** | [`/port-reference/`](https://iqverse.net/port-reference/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | TCP/UDP port reference guide with service definitions & status checks |
 | **WHOIS & RDAP Lookup** | [`/whois-lookup/`](https://iqverse.net/whois-lookup/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Query domain registration metadata & expiration timelines via RDAP |
+
+### 🎨 Design
+
+| Tool Name | Route / Link | Status | Description |
+| :--- | :--- | :--- | :--- |
+| **Color Palette Generator** | [`/chromata/`](https://iqverse.net/chromata/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Create harmonious color palettes & extract colors from images |
+| **CSS Units Converter** | [`/cssunits/`](https://iqverse.net/cssunits/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Convert px, rem, em, vw, vh with live browser viewport context |
+| **SVG Optimizer** | [`/svg-optimizer/`](https://iqverse.net/svg-optimizer/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Minify inline SVG markup by stripping redundant metadata |
+| **CSS Box Shadow Builder** | [`/box-shadow/`](https://iqverse.net/box-shadow/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Stack and tune layered CSS shadows with a live preview and paste-to-edit |
+| **Cubic Bezier Easing Editor** | [`/cubic-bezier/`](https://iqverse.net/cubic-bezier/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Drag control points to build CSS timing functions with a live motion preview |
+| **CSS Gradient Builder** | [`/gradient-builder/`](https://iqverse.net/gradient-builder/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Visual linear, radial and conic CSS gradient generator |
+| **Image Optimizer** | [`/imageoptimizer/`](https://iqverse.net/imageoptimizer/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Compress PNG, JPEG and WebP in-browser while keeping files local |
+| **Image Format Converter** | [`/image-converter/`](https://iqverse.net/image-converter/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Convert PNG, JPEG, WebP and AVIF with canvas scaling |
+| **Icon & Sprite Generator** | [`/sprite-generator/`](https://iqverse.net/sprite-generator/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Combine icons into a single sprite sheet with CSS/JSON coordinates |
+| **WCAG Contrast Checker** | [`/wcag-contrast/`](https://iqverse.net/wcag-contrast/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Calculate contrast ratios with WCAG AA/AAA compliance badges |
 
 ### 🖥️ Desktop Utilities & Community Tools
 
@@ -165,60 +190,7 @@ iqverse.net/
 │   ├── 📂 e2e/                 # Playwright end-to-end page & navigation tests
 │   └── 📂 unit/                # Core lib utility function tests
 ├── 📂 app/                      # Next.js App Router routes & tools (50+ Live Tools)
-│   ├── 📂 agentscan/           # AI Agents Scanner route
-│   ├── 📂 ai-log-analyzer/     # AI Crawler Log Analyzer route
-│   ├── 📂 case-converter/      # Text Case Converter route
-│   ├── 📂 chromata/            # Color Palette Generator route
-│   ├── 📂 compression/         # Deflate Text Compression route
-│   ├── 📂 cookie-inspector/    # Cookie Inspector route
-│   ├── 📂 cors-tester/         # CORS Tester route
-│   ├── 📂 cron-builder/        # Cron Expression Builder route
-│   ├── 📂 csp-builder/         # CSP Header Builder route
-│   ├── 📂 cssunits/            # CSS Units Converter route
-│   ├── 📂 csvviewer/           # CSV Viewer & Converter route
-│   ├── 📂 dataconverter/       # Multi-format Data Converter route
-│   ├── 📂 diff-checker/        # Diff Checker route
-│   ├── 📂 dnslookup/           # DNS Lookup tool route
-│   ├── 📂 encodelab/           # Base64 & URL Encoder route
-│   ├── 📂 fake-data-generator/ # Lorem Ipsum & Fake Data Generator route
-│   ├── 📂 favicongen/          # Favicon Generator route
-│   ├── 📂 file-hash/           # File Hash Verifier route
-│   ├── 📂 ges/                 # GES SaaS platform route
-│   ├── 📂 goo/                 # GOO SaaS platform route
-│   ├── 📂 gradient-builder/    # CSS Gradient Builder route
-│   ├── 📂 gst/                 # GST SaaS platform route
-│   ├── 📂 gyp/                 # GYP SaaS platform route
-│   ├── 📂 hashing/             # WebCrypto SHA & HMAC Hashing route
-│   ├── 📂 headers/             # HeaderScan tool route
-│   ├── 📂 http-status/         # HTTP Status Code Reference route
-│   ├── 📂 image-converter/     # Image Format Converter route
-│   ├── 📂 imageoptimizer/      # In-browser Image Optimizer route
-│   ├── 📂 ip-lookup/           # IP Info & Geolocation route
-│   ├── 📂 json/                # JSON Formatter route
-│   ├── 📂 jwt-debugger/        # JWT Debugger & Verifier route
-│   ├── 📂 linkradar/           # Link Radar route
-│   ├── 📂 llmstxt/             # llms.txt Generator & Validator route
-│   ├── 📂 markdown-preview/    # Markdown Previewer route
-│   ├── 📂 og-preview/          # Meta Tag & Open Graph Previewer route
-│   ├── 📂 password/            # Password Generator route
-│   ├── 📂 password-analyzer/   # Password Strength Analyzer route
-│   ├── 📂 ping-visualizer/     # Ping & Traceroute Visualizer route
-│   ├── 📂 port-reference/      # Port Status & Reference Guide route
-│   ├── 📂 qrforge/             # QR Forge route
-│   ├── 📂 regex/               # RegEx Forge route
-│   ├── 📂 robots-generator/    # robots.txt Generator route
-│   ├── 📂 schema-validator/    # Structured Data Validator route
-│   ├── 📂 sitemap-generator/   # Sitemap Generator route
-│   ├── 📂 sprite-generator/    # Icon & Sprite Sheet Generator route
-│   ├── 📂 ssl-inspector/       # SSL / TLS Certificate Inspector route
-│   ├── 📂 svg-optimizer/       # SVG Optimizer route
-│   ├── 📂 timestamp-converter/ # Timestamp Converter route
-│   ├── 📂 url/                 # URL Parser & Builder route
-│   ├── 📂 uuid-ulid-generator/ # UUID / ULID Generator route
-│   ├── 📂 wcag-contrast/       # WCAG Contrast Checker route
-│   ├── 📂 webhook-inspector/   # Webhook Inspector route
-│   ├── 📂 whois-lookup/        # WHOIS & RDAP Lookup route
-│   ├── 📂 yaml-json-toml/      # YAML / JSON / TOML Converter route
+│   ├── 📂 tools...
 │   ├── 📄 catalog.module.css   # Main catalog CSS module
 │   ├── 📄 globals.css          # Design system, CSS variables & reset
 │   ├── 📄 home.module.css      # Catalog layout styles
@@ -370,6 +342,7 @@ Every tool is four things: pure logic in `lib/<name>.ts`, a page at `src/pages/<
 ```
 
 - `cats` is ordered. The first entry is the primary category: it drives homepage grouping, the JSON-LD `applicationCategory` and the breadcrumb. Any extra categories only widen filter and search reach, so a tool never appears twice in the grouped view. Categories are checked at compile time against `CATEGORIES`.
+- The category set is AI & Agents, Web & SEO, Data & Formats, Text & Code, Generators, APIs & HTTP, Security, Crypto & Hashing, Network, Design, Desktop and SaaS. Keep any single category under roughly 15 tools. Split it once it grows past that.
 - `aliases` holds the words people search for that the name and tags do not contain (`epoch` for the Timestamp Converter, `guid` for UUID, `beautify` for the JSON Formatter). They are weighted just below the name in search ranking.
 - `url` doubles as the registry key, so it must be unique.
 

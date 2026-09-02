@@ -8,13 +8,24 @@ function normalizeUrl(path?: string): string {
   return `https://iqverse.net${normalizedPath}`;
 }
 
+const APPLICATION_CATEGORIES: Record<Category, string> = {
+  'AI & Agents': 'DeveloperApplication',
+  'Web & SEO': 'DeveloperApplication',
+  'Data & Formats': 'DeveloperApplication',
+  'Text & Code': 'DeveloperApplication',
+  Generators: 'DeveloperApplication',
+  'APIs & HTTP': 'UtilitiesApplication',
+  Security: 'SecurityApplication',
+  'Crypto & Hashing': 'SecurityApplication',
+  Network: 'UtilitiesApplication',
+  Design: 'DesignApplication',
+  Desktop: 'UtilitiesApplication',
+  SaaS: 'BusinessApplication',
+};
+
 export function getApplicationCategory(category: Category | 'Developer'): string {
-  if (category === 'Security') return 'SecurityApplication';
-  if (category === 'Design') return 'DesignApplication';
-  if (category === 'Network' || category === 'Browser Tools') return 'UtilitiesApplication';
-  if (category === 'SaaS') return 'BusinessApplication';
-  if (category === 'AI & Agents') return 'DeveloperApplication';
-  return 'DeveloperApplication';
+  if (category === 'Developer') return 'DeveloperApplication';
+  return APPLICATION_CATEGORIES[category];
 }
 
 export function getWebSiteJsonLd() {
