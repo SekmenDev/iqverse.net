@@ -1,0 +1,386 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+import { EASING_PRESETS } from '@/lib/easing';
+
+const groups = [...new Set(EASING_PRESETS.map(preset => preset.group))];
+---
+
+<ToolLayout
+  title="Cubic Bezier Easing Editor"
+  subtitle="Design & Preview CSS Animation Timing Curves"
+  pill="DESIGN"
+  toolSlug="cubic-bezier"
+  description="Drag the control points to build a CSS cubic-bezier() timing function, compare it against the built-in easings and preview the motion before you copy the value."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+          <div style="flex: 0 0 auto;">
+            <svg
+              id="bezier-canvas"
+              viewBox="-20 -60 140 220"
+              width="280"
+              height="440"
+              role="application"
+              aria-label="Cubic bezier curve editor"
+              style="touch-action: none; max-width: 100%;"
+            >
+              <rect x="0" y="0" width="100" height="100" fill="var(--surface)" stroke="var(--border)" stroke-width="0.5" />
+
+              <g stroke="var(--border)" stroke-width="0.3" opacity="0.6">
+                <line x1="25" y1="0" x2="25" y2="100" />
+                <line x1="50" y1="0" x2="50" y2="100" />
+                <line x1="75" y1="0" x2="75" y2="100" />
+                <line x1="0" y1="25" x2="100" y2="25" />
+                <line x1="0" y1="50" x2="100" y2="50" />
+                <line x1="0" y1="75" x2="100" y2="75" />
+              </g>
+
+              <line x1="0" y1="100" x2="100" y2="0" stroke="var(--muted)" stroke-width="0.4" stroke-dasharray="2 2" opacity="0.5" />
+
+              <line id="handle-line-1" stroke="var(--accent)" stroke-width="0.8" opacity="0.6" />
+              <line id="handle-line-2" stroke="var(--yellow, #eab308)" stroke-width="0.8" opacity="0.6" />
+
+              <path id="bezier-path" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" />
+
+              <circle id="progress-dot" r="2.4" fill="var(--green, #10b981)" opacity="0" />
+
+              <circle id="handle-1" cx="42" cy="100" r="3.6" fill="var(--accent)" stroke="var(--bg)" stroke-width="1" style="cursor: grab;" tabindex="0" role="slider" aria-label="First control point" />
+              <circle id="handle-2" cx="100" cy="0" r="3.6" fill="var(--yellow, #eab308)" stroke="var(--bg)" stroke-width="1" style="cursor: grab;" tabindex="0" role="slider" aria-label="Second control point" />
+            </svg>
+          </div>
+
+          <div style="flex: 1; min-width: 260px;">
+            <div class={sharedStyles.field}>
+              <label class={sharedStyles.fieldLabel} for="bezierInput">
+                Timing function
+              </label>
+              <input
+                id="bezierInput"
+                type="text"
+                class={sharedStyles.input}
+                style="font-family: monospace;"
+                autocomplete="off"
+                spellcheck="false"
+                value="cubic-bezier(0.42, 0, 0.58, 1)"
+              />
+            </div>
+
+            <div id="bezier-error" class={sharedStyles.errorMessage} style="display: none; margin-top: 8px;"></div>
+
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px;">
+              <div>
+                <div style="font-size: 0.7rem; opacity: 0.7;">P1 x</div>
+                <input id="num-p1x" type="number" class={sharedStyles.input} step="0.01" min="0" max="1" style="font-family: monospace; padding: 6px 8px;" />
+              </div>
+              <div>
+                <div style="font-size: 0.7rem; opacity: 0.7;">P1 y</div>
+                <input id="num-p1y" type="number" class={sharedStyles.input} step="0.01" style="font-family: monospace; padding: 6px 8px;" />
+              </div>
+              <div>
+                <div style="font-size: 0.7rem; opacity: 0.7;">P2 x</div>
+                <input id="num-p2x" type="number" class={sharedStyles.input} step="0.01" min="0" max="1" style="font-family: monospace; padding: 6px 8px;" />
+              </div>
+              <div>
+                <div style="font-size: 0.7rem; opacity: 0.7;">P2 y</div>
+                <input id="num-p2y" type="number" class={sharedStyles.input} step="0.01" style="font-family: monospace; padding: 6px 8px;" />
+              </div>
+            </div>
+
+            <div id="overshoot-note" style="font-size: 0.8rem; margin-top: 12px; opacity: 0.8; display: none;">
+              This curve leaves the 0–1 range, so the animated property overshoots its target before settling.
+            </div>
+
+            <div class={sharedStyles.buttonGroup} style="margin-top: 16px;">
+              <button type="button" id="btn-copy" class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}>
+                Copy CSS
+              </button>
+              <button type="button" id="btn-replay" class={sharedStyles.button}>
+                Replay
+              </button>
+            </div>
+
+            <div class={sharedStyles.field} style="margin-top: 16px;">
+              <label class={sharedStyles.fieldLabel} for="durationInput">
+                Preview duration: <span id="duration-label">1000</span> ms
+              </label>
+              <input id="durationInput" type="range" min="200" max="4000" step="100" value="1000" style="width: 100%;" />
+            </div>
+
+            <div style="margin-top: 8px; padding: 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); overflow: hidden;">
+              <div style="font-size: 0.7rem; opacity: 0.7; margin-bottom: 10px;">Motion preview</div>
+              <div style="position: relative; height: 24px;">
+                <div
+                  id="preview-dot"
+                  style="position: absolute; top: 0; left: 0; width: 24px; height: 24px; border-radius: 50%; background: var(--accent);"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class={sharedStyles.card} style="margin-top: 20px;">
+        <h3 style="margin: 0 0 16px 0; font-size: 1.1rem;">Presets</h3>
+        {groups.map(group => (
+          <div style="margin-bottom: 14px;">
+            <div style="font-size: 0.72rem; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;">
+              {group}
+            </div>
+            <div class={sharedStyles.buttonGroup} style="flex-wrap: wrap;">
+              {EASING_PRESETS.filter(preset => preset.group === group).map(preset => (
+                <button
+                  type="button"
+                  class={`${sharedStyles.button} ${sharedStyles.buttonSmall}`}
+                  data-preset={preset.name}
+                >
+                  {preset.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  import {
+    clampControlPoints,
+    easingValue,
+    formatCubicBezier,
+    matchPreset,
+    overshoots,
+    parseCubicBezier,
+    type BezierPoints,
+  } from '@/lib/easing';
+
+  const svg = document.getElementById('bezier-canvas') as SVGSVGElement | null;
+  const path = document.getElementById('bezier-path');
+  const line1 = document.getElementById('handle-line-1');
+  const line2 = document.getElementById('handle-line-2');
+  const handle1 = document.getElementById('handle-1');
+  const handle2 = document.getElementById('handle-2');
+  const progressDot = document.getElementById('progress-dot');
+  const input = document.getElementById('bezierInput') as HTMLInputElement | null;
+  const errorBox = document.getElementById('bezier-error');
+  const overshootNote = document.getElementById('overshoot-note');
+  const previewDot = document.getElementById('preview-dot');
+  const durationInput = document.getElementById('durationInput') as HTMLInputElement | null;
+  const durationLabel = document.getElementById('duration-label');
+  const btnCopy = document.getElementById('btn-copy');
+  const btnReplay = document.getElementById('btn-replay');
+
+  const numbers = {
+    p1x: document.getElementById('num-p1x') as HTMLInputElement | null,
+    p1y: document.getElementById('num-p1y') as HTMLInputElement | null,
+    p2x: document.getElementById('num-p2x') as HTMLInputElement | null,
+    p2y: document.getElementById('num-p2y') as HTMLInputElement | null,
+  };
+
+  let points: BezierPoints = { p1x: 0.42, p1y: 0, p2x: 0.58, p2y: 1 };
+  let dragging: 1 | 2 | null = null;
+  let animationStart = 0;
+  let animationFrame = 0;
+
+  // The SVG box is 100x100 with y flipped, so y=0 is the top and progress 1
+  const toSvgX = (x: number) => x * 100;
+  const toSvgY = (y: number) => (1 - y) * 100;
+  const fromSvgX = (x: number) => x / 100;
+  const fromSvgY = (y: number) => 1 - y / 100;
+
+  function redraw() {
+    path?.setAttribute(
+      'd',
+      `M 0 100 C ${toSvgX(points.p1x)} ${toSvgY(points.p1y)}, ${toSvgX(points.p2x)} ${toSvgY(points.p2y)}, 100 0`
+    );
+
+    line1?.setAttribute('x1', '0');
+    line1?.setAttribute('y1', '100');
+    line1?.setAttribute('x2', String(toSvgX(points.p1x)));
+    line1?.setAttribute('y2', String(toSvgY(points.p1y)));
+
+    line2?.setAttribute('x1', '100');
+    line2?.setAttribute('y1', '0');
+    line2?.setAttribute('x2', String(toSvgX(points.p2x)));
+    line2?.setAttribute('y2', String(toSvgY(points.p2y)));
+
+    handle1?.setAttribute('cx', String(toSvgX(points.p1x)));
+    handle1?.setAttribute('cy', String(toSvgY(points.p1y)));
+    handle2?.setAttribute('cx', String(toSvgX(points.p2x)));
+    handle2?.setAttribute('cy', String(toSvgY(points.p2y)));
+
+    const css = formatCubicBezier(points);
+    const preset = matchPreset(points);
+
+    if (input && document.activeElement !== input) {
+      input.value = preset ? `${css}  /* ${preset.name} */` : css;
+    }
+
+    (Object.keys(numbers) as Array<keyof BezierPoints>).forEach(key => {
+      const field = numbers[key];
+      if (field && document.activeElement !== field) {
+        field.value = String(Number(points[key].toFixed(4)));
+      }
+    });
+
+    if (overshootNote) overshootNote.style.display = overshoots(points) ? 'block' : 'none';
+
+    document.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach(btn => {
+      btn.setAttribute('aria-pressed', btn.dataset.preset === preset?.name ? 'true' : 'false');
+    });
+  }
+
+  function setPoints(next: BezierPoints) {
+    points = clampControlPoints(next);
+    redraw();
+    runPreview();
+  }
+
+  function pointerPosition(event: PointerEvent): { x: number; y: number } | null {
+    if (!svg) return null;
+    const rect = svg.getBoundingClientRect();
+    const viewBox = svg.viewBox.baseVal;
+
+    const svgX = viewBox.x + ((event.clientX - rect.left) / rect.width) * viewBox.width;
+    const svgY = viewBox.y + ((event.clientY - rect.top) / rect.height) * viewBox.height;
+    return { x: fromSvgX(svgX), y: fromSvgY(svgY) };
+  }
+
+  function startDrag(which: 1 | 2) {
+    return (event: PointerEvent) => {
+      event.preventDefault();
+      dragging = which;
+      (event.target as Element).setPointerCapture(event.pointerId);
+    };
+  }
+
+  handle1?.addEventListener('pointerdown', startDrag(1));
+  handle2?.addEventListener('pointerdown', startDrag(2));
+
+  window.addEventListener('pointermove', event => {
+    if (!dragging) return;
+    const position = pointerPosition(event);
+    if (!position) return;
+
+    setPoints(
+      dragging === 1
+        ? { ...points, p1x: position.x, p1y: position.y }
+        : { ...points, p2x: position.x, p2y: position.y }
+    );
+  });
+
+  window.addEventListener('pointerup', () => {
+    dragging = null;
+  });
+
+  function nudge(which: 1 | 2, dx: number, dy: number) {
+    setPoints(
+      which === 1
+        ? { ...points, p1x: points.p1x + dx, p1y: points.p1y + dy }
+        : { ...points, p2x: points.p2x + dx, p2y: points.p2y + dy }
+    );
+  }
+
+  function keyboardHandler(which: 1 | 2) {
+    return (event: KeyboardEvent) => {
+      const step = event.shiftKey ? 0.1 : 0.01;
+      const moves: Record<string, [number, number]> = {
+        ArrowLeft: [-step, 0],
+        ArrowRight: [step, 0],
+        ArrowUp: [0, step],
+        ArrowDown: [0, -step],
+      };
+
+      const move = moves[event.key];
+      if (!move) return;
+      event.preventDefault();
+      nudge(which, move[0], move[1]);
+    };
+  }
+
+  handle1?.addEventListener('keydown', keyboardHandler(1));
+  handle2?.addEventListener('keydown', keyboardHandler(2));
+
+  function runPreview() {
+    cancelAnimationFrame(animationFrame);
+    animationStart = performance.now();
+
+    const duration = Number(durationInput?.value ?? 1000);
+
+    const step = (now: number) => {
+      const elapsed = now - animationStart;
+      const progress = Math.min(1, elapsed / duration);
+      const eased = easingValue(points, progress);
+
+      if (previewDot) {
+        const track = previewDot.parentElement;
+        const travel = track ? track.clientWidth - previewDot.clientWidth : 0;
+        previewDot.style.transform = `translateX(${eased * travel}px)`;
+      }
+
+      if (progressDot) {
+        progressDot.setAttribute('cx', String(toSvgX(progress)));
+        progressDot.setAttribute('cy', String(toSvgY(eased)));
+        progressDot.setAttribute('opacity', '1');
+      }
+
+      if (progress < 1) animationFrame = requestAnimationFrame(step);
+    };
+
+    animationFrame = requestAnimationFrame(step);
+  }
+
+  input?.addEventListener('input', () => {
+    const raw = input.value.replace(/\/\*.*?\*\//g, '').trim();
+    const parsed = parseCubicBezier(raw);
+
+    if (!parsed) {
+      if (errorBox) {
+        errorBox.textContent = 'Enter cubic-bezier(x1, y1, x2, y2) or an easing name. X values must be between 0 and 1.';
+        errorBox.style.display = 'block';
+      }
+      return;
+    }
+
+    if (errorBox) errorBox.style.display = 'none';
+    setPoints(parsed);
+  });
+
+  (Object.keys(numbers) as Array<keyof BezierPoints>).forEach(key => {
+    numbers[key]?.addEventListener('input', () => {
+      const value = Number(numbers[key]?.value);
+      if (!Number.isFinite(value)) return;
+      setPoints({ ...points, [key]: value });
+    });
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const parsed = parseCubicBezier(btn.dataset.preset ?? '');
+      if (parsed) setPoints(parsed);
+    });
+  });
+
+  durationInput?.addEventListener('input', () => {
+    if (durationLabel) durationLabel.textContent = durationInput.value;
+    runPreview();
+  });
+
+  btnReplay?.addEventListener('click', runPreview);
+
+  btnCopy?.addEventListener('click', async () => {
+    await navigator.clipboard.writeText(formatCubicBezier(points));
+    const original = btnCopy.textContent;
+    btnCopy.textContent = 'Copied!';
+    setTimeout(() => {
+      btnCopy.textContent = original;
+    }, 1500);
+  });
+
+  redraw();
+  runPreview();
+</script>
