@@ -15,7 +15,9 @@ export const CATEGORIES = [
 
 export type Category = (typeof CATEGORIES)[number];
 
-export type ToolType = 'open' | 'saas' | 'coming';
+export const TOOL_TYPES = ['open', 'saas', 'coming'] as const;
+
+export type ToolType = (typeof TOOL_TYPES)[number];
 
 export interface Tool {
   name: string;
@@ -162,7 +164,8 @@ export function getUniqueCategories(): Array<Category | 'all'> {
 }
 
 export function getUniqueStatuses(): Array<ToolType | 'all'> {
-  return ['all', 'open', 'saas', 'coming'];
+  const used = new Set<string>(tools.map(t => t.type));
+  return ['all', ...TOOL_TYPES.filter(s => used.has(s))];
 }
 
 export function countByCategory(): Record<string, number> {
@@ -175,7 +178,7 @@ export function countByCategory(): Record<string, number> {
 
 export function countByStatus(): Record<string, number> {
   const counts: Record<string, number> = { all: tools.length };
-  for (const status of ['open', 'saas', 'coming'] as const) {
+  for (const status of TOOL_TYPES) {
     counts[status] = tools.filter(t => t.type === status).length;
   }
   return counts;

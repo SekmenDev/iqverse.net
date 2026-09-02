@@ -11,6 +11,7 @@ import {
   primaryCategory,
   sortTools,
   tools,
+  TOOL_TYPES,
   type Tool,
 } from '@/lib/tools';
 
@@ -80,8 +81,13 @@ describe('lib/tools.ts - helpers', () => {
     categories.slice(1).forEach(cat => expect(CATEGORIES).toContain(cat));
   });
 
-  it('lists the fixed status set', () => {
-    expect(getUniqueStatuses()).toEqual(['all', 'open', 'saas', 'coming']);
+  it('lists only statuses that have tools, prefixed with all', () => {
+    const statuses = getUniqueStatuses();
+    const counts = countByStatus();
+
+    expect(statuses[0]).toBe('all');
+    statuses.slice(1).forEach(status => expect(counts[status]).toBeGreaterThan(0));
+    TOOL_TYPES.filter(s => counts[s] === 0).forEach(s => expect(statuses).not.toContain(s));
   });
 
   it('counts a tool under every category it declares', () => {

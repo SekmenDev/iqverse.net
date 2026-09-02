@@ -343,6 +343,7 @@ Every tool is four things: pure logic in `lib/<name>.ts`, a page at `src/pages/<
 
 - `cats` is ordered. The first entry is the primary category: it drives homepage grouping, the JSON-LD `applicationCategory` and the breadcrumb. Any extra categories only widen filter and search reach, so a tool never appears twice in the grouped view. Categories are checked at compile time against `CATEGORIES`.
 - The category set is AI & Agents, Web & SEO, Data & Formats, Text & Code, Generators, APIs & HTTP, Security, Crypto & Hashing, Network, Design, Desktop and SaaS. Keep any single category under roughly 15 tools. Split it once it grows past that.
+- `type` is one of `TOOL_TYPES` in `lib/tools.ts`. To add a status, append it to that tuple and give it an entry in `STATUS_ICONS`, `STATUS_LABELS` and the `DOT_CLASS` maps in `src/pages/index.astro` and `src/components/ToolCard.astro`, plus a dot colour class in `src/styles/catalog.module.css`. The sidebar only lists statuses that have at least one tool.
 - `aliases` holds the words people search for that the name and tags do not contain (`epoch` for the Timestamp Converter, `guid` for UUID, `beautify` for the JSON Formatter). They are weighted just below the name in search ranking.
 - `url` doubles as the registry key, so it must be unique.
 

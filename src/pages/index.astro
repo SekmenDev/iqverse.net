@@ -180,7 +180,7 @@ const jsonLdData = getToolsCollectionJsonLd();
 
 <script>
   import { highlight, searchTools, suggestTools, type SearchResult } from '@/lib/tool-search';
-  import { CATEGORIES, STATUS_LABELS, type Category, type ToolType } from '@/lib/tools';
+  import { CATEGORIES, STATUS_LABELS, TOOL_TYPES, type Category, type ToolType } from '@/lib/tools';
   import styles from '@/styles/catalog.module.css';
 
   type SortMode = 'default' | 'az';
@@ -192,8 +192,6 @@ const jsonLdData = getToolsCollectionJsonLd();
     sort: SortMode;
   }
 
-  const STATUSES: ToolType[] = ['open', 'saas', 'coming'];
-
   function readState(): CatalogState {
     const params = new URLSearchParams(window.location.search);
     const cat = params.get('cat');
@@ -202,7 +200,7 @@ const jsonLdData = getToolsCollectionJsonLd();
     return {
       q: params.get('q') ?? '',
       cat: CATEGORIES.includes(cat as Category) ? (cat as Category) : 'all',
-      status: STATUSES.includes(status as ToolType) ? (status as ToolType) : 'all',
+      status: TOOL_TYPES.includes(status as ToolType) ? (status as ToolType) : 'all',
       sort: params.get('sort') === 'az' ? 'az' : 'default',
     };
   }
