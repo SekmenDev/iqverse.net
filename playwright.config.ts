@@ -1,6 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const port = Number(process.env.PREVIEW_PORT ?? 4321);
+// Not 4321: that is the Astro dev default, so any Astro dev server running
+// locally would be reused and the suite would silently test the wrong site.
+const port = Number(process.env.PREVIEW_PORT ?? 4327);
 
 export default defineConfig({
   testDir: './__tests__/e2e',
@@ -22,7 +24,7 @@ export default defineConfig({
   webServer: {
     command: `yarn vite preview --port ${port} --outDir dist`,
     url: `http://localhost:${port}`,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     timeout: 120 * 1000,
   },
 });
