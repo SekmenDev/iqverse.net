@@ -1,0 +1,201 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+
+const EXAMPLES: Array<{ label: string; command: string }> = [
+  {
+    label: 'GET with headers',
+    command: `curl 'https://api.github.com/repos/SekmenDev/iqverse.net' \\\n  -H 'Accept: application/vnd.github+json' \\\n  -H 'User-Agent: iqverse'`,
+  },
+  {
+    label: 'POST JSON',
+    command: `curl -X POST 'https://api.example.com/v1/users' \\\n  -H 'Content-Type: application/json' \\\n  -H 'Authorization: Bearer token123' \\\n  -d '{"name":"Alice","roles":["admin"],"active":true}'`,
+  },
+  {
+    label: 'Form + basic auth',
+    command: `curl -u admin:s3cret \\\n  -d 'grant_type=client_credentials&scope=read' \\\n  'https://auth.example.com/token'`,
+  },
+];
+---
+
+<ToolLayout
+  title="curl to fetch & Python Converter"
+  subtitle="Turn curl Commands into JavaScript or Python Code"
+  pill="BROWSER TOOLS"
+  toolSlug="curl-converter"
+  description="Paste a curl command and get equivalent JavaScript fetch or Python requests code. Handles headers, JSON and form bodies, basic auth, query flags and redirect options."
+>
+  <div style="max-width: 1000px;">
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <div class={sharedStyles.field}>
+          <label class={sharedStyles.fieldLabel} for="curlInput">
+            curl command
+          </label>
+          <textarea
+            id="curlInput"
+            class={sharedStyles.textarea}
+            rows="7"
+            style="font-family: monospace; font-size: 0.82rem;"
+            spellcheck="false"
+            placeholder="curl -X POST https://api.example.com/users -H 'Content-Type: application/json' -d '{&quot;name&quot;:&quot;Alice&quot;}'"
+          ></textarea>
+        </div>
+
+        <div class={sharedStyles.buttonGroup} style="flex-wrap: wrap;">
+          {EXAMPLES.map(example => (
+            <button
+              type="button"
+              class={`${sharedStyles.button} ${sharedStyles.buttonSmall}`}
+              data-example={example.command}
+            >
+              {example.label}
+            </button>
+          ))}
+        </div>
+
+        <div id="curl-error" class={sharedStyles.errorMessage} style="display: none; margin-top: 12px;"></div>
+      </div>
+
+      <div id="summary-card" class={sharedStyles.card} style="margin-top: 20px; display: none;">
+        <h3 style="margin: 0 0 16px 0; font-size: 1.1rem;">Parsed request</h3>
+        <div
+          id="summary-grid"
+          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px;"
+        ></div>
+      </div>
+
+      <div id="output-card" class={sharedStyles.card} style="margin-top: 20px; display: none;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+          <div class={sharedStyles.buttonGroup}>
+            <button type="button" class={sharedStyles.button} data-target="fetch" aria-pressed="true">
+              JavaScript fetch
+            </button>
+            <button type="button" class={sharedStyles.button} data-target="python" aria-pressed="false">
+              Python requests
+            </button>
+          </div>
+          <button type="button" id="btn-copy" class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`} style="margin-left: auto;">
+            Copy code
+          </button>
+        </div>
+
+        <pre
+          id="code-output"
+          class={sharedStyles.outputArea}
+          style="font-family: monospace; font-size: 0.8rem; white-space: pre-wrap; word-break: break-word; margin: 0; min-height: 160px;"
+        ></pre>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  import { parseCurl, toFetch, toPythonRequests, type CurlRequest } from '@/lib/curl';
+  import { escapeHtml } from '@/lib/utils';
+
+  const curlInput = document.getElementById('curlInput') as HTMLTextAreaElement | null;
+  const errorBox = document.getElementById('curl-error');
+  const summaryCard = document.getElementById('summary-card');
+  const summaryGrid = document.getElementById('summary-grid');
+  const outputCard = document.getElementById('output-card');
+  const codeOutput = document.getElementById('code-output');
+  const btnCopy = document.getElementById('btn-copy');
+
+  let target: 'fetch' | 'python' = 'fetch';
+  let parsed: CurlRequest | null = null;
+
+  function renderSummary(request: CurlRequest) {
+    if (!summaryGrid) return;
+
+    const rows: Array<[string, string]> = [
+      ['Method', request.method],
+      ['URL', request.url],
+      ['Headers', String(request.headers.length)],
+      ['Body', request.bodyKind === 'none' ? 'none' : request.bodyKind],
+      ['Basic auth', request.auth ? request.auth.user : 'none'],
+      ['Follow redirects', request.followRedirects ? 'yes' : 'no'],
+    ];
+
+    summaryGrid.innerHTML = rows
+      .map(
+        ([label, value]) => `
+          <div style="padding: 10px 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+            <div style="font-size: 0.72rem; opacity: 0.7;">${escapeHtml(label)}</div>
+            <div style="font-size: 0.85rem; font-weight: 600; font-family: monospace; word-break: break-all;">${escapeHtml(value)}</div>
+          </div>`
+      )
+      .join('');
+  }
+
+  function renderCode() {
+    if (!parsed || !codeOutput) return;
+    codeOutput.textContent = target === 'fetch' ? toFetch(parsed) : toPythonRequests(parsed);
+  }
+
+  function update() {
+    const command = curlInput?.value.trim() ?? '';
+
+    if (!command) {
+      parsed = null;
+      if (errorBox) errorBox.style.display = 'none';
+      if (summaryCard) summaryCard.style.display = 'none';
+      if (outputCard) outputCard.style.display = 'none';
+      return;
+    }
+
+    const result = parseCurl(command);
+
+    if (!result.ok) {
+      parsed = null;
+      if (errorBox) {
+        errorBox.textContent = result.error;
+        errorBox.style.display = 'block';
+      }
+      if (summaryCard) summaryCard.style.display = 'none';
+      if (outputCard) outputCard.style.display = 'none';
+      return;
+    }
+
+    parsed = result.request;
+    if (errorBox) errorBox.style.display = 'none';
+    if (summaryCard) summaryCard.style.display = 'block';
+    if (outputCard) outputCard.style.display = 'block';
+
+    renderSummary(parsed);
+    renderCode();
+  }
+
+  curlInput?.addEventListener('input', update);
+
+  document.querySelectorAll<HTMLButtonElement>('[data-example]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (!curlInput) return;
+      curlInput.value = btn.dataset.example ?? '';
+      update();
+    });
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('[data-target]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      target = btn.dataset.target === 'python' ? 'python' : 'fetch';
+
+      document.querySelectorAll<HTMLButtonElement>('[data-target]').forEach(other => {
+        other.setAttribute('aria-pressed', other === btn ? 'true' : 'false');
+      });
+
+      renderCode();
+    });
+  });
+
+  btnCopy?.addEventListener('click', async () => {
+    if (!codeOutput?.textContent) return;
+
+    await navigator.clipboard.writeText(codeOutput.textContent);
+    const original = btnCopy.textContent;
+    btnCopy.textContent = 'Copied!';
+    setTimeout(() => {
+      btnCopy.textContent = original;
+    }, 1500);
+  });
+</script>

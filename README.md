@@ -87,6 +87,7 @@ IQVerse organizes tools into intuitive categories. Below is the full directory o
 | **Meta Tag & Open Graph** | [`/og-preview/`](https://iqverse.net/og-preview/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Preview social card appearance across Google, Twitter, FB & LinkedIn |
 | **HTTP Status Reference** | [`/http-status/`](https://iqverse.net/http-status/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Searchable reference of HTTP status codes & standard response headers |
 | **CORS Tester** | [`/cors-tester/`](https://iqverse.net/cors-tester/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Test CORS configuration and header response rules for API endpoints |
+| **curl to fetch Converter** | [`/curl-converter/`](https://iqverse.net/curl-converter/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Convert curl commands into JavaScript fetch or Python requests code |
 | **Webhook Inspector** | [`/webhook-inspector/`](https://iqverse.net/webhook-inspector/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Inspect and debug incoming HTTP webhook payloads and request headers |
 | **Cookie Inspector** | [`/cookie-inspector/`](https://iqverse.net/cookie-inspector/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Parse raw Cookie & Set-Cookie headers for SameSite and security flags |
 
