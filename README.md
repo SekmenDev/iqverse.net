@@ -102,6 +102,7 @@ IQVerse organizes tools into intuitive categories. Below is the full directory o
 | **CSP Header Builder** | [`/csp-builder/`](https://iqverse.net/csp-builder/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Interactive Content-Security-Policy generator & directive validator |
 | **SPF, DKIM & DMARC Checker** | [`/email-auth/`](https://iqverse.net/email-auth/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Validate email auth records, SPF lookup budget and DKIM key strength |
 | **Password Analyzer** | [`/password-analyzer/`](https://iqverse.net/password-analyzer/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Evaluate password strength, bit entropy and crack time offline |
+| **TOTP Authenticator Generator** | [`/totp-generator/`](https://iqverse.net/totp-generator/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Generate and verify RFC 6238 2FA codes with QR enrollment, fully offline |
 | **SRI Hash Generator** | [`/sri-generator/`](https://iqverse.net/sri-generator/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Generate and verify Subresource Integrity hashes for CDN scripts and styles |
 | **File Hash Verifier** | [`/file-hash/`](https://iqverse.net/file-hash/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Calculate and compare MD5, SHA-1, SHA-256 and SHA-512 file hashes |
 
