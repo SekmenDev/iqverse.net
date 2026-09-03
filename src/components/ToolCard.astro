@@ -22,7 +22,7 @@ const DOT_CLASS: Record<ToolType, string> = {
 };
 
 const coming = tool.type === 'coming';
-const href = coming ? '' : tool.url;
+const href = tool.url;
 const external = !!href && isExternalUrl(href);
 const category = primaryCategory(tool);
 const tags = tool.tags.split(' ').filter(Boolean).slice(0, 3);

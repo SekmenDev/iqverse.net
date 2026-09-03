@@ -46,6 +46,10 @@ Run the narrowest relevant check first. Run `yarn build` after changes that affe
 - Preserve strict TypeScript settings. Avoid `any` and keep aliases compatible with `@/*`.
 - Use the existing category, status and search metadata conventions in `lib/tools.ts`.
 - Keep changes focused. Do not introduce a new framework, state library or backend for a client-side tool.
+- Prefer `Number.isNaN` over `isNaN`.
+- Prefer `Number.parseInt` over `parseInt`.
+- Prefer `String#replaceAll()` over `String#replace()`.
+
 
 ## Environment
 

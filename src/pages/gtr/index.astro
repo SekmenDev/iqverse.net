@@ -1,0 +1,283 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import ThemeToggle from '@/components/ThemeToggle.astro';
+import CapCaptcha from '@/components/CapCaptcha.astro';
+import styles from '@/styles/saas-landing.module.css';
+---
+
+<Layout
+  title="GTR | Site-Wide Crawler & Monitor (Coming Soon) | IQVerse"
+  description="GTR runs IQVerse's tool checks across every page of your site on a schedule, tracking a health score, history and alerts in one report. Join the waitlist."
+  canonicalUrl="https://iqverse.net/gtr/"
+  hideDefaultFooter={true}
+>
+  <div class={styles.page}>
+    <nav class={styles.nav}>
+      <div class={styles.navLeft}>
+        <a class={styles.navLogo} href="/">
+          <ThemeToggle />
+          <span>IQVerse</span>
+        </a>
+        <div class={styles.navBreadcrumb}>
+          <span>SaaS</span>
+          <span class={styles.sep}>/</span>
+          <span class={styles.current}>GTR</span>
+        </div>
+      </div>
+      <div class={styles.navLinks}>
+        <a href="#compare">Compare</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#waitlist">Waitlist</a>
+      </div>
+      <div class={styles.navRight}>
+        <a class={styles.navCta} href="#waitlist">Join the waitlist</a>
+      </div>
+    </nav>
+
+    <main id="top">
+      <section class={styles.hero}>
+        <div class={styles.heroCopy}>
+          <span class={styles.tag}>Coming Soon</span>
+          <h1>
+            Run every IQVerse check
+            <span class={styles.heroAccent}> across your whole site</span>
+          </h1>
+          <p>
+            Free tools check one URL at a time. GTR crawls every page on a schedule,
+            tracks a health score over time and alerts you before things break.
+          </p>
+          <div class={styles.heroActions}>
+            <a class={styles.btnPrimary} href="#waitlist">Join the waitlist</a>
+            <a class={styles.btnSecondary} href="#compare">See what's included</a>
+          </div>
+          <div class={styles.highlightList}>
+            <span>Full-site crawl</span>
+            <span>Score history</span>
+            <span>Cert &amp; header alerts</span>
+          </div>
+        </div>
+
+        <div class={styles.heroPreview}>
+          <div class={styles.previewBar}>
+            <span>GTR Report Preview</span>
+            <span>Coming Soon</span>
+          </div>
+          <div class={styles.previewBody}>
+            <div class={styles.previewList}>
+              <div class={styles.previewRow}>
+                <span>🤖</span>
+                <span>AI crawler access &amp; llms.txt coverage, site-wide</span>
+              </div>
+              <div class={styles.previewRow}>
+                <span>🛡️</span>
+                <span>Security headers on every page, checked daily</span>
+              </div>
+              <div class={styles.previewRow}>
+                <span>📜</span>
+                <span>SSL/TLS certificate expiry, monitored per domain</span>
+              </div>
+              <div class={styles.previewRow}>
+                <span>🔗</span>
+                <span>Broken links and redirect loops, whole site</span>
+              </div>
+              <div class={styles.previewRow}>
+                <span>📈</span>
+                <span>One score, tracked and diffed against the last scan</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class={styles.section} id="why">
+        <div class={styles.sectionHeader}>
+          <span class={styles.subtleLabel}>The Problem</span>
+          <h2>One page at a time isn't enough</h2>
+          <p>Free tools are built for checking a single URL. A whole site needs more.</p>
+        </div>
+        <div class={styles.cardGrid}>
+          <article class={styles.card}>
+            <div class={styles.cardIcon}>🔍</div>
+            <h3>One page at a time</h3>
+            <p>A 200-page site needs 200 manual checks to know where it actually stands.</p>
+          </article>
+          <article class={styles.card}>
+            <div class={styles.cardIcon}>📉</div>
+            <h3>No history</h3>
+            <p>A one-off scan shows today's state, not whether things are getting better or worse.</p>
+          </article>
+          <article class={styles.card}>
+            <div class={styles.cardIcon}>🔔</div>
+            <h3>No alerts</h3>
+            <p>Certificates expire and headers regress silently between visits, with nobody watching.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class={styles.sectionAlt} id="how-it-works">
+        <div class={styles.sectionHeader}>
+          <span class={styles.subtleLabel}>How GTR works</span>
+          <h2>A crawler for every IQVerse check</h2>
+          <p>GTR reuses the same checks behind the free tools and runs them across your whole site.</p>
+        </div>
+        <div class={styles.solutionBox}>
+          <div class={styles.bulletRow}>
+            <span class={styles.bulletCheck}>✓</span>
+            <div>
+              <h3>Site-wide crawl</h3>
+              <p>Every URL from your sitemap, plus pages found by crawling outward from the homepage, checked automatically.</p>
+            </div>
+          </div>
+          <div class={styles.bulletRow}>
+            <span class={styles.bulletCheck}>✓</span>
+            <div>
+              <h3>Score history</h3>
+              <p>Track a site health score over time and see exactly what changed since the last scan.</p>
+            </div>
+          </div>
+          <div class={styles.bulletRow}>
+            <span class={styles.bulletCheck}>✓</span>
+            <div>
+              <h3>Alerts before it breaks</h3>
+              <p>Get notified before a certificate expires or a security header regresses, not after.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class={styles.section} id="compare">
+        <div class={styles.sectionHeader}>
+          <span class={styles.subtleLabel}>Free vs GTR</span>
+          <h2>See the gap</h2>
+          <p>Free tools check one page. GTR checks all of them, automatically.</p>
+        </div>
+        <div class={styles.compareWrap}>
+          <div class={styles.compareHead}>
+            <span>Check</span>
+            <span>Free</span>
+            <span>GTR</span>
+          </div>
+          <div class={styles.compareRow}>
+            <span>Security headers</span>
+            <span class={styles.compareFree}>1 page</span>
+            <span class={styles.comparePlus}>Every page, daily</span>
+          </div>
+          <div class={styles.compareRow}>
+            <span>SSL / cert expiry</span>
+            <span class={styles.compareFree}>One-time check</span>
+            <span class={styles.comparePlus}>Alert before expiry</span>
+          </div>
+          <div class={styles.compareRow}>
+            <span>Broken links</span>
+            <span class={styles.compareFree}>1 page</span>
+            <span class={styles.comparePlus}>Whole site, weekly</span>
+          </div>
+          <div class={styles.compareRow}>
+            <span>AI crawler / llms.txt</span>
+            <span class={styles.compareFree}>1 page</span>
+            <span class={styles.comparePlus}>Site-wide AEO score</span>
+          </div>
+          <div class={styles.compareRow}>
+            <span>History and trends</span>
+            <span class={styles.compareExcluded}>Not included</span>
+            <span class={styles.compareIncluded}>Included</span>
+          </div>
+        </div>
+      </section>
+
+      <section class={styles.section} id="waitlist">
+        <div class={styles.sectionHeader}>
+          <span class={styles.subtleLabel}>Coming Soon</span>
+          <h2>Be first to try GTR</h2>
+          <p>Site-wide monitoring is still in development. Leave your email and we'll let you know when it's ready.</p>
+        </div>
+        <div class={styles.waitlistBox}>
+          <div class={styles.waitlistCopy}>
+            <p>No spam. One email when GTR opens up.</p>
+          </div>
+          <form id="waitlist-form" class={styles.waitlistForm}>
+            <div class={styles.waitlistRow}>
+              <input
+                id="waitlist-email"
+                name="email"
+                type="email"
+                class={styles.waitlistInput}
+                placeholder="you@company.com"
+                required
+              />
+              <button type="submit" id="waitlist-submit" class={styles.waitlistSubmit}>
+                Notify me
+              </button>
+            </div>
+            <CapCaptcha id="waitlist-captcha" />
+            <p id="waitlist-status" class={styles.waitlistStatus}></p>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class={styles.footer}>
+      <h2>GTR</h2>
+      <p>Have questions before it launches? Reach out any time.</p>
+      <a class={styles.btnPrimary} href="mailto:hello@iqverse.net">hello@iqverse.net</a>
+    </footer>
+  </div>
+</Layout>
+
+<script>
+  import { validateCaptcha } from '@/lib/captcha';
+  import styles from '@/styles/saas-landing.module.css';
+
+  const WAITLIST_ENDPOINT = 'https://sekmen.dev/api/submit';
+
+  const form = document.getElementById('waitlist-form') as HTMLFormElement | null;
+  const emailInput = document.getElementById('waitlist-email') as HTMLInputElement | null;
+  const submitBtn = document.getElementById('waitlist-submit') as HTMLButtonElement | null;
+  const statusEl = document.getElementById('waitlist-status');
+
+  function setStatus(message: string, tone: 'ok' | 'err' | '') {
+    if (!statusEl) return;
+    statusEl.textContent = message;
+    statusEl.classList.remove(styles.waitlistStatusOk, styles.waitlistStatusErr);
+    if (tone === 'ok') statusEl.classList.add(styles.waitlistStatusOk);
+    if (tone === 'err') statusEl.classList.add(styles.waitlistStatusErr);
+  }
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!form || !emailInput || !submitBtn) return;
+
+    const { valid, token } = validateCaptcha(form);
+    if (!valid || !token) return;
+
+    const email = emailInput.value.trim();
+    if (!email) return;
+
+    submitBtn.disabled = true;
+    setStatus('Sending...', '');
+
+    try {
+      const res = await fetch(WAITLIST_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'GTR Waitlist',
+          email,
+          message: 'Waitlist signup for GTR (site-wide crawler & monitor).',
+          company: '',
+          phone: '',
+          'cap-token': token,
+        }),
+      });
+
+      if (!res.ok) throw new Error(`Request failed with status ${res.status}`);
+
+      setStatus("You're on the list! We'll email you when GTR is ready.", 'ok');
+      form.reset();
+    } catch {
+      setStatus('Something went wrong. Please try again in a moment.', 'err');
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+</script>

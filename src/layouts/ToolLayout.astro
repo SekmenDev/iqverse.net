@@ -28,8 +28,8 @@ const matchedTool =
   (toolSlug ? tools.find((t) => t.url.includes(toolSlug)) : undefined);
 const slug =
   toolSlug ||
-  matchedTool?.url.replace(/\//g, "") ||
-  title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  matchedTool?.url.replaceAll("/", "") ||
+  title.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-");
 const jsonLdData = getToolJsonLd(
   title,
   description,
@@ -64,6 +64,9 @@ const pageTitle = subtitle
       <ToolNavSearch />
 
       <div class={styles.navRight}>
+        <a href="/gtr/" class={styles.navGtrCta}>
+          GTR ↗
+        </a>
         <a
           href="https://github.com/SekmenDev/iqverse.net"
           target="_blank"

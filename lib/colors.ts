@@ -15,12 +15,12 @@ export function clamp(value: number, min: number, max: number): number {
 }
 
 export function hexToRgb(hex: string): { r: number; g: number; b: number } {
-  const normalized = hex.replace('#', '');
+  const normalized = hex.replaceAll('#', '');
   const full = normalized.length === 3
     ? normalized.split('').map((c) => c + c).join('')
     : normalized;
 
-  const n = parseInt(full, 16);
+  const n = Number.parseInt(full, 16);
   return {
     r: (n >> 16) & 255,
     g: (n >> 8) & 255,
@@ -188,7 +188,7 @@ export function generatePalette(
     const baseHex = hslToHex(hue, s, l);
     return {
       name: names[index] || `Color ${index + 1}`,
-      key: (names[index] || `color-${index + 1}`).toLowerCase().replace(/\s+/g, '-'),
+      key: (names[index] || `color-${index + 1}`).toLowerCase().replaceAll(/\s+/g, '-'),
       shades: generateShades(baseHex, shadesCount, opts),
     };
   });

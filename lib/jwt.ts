@@ -25,7 +25,7 @@ export interface JwtDecodedResult {
 }
 
 export function base64UrlDecode(str: string): string {
-  let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+  let base64 = str.replaceAll('-', '+').replaceAll('_', '/');
   while (base64.length % 4) {
     base64 += '=';
   }
@@ -137,9 +137,9 @@ export async function verifyJwtSignatureHmac(
   }
 
   const computedBase64Url = (typeof btoa === 'function' ? btoa(binary) : Buffer.from(binary, 'binary').toString('base64'))
-    .replace(/=/g, '')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_');
+    .replaceAll('=', '')
+    .replaceAll('+', '-')
+    .replaceAll('/', '_');
 
   return computedBase64Url === parts[2];
 }

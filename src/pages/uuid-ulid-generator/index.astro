@@ -130,7 +130,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
   function generate() {
     const type = (idType?.value || 'uuid') as 'uuid' | 'ulid';
-    const count = Math.max(1, parseInt(idCount?.value || '5', 10));
+    const count = Math.max(1, Number.parseInt(idCount?.value || '5', 10));
     const uppercase = cbUpper?.checked || false;
     const removeHyphens = cbHyphens?.checked || false;
     const braces = cbBraces?.checked || false;

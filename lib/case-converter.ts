@@ -5,9 +5,9 @@ export interface CaseItem {
 
 export function toWords(input: string): string[] {
   return input
-    .replace(/([a-z])([A-Z])/g, '$1 $2')
-    .replace(/([A-Z])([A-Z][a-z])/g, '$1 $2')
-    .replace(/[^a-zA-Z0-9]+/g, ' ')
+    .replaceAll(/([a-z])([A-Z])/g, '$1 $2')
+    .replaceAll(/([A-Z])([A-Z][a-z])/g, '$1 $2')
+    .replaceAll(/[^a-zA-Z0-9]+/g, ' ')
     .trim()
     .split(/\s+/)
     .filter(Boolean);

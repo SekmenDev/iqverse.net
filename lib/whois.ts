@@ -30,7 +30,7 @@ export const normalizeDomainName = cleanDomainInput;
 
 export function calculateDomainRemainingDays(expirationDateStr: string, now: number = Date.now()): number {
   const expDate = new Date(expirationDateStr);
-  if (isNaN(expDate.getTime())) return 0;
+  if (Number.isNaN(expDate.getTime())) return 0;
   return Math.floor((expDate.getTime() - now) / (86400 * 1000));
 }
 

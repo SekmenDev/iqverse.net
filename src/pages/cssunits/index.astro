@@ -83,11 +83,11 @@ const units = ['px', 'rem', 'em', 'vh', 'vw', '%'];
     const fromUnit = (fromSelect?.value || 'px') as CssUnit;
     const toUnit = (toSelect?.value || 'rem') as CssUnit;
 
-    if (isNaN(val)) {
+    if (Number.isNaN(val)) {
       resultEl.textContent = 'Please enter a valid number.';
       return;
     }
-    if (isNaN(root) || root <= 0) {
+    if (Number.isNaN(root) || root <= 0) {
       resultEl.textContent = 'Root font size must be positive.';
       return;
     }

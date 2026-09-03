@@ -198,11 +198,11 @@ function validateSchemaObject(
     }
   }
 
-  if (obj.datePublished && isNaN(Date.parse(obj.datePublished))) {
+  if (obj.datePublished && Number.isNaN(Date.parse(obj.datePublished))) {
     warnings.push(`Invalid date format for 'datePublished': '${obj.datePublished}'. Use ISO-8601 (e.g. YYYY-MM-DD).`);
   }
 
-  if (obj.dateModified && isNaN(Date.parse(obj.dateModified))) {
+  if (obj.dateModified && Number.isNaN(Date.parse(obj.dateModified))) {
     warnings.push(`Invalid date format for 'dateModified': '${obj.dateModified}'. Use ISO-8601 (e.g. YYYY-MM-DD).`);
   }
 }

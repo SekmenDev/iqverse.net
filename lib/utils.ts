@@ -23,8 +23,8 @@ export function timeAgo(ts: number): string {
 
 export function formatTTL(seconds: number | undefined | null): string {
   if (seconds === undefined || seconds === null) return '—';
-  const s = parseInt(String(seconds));
-  if (isNaN(s)) return '—';
+  const s = Number.parseInt(String(seconds), 10);
+  if (Number.isNaN(s)) return '—';
   if (s < 60) return `${s}s`;
   if (s < 3600) return `${Math.floor(s / 60)}m ${s % 60}s`;
   if (s < 86400) return `${Math.floor(s / 3600)}h ${Math.floor((s % 3600) / 60)}m`;

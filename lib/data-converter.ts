@@ -5,7 +5,7 @@ export function objectToYaml(obj: unknown, indentLevel: number = 0): string {
   if (typeof obj === 'number') return obj.toString();
   if (typeof obj === 'string') {
     if (obj.includes('\n') || obj.includes(':') || obj.includes('#')) {
-      return `"${obj.replace(/"/g, '\\"')}"`;
+      return `"${obj.replaceAll('"', '\\"')}"`;
     }
     return obj || '""';
   }
@@ -60,7 +60,7 @@ export function yamlToObject(yamlStr: string): unknown {
       if (valStr === 'true') val = true;
       else if (valStr === 'false') val = false;
       else if (valStr === 'null') val = null;
-      else if (!isNaN(Number(valStr)) && valStr !== '') val = Number(valStr);
+      else if (!Number.isNaN(Number(valStr)) && valStr !== '') val = Number(valStr);
 
       root[key] = val;
     }
@@ -120,7 +120,7 @@ export function tomlToObject(tomlStr: string): Record<string, unknown> {
       let val: unknown = valStr;
       if (valStr === 'true') val = true;
       else if (valStr === 'false') val = false;
-      else if (!isNaN(Number(valStr)) && valStr !== '') val = Number(valStr);
+      else if (!Number.isNaN(Number(valStr)) && valStr !== '') val = Number(valStr);
 
       root[key] = val;
     }

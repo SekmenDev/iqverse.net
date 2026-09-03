@@ -8,16 +8,16 @@ export interface WcagCompliance {
 }
 
 export function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
-  const clean = hex.replace('#', '').trim();
+  const clean = hex.replaceAll('#', '').trim();
   if (clean.length === 3) {
-    const r = parseInt(clean[0] + clean[0], 16);
-    const g = parseInt(clean[1] + clean[1], 16);
-    const b = parseInt(clean[2] + clean[2], 16);
+    const r = Number.parseInt(clean[0] + clean[0], 16);
+    const g = Number.parseInt(clean[1] + clean[1], 16);
+    const b = Number.parseInt(clean[2] + clean[2], 16);
     return { r, g, b };
   } else if (clean.length === 6) {
-    const r = parseInt(clean.slice(0, 2), 16);
-    const g = parseInt(clean.slice(2, 4), 16);
-    const b = parseInt(clean.slice(4, 6), 16);
+    const r = Number.parseInt(clean.slice(0, 2), 16);
+    const g = Number.parseInt(clean.slice(2, 4), 16);
+    const b = Number.parseInt(clean.slice(4, 6), 16);
     return { r, g, b };
   }
   return null;
@@ -59,7 +59,7 @@ export function evaluateWcagCompliance(
     ratio = Math.round(calculateContrastRatio(fgHexOrRatio, bgHex) * 100) / 100;
   } else if (typeof fgHexOrRatio === 'string') {
     const parsed = parseFloat(fgHexOrRatio);
-    if (!isNaN(parsed)) ratio = Math.round(parsed * 100) / 100;
+    if (!Number.isNaN(parsed)) ratio = Math.round(parsed * 100) / 100;
   }
 
   return {

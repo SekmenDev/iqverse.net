@@ -3,7 +3,7 @@ export function isIPv4(ip: string): boolean {
   if (parts.length !== 4) return false;
   return parts.every((p) => {
     const num = Number(p);
-    return !isNaN(num) && num >= 0 && num <= 255 && String(num) === p;
+    return !Number.isNaN(num) && num >= 0 && num <= 255 && String(num) === p;
   });
 }
 

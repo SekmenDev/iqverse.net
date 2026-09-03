@@ -81,7 +81,7 @@ export function ipv6ToBigInt(value: string): bigint | null {
   let result = 0n;
   for (const group of groups) {
     if (!/^[0-9a-f]{1,4}$/.test(group)) return null;
-    result = (result << 16n) | BigInt(parseInt(group, 16));
+    result = (result << 16n) | BigInt(Number.parseInt(group, 16));
   }
   return result;
 }
