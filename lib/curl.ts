@@ -29,7 +29,7 @@ const FLAGS_WITH_VALUE = new Set([
 ]);
 
 export function tokenizeCurl(input: string): string[] {
-  const text = input.replace(/\\\r?\n/g, ' ').replace(/\s*\^\r?\n\s*/g, ' ');
+  const text = input.replaceAll(/\\\r?\n/g, ' ').replaceAll(/\s*\^\r?\n\s*/g, ' ');
   const tokens: string[] = [];
 
   let current = '';
@@ -329,7 +329,7 @@ export function toFetch(request: CurlRequest): string {
 }
 
 function quotePython(value: string): string {
-  return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+  return `"${value.replaceAll('\\', '\\\\').replaceAll('"', '\\"')}"`;
 }
 
 export function toPythonRequests(request: CurlRequest): string {
@@ -352,7 +352,7 @@ export function toPythonRequests(request: CurlRequest): string {
       const pretty = prettyJson(request.body, '    ');
       args.push(
         pretty
-          ? `    json=${pretty.replace(/\btrue\b/g, 'True').replace(/\bfalse\b/g, 'False').replace(/\bnull\b/g, 'None')},`
+          ? `    json=${pretty.replaceAll(/\btrue\b/g, 'True').replaceAll(/\bfalse\b/g, 'False').replaceAll(/\bnull\b/g, 'None')},`
           : `    data=${quotePython(request.body)},`
       );
     } else {

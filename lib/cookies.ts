@@ -72,7 +72,7 @@ export function parseSetCookieHeader(input: string): (ParsedCookie[] & ParsedCoo
       warnings.push('Cookie missing Secure flag (transmitted over insecure HTTP connection).');
     }
 
-    const parsedMaxAge: any = maxAge !== undefined && !isNaN(Number(maxAge)) ? Number(maxAge) : maxAge;
+    const parsedMaxAge: any = maxAge !== undefined && !Number.isNaN(Number(maxAge)) ? Number(maxAge) : maxAge;
 
     cookies.push({
       name,

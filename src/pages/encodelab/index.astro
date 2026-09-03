@@ -131,8 +131,8 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
         jwtBox.style.display = 'none';
         return;
       }
-      const hdr = b64Decode(parts[0].replace(/-/g, '+').replace(/_/g, '/'), false);
-      const pld = b64Decode(parts[1].replace(/-/g, '+').replace(/_/g, '/'), false);
+      const hdr = b64Decode(parts[0].replaceAll('-', '+').replaceAll('_', '/'), false);
+      const pld = b64Decode(parts[1].replaceAll('-', '+').replaceAll('_', '/'), false);
       jwtHdr.textContent = hdr;
       jwtPld.textContent = pld;
       jwtBox.style.display = 'block';

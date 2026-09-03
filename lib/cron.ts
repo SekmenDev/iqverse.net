@@ -97,7 +97,7 @@ export function calculateCronNextRuns(
 
   let stepMinutes = 1;
   if (minStr.startsWith('*/')) {
-    stepMinutes = parseInt(minStr.slice(2), 10) || 1;
+    stepMinutes = Number.parseInt(minStr.slice(2), 10) || 1;
   }
 
   for (let i = 0; i < count * 1440 && runs.length < count; i++) {
@@ -112,7 +112,7 @@ export function calculateCronNextRuns(
     const hourMatch =
       hourStr === '*' ||
       (hourStr.startsWith('*/') &&
-        h % (parseInt(hourStr.slice(2), 10) || 1) === 0) ||
+        h % (Number.parseInt(hourStr.slice(2), 10) || 1) === 0) ||
       Number(hourStr) === h;
 
     if (minMatch && hourMatch) {

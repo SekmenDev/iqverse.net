@@ -176,7 +176,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
   function handleGenLorem() {
     const type = (loremType?.value || 'paragraphs') as 'paragraphs' | 'sentences' | 'words';
-    const count = Math.max(1, parseInt(loremCount?.value || '3', 10));
+    const count = Math.max(1, Number.parseInt(loremCount?.value || '3', 10));
     const result = generateLorem(type, count);
 
     if (loremOutArea && loremOutField) {
@@ -187,7 +187,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 
   function handleGenJsonMock() {
     const type = (schemaType?.value || 'users') as 'users' | 'products' | 'transactions';
-    const count = Math.max(1, parseInt(batchSize?.value || '5', 10));
+    const count = Math.max(1, Number.parseInt(batchSize?.value || '5', 10));
     const items = generateMockDataset(type, count);
 
     if (jsonOutArea && jsonOutField) {

@@ -79,7 +79,7 @@ export function parseAccessLogs(logContent: string): AiLogAnalysisResult {
       }
       botCounts[botMatch.name].count++;
 
-      const statusCodeNum = parseInt(status, 10) || status;
+      const statusCodeNum = Number.parseInt(status, 10) || status;
       statusCounts[statusCodeNum] = (statusCounts[statusCodeNum] || 0) + 1;
       statusCounts[status] = statusCounts[statusCodeNum];
 

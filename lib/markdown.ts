@@ -8,35 +8,35 @@ export interface MarkdownStats {
 
 export function parseMarkdownToHtml(md: string): string {
   let html = md;
-  html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  html = html.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 
   // Fenced Code Blocks
-  html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
+  html = html.replaceAll(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
     return `<pre><code class="language-${lang}">${code.trim()}</code></pre>`;
   });
 
   // Inline Code
-  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+  html = html.replaceAll(/`([^`]+)`/g, '<code>$1</code>');
 
   // Headings
-  html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
-  html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
-  html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+  html = html.replaceAll(/^### (.*$)/gim, '<h3>$1</h3>');
+  html = html.replaceAll(/^## (.*$)/gim, '<h2>$1</h2>');
+  html = html.replaceAll(/^# (.*$)/gim, '<h1>$1</h1>');
 
   // Blockquotes
-  html = html.replace(/^&gt;\s?(.*$)/gim, '<blockquote>$1</blockquote>');
+  html = html.replaceAll(/^&gt;\s?(.*$)/gim, '<blockquote>$1</blockquote>');
 
   // Links [text](url)
-  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+  html = html.replaceAll(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
 
   // Bold & Italic
-  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-  html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  html = html.replaceAll(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  html = html.replaceAll(/\*([^*]+)\*/g, '<em>$1</em>');
 
   // Task lists & unordered lists
-  html = html.replace(/^-\s*\[x\]\s*(.*$)/gim, '<li style="list-style: none;">☑ $1</li>');
-  html = html.replace(/^-\s*\[\s*\]\s*(.*$)/gim, '<li style="list-style: none;">☐ $1</li>');
-  html = html.replace(/^-\s*(.*$)/gim, '<li>$1</li>');
+  html = html.replaceAll(/^-\s*\[x\]\s*(.*$)/gim, '<li style="list-style: none;">☑ $1</li>');
+  html = html.replaceAll(/^-\s*\[\s*\]\s*(.*$)/gim, '<li style="list-style: none;">☐ $1</li>');
+  html = html.replaceAll(/^-\s*(.*$)/gim, '<li>$1</li>');
 
   // Paragraphs
   html = html
@@ -51,7 +51,7 @@ export function parseMarkdownToHtml(md: string): string {
       ) {
         return trimmed;
       }
-      return `<p>${trimmed.replace(/\n/g, '<br/>')}</p>`;
+      return `<p>${trimmed.replaceAll('\n', '<br/>')}</p>`;
     })
     .join('\n');
 

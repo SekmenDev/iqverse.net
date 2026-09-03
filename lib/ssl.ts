@@ -15,7 +15,7 @@ export interface SslInspectionResult {
 
 export function calculateCertificateRemainingDays(validToDate: Date | string, now: number = Date.now()): number {
   const target = typeof validToDate === 'string' ? new Date(validToDate) : validToDate;
-  if (isNaN(target.getTime())) return 0;
+  if (Number.isNaN(target.getTime())) return 0;
   return Math.floor((target.getTime() - now) / (86400 * 1000));
 }
 

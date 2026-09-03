@@ -28,7 +28,7 @@ const RESERVED = new Set(['default', 'function', 'class', 'interface', 'enum', '
 
 export function pascalCase(input: string): string {
   const cleaned = input
-    .replace(/[^A-Za-z0-9]+/g, ' ')
+    .replaceAll(/[^A-Za-z0-9]+/g, ' ')
     .trim()
     .split(/\s+|(?<=[a-z0-9])(?=[A-Z])/)
     .filter(Boolean)

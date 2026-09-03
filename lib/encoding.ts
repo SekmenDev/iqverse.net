@@ -8,7 +8,7 @@ export function b64Encode(input: string, urlSafe = false): string {
       const binString = Array.from(bytes, (byte) => String.fromCodePoint(byte)).join('');
       encoded = btoa(binString);
     }
-    return urlSafe ? encoded.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '') : encoded;
+    return urlSafe ? encoded.replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '') : encoded;
   } catch {
     return 'Encoding error';
   }
@@ -18,7 +18,7 @@ export function b64Decode(input: string, urlSafe = false): string {
   try {
     let data = input;
     if (urlSafe) {
-      data = data.replace(/-/g, '+').replace(/_/g, '/');
+      data = data.replaceAll('-', '+').replaceAll('_', '/');
       while (data.length % 4) data += '=';
     }
     if (typeof Buffer !== 'undefined') {
@@ -47,13 +47,13 @@ export function hexEncode(input: string): string {
 
 export function hexDecode(input: string): string {
   try {
-    const cleaned = input.replace(/\s+/g, '');
+    const cleaned = input.replaceAll(/\s+/g, '');
     if (cleaned.length % 2 !== 0) {
       throw new TypeError('Hex input must have an even length.');
     }
     const hexPairs = cleaned.match(/.{1,2}/g) || [];
     const bytes = Uint8Array.from(hexPairs, (pair) => {
-      const byte = parseInt(pair, 16);
+      const byte = Number.parseInt(pair, 16);
       if (Number.isNaN(byte)) {
         throw new TypeError('Invalid hex input.');
       }

@@ -68,9 +68,9 @@ const QUALIFIERS: Record<string, SpfMechanism['qualifier']> = {
 function normalize(record: string): string {
   return record
     .trim()
-    .replace(/^["']|["']$/g, '')
-    .replace(/"\s*"/g, '')
-    .replace(/\s+/g, ' ')
+    .replaceAll(/^["']|["']$/g, '')
+    .replaceAll(/"\s*"/g, '')
+    .replaceAll(/\s+/g, ' ')
     .trim();
 }
 
@@ -258,7 +258,7 @@ export function parseDmarc(record: string): DmarcRecord {
 }
 
 export function estimateKeyBits(publicKey: string): number | null {
-  const clean = publicKey.replace(/\s/g, '');
+  const clean = publicKey.replaceAll(/\s/g, '');
   if (!clean) return null;
 
   // Base64 length maps to DER bytes; subtract the SubjectPublicKeyInfo header
@@ -293,7 +293,7 @@ export function parseDkim(record: string): DkimRecord {
       severity: 'warning',
       message: 'An empty "p" tag revokes this selector. Signatures using it will fail.',
     });
-  } else if (!/^[A-Za-z0-9+/=]+$/.test(publicKey.replace(/\s/g, ''))) {
+  } else if (!/^[A-Za-z0-9+/=]+$/.test(publicKey.replaceAll(/\s/g, ''))) {
     findings.push({ severity: 'error', message: 'The "p" tag is not valid base64.' });
   }
 
@@ -349,11 +349,11 @@ export function parseEmailAuthRecord(record: string): ParsedRecord {
 }
 
 export function dmarcLookupName(domain: string): string {
-  return `_dmarc.${domain.trim().replace(/^\.+|\.+$/g, '')}`;
+  return `_dmarc.${domain.trim().replaceAll(/^\.+|\.+$/g, '')}`;
 }
 
 export function dkimLookupName(domain: string, selector: string): string {
-  const cleanDomain = domain.trim().replace(/^\.+|\.+$/g, '');
-  const cleanSelector = selector.trim().replace(/^\.+|\.+$/g, '');
+  const cleanDomain = domain.trim().replaceAll(/^\.+|\.+$/g, '');
+  const cleanSelector = selector.trim().replaceAll(/^\.+|\.+$/g, '');
   return `${cleanSelector}._domainkey.${cleanDomain}`;
 }

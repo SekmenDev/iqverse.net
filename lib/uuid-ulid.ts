@@ -63,7 +63,7 @@ export function decodeUlidTimestamp(ulid: string): string | null {
     timestamp = timestamp * 32 + val;
   }
   const date = new Date(timestamp);
-  if (isNaN(date.getTime())) return null;
+  if (Number.isNaN(date.getTime())) return null;
   return date.toISOString();
 }
 

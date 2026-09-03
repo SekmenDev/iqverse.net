@@ -105,7 +105,7 @@ function toHexAndOpacity(token: string): { color: string; opacity: number } | nu
 
   const hex8 = /^#([0-9a-f]{6})([0-9a-f]{2})$/i.exec(token);
   if (hex8) {
-    return { color: `#${hex8[1].toLowerCase()}`, opacity: Number((parseInt(hex8[2], 16) / 255).toFixed(3)) };
+    return { color: `#${hex8[1].toLowerCase()}`, opacity: Number((Number.parseInt(hex8[2], 16) / 255).toFixed(3)) };
   }
 
   if (token.toLowerCase() === 'black') return { color: '#000000', opacity: 1 };

@@ -28,7 +28,7 @@ const formattedCanonical = canonicalUrl.endsWith('/') ? canonicalUrl : `${canoni
 
 const defaultJsonLd = [getWebSiteJsonLd(), getOrganizationJsonLd(), getSoftwareSourceCodeJsonLd()];
 const finalJsonLd = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : defaultJsonLd;
-const jsonLdString = JSON.stringify(finalJsonLd).replace(/</g, '\\u003c');
+const jsonLdString = JSON.stringify(finalJsonLd).replaceAll('<', '\\u003c');
 ---
 
 <!DOCTYPE html><!--

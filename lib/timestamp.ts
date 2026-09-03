@@ -23,14 +23,14 @@ export function parseEpochTimestamp(
   currentTimeSec: number = Math.floor(Date.now() / 1000)
 ): ParsedTimestampResult | null {
   const num = Number(rawInput);
-  if (isNaN(num) || String(rawInput).trim() === '') {
+  if (Number.isNaN(num) || String(rawInput).trim() === '') {
     return null;
   }
 
   const isMs = num > 30000000000;
   const dateObj = new Date(isMs ? num : num * 1000);
 
-  if (isNaN(dateObj.getTime())) {
+  if (Number.isNaN(dateObj.getTime())) {
     return null;
   }
 
@@ -53,7 +53,7 @@ export function convertDateToEpoch(dateInput: string | Date): {
   ms: number;
 } | null {
   const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
-  if (isNaN(date.getTime())) return null;
+  if (Number.isNaN(date.getTime())) return null;
 
   const seconds = Math.floor(date.getTime() / 1000);
   const milliseconds = date.getTime();

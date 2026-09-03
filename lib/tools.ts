@@ -148,6 +148,7 @@ export const tools: Tool[] = [
   { name: "GES: Quiz Platform", desc: "GES is an interactive quiz platform to create online assessments, deliver tests and track student performance in real time.", icon: "❓", url: "/ges/", type: "saas", tags: "quiz assessment education analytics reports", cats: ["SaaS"], aliases: "exam test online assessment survey kahoot" },
   { name: "GYP: License Tracker", desc: "GYP is a software license and client management platform for tracking client subscriptions, license keys, billing and support requests.", icon: "📜", url: "/gyp/", type: "saas", tags: "license crm billing clients software management", cats: ["SaaS"], aliases: "subscription licensing crm invoicing support desk" },
   { name: "GST: Stock Tracker", desc: "GST is a mobile-first inventory and expense tracking web app designed for small workshops, business stock and materials management.", icon: "📦", url: "/gst/", type: "saas", tags: "inventory stock expense mobile pwa shop", cats: ["SaaS"], aliases: "warehouse inventory depo stok expense tracking pwa" },
+  { name: "GTR: Site Crawler & Monitor", desc: "GTR runs IQVerse's tool checks across every page of your site on a schedule, tracking a health score, history and alerts in one place. Coming soon, join the waitlist.", icon: "🕸️", url: "/gtr/", type: "coming", tags: "crawler monitor site-wide score history alerts waitlist saas", cats: ["SaaS"], aliases: "g-tool runner site wide scan aggregate report aeo health score waitlist" },
 ];
 
 export function primaryCategory(tool: Tool): Category {

@@ -205,7 +205,7 @@ import { TOTP_ALGORITHMS } from '@/lib/totp';
   }
 
   function cleanSecret(): string {
-    return (secretInput?.value ?? '').replace(/[\s-]/g, '').toUpperCase();
+    return (secretInput?.value ?? '').replaceAll(/[\s-]/g, '').toUpperCase();
   }
 
   function showError(message: string) {
