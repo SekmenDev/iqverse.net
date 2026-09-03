@@ -1,84 +1,202 @@
 ---
 import ToolLayout from '@/layouts/ToolLayout.astro';
+import CapCaptcha from '@/components/CapCaptcha.astro';
 import sharedStyles from '@/styles/shared-tool-styles.module.css';
 ---
 
 <ToolLayout
-  title="Sitemap XML Generator"
-  subtitle="Standard XML Sitemap Builder & Exporter"
+  title="Sitemap Generator"
+  subtitle="Dynamic Website Crawler & Sitemap Builder"
   pill="BROWSER TOOLS"
   toolSlug="sitemap-generator"
-  description="Generate valid XML sitemaps for search engines and AI crawlers with change frequency, priority and lastmod tags."
+  description="Crawl any website to discover internal links and automatically generate standard XML or plain text sitemaps for search engines."
 >
   <div style="max-width: 1050px;">
     <section class={sharedStyles.section}>
       <div class={sharedStyles.card}>
-        <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
-          <div class={sharedStyles.field} style="margin: 0; flex: 1; min-width: 240px;">
-            <label class={sharedStyles.fieldLabel} for="baseUrlInput">
-              Base Website URL
+        <form id="sitemap-crawler-form">
+          <div class={sharedStyles.field}>
+            <label class={sharedStyles.fieldLabel} for="targetUrl">
+              Website Domain or URL to Crawl
             </label>
-            <input
-              id="baseUrlInput"
-              type="text"
-              value="https://iqverse.net"
-              class={sharedStyles.input}
-            />
-          </div>
-          <button type="button" id="btn-add-sitemap-url" class={sharedStyles.button} style="margin-top: 22px;">
-            + Add URL
-          </button>
-        </div>
-
-        <!-- Bulk Import -->
-        <div
-          style="padding: 14px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); margin-bottom: 20px;"
-        >
-          <label class={sharedStyles.fieldLabel} for="bulkArea">
-            Bulk Import URLs (one path or URL per line)
-          </label>
-          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-            <textarea
-              id="bulkArea"
-              class={sharedStyles.textarea}
-              rows="2"
-              placeholder="/about&#10;/contact&#10;/pricing"
-              style="flex: 1;"
-            ></textarea>
-            <button type="button" id="btn-bulk-import" class={sharedStyles.button} style="align-self: flex-end;">
-              Import
-            </button>
-          </div>
-        </div>
-
-        <!-- URL List -->
-        <div style="margin-bottom: 24px;">
-          <h4 style="margin-bottom: 12px;">Sitemap Entries</h4>
-          <div id="sitemap-urls-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
-        </div>
-
-        <!-- Generated XML -->
-        <div class={sharedStyles.field}>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
-            <label class={sharedStyles.fieldLabel} for="xmlOutput">
-              Generated sitemap.xml
-            </label>
-            <div style="display: flex; gap: 8px;">
-              <button type="button" id="btn-copy-sitemap-xml" class={sharedStyles.button}>
-                Copy XML
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <input
+                id="targetUrl"
+                type="text"
+                value="https://iqverse.net"
+                class={sharedStyles.input}
+                style="flex: 1; min-width: 260px;"
+                placeholder="https://example.com"
+                required
+              />
+              <button
+                type="submit"
+                id="btn-start-crawl"
+                class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}
+              >
+                Start Crawl
               </button>
-              <button type="button" id="btn-download-sitemap-xml" class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}>
+              <button
+                type="button"
+                id="btn-stop-crawl"
+                class={sharedStyles.button}
+                style="display: none; color: #ff4d4f;"
+              >
+                Stop Crawl
+              </button>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 14px;">
+            <div class={sharedStyles.field} style="margin-bottom: 0;">
+              <label class={sharedStyles.fieldLabel} for="maxDepth">Max Crawl Depth</label>
+              <select id="maxDepth" class={sharedStyles.select}>
+                <option value="1">Depth 1 (Homepage links)</option>
+                <option value="2" selected>Depth 2 (Internal subpages)</option>
+                <option value="3">Depth 3 (Deep crawl)</option>
+              </select>
+            </div>
+            <div class={sharedStyles.field} style="margin-bottom: 0;">
+              <label class={sharedStyles.fieldLabel} for="maxPages">Max Page Limit</label>
+              <select id="maxPages" class={sharedStyles.select}>
+                <option value="25">25 pages</option>
+                <option value="50" selected>50 pages</option>
+                <option value="100">100 pages</option>
+                <option value="200">200 pages</option>
+              </select>
+            </div>
+            <div class={sharedStyles.field} style="margin-bottom: 0;">
+              <label class={sharedStyles.fieldLabel} for="defaultChangefreq">Change Frequency</label>
+              <select id="defaultChangefreq" class={sharedStyles.select}>
+                <option value="daily">daily</option>
+                <option value="weekly" selected>weekly</option>
+                <option value="monthly">monthly</option>
+                <option value="yearly">yearly</option>
+              </select>
+            </div>
+            <div class={sharedStyles.field} style="margin-bottom: 0;">
+              <label class={sharedStyles.fieldLabel} for="defaultPriority">Default Priority</label>
+              <select id="defaultPriority" class={sharedStyles.select}>
+                <option value="1.0">1.0 (Highest)</option>
+                <option value="0.8" selected>0.8 (High)</option>
+                <option value="0.5">0.5 (Normal)</option>
+                <option value="0.3">0.3 (Low)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-top: 14px;">
+            <CapCaptcha />
+          </div>
+        </form>
+
+        <!-- Live Crawl Status Overview -->
+        <div
+          id="crawl-status-box"
+          style="display: none; margin-top: 20px; padding: 14px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);"
+        >
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span id="crawl-status-dot" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--green);"></span>
+              <span id="crawl-status-text" style="font-weight: 600; font-size: 0.9rem;">Crawling website...</span>
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted);">
+              Discovered: <strong id="crawl-count-discovered" style="color: var(--text);">0</strong> | Scanned: <strong id="crawl-count-scanned" style="color: var(--text);">0</strong> | Queue: <strong id="crawl-count-queue" style="color: var(--text);">0</strong>
+            </div>
+          </div>
+          <div id="crawl-current-url" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></div>
+        </div>
+
+        <!-- Generated Sitemap Text Output Area -->
+        <div class={sharedStyles.field} style="margin-top: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <label class={sharedStyles.fieldLabel} style="margin: 0;">
+                Generated Sitemap
+              </label>
+              <div style="display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden;">
+                <button
+                  type="button"
+                  id="btn-format-xml"
+                  class="format-toggle-btn active"
+                  style="padding: 4px 12px; font-size: 0.8rem; border: none; cursor: pointer; background: var(--accent); color: #0c0e14; font-weight: 600;"
+                >
+                  XML (.xml)
+                </button>
+                <button
+                  type="button"
+                  id="btn-format-txt"
+                  class="format-toggle-btn"
+                  style="padding: 4px 12px; font-size: 0.8rem; border: none; cursor: pointer; background: var(--surface); color: var(--text); font-weight: 600;"
+                >
+                  Plain Text (.txt)
+                </button>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 8px;">
+              <button type="button" id="btn-copy-sitemap" class={sharedStyles.button}>
+                Copy Sitemap
+              </button>
+              <button type="button" id="btn-download-sitemap" class={`${sharedStyles.button} ${sharedStyles.buttonPrimary}`}>
                 Download sitemap.xml
               </button>
             </div>
           </div>
+
           <textarea
-            id="xmlOutput"
+            id="sitemapOutput"
             readonly
             class={sharedStyles.outputArea}
             rows="12"
-            style="font-family: monospace;"
+            style="font-family: var(--font-mono);"
+            placeholder="Discovered URLs and generated sitemap text will appear here..."
           ></textarea>
+        </div>
+
+        <!-- Discovered URLs Management -->
+        <div style="margin-top: 28px; border-top: 1px solid var(--border); padding-top: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+            <h4 style="margin: 0; display: flex; align-items: center; gap: 8px;">
+              <span>Discovered URLs</span>
+              <span id="entries-counter" style="font-size: 0.8rem; padding: 2px 8px; border-radius: 12px; background: rgba(255, 255, 255, 0.08); color: var(--text-muted); font-family: var(--font-mono);">0</span>
+            </h4>
+            <div style="display: flex; gap: 8px;">
+              <button type="button" id="btn-toggle-bulk" class={sharedStyles.button} style="font-size: 0.82rem; padding: 0.4rem 0.8rem;">
+                + Bulk Import
+              </button>
+              <button type="button" id="btn-add-manual-url" class={sharedStyles.button} style="font-size: 0.82rem; padding: 0.4rem 0.8rem;">
+                + Add URL
+              </button>
+              <button type="button" id="btn-clear-all" class={sharedStyles.button} style="font-size: 0.82rem; padding: 0.4rem 0.8rem; color: #ff4d4f;">
+                Clear All
+              </button>
+            </div>
+          </div>
+
+          <!-- Collapsible Bulk Import -->
+          <div
+            id="bulk-import-container"
+            style="display: none; padding: 14px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); margin-bottom: 16px;"
+          >
+            <label class={sharedStyles.fieldLabel} for="bulkArea">
+              Bulk Import URLs (one path or URL per line)
+            </label>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <textarea
+                id="bulkArea"
+                class={sharedStyles.textarea}
+                rows="3"
+                placeholder="/about&#10;/contact&#10;/pricing"
+                style="flex: 1;"
+              ></textarea>
+              <button type="button" id="btn-bulk-import" class={sharedStyles.button} style="align-self: flex-end;">
+                Import URLs
+              </button>
+            </div>
+          </div>
+
+          <div id="sitemap-urls-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 420px; overflow-y: auto; padding-right: 4px;"></div>
         </div>
       </div>
     </section>
@@ -86,26 +204,84 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
 </ToolLayout>
 
 <script>
-  import { generateSitemapXml, parseBulkSitemapPaths, type SitemapUrlEntry } from '@/lib/sitemap';
+  import { validateCaptcha, getCaptchaToken } from '@/lib/captcha';
+  import { extractLinksFromHtml } from '@/lib/linkradar';
+  import {
+    generateSitemapXml,
+    generateSitemapTxt,
+    normalizeSitemapUrl,
+    parseBulkSitemapPaths,
+    type SitemapUrlEntry,
+  } from '@/lib/sitemap';
 
   const today = new Date().toISOString().split('T')[0];
+  let currentFormat: 'xml' | 'txt' = 'xml';
+  let isScanning = false;
+  let abortCtrl: AbortController | null = null;
+
   let urls: SitemapUrlEntry[] = [
     { loc: 'https://iqverse.net/', lastmod: today, changefreq: 'daily', priority: '1.0' },
     { loc: 'https://iqverse.net/agentscan/', lastmod: today, changefreq: 'weekly', priority: '0.8' },
-    { loc: 'https://iqverse.net/llmstxt/', lastmod: today, changefreq: 'weekly', priority: '0.8' },
+    { loc: 'https://iqverse.net/linkradar/', lastmod: today, changefreq: 'weekly', priority: '0.8' },
   ];
 
-  const baseUrlInput = document.getElementById('baseUrlInput') as HTMLInputElement;
-  const btnAddUrl = document.getElementById('btn-add-sitemap-url');
+  const form = document.getElementById('sitemap-crawler-form') as HTMLFormElement;
+  const targetUrlInput = document.getElementById('targetUrl') as HTMLInputElement;
+  const btnStart = document.getElementById('btn-start-crawl');
+  const btnStop = document.getElementById('btn-stop-crawl');
+
+  const maxDepthSelect = document.getElementById('maxDepth') as HTMLSelectElement;
+  const maxPagesSelect = document.getElementById('maxPages') as HTMLSelectElement;
+  const changefreqSelect = document.getElementById('defaultChangefreq') as HTMLSelectElement;
+  const prioritySelect = document.getElementById('defaultPriority') as HTMLSelectElement;
+
+  const crawlStatusBox = document.getElementById('crawl-status-box');
+  const crawlStatusDot = document.getElementById('crawl-status-dot');
+  const crawlStatusText = document.getElementById('crawl-status-text');
+  const crawlDiscoveredCount = document.getElementById('crawl-count-discovered');
+  const crawlScannedCount = document.getElementById('crawl-count-scanned');
+  const crawlQueueCount = document.getElementById('crawl-count-queue');
+  const crawlCurrentUrl = document.getElementById('crawl-current-url');
+
+  const btnFormatXml = document.getElementById('btn-format-xml');
+  const btnFormatTxt = document.getElementById('btn-format-txt');
+  const btnCopy = document.getElementById('btn-copy-sitemap');
+  const btnDownload = document.getElementById('btn-download-sitemap');
+  const outputArea = document.getElementById('sitemapOutput') as HTMLTextAreaElement;
+
+  const entriesCounter = document.getElementById('entries-counter');
+  const urlsListContainer = document.getElementById('sitemap-urls-list');
+  const btnToggleBulk = document.getElementById('btn-toggle-bulk');
+  const bulkContainer = document.getElementById('bulk-import-container');
   const bulkArea = document.getElementById('bulkArea') as HTMLTextAreaElement;
   const btnBulkImport = document.getElementById('btn-bulk-import');
-  const urlsListContainer = document.getElementById('sitemap-urls-list');
-  const xmlOutput = document.getElementById('xmlOutput') as HTMLTextAreaElement;
-  const btnCopy = document.getElementById('btn-copy-sitemap-xml');
-  const btnDownload = document.getElementById('btn-download-sitemap-xml');
+  const btnAddManual = document.getElementById('btn-add-manual-url');
+  const btnClearAll = document.getElementById('btn-clear-all');
+
+  function updateOutput() {
+    if (!outputArea) return;
+    if (currentFormat === 'xml') {
+      outputArea.value = generateSitemapXml(urls);
+      if (btnDownload) btnDownload.textContent = 'Download sitemap.xml';
+    } else {
+      outputArea.value = generateSitemapTxt(urls);
+      if (btnDownload) btnDownload.textContent = 'Download sitemap.txt';
+    }
+  }
 
   function renderList() {
+    if (entriesCounter) entriesCounter.textContent = String(urls.length);
     if (!urlsListContainer) return;
+
+    if (urls.length === 0) {
+      urlsListContainer.innerHTML = `
+        <div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 0.88rem; background: rgba(255,255,255,0.01); border-radius: 6px; border: 1px dashed var(--border);">
+          No URLs in sitemap yet. Enter a website and start crawling or add URLs manually.
+        </div>
+      `;
+      return;
+    }
+
     urlsListContainer.innerHTML = urls
       .map(
         (entry, idx) => `
@@ -158,7 +334,8 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
           type="button"
           class="btn-remove-url"
           data-idx="${idx}"
-          style="background: transparent; color: #ff4d4f; border: none; font-size: 1.1rem; cursor: pointer;"
+          title="Remove URL"
+          style="background: transparent; color: #ff4d4f; border: none; font-size: 1.1rem; cursor: pointer; padding: 4px;"
         >
           ✕
         </button>
@@ -167,35 +344,47 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
       )
       .join('');
 
+    bindListEvents();
+  }
+
+  function bindListEvents() {
     document.querySelectorAll('.url-field-loc').forEach((el) => {
       el.addEventListener('input', (e) => {
         const i = Number((e.target as HTMLElement).dataset.idx);
-        urls[i].loc = (e.target as HTMLInputElement).value;
-        updateXml();
+        if (urls[i]) {
+          urls[i].loc = (e.target as HTMLInputElement).value;
+          updateOutput();
+        }
       });
     });
 
     document.querySelectorAll('.url-field-lastmod').forEach((el) => {
       el.addEventListener('input', (e) => {
         const i = Number((e.target as HTMLElement).dataset.idx);
-        urls[i].lastmod = (e.target as HTMLInputElement).value;
-        updateXml();
+        if (urls[i]) {
+          urls[i].lastmod = (e.target as HTMLInputElement).value;
+          updateOutput();
+        }
       });
     });
 
     document.querySelectorAll('.url-field-changefreq').forEach((el) => {
       el.addEventListener('change', (e) => {
         const i = Number((e.target as HTMLElement).dataset.idx);
-        urls[i].changefreq = (e.target as HTMLSelectElement).value;
-        updateXml();
+        if (urls[i]) {
+          urls[i].changefreq = (e.target as HTMLSelectElement).value;
+          updateOutput();
+        }
       });
     });
 
     document.querySelectorAll('.url-field-priority').forEach((el) => {
       el.addEventListener('change', (e) => {
         const i = Number((e.target as HTMLElement).dataset.idx);
-        urls[i].priority = (e.target as HTMLSelectElement).value;
-        updateXml();
+        if (urls[i]) {
+          urls[i].priority = (e.target as HTMLSelectElement).value;
+          updateOutput();
+        }
       });
     });
 
@@ -204,34 +393,36 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
         const i = Number((e.target as HTMLElement).dataset.idx);
         urls = urls.filter((_, idx) => idx !== i);
         renderList();
-        updateXml();
+        updateOutput();
       });
     });
   }
 
-  function updateXml() {
-    if (xmlOutput) xmlOutput.value = generateSitemapXml(urls);
-  }
-
-  btnAddUrl?.addEventListener('click', () => {
-    const base = baseUrlInput?.value.trim().replace(/\/$/, '') || 'https://example.com';
-    urls.push({ loc: `${base}/new-page`, lastmod: today, changefreq: 'monthly', priority: '0.5' });
-    renderList();
-    updateXml();
+  btnFormatXml?.addEventListener('click', () => {
+    currentFormat = 'xml';
+    btnFormatXml.style.background = 'var(--accent)';
+    btnFormatXml.style.color = '#0c0e14';
+    if (btnFormatTxt) {
+      btnFormatTxt.style.background = 'var(--surface)';
+      btnFormatTxt.style.color = 'var(--text)';
+    }
+    updateOutput();
   });
 
-  btnBulkImport?.addEventListener('click', () => {
-    const base = baseUrlInput?.value.trim() || 'https://example.com';
-    const newEntries = parseBulkSitemapPaths(bulkArea?.value || '', base);
-    urls = [...urls, ...newEntries];
-    if (bulkArea) bulkArea.value = '';
-    renderList();
-    updateXml();
+  btnFormatTxt?.addEventListener('click', () => {
+    currentFormat = 'txt';
+    btnFormatTxt.style.background = 'var(--accent)';
+    btnFormatTxt.style.color = '#0c0e14';
+    if (btnFormatXml) {
+      btnFormatXml.style.background = 'var(--surface)';
+      btnFormatXml.style.color = 'var(--text)';
+    }
+    updateOutput();
   });
 
   btnCopy?.addEventListener('click', async () => {
-    if (xmlOutput?.value && btnCopy) {
-      await navigator.clipboard.writeText(xmlOutput.value);
+    if (outputArea?.value && btnCopy) {
+      await navigator.clipboard.writeText(outputArea.value);
       const prev = btnCopy.textContent;
       btnCopy.textContent = 'Copied!';
       setTimeout(() => (btnCopy.textContent = prev), 1500);
@@ -239,15 +430,186 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   });
 
   btnDownload?.addEventListener('click', () => {
-    const blob = new Blob([generateSitemapXml(urls)], { type: 'application/xml;charset=utf-8' });
+    const isXml = currentFormat === 'xml';
+    const content = isXml ? generateSitemapXml(urls) : generateSitemapTxt(urls);
+    const mimeType = isXml ? 'application/xml;charset=utf-8' : 'text/plain;charset=utf-8';
+    const filename = isXml ? 'sitemap.xml' : 'sitemap.txt';
+
+    const blob = new Blob([content], { type: mimeType });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'sitemap.xml';
+    a.download = filename;
     a.click();
     URL.revokeObjectURL(url);
   });
 
+  btnToggleBulk?.addEventListener('click', () => {
+    if (!bulkContainer) return;
+    const isHidden = bulkContainer.style.display === 'none';
+    bulkContainer.style.display = isHidden ? 'block' : 'none';
+  });
+
+  btnBulkImport?.addEventListener('click', () => {
+    const base = targetUrlInput?.value.trim() || 'https://example.com';
+    const defaultPriority = prioritySelect?.value || '0.8';
+    const defaultChangefreq = changefreqSelect?.value || 'weekly';
+    const newEntries = parseBulkSitemapPaths(bulkArea?.value || '', base, defaultPriority, defaultChangefreq);
+
+    const existingLocs = new Set(urls.map((u) => u.loc));
+    newEntries.forEach((entry) => {
+      if (!existingLocs.has(entry.loc)) {
+        urls.push(entry);
+        existingLocs.add(entry.loc);
+      }
+    });
+
+    if (bulkArea) bulkArea.value = '';
+    renderList();
+    updateOutput();
+  });
+
+  btnAddManual?.addEventListener('click', () => {
+    const raw = targetUrlInput?.value.trim() || 'https://example.com';
+    const base = raw.startsWith('http') ? raw : `https://${raw}`;
+    const defaultPriority = prioritySelect?.value || '0.8';
+    const defaultChangefreq = changefreqSelect?.value || 'weekly';
+
+    urls.push({
+      loc: `${base.replace(/\/$/, '')}/new-page`,
+      lastmod: today,
+      changefreq: defaultChangefreq,
+      priority: defaultPriority,
+    });
+    renderList();
+    updateOutput();
+  });
+
+  btnClearAll?.addEventListener('click', () => {
+    urls = [];
+    renderList();
+    updateOutput();
+  });
+
+  async function fetchUrl(url: string) {
+    try {
+      const token = getCaptchaToken(form);
+      const tokenParam = token ? `&token=${encodeURIComponent(token)}` : '';
+      const res = await fetch(`/api/check-url?url=${encodeURIComponent(url)}${tokenParam}`, {
+        signal: abortCtrl?.signal,
+      });
+      const json = await res.json();
+      return {
+        status: json.status || (res.ok ? 200 : 500),
+        html: json.html || json.body || '',
+      };
+    } catch {
+      return { status: 0, html: '' };
+    }
+  }
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const raw = targetUrlInput?.value.trim();
+    if (!raw) return;
+
+    const { valid } = validateCaptcha(form);
+    if (!valid) return;
+
+    const formattedTarget = raw.startsWith('http') ? raw : `https://${raw}`;
+    let origin: string;
+    try {
+      origin = new URL(formattedTarget).origin;
+    } catch {
+      return;
+    }
+
+    isScanning = true;
+    abortCtrl = new AbortController();
+    urls = [];
+
+    const maxDepth = Number(maxDepthSelect?.value || 2);
+    const maxPages = Number(maxPagesSelect?.value || 50);
+    const defaultChangefreq = changefreqSelect?.value || 'weekly';
+    const defaultPriority = prioritySelect?.value || '0.8';
+
+    if (btnStart) btnStart.style.display = 'none';
+    if (btnStop) btnStop.style.display = 'inline-block';
+    if (crawlStatusBox) crawlStatusBox.style.display = 'block';
+    if (crawlStatusDot) crawlStatusDot.style.background = 'var(--green)';
+    if (crawlStatusText) crawlStatusText.textContent = 'Crawling website...';
+
+    const visited = new Set<string>();
+    const queued = new Set<string>();
+    const queue = [{ url: formattedTarget, depth: 0 }];
+    queued.add(formattedTarget);
+
+    let scannedCount = 0;
+
+    while (queue.length > 0 && isScanning && urls.length < maxPages) {
+      const item = queue.shift();
+      if (!item || visited.has(item.url)) continue;
+      visited.add(item.url);
+      scannedCount++;
+
+      if (crawlDiscoveredCount) crawlDiscoveredCount.textContent = String(urls.length);
+      if (crawlScannedCount) crawlScannedCount.textContent = String(scannedCount);
+      if (crawlQueueCount) crawlQueueCount.textContent = String(queue.length);
+      if (crawlCurrentUrl) crawlCurrentUrl.textContent = `Scanning: ${item.url}`;
+
+      const res = await fetchUrl(item.url);
+
+      if (res.status >= 200 && res.status < 400) {
+        if (!urls.some((u) => u.loc === item.url)) {
+          urls.push({
+            loc: item.url,
+            lastmod: today,
+            changefreq: item.depth === 0 ? 'daily' : defaultChangefreq,
+            priority: item.depth === 0 ? '1.0' : defaultPriority,
+          });
+          renderList();
+          updateOutput();
+        }
+
+        if (item.depth < maxDepth && res.html && urls.length < maxPages) {
+          const links = extractLinksFromHtml(res.html, item.url, false, false);
+          for (const link of links) {
+            const normalized = normalizeSitemapUrl(link.url, origin);
+            if (normalized && !visited.has(normalized) && !queued.has(normalized)) {
+              queued.add(normalized);
+              queue.push({ url: normalized, depth: item.depth + 1 });
+            }
+          }
+        }
+      }
+
+      if (crawlDiscoveredCount) crawlDiscoveredCount.textContent = String(urls.length);
+      if (crawlScannedCount) crawlScannedCount.textContent = String(scannedCount);
+      if (crawlQueueCount) crawlQueueCount.textContent = String(queue.length);
+    }
+
+    isScanning = false;
+    if (btnStart) btnStart.style.display = 'inline-block';
+    if (btnStop) btnStop.style.display = 'none';
+    if (crawlStatusDot) crawlStatusDot.style.background = 'var(--accent)';
+    if (crawlStatusText) {
+      crawlStatusText.textContent = urls.length >= maxPages
+        ? `Crawl reached limit (${maxPages} pages). Found ${urls.length} URLs.`
+        : `Crawl completed! Found ${urls.length} valid internal URLs.`;
+    }
+    if (crawlCurrentUrl) crawlCurrentUrl.textContent = 'Scan finished.';
+  });
+
+  btnStop?.addEventListener('click', () => {
+    isScanning = false;
+    abortCtrl?.abort();
+    if (btnStart) btnStart.style.display = 'inline-block';
+    if (btnStop) btnStop.style.display = 'none';
+    if (crawlStatusDot) crawlStatusDot.style.background = 'var(--text-muted)';
+    if (crawlStatusText) crawlStatusText.textContent = `Crawl stopped by user. Found ${urls.length} URLs.`;
+    if (crawlCurrentUrl) crawlCurrentUrl.textContent = '';
+  });
+
   renderList();
-  updateXml();
+  updateOutput();
 </script>

@@ -64,3 +64,59 @@ export function parseBulkSitemapPaths(
     };
   });
 }
+
+const NON_HTML_EXTENSIONS = [
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.gif',
+  '.svg',
+  '.webp',
+  '.ico',
+  '.bmp',
+  '.tiff',
+  '.pdf',
+  '.zip',
+  '.tar',
+  '.gz',
+  '.rar',
+  '.7z',
+  '.mp4',
+  '.webm',
+  '.mp3',
+  '.wav',
+  '.ogg',
+  '.css',
+  '.js',
+  '.mjs',
+  '.map',
+  '.woff',
+  '.woff2',
+  '.ttf',
+  '.eot',
+  '.xml',
+  '.json',
+  '.txt',
+];
+
+export function normalizeSitemapUrl(rawUrl: string, baseOrigin: string): string | null {
+  try {
+    const parsed = new URL(rawUrl, baseOrigin);
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return null;
+    if (parsed.origin !== new URL(baseOrigin).origin) return null;
+    parsed.hash = '';
+    const pathname = parsed.pathname.toLowerCase();
+    if (NON_HTML_EXTENSIONS.some((ext) => pathname.endsWith(ext))) return null;
+    return parsed.href;
+  } catch {
+    return null;
+  }
+}
+
+export function generateSitemapTxt(urls: (SitemapUrlEntry | string)[]): string {
+  const lines = urls
+    .map((u) => (typeof u === 'string' ? u.trim() : u.loc.trim()))
+    .filter(Boolean);
+  return Array.from(new Set(lines)).join('\n');
+}
+

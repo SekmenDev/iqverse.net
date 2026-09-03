@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { generateSitemapXml, parseBulkSitemapPaths } from '@/lib/sitemap';
+import {
+  generateSitemapXml,
+  generateSitemapTxt,
+  normalizeSitemapUrl,
+  parseBulkSitemapPaths,
+} from '@/lib/sitemap';
 
 describe('Sitemap Generator Engine (lib/sitemap)', () => {
   it('parses bulk paths and builds full URLs', () => {
@@ -31,5 +36,28 @@ describe('Sitemap Generator Engine (lib/sitemap)', () => {
     expect(xml).toContain('<changefreq>daily</changefreq>');
     expect(xml).toContain('<priority>1.0</priority>');
     expect(xml).toContain('</urlset>');
+  });
+
+  it('generates plain text sitemap output', () => {
+    const entries = [
+      { loc: 'https://example.com/' },
+      { loc: 'https://example.com/about' },
+      { loc: 'https://example.com/contact' },
+      { loc: 'https://example.com/about' },
+    ];
+
+    const txt = generateSitemapTxt(entries);
+    expect(txt).toBe('https://example.com/\nhttps://example.com/about\nhttps://example.com/contact');
+  });
+
+  it('normalizes internal URLs and filters out non-html assets or external domains', () => {
+    const base = 'https://example.com';
+    expect(normalizeSitemapUrl('/page#section', base)).toBe('https://example.com/page');
+    expect(normalizeSitemapUrl('https://example.com/blog?page=2', base)).toBe('https://example.com/blog?page=2');
+    expect(normalizeSitemapUrl('https://otherdomain.com/path', base)).toBeNull();
+    expect(normalizeSitemapUrl('/image.png', base)).toBeNull();
+    expect(normalizeSitemapUrl('/styles.css', base)).toBeNull();
+    expect(normalizeSitemapUrl('/doc.pdf', base)).toBeNull();
+    expect(normalizeSitemapUrl('javascript:void(0)', base)).toBeNull();
   });
 });

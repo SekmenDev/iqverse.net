@@ -63,4 +63,39 @@ test.describe('Mandatory CAPTCHA Challenge Enforcement E2E', () => {
     await expect(errorNotice).toBeVisible();
     await expect(errorNotice).toContainText(/complete the CAPTCHA challenge/i);
   });
+
+  test('Sitemap Generator blocks crawler start when CAPTCHA is unsolved and toggles text formats', async ({ page }) => {
+    await page.goto('/sitemap-generator/');
+
+    const form = page.locator('#sitemap-crawler-form');
+    const submitBtn = page.locator('#btn-start-crawl');
+    const stopBtn = page.locator('#btn-stop-crawl');
+    const statusBox = page.locator('#crawl-status-box');
+    const errorNotice = form.locator('.cap-captcha-error');
+
+    // Direct submit attempt without CAPTCHA
+    await submitBtn.click();
+    await expect(stopBtn).toBeHidden();
+    await expect(statusBox).toBeHidden();
+    await expect(errorNotice).toBeVisible();
+    await expect(errorNotice).toContainText(/complete the CAPTCHA challenge/i);
+
+    // Verify format switcher between XML and Plain text
+    const outputArea = page.locator('#sitemapOutput');
+    const btnFormatXml = page.locator('#btn-format-xml');
+    const btnFormatTxt = page.locator('#btn-format-txt');
+    const btnDownload = page.locator('#btn-download-sitemap');
+
+    await expect(outputArea).toHaveValue(/<\?xml/);
+    await expect(btnDownload).toHaveText('Download sitemap.xml');
+
+    await btnFormatTxt.click();
+    await expect(outputArea).not.toHaveValue(/<\?xml/);
+    await expect(outputArea).toHaveValue(/https:\/\/iqverse\.net/);
+    await expect(btnDownload).toHaveText('Download sitemap.txt');
+
+    await btnFormatXml.click();
+    await expect(outputArea).toHaveValue(/<\?xml/);
+    await expect(btnDownload).toHaveText('Download sitemap.xml');
+  });
 });

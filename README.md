@@ -186,25 +186,25 @@ IQVerse organizes tools into intuitive categories. Below is the full directory o
 
 ```text
 iqverse.net/
-├── 📂 __tests__/                # Vitest & Playwright test suites
+├── 📂 __tests__/               # Vitest & Playwright test suites
 │   ├── 📂 e2e/                 # Playwright end-to-end page & navigation tests
 │   └── 📂 unit/                # Core lib utility function tests
-├── 📂 app/                      # Next.js App Router routes & tools (50+ Live Tools)
-│   ├── 📂 tools...
-│   ├── 📄 catalog.module.css   # Main catalog CSS module
-│   ├── 📄 globals.css          # Design system, CSS variables & reset
-│   ├── 📄 home.module.css      # Catalog layout styles
-│   ├── 📄 layout.tsx           # Root HTML layout, SEO tags & metadata
-│   ├── 📄 page.tsx             # Dynamic tool catalog homepage (filtering & search)
-│   └── 📄 sitemap.ts           # Dynamic XML sitemap generator
-├── 📂 components/              # Modular UI & Tool React components
-│   ├── 📂 layout/              # Header, Footer, Navigation bars
-│   └── 📂 tools/               # Isolated tool UI component implementations
+├── 📂 functions/               # Cloudflare Workers functions
+│   └── 📂 api/                 # Worker scripts for API routes
 ├── 📂 lib/                     # Core business logic & registries
+│   ├── 📄 tool-libraries       # Tools libraries
 │   ├── 📄 tools.ts             # Central tool catalog registry, categories & filters
 │   └── 📄 tool-search.ts       # Ranked fuzzy search, highlighting & suggestions
 ├── 📂 public/                  # Static assets, tool icons, manifest & favicons
-├── 📂 styles/                  # Supplemental style utilities
+│   ├── 📄 _headers             # Cloudflare Pages _headers file
+│   └── 📄 _redirects           # Cloudflare Pages _redirects file
+├── 📂 src/                     # Next.js App Router routes & tools (50+ Live Tools)
+│   ├── 📂 components/          # Modular UI & Tool React components
+│   ├── 📂 layouts/             # Root HTML layout, SEO tags & metadata
+│   ├── 📂 pages/               # Isolated tool UI component implementations
+│   │   ├── 📂 tools-folders    # Tools folders
+│   │   └── 📄 sitemap.ts       # Dynamic XML sitemap generator
+│   └── 📂 styles/              # Supplemental style utilities
 ├── 📄 eslint.config.mjs        # ESLint flat configuration
 ├── 📄 next.config.ts           # Next.js configuration (static export output)
 ├── 📄 package.json             # NPM package manifest and scripts
