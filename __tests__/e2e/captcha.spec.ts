@@ -98,4 +98,21 @@ test.describe('Mandatory CAPTCHA Challenge Enforcement E2E', () => {
     await expect(outputArea).toHaveValue(/<\?xml/);
     await expect(btnDownload).toHaveText('Download sitemap.xml');
   });
+
+  test('GTR waitlist blocks submission when CAPTCHA is unsolved', async ({ page }) => {
+    await page.goto('/gtr/');
+
+    const form = page.locator('#waitlist-form');
+    const emailInput = page.locator('#waitlist-email');
+    const submitBtn = page.locator('#waitlist-submit');
+    const errorNotice = form.locator('.cap-captcha-error');
+    const statusEl = page.locator('#waitlist-status');
+
+    await emailInput.fill('waitlist-test@example.com');
+    await submitBtn.click();
+
+    await expect(errorNotice).toBeVisible();
+    await expect(errorNotice).toContainText(/complete the CAPTCHA challenge/i);
+    await expect(statusEl).toHaveText('');
+  });
 });

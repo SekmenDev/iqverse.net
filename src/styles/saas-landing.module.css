@@ -365,6 +365,127 @@
   margin-bottom: 0.8rem;
 }
 
+.compareWrap {
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.compareHead,
+.compareRow {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr;
+  padding: 0.9rem 1.1rem;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.compareHead {
+  background: rgba(255,255,255,0.04);
+  color: #98a4bf;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.compareRow {
+  border-top: 1px solid rgba(255,255,255,0.08);
+  font-size: 0.92rem;
+}
+
+.compareFree {
+  color: #98a4bf;
+}
+
+.comparePlus {
+  color: #7dd3fc;
+  font-weight: 600;
+}
+
+.compareIncluded {
+  color: #7ee7b4;
+}
+
+.compareExcluded {
+  color: #f4a3a3;
+}
+
+.waitlistBox {
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  background: rgba(255,255,255,0.04);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.waitlistCopy p {
+  color: #a7b2c8;
+}
+
+.waitlistForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.waitlistRow {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.waitlistInput {
+  min-width: 220px;
+  padding: 0.7rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.04);
+  color: #f7f9ff;
+  font-size: 0.9rem;
+}
+
+.waitlistInput::placeholder {
+  color: #6f7a92;
+}
+
+.waitlistSubmit {
+  padding: 0.7rem 1.15rem;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #818cf8, #4f46e5);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 180ms ease;
+}
+
+.waitlistSubmit:hover {
+  transform: translateY(-1px);
+}
+
+.waitlistSubmit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.waitlistStatus {
+  font-size: 0.85rem;
+  min-height: 1.1em;
+}
+
+.waitlistStatusOk {
+  color: #7ee7b4;
+}
+
+.waitlistStatusErr {
+  color: #f4a3a3;
+}
+
 @media (max-width: 900px) {
   .hero {
     grid-template-columns: 1fr;
@@ -392,5 +513,18 @@
 
   .statGrid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .compareHead,
+  .compareRow {
+    grid-template-columns: 1.3fr 1fr 1fr;
+    font-size: 0.82rem;
+  }
+
+  .waitlistBox {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
