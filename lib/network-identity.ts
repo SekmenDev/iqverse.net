@@ -474,7 +474,7 @@ export function summariseLocation(edge: EdgeNetworkInfo): string {
   return parts.length > 0 ? parts.join(', ') : 'Unknown';
 }
 
-export const NETWORK_ENDPOINT = '/api/v1/network';
+export const NETWORK_ENDPOINT = '/api/network';
 
 export async function fetchEdgeNetworkInfo(): Promise<EdgeNetworkInfo | null> {
   try {

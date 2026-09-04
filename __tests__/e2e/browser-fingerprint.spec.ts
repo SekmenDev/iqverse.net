@@ -58,7 +58,7 @@ test.describe('Browser Fingerprint collection & filtering', () => {
 
   test('runs the private browsing and Tor checks without any network request', async ({ page }) => {
     let edgeRequests = 0;
-    await page.route('**/api/v1/network', (route) => {
+    await page.route('**/api/network', (route) => {
       edgeRequests += 1;
       void route.abort();
     });
@@ -73,7 +73,7 @@ test.describe('Browser Fingerprint collection & filtering', () => {
   });
 
   test('reports IP, VPN and Tor once the opt-in check runs', async ({ page }) => {
-    await page.route('**/api/v1/network', (route) =>
+    await page.route('**/api/network', (route) =>
       route.fulfill({
         json: {
           ip: '203.0.113.42',
@@ -122,7 +122,7 @@ test.describe('Browser Fingerprint collection & filtering', () => {
     const pageErrors: string[] = [];
     page.on('pageerror', (err) => pageErrors.push(err.message));
 
-    await page.route('**/api/v1/network', (route) => route.fulfill({ status: 500, body: 'nope' }));
+    await page.route('**/api/network', (route) => route.fulfill({ status: 500, body: 'nope' }));
 
     await page.goto('/browser-fingerprint/');
     await page.locator('#btn-check-network').click();
@@ -166,7 +166,7 @@ test.describe('Browser Fingerprint collection & filtering', () => {
   });
 
   test('reports signal consistency and upgrades it with request headers', async ({ page }) => {
-    await page.route('**/api/v1/network', (route) =>
+    await page.route('**/api/network', (route) =>
       route.fulfill({
         json: {
           ip: '198.51.100.9',
