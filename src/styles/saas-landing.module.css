@@ -73,9 +73,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.25rem 2rem;
-  max-width: 1180px;
-  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 1rem 20px;
+  border-bottom: 1px solid var(--saas-border);
 }
 
 .navRight {
