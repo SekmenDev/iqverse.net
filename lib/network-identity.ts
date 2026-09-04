@@ -43,6 +43,17 @@ export interface EdgeNetworkInfo {
   torExit: boolean;
   forwardedHops: number;
   proxyHeaders: string[];
+  receivedHeaders: ReceivedHeader[];
+}
+
+export interface ReceivedHeader {
+  name: string;
+  value: string;
+}
+
+export function findHeader(headers: ReceivedHeader[], name: string): string | null {
+  const needle = name.toLowerCase();
+  return headers.find(header => header.name.toLowerCase() === needle)?.value ?? null;
 }
 
 /** Organisation substrings that identify a consumer VPN or proxy network. */
@@ -153,6 +164,13 @@ export function parseEdgeNetworkInfo(payload: unknown): EdgeNetworkInfo | null {
     ? raw.proxyHeaders.filter((entry): entry is string => typeof entry === 'string')
     : [];
 
+  const receivedHeaders = Array.isArray(raw.receivedHeaders)
+    ? raw.receivedHeaders
+        .filter((entry): entry is Record<string, unknown> => typeof entry === 'object' && entry !== null)
+        .filter(entry => typeof entry.name === 'string' && typeof entry.value === 'string')
+        .map(entry => ({ name: entry.name as string, value: entry.value as string }))
+    : [];
+
   return {
     ip: raw.ip,
     ipVersion: version === 'IPv4' || version === 'IPv6' ? version : 'Unknown',
@@ -174,6 +192,7 @@ export function parseEdgeNetworkInfo(payload: unknown): EdgeNetworkInfo | null {
     torExit: raw.torExit === true,
     forwardedHops: toNumber(raw.forwardedHops) ?? 0,
     proxyHeaders,
+    receivedHeaders,
   };
 }
 

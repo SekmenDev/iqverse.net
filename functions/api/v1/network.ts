@@ -35,6 +35,44 @@ const PROXY_HEADERS = [
   'x-proxy-id',
 ];
 
+/**
+ * Headers echoed back so the visitor can see what every request already sends.
+ * Strictly allow-listed: cookies, authorisation and forwarded addresses stay out.
+ */
+const REPORTABLE_HEADERS = new Set([
+  'accept',
+  'accept-encoding',
+  'accept-language',
+  'cache-control',
+  'connection',
+  'dnt',
+  'forwarded',
+  'from',
+  'pragma',
+  'priority',
+  'referer',
+  'save-data',
+  'sec-ch-ua',
+  'sec-ch-ua-arch',
+  'sec-ch-ua-bitness',
+  'sec-ch-ua-full-version-list',
+  'sec-ch-ua-mobile',
+  'sec-ch-ua-model',
+  'sec-ch-ua-platform',
+  'sec-ch-ua-platform-version',
+  'sec-ch-ua-wow64',
+  'sec-fetch-dest',
+  'sec-fetch-mode',
+  'sec-fetch-site',
+  'sec-fetch-user',
+  'sec-gpc',
+  'te',
+  'upgrade-insecure-requests',
+  'user-agent',
+  'via',
+  'x-requested-with',
+]);
+
 function ipVersion(ip: string): 'IPv4' | 'IPv6' | 'Unknown' {
   if (/^\d{1,3}(\.\d{1,3}){3}$/.test(ip)) return 'IPv4';
   if (ip.includes(':')) return 'IPv6';
@@ -52,6 +90,11 @@ export const onRequestGet: PagesFunction = ({ request }) => {
     .filter(Boolean).length;
 
   const proxyHeaders = PROXY_HEADERS.filter(name => request.headers.get(name) !== null);
+
+  const receivedHeaders: Array<{ name: string; value: string }> = [];
+  request.headers.forEach((value, name) => {
+    if (REPORTABLE_HEADERS.has(name.toLowerCase())) receivedHeaders.push({ name, value });
+  });
 
   return Response.json(
     {
@@ -76,6 +119,7 @@ export const onRequestGet: PagesFunction = ({ request }) => {
       torExit: cf.country === 'T1',
       forwardedHops,
       proxyHeaders,
+      receivedHeaders,
     },
     {
       headers: {

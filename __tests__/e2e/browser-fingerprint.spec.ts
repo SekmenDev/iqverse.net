@@ -133,6 +133,83 @@ test.describe('Browser Fingerprint collection & filtering', () => {
     expect(pageErrors).toEqual([]);
   });
 
+  test('labels which signals feed the fingerprint ID', async ({ page }) => {
+    await page.goto('/browser-fingerprint/');
+    await expect(page.locator('#fp-id')).toHaveText(/^[0-9a-f]{32}$/, { timeout: 15000 });
+
+    const results = page.locator('#fp-results');
+    await expect(results).toContainText('in fingerprint ID');
+    await expect(results).toContainText('varies per session');
+
+    // Viewport size is deliberately excluded so a resize does not change the ID
+    const viewportRow = page.locator('#fp-results > div').filter({ hasText: 'Viewport size' });
+    await expect(viewportRow).toContainText('varies per session');
+  });
+
+  test('recognises the browser on a return visit and forgets on request', async ({ page }) => {
+    await page.goto('/browser-fingerprint/');
+    const visitsCard = page.locator('#card-visits');
+    await expect(visitsCard).toContainText('First visit recorded', { timeout: 15000 });
+
+    await page.reload();
+    await expect(visitsCard).toContainText('Recognised 2 times', { timeout: 15000 });
+    await expect(visitsCard).toContainText('has not changed');
+
+    await page.reload();
+    await expect(visitsCard).toContainText('Recognised 3 times', { timeout: 15000 });
+
+    await page.locator('#btn-forget-visits').click();
+    await expect(visitsCard).toContainText('No local record');
+
+    await page.reload();
+    await expect(visitsCard).toContainText('First visit recorded', { timeout: 15000 });
+  });
+
+  test('reports signal consistency and upgrades it with request headers', async ({ page }) => {
+    await page.route('**/api/v1/network', (route) =>
+      route.fulfill({
+        json: {
+          ip: '198.51.100.9',
+          ipVersion: 'IPv4',
+          asn: 3320,
+          organization: 'Deutsche Telekom AG',
+          city: 'Berlin',
+          region: 'Berlin',
+          country: 'DE',
+          timezone: 'Europe/Berlin',
+          colo: 'FRA',
+          httpProtocol: 'HTTP/3',
+          tlsVersion: 'TLSv1.3',
+          tlsCipher: 'AEAD-AES128-GCM-SHA256',
+          clientTcpRtt: 11,
+          torExit: false,
+          forwardedHops: 1,
+          proxyHeaders: [],
+          receivedHeaders: [
+            { name: 'accept-language', value: 'de-DE,de;q=0.9' },
+            { name: 'sec-ch-ua-platform', value: '"macOS"' },
+            { name: 'accept-encoding', value: 'gzip, br' },
+          ],
+        },
+      })
+    );
+
+    await page.goto('/browser-fingerprint/');
+    const card = page.locator('#card-consistency');
+    await expect(card).toContainText('run the IP check to compare request headers', { timeout: 15000 });
+
+    await page.locator('#btn-check-network').click();
+    await expect(card).toContainText('request headers compared');
+
+    // The mocked headers contradict a Chromium-on-Linux test browser
+    await expect(card).toContainText('Client hint platform disagrees with the user agent');
+    await expect(card).toContainText('Header and JavaScript languages disagree');
+
+    const headers = page.locator('#net-headers');
+    await expect(headers).toContainText('accept-encoding');
+    await expect(headers).toContainText('gzip, br');
+  });
+
   test('is reachable from the featured row on the homepage', async ({ page }) => {
     await page.goto('/');
 

@@ -36,6 +36,7 @@ function edge(overrides: Partial<EdgeNetworkInfo> = {}): EdgeNetworkInfo {
     torExit: false,
     forwardedHops: 1,
     proxyHeaders: [],
+    receivedHeaders: [],
     ...overrides,
   };
 }
