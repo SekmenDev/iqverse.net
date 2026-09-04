@@ -117,7 +117,7 @@ IQVerse organizes tools into intuitive categories. Below is the full directory o
 
 | Tool Name | Route / Link | Status | Description |
 | :--- | :--- | :--- | :--- |
-| **Browser Fingerprint & Privacy Inspector** | [`/browser-fingerprint/`](https://iqverse.net/browser-fingerprint/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Every signal a site can read from your browser, ranked by identifying power |
+| **Browser Fingerprint & Privacy Inspector** | [`/browser-fingerprint/`](https://iqverse.net/browser-fingerprint/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Every signal a site can read from your browser ranked by identifying power, plus opt-in IP, VPN, Tor and incognito detection |
 | **HeaderScan** | [`/headers/`](https://iqverse.net/headers/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | HTTP response header inspector with security assessment breakdown |
 | **CSP Header Builder** | [`/csp-builder/`](https://iqverse.net/csp-builder/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Interactive Content-Security-Policy generator & directive validator |
 | **SSL / TLS Inspector** | [`/ssl-inspector/`](https://iqverse.net/ssl-inspector/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Inspect SSL/TLS certificate validity, issuer details & trust chain |

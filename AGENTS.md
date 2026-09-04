@@ -8,7 +8,6 @@ See AGENTS.project.md in this repo for stack, commands and conventions specific 
 - Simplest implementation that meets current requirements. No speculative abstractions.
 - Build the smallest working end-to-end version first, then layer on top of it.
 - Keep components modular with clean separation of concerns.
-- Version all APIs explicitly (e.g. /api/v1/).
 - Follow proven conventions from established products over inventing custom approaches.
 
 ## Code quality

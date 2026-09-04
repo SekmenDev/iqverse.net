@@ -56,6 +56,83 @@ test.describe('Browser Fingerprint collection & filtering', () => {
     await expect(page.locator('#fp-results')).toContainText('Fingerprint Hashes');
   });
 
+  test('runs the private browsing and Tor checks without any network request', async ({ page }) => {
+    let edgeRequests = 0;
+    await page.route('**/api/v1/network', (route) => {
+      edgeRequests += 1;
+      void route.abort();
+    });
+
+    await page.goto('/browser-fingerprint/');
+
+    await expect(page.locator('#card-private')).toContainText(/browsing window|browsing indicators|incognito/i);
+    await expect(page.locator('#card-tor')).toContainText(/Tor|anti-fingerprinting/i);
+    await expect(page.locator('#card-vpn')).toContainText('Check my IP & VPN status');
+
+    expect(edgeRequests).toBe(0);
+  });
+
+  test('reports IP, VPN and Tor once the opt-in check runs', async ({ page }) => {
+    await page.route('**/api/v1/network', (route) =>
+      route.fulfill({
+        json: {
+          ip: '203.0.113.42',
+          ipVersion: 'IPv4',
+          asn: 9009,
+          organization: 'M247 Europe SRL',
+          city: 'Amsterdam',
+          region: 'North Holland',
+          country: 'NL',
+          continent: 'EU',
+          postalCode: '1012',
+          latitude: '52.37',
+          longitude: '4.89',
+          timezone: 'Europe/Amsterdam',
+          colo: 'AMS',
+          httpProtocol: 'HTTP/3',
+          tlsVersion: 'TLSv1.3',
+          tlsCipher: 'AEAD-AES128-GCM-SHA256',
+          clientTcpRtt: 21,
+          torExit: true,
+          forwardedHops: 1,
+          proxyHeaders: [],
+        },
+      })
+    );
+
+    await page.goto('/browser-fingerprint/');
+    await expect(page.locator('#fp-id')).toHaveText(/^[0-9a-f]{32}$/, { timeout: 15000 });
+
+    await page.locator('#btn-check-network').click();
+
+    const vpnCard = page.locator('#card-vpn');
+    await expect(vpnCard).toContainText('commercial VPN', { timeout: 10000 });
+    await expect(vpnCard).toContainText('M247 Europe SRL');
+
+    const details = page.locator('#net-details');
+    await expect(details).toContainText('203.0.113.42');
+    await expect(details).toContainText('Amsterdam, North Holland, NL');
+    await expect(details).toContainText('AS9009');
+
+    // The exit node tag upgrades the Tor verdict from heuristic to certain
+    await expect(page.locator('#card-tor')).toContainText('You are using Tor');
+  });
+
+  test('degrades gracefully when the edge lookup is unreachable', async ({ page }) => {
+    const pageErrors: string[] = [];
+    page.on('pageerror', (err) => pageErrors.push(err.message));
+
+    await page.route('**/api/v1/network', (route) => route.fulfill({ status: 500, body: 'nope' }));
+
+    await page.goto('/browser-fingerprint/');
+    await page.locator('#btn-check-network').click();
+
+    await expect(page.locator('#card-vpn')).toContainText('did not reach the edge');
+    await expect(page.locator('#btn-check-network')).toBeEnabled();
+    await expect(page.locator('#btn-check-network')).toHaveText('Retry IP & VPN check');
+    expect(pageErrors).toEqual([]);
+  });
+
   test('is reachable from the featured row on the homepage', async ({ page }) => {
     await page.goto('/');
 

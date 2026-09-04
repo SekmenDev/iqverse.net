@@ -10,7 +10,7 @@ import { IMPORTANCE_LABELS, IMPORTANCE_LEVELS } from '@/lib/fingerprint';
   subtitle="Everything This Page Can Learn About You"
   pill="PRIVACY"
   toolSlug="browser-fingerprint"
-  description="See your browser fingerprint and every signal a website can read from your browser, ranked by how much each one identifies you. Runs entirely in your browser with nothing uploaded."
+  description="See your browser fingerprint and every signal a website can read from your browser, ranked by how much each one identifies you. Includes opt-in IP address, VPN, Tor and private browsing detection."
 >
   <div style="max-width: 1100px;">
     <section class={styles.summary}>
@@ -38,6 +38,34 @@ import { IMPORTANCE_LABELS, IMPORTANCE_LEVELS } from '@/lib/fingerprint';
           Measuring how far this browser stands out from the crowd.
         </p>
       </div>
+    </section>
+
+    <section class={sharedStyles.section}>
+      <p class={styles.groupHead}>Network &amp; identity</p>
+      <div class={styles.verdicts}>
+        <div class={styles.verdictCard} id="card-private">
+          <span class={styles.verdictTitle}>Private browsing</span>
+          <p class={styles.verdictHeadline}>Checking…</p>
+        </div>
+
+        <div class={styles.verdictCard} id="card-tor">
+          <span class={styles.verdictTitle}>Tor &amp; anti-fingerprinting</span>
+          <p class={styles.verdictHeadline}>Checking…</p>
+        </div>
+
+        <div class={styles.verdictCard} id="card-vpn">
+          <span class={styles.verdictTitle}>IP address &amp; VPN</span>
+          <p class={styles.disclosure}>
+            Your public IP is only visible to a server, so this check sends one request to
+            iqverse.net. The response is rendered here and nothing is logged or stored.
+          </p>
+          <button type="button" id="btn-check-network" class={sharedStyles.button}>
+            Check my IP &amp; VPN status
+          </button>
+        </div>
+      </div>
+
+      <div id="net-details" class={styles.netGrid}></div>
     </section>
 
     <section class={sharedStyles.section}>
@@ -88,8 +116,17 @@ import { IMPORTANCE_LABELS, IMPORTANCE_LEVELS } from '@/lib/fingerprint';
           between page loads, like window size and network speed, are excluded so the ID stays the
           same when you reload.
         </p>
+        <p style="line-height: 1.65; margin-bottom: 10px;">
+          Private browsing and Tor detection are heuristics, not proof. They read side effects like
+          storage quota limits and spoofed values, so a full disk or a hardened browser profile can
+          push them either way. The Tor verdict only becomes certain once the IP check confirms the
+          request came from an exit node.
+        </p>
         <p style="line-height: 1.65;">
-          Everything here is computed in your browser. No values are uploaded, logged or stored.
+          Everything on this page is computed in your browser and nothing is uploaded, with one
+          exception you control: the IP and VPN check needs a server to see your public address, so
+          it sends a single request to iqverse.net when you press the button. That response is
+          rendered here and never logged or stored.
         </p>
       </div>
     </section>
@@ -115,6 +152,18 @@ import { IMPORTANCE_LABELS, IMPORTANCE_LEVELS } from '@/lib/fingerprint';
     type Importance,
     type Signal,
   } from '@/lib/fingerprint';
+  import {
+    detectPrivateMode,
+    detectTor,
+    detectVpn,
+    fetchEdgeNetworkInfo,
+    readLocalNetworkContext,
+    readPrivateModeContext,
+    readTorClientContext,
+    summariseLocation,
+    type EdgeNetworkInfo,
+    type Verdict,
+  } from '@/lib/network-identity';
   import styles from '@/styles/fingerprint.module.css';
 
   const idEl = document.getElementById('fp-id');
@@ -130,12 +179,132 @@ import { IMPORTANCE_LABELS, IMPORTANCE_LEVELS } from '@/lib/fingerprint';
   const copyJsonBtn = document.getElementById('btn-copy-json');
   const downloadBtn = document.getElementById('btn-download');
   const rescanBtn = document.getElementById('btn-rescan');
+  const privateCard = document.getElementById('card-private');
+  const torCard = document.getElementById('card-tor');
+  const vpnCard = document.getElementById('card-vpn');
+  const netDetailsEl = document.getElementById('net-details');
+  const checkNetworkBtn = document.getElementById('btn-check-network') as HTMLButtonElement | null;
 
   let signals: Signal[] = [];
   let fingerprintId = '';
   let query = '';
   let importance: Importance | 'all' = 'all';
   let view: 'importance' | 'group' = 'importance';
+  let edge: EdgeNetworkInfo | null = null;
+
+  function signalValue(id: string): string {
+    const found = signals.find(signal => signal.id === id);
+    return !found || found.value === UNAVAILABLE ? '' : found.value;
+  }
+
+  function webrtcHosts(): string[] {
+    const raw = signalValue('webrtc-hosts');
+    return raw ? raw.split(', ').filter(Boolean) : [];
+  }
+
+  function paintVerdict(card: HTMLElement, title: string, verdict: Verdict) {
+    card.replaceChildren();
+    card.style.borderTopColor = verdict.color;
+
+    const heading = document.createElement('span');
+    heading.className = styles.verdictTitle;
+    heading.textContent = title;
+
+    const headline = document.createElement('p');
+    headline.className = styles.verdictHeadline;
+    headline.style.color = verdict.color;
+    headline.textContent = verdict.headline;
+
+    const confidence = document.createElement('div');
+    confidence.className = styles.verdictConfidence;
+    confidence.textContent = `${verdict.confidence} · ${verdict.clues.length} indicator${verdict.clues.length === 1 ? '' : 's'}`;
+
+    card.append(heading, headline, confidence);
+
+    for (const clue of verdict.clues) {
+      const wrapper = document.createElement('div');
+      wrapper.className = styles.clue;
+
+      const label = document.createElement('div');
+      label.className = styles.clueLabel;
+      label.textContent = clue.label;
+
+      const detail = document.createElement('p');
+      detail.className = styles.clueDetail;
+      detail.textContent = clue.detail;
+
+      wrapper.append(label, detail);
+      card.append(wrapper);
+    }
+  }
+
+  function paintNetworkDetails(info: EdgeNetworkInfo) {
+    if (!netDetailsEl) return;
+    netDetailsEl.replaceChildren();
+
+    const entries: Array<[string, string]> = [
+      ['Public IP', `${info.ip} (${info.ipVersion})`],
+      ['Location', summariseLocation(info)],
+      ['IP time zone', info.timezone || 'Unknown'],
+      ['Network', info.asn ? `AS${info.asn} ${info.organization}` : info.organization || 'Unknown'],
+      ['Edge location', info.colo || 'Unknown'],
+      ['Protocol', [info.httpProtocol, info.tlsVersion].filter(Boolean).join(' · ') || 'Unknown'],
+      ['TLS cipher', info.tlsCipher || 'Unknown'],
+      ['TCP round trip', info.clientTcpRtt === null ? 'Unknown' : `${info.clientTcpRtt} ms`],
+    ];
+
+    for (const [key, value] of entries) {
+      const item = document.createElement('div');
+      item.className = styles.netItem;
+
+      const keyEl = document.createElement('div');
+      keyEl.className = styles.netKey;
+      keyEl.textContent = key;
+
+      const valueEl = document.createElement('div');
+      valueEl.className = styles.netValue;
+      valueEl.textContent = value;
+
+      item.append(keyEl, valueEl);
+      netDetailsEl.append(item);
+    }
+  }
+
+  function renderTorVerdict() {
+    if (!torCard) return;
+    const verdict = detectTor(edge?.torExit ?? false, readTorClientContext(signalValue('webgl-renderer')));
+    paintVerdict(torCard, 'Tor & anti-fingerprinting', verdict);
+  }
+
+  async function renderPrivateVerdict() {
+    if (!privateCard) return;
+    const verdict = detectPrivateMode(await readPrivateModeContext());
+    paintVerdict(privateCard, 'Private browsing', verdict);
+  }
+
+  async function checkNetwork() {
+    if (!checkNetworkBtn || !vpnCard) return;
+    checkNetworkBtn.disabled = true;
+    checkNetworkBtn.textContent = 'Checking…';
+
+    edge = await fetchEdgeNetworkInfo();
+
+    if (!edge) {
+      checkNetworkBtn.disabled = false;
+      checkNetworkBtn.textContent = 'Retry IP & VPN check';
+      const failure = document.createElement('p');
+      failure.className = styles.clueDetail;
+      failure.style.marginTop = '10px';
+      failure.textContent =
+        'The lookup did not reach the edge. It is unavailable on local preview builds and can be blocked by extensions.';
+      vpnCard.append(failure);
+      return;
+    }
+
+    paintVerdict(vpnCard, 'IP address & VPN', detectVpn(edge, readLocalNetworkContext(webrtcHosts())));
+    paintNetworkDetails(edge);
+    renderTorVerdict();
+  }
 
   function buildRow(signal: Signal): HTMLElement {
     const row = document.createElement('div');
@@ -245,6 +414,8 @@ import { IMPORTANCE_LABELS, IMPORTANCE_LEVELS } from '@/lib/fingerprint';
     }
     renderSummary();
     render();
+    renderTorVerdict();
+    void renderPrivateVerdict();
   }
 
   async function copyText(button: HTMLElement, value: string) {
@@ -296,6 +467,10 @@ import { IMPORTANCE_LABELS, IMPORTANCE_LEVELS } from '@/lib/fingerprint';
 
   rescanBtn?.addEventListener('click', () => {
     void scan();
+  });
+
+  checkNetworkBtn?.addEventListener('click', () => {
+    void checkNetwork();
   });
 
   void scan();
