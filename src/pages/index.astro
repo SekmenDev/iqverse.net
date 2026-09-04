@@ -9,6 +9,7 @@ import {
   STATUS_LABELS,
   countByCategory,
   countByStatus,
+  getFeaturedTools,
   getUniqueCategories,
   getUniqueStatuses,
   groupByPrimaryCategory,
@@ -23,6 +24,7 @@ const statuses = getUniqueStatuses();
 const catCounts = countByCategory();
 const statusCounts = countByStatus();
 const groups = groupByPrimaryCategory();
+const featured = getFeaturedTools();
 
 const DOT_CLASS: Record<ToolType, string> = {
   open: styles.dotOpen,
@@ -147,6 +149,14 @@ const jsonLdData = getToolsCollectionJsonLd();
 
         <div id="content-area">
           <div id="category-groups-container">
+            {featured.length > 0 && (
+              <div class="category-group" data-group-cat="featured">
+                <p class={styles.sectionHead}>★ Featured</p>
+                <div class={`card-grid-container ${styles.cardGrid}`}>
+                  {featured.map(tool => <ToolCard tool={tool} />)}
+                </div>
+              </div>
+            )}
             {groups.map(({ category, tools: catTools }) => (
               <div class="category-group" data-group-cat={category}>
                 <p class={styles.sectionHead}>

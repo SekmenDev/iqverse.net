@@ -1,0 +1,727 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+import styles from '@/styles/fingerprint.module.css';
+import { IMPORTANCE_LABELS, IMPORTANCE_LEVELS } from '@/lib/fingerprint';
+---
+
+<ToolLayout
+  title="Browser Fingerprint & Privacy Inspector"
+  subtitle="Everything This Page Can Learn About You"
+  pill="PRIVACY"
+  toolSlug="browser-fingerprint"
+  description="See your browser fingerprint and every signal a website can read from your browser, ranked by how much each one identifies you. Includes opt-in IP address, VPN, Tor and private browsing detection."
+>
+  <div style="max-width: 1100px;">
+    <section class={styles.summary}>
+      <div class={styles.summaryCard}>
+        <span class={styles.summaryLabel}>Fingerprint ID (SHA-256)</span>
+        <div class={styles.idValue} id="fp-id">Collecting signals…</div>
+        <div class={styles.idActions}>
+          <button type="button" id="btn-copy-id" class={sharedStyles.button}>Copy ID</button>
+          <button type="button" id="btn-copy-json" class={sharedStyles.button}>Copy JSON</button>
+          <button type="button" id="btn-download" class={sharedStyles.button}>Download JSON</button>
+          <button type="button" id="btn-rescan" class={sharedStyles.button}>Re-scan</button>
+        </div>
+      </div>
+
+      <div class={styles.summaryCard}>
+        <span class={styles.summaryLabel}>Identifiability</span>
+        <div class={styles.gauge}>
+          <span class={styles.gaugeValue} id="fp-bits">—</span>
+          <span class={styles.gaugeUnit}>bits of entropy</span>
+        </div>
+        <div class={styles.gaugeTrack}>
+          <div class={styles.gaugeFill} id="fp-gauge" style="width: 0%; background: var(--accent);"></div>
+        </div>
+        <p class={styles.gaugeNote} id="fp-verdict">
+          Measuring how far this browser stands out from the crowd.
+        </p>
+      </div>
+    </section>
+
+    <section class={sharedStyles.section}>
+      <p class={styles.groupHead}>Identity &amp; network checks</p>
+      <div class={styles.verdicts}>
+        <div class={styles.verdictCard} id="card-visits">
+          <span class={styles.verdictTitle}>Return visits</span>
+          <p class={styles.verdictHeadline}>Checking…</p>
+        </div>
+
+        <div class={styles.verdictCard} id="card-consistency">
+          <span class={styles.verdictTitle}>Signal consistency</span>
+          <p class={styles.verdictHeadline}>Checking…</p>
+        </div>
+
+        <div class={styles.verdictCard} id="card-automation">
+          <span class={styles.verdictTitle}>Automation &amp; headless</span>
+          <p class={styles.verdictHeadline}>Checking…</p>
+        </div>
+
+        <div class={styles.verdictCard} id="card-private">
+          <span class={styles.verdictTitle}>Private browsing</span>
+          <p class={styles.verdictHeadline}>Checking…</p>
+        </div>
+
+        <div class={styles.verdictCard} id="card-tor">
+          <span class={styles.verdictTitle}>Tor &amp; anti-fingerprinting</span>
+          <p class={styles.verdictHeadline}>Checking…</p>
+        </div>
+
+        <div class={styles.verdictCard} id="card-vpn">
+          <span class={styles.verdictTitle}>IP address &amp; VPN</span>
+          <p class={styles.disclosure}>
+            Your public IP is only visible to a server, so this check sends one request to
+            iqverse.net. The response is rendered here and nothing is logged or stored.
+          </p>
+          <button type="button" id="btn-check-network" class={sharedStyles.button}>
+            Check my IP &amp; VPN status
+          </button>
+        </div>
+      </div>
+
+      <div id="net-details" class={styles.netGrid}></div>
+
+      <div id="net-headers-block" hidden>
+        <p class={styles.groupHead}>Headers your browser sent</p>
+        <p class={styles.disclosure}>
+          These travel with every request before a single line of JavaScript runs. Client hints
+          under Sec-CH-UA describe your device, and Accept-Language repeats your locale.
+        </p>
+        <div id="net-headers" class={styles.netGrid}></div>
+      </div>
+    </section>
+
+    <section class={sharedStyles.section}>
+      <div class={styles.toolbar}>
+        <input
+          type="search"
+          id="fp-search"
+          class={`${sharedStyles.input} ${styles.search}`}
+          placeholder="Filter signals…"
+          autocomplete="off"
+        />
+        <div class={styles.chipRow} id="fp-importance" role="group" aria-label="Filter by importance">
+          <button type="button" class={styles.chip} data-importance="all" aria-pressed="true">
+            All<span class={styles.chipCount} data-count="all"></span>
+          </button>
+          {IMPORTANCE_LEVELS.map(level => (
+            <button type="button" class={styles.chip} data-importance={level} aria-pressed="false">
+              {IMPORTANCE_LABELS[level]}<span class={styles.chipCount} data-count={level}></span>
+            </button>
+          ))}
+        </div>
+        <div class={styles.chipRow} id="fp-view" role="group" aria-label="Sort mode">
+          <button type="button" class={styles.chip} data-view="importance" aria-pressed="true">
+            By importance
+          </button>
+          <button type="button" class={styles.chip} data-view="group" aria-pressed="false">
+            By group
+          </button>
+        </div>
+      </div>
+
+      <div id="fp-results" class={styles.list}></div>
+
+      <div id="fp-empty" class={styles.empty} hidden>No signals match this filter.</div>
+    </section>
+
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <h2 style="font-size: 1rem; margin-bottom: 10px;">Reducing your fingerprint</h2>
+        <p style="line-height: 1.65; margin-bottom: 10px;">
+          Individual rows carry a "Defence" line where one exists. Four strategies do most of the
+          work, in descending order of effectiveness:
+        </p>
+        <ol style="line-height: 1.7; padding-left: 20px;">
+          <li>
+            Use Tor Browser. It blocks canvas, normalises fonts, pins the time zone to UTC and
+            letterboxes the window so every user reports the same values.
+          </li>
+          <li>
+            Use Firefox with privacy.resistFingerprinting enabled. It covers canvas, audio, WebGL,
+            time zone and core count in one switch, at the cost of some site breakage.
+          </li>
+          <li>
+            Blend in rather than stand out. Skip Do Not Track, trim your language list to one
+            common locale and leave the user agent alone. Rare settings identify you.
+          </li>
+          <li>
+            Keep a VPN and the browser consistent. Match the browser time zone to the exit country
+            and disable WebRTC, or the mismatches on this page give the tunnel away.
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <h2 style="font-size: 1rem; margin-bottom: 10px;">How to read this</h2>
+        <p style="line-height: 1.65; margin-bottom: 10px;">
+          Entropy measures how much a signal narrows you down. Every bit halves the crowd you hide
+          in. Around 33 bits is enough to single out one person on Earth, so the total is capped
+          there. Real trackers reach a lower effective number because signals overlap, but the
+          ranking still shows which ones matter.
+        </p>
+        <p style="line-height: 1.65; margin-bottom: 10px;">
+          The fingerprint ID is a SHA-256 digest of the stable signals only. Each row says whether
+          it feeds the ID or varies per session. Values that shift between page loads, like window
+          size and network speed, are excluded so the ID stays the same when you reload.
+        </p>
+        <p style="line-height: 1.65; margin-bottom: 10px;">
+          The return visit card stores that ID in this browser's local storage, and nowhere else,
+          to show how well the fingerprint survives across visits. That is the whole trick behind
+          cookieless tracking. Press "Forget this record" to delete it.
+        </p>
+        <p style="line-height: 1.65; margin-bottom: 10px;">
+          Private browsing and Tor detection are heuristics, not proof. They read side effects like
+          storage quota limits and spoofed values, so a full disk or a hardened browser profile can
+          push them either way. The Tor verdict only becomes certain once the IP check confirms the
+          request came from an exit node.
+        </p>
+        <p style="line-height: 1.65;">
+          Everything on this page is computed in your browser and nothing is uploaded, with one
+          exception you control: the IP and VPN check needs a server to see your public address, so
+          it sends a single request to iqverse.net when you press the button. That response is
+          rendered here and never logged or stored.
+        </p>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  import {
+    IMPORTANCE_COLORS,
+    IMPORTANCE_LABELS,
+    MAX_ENTROPY_BITS,
+    UNAVAILABLE,
+    collectSignals,
+    computeFingerprintId,
+    countByImportance,
+    describeUniqueness,
+    effectiveEntropyBits,
+    filterSignals,
+    groupSignals,
+    signalsToJson,
+    sortSignals,
+    totalEntropyBits,
+    SIGNAL_ADVICE,
+    type Importance,
+    type Signal,
+  } from '@/lib/fingerprint';
+  import {
+    detectPrivateMode,
+    detectTor,
+    detectVpn,
+    fetchEdgeNetworkInfo,
+    findHeader,
+    readLocalNetworkContext,
+    readPrivateModeContext,
+    readTorClientContext,
+    summariseLocation,
+    type EdgeNetworkInfo,
+  } from '@/lib/network-identity';
+  import type { Verdict } from '@/lib/verdict';
+  import { detectAutomation, readAutomationContext } from '@/lib/automation';
+  import {
+    SEVERITY_COLORS,
+    SEVERITY_LABELS,
+    checkConsistency,
+    summariseConsistency,
+  } from '@/lib/consistency';
+  import {
+    clearVisitRecord,
+    describeVisitRecord,
+    loadVisitRecord,
+    saveVisitRecord,
+    updateVisitRecord,
+  } from '@/lib/visit-history';
+  import styles from '@/styles/fingerprint.module.css';
+  import sharedStyles from '@/styles/shared-tool-styles.module.css';
+
+  const idEl = document.getElementById('fp-id');
+  const bitsEl = document.getElementById('fp-bits');
+  const gaugeEl = document.getElementById('fp-gauge');
+  const verdictEl = document.getElementById('fp-verdict');
+  const resultsEl = document.getElementById('fp-results');
+  const emptyEl = document.getElementById('fp-empty');
+  const searchEl = document.getElementById('fp-search') as HTMLInputElement | null;
+  const importanceButtons = document.querySelectorAll<HTMLButtonElement>('#fp-importance button[data-importance]');
+  const viewButtons = document.querySelectorAll<HTMLButtonElement>('#fp-view button[data-view]');
+  const copyIdBtn = document.getElementById('btn-copy-id');
+  const copyJsonBtn = document.getElementById('btn-copy-json');
+  const downloadBtn = document.getElementById('btn-download');
+  const rescanBtn = document.getElementById('btn-rescan');
+  const privateCard = document.getElementById('card-private');
+  const torCard = document.getElementById('card-tor');
+  const vpnCard = document.getElementById('card-vpn');
+  const netDetailsEl = document.getElementById('net-details');
+  const netHeadersEl = document.getElementById('net-headers');
+  const netHeadersBlock = document.getElementById('net-headers-block');
+  const checkNetworkBtn = document.getElementById('btn-check-network') as HTMLButtonElement | null;
+  const consistencyCard = document.getElementById('card-consistency');
+  const visitsCard = document.getElementById('card-visits');
+  const automationCard = document.getElementById('card-automation');
+
+  let signals: Signal[] = [];
+  let fingerprintId = '';
+  let query = '';
+  let importance: Importance | 'all' = 'all';
+  let view: 'importance' | 'group' = 'importance';
+  let edge: EdgeNetworkInfo | null = null;
+  let visitRecorded = false;
+
+  function signalValue(id: string): string {
+    const found = signals.find(signal => signal.id === id);
+    return !found || found.value === UNAVAILABLE ? '' : found.value;
+  }
+
+  function webrtcHosts(): string[] {
+    const raw = signalValue('webrtc-hosts');
+    return raw ? raw.split(', ').filter(Boolean) : [];
+  }
+
+  function paintVerdict(card: HTMLElement, title: string, verdict: Verdict) {
+    card.replaceChildren();
+    card.style.borderTopColor = verdict.color;
+
+    const heading = document.createElement('span');
+    heading.className = styles.verdictTitle;
+    heading.textContent = title;
+
+    const headline = document.createElement('p');
+    headline.className = styles.verdictHeadline;
+    headline.style.color = verdict.color;
+    headline.textContent = verdict.headline;
+
+    const confidence = document.createElement('div');
+    confidence.className = styles.verdictConfidence;
+    confidence.textContent = `${verdict.confidence} · ${verdict.clues.length} indicator${verdict.clues.length === 1 ? '' : 's'}`;
+
+    card.append(heading, headline, confidence);
+
+    for (const clue of verdict.clues) {
+      const wrapper = document.createElement('div');
+      wrapper.className = styles.clue;
+
+      const label = document.createElement('div');
+      label.className = styles.clueLabel;
+      label.textContent = clue.label;
+
+      const detail = document.createElement('p');
+      detail.className = styles.clueDetail;
+      detail.textContent = clue.detail;
+
+      wrapper.append(label, detail);
+      card.append(wrapper);
+    }
+  }
+
+  function paintNetworkDetails(info: EdgeNetworkInfo) {
+    if (!netDetailsEl) return;
+    netDetailsEl.replaceChildren();
+
+    const entries: Array<[string, string]> = [
+      ['Public IP', `${info.ip} (${info.ipVersion})`],
+      ['Location', summariseLocation(info)],
+      ['IP time zone', info.timezone || 'Unknown'],
+      ['Network', info.asn ? `AS${info.asn} ${info.organization}` : info.organization || 'Unknown'],
+      ['Edge location', info.colo || 'Unknown'],
+      ['Protocol', [info.httpProtocol, info.tlsVersion].filter(Boolean).join(' · ') || 'Unknown'],
+      ['TLS cipher', info.tlsCipher || 'Unknown'],
+      ['TCP round trip', info.clientTcpRtt === null ? 'Unknown' : `${info.clientTcpRtt} ms`],
+    ];
+
+    for (const [key, value] of entries) {
+      const item = document.createElement('div');
+      item.className = styles.netItem;
+
+      const keyEl = document.createElement('div');
+      keyEl.className = styles.netKey;
+      keyEl.textContent = key;
+
+      const valueEl = document.createElement('div');
+      valueEl.className = styles.netValue;
+      valueEl.textContent = value;
+
+      item.append(keyEl, valueEl);
+      netDetailsEl.append(item);
+    }
+  }
+
+  function paintReceivedHeaders(info: EdgeNetworkInfo) {
+    if (!netHeadersEl || !netHeadersBlock) return;
+
+    netHeadersEl.replaceChildren();
+    netHeadersBlock.hidden = info.receivedHeaders.length === 0;
+
+    for (const header of info.receivedHeaders) {
+      const item = document.createElement('div');
+      item.className = styles.netItem;
+
+      const keyEl = document.createElement('div');
+      keyEl.className = styles.netKey;
+      keyEl.textContent = header.name;
+
+      const valueEl = document.createElement('div');
+      valueEl.className = styles.netValue;
+      valueEl.textContent = header.value;
+
+      item.append(keyEl, valueEl);
+      netHeadersEl.append(item);
+    }
+  }
+
+  function mobileHint(): boolean | null {
+    const data = (navigator as Navigator & { userAgentData?: { mobile?: boolean } }).userAgentData;
+    return data?.mobile ?? null;
+  }
+
+  function renderConsistency() {
+    if (!consistencyCard) return;
+
+    const headers = edge?.receivedHeaders ?? [];
+    const summary = summariseConsistency(
+      checkConsistency({
+        userAgent: navigator.userAgent,
+        platform: navigator.platform,
+        maxTouchPoints: navigator.maxTouchPoints,
+        mobileHint: mobileHint(),
+        languages: [...navigator.languages],
+        vendor: navigator.vendor,
+        pluginCount: navigator.plugins.length,
+        webdriver: navigator.webdriver === true,
+        screenWidth: screen.width,
+        innerWidth: window.innerWidth,
+        serverUserAgent: findHeader(headers, 'user-agent'),
+        acceptLanguage: findHeader(headers, 'accept-language'),
+        secChUa: findHeader(headers, 'sec-ch-ua'),
+        secChUaPlatform: findHeader(headers, 'sec-ch-ua-platform'),
+      })
+    );
+
+    consistencyCard.replaceChildren();
+    consistencyCard.style.borderTopColor = summary.color;
+
+    const heading = document.createElement('span');
+    heading.className = styles.verdictTitle;
+    heading.textContent = 'Signal consistency';
+
+    const headline = document.createElement('p');
+    headline.className = styles.verdictHeadline;
+    headline.style.color = summary.color;
+    headline.textContent = summary.headline;
+
+    const meta = document.createElement('div');
+    meta.className = styles.verdictConfidence;
+    const count = `${summary.findings.length} finding${summary.findings.length === 1 ? '' : 's'}`;
+    meta.textContent = edge
+      ? `${count} · request headers compared`
+      : `${count} · run the IP check to compare request headers`;
+
+    consistencyCard.append(heading, headline, meta);
+
+    for (const finding of summary.findings) {
+      const wrapper = document.createElement('div');
+      wrapper.className = styles.clue;
+
+      const label = document.createElement('div');
+      label.className = styles.clueLabel;
+      label.style.color = SEVERITY_COLORS[finding.severity];
+      label.textContent = `${SEVERITY_LABELS[finding.severity]}: ${finding.label}`;
+
+      const detail = document.createElement('p');
+      detail.className = styles.clueDetail;
+      detail.textContent = finding.detail;
+
+      wrapper.append(label, detail);
+      consistencyCard.append(wrapper);
+    }
+  }
+
+  function renderVisits() {
+    if (!visitsCard) return;
+
+    const record = loadVisitRecord();
+    visitsCard.replaceChildren();
+
+    const heading = document.createElement('span');
+    heading.className = styles.verdictTitle;
+    heading.textContent = 'Return visits';
+
+    const headline = document.createElement('p');
+    headline.className = styles.verdictHeadline;
+
+    const body = document.createElement('p');
+    body.className = styles.clueDetail;
+
+    if (!record) {
+      visitsCard.style.borderTopColor = 'var(--border)';
+      headline.textContent = 'No local record';
+      body.textContent =
+        'Nothing is stored for this browser. Either the record was cleared or storage is blocked.';
+      visitsCard.append(heading, headline, body);
+      return;
+    }
+
+    const returning = record.visits > 1;
+    visitsCard.style.borderTopColor = returning ? '#ff9800' : 'var(--border)';
+    headline.style.color = returning ? '#ff9800' : '';
+    headline.textContent = returning
+      ? `Recognised ${record.visits} times`
+      : 'First visit recorded';
+    body.textContent = describeVisitRecord(record, new Date());
+
+    const forget = document.createElement('button');
+    forget.type = 'button';
+    forget.id = 'btn-forget-visits';
+    forget.className = sharedStyles.button;
+    forget.style.marginTop = '12px';
+    forget.textContent = 'Forget this record';
+    forget.addEventListener('click', () => {
+      clearVisitRecord();
+      visitRecorded = true;
+      renderVisits();
+    });
+
+    visitsCard.append(heading, headline, body, forget);
+  }
+
+  function recordVisit() {
+    if (visitRecorded || !fingerprintId || fingerprintId === 'Collection failed') return;
+    visitRecorded = true;
+    saveVisitRecord(updateVisitRecord(loadVisitRecord(), fingerprintId, new Date()));
+  }
+
+  function renderAutomationVerdict() {
+    if (!automationCard) return;
+    const verdict = detectAutomation(readAutomationContext(signalValue('webgl-renderer')));
+    paintVerdict(automationCard, 'Automation & headless', verdict);
+  }
+
+  function renderTorVerdict() {
+    if (!torCard) return;
+    const verdict = detectTor(edge?.torExit ?? false, readTorClientContext(signalValue('webgl-renderer')));
+    paintVerdict(torCard, 'Tor & anti-fingerprinting', verdict);
+  }
+
+  async function renderPrivateVerdict() {
+    if (!privateCard) return;
+    const verdict = detectPrivateMode(await readPrivateModeContext());
+    paintVerdict(privateCard, 'Private browsing', verdict);
+  }
+
+  async function checkNetwork() {
+    if (!checkNetworkBtn || !vpnCard) return;
+    checkNetworkBtn.disabled = true;
+    checkNetworkBtn.textContent = 'Checking…';
+
+    edge = await fetchEdgeNetworkInfo();
+
+    if (!edge) {
+      checkNetworkBtn.disabled = false;
+      checkNetworkBtn.textContent = 'Retry IP & VPN check';
+      const failure = document.createElement('p');
+      failure.className = styles.clueDetail;
+      failure.style.marginTop = '10px';
+      failure.textContent =
+        'The lookup did not reach the edge. It is unavailable on local preview builds and can be blocked by extensions.';
+      vpnCard.append(failure);
+      return;
+    }
+
+    paintVerdict(vpnCard, 'IP address & VPN', detectVpn(edge, readLocalNetworkContext(webrtcHosts())));
+    paintNetworkDetails(edge);
+    paintReceivedHeaders(edge);
+    renderTorVerdict();
+    renderConsistency();
+  }
+
+  function buildRow(signal: Signal): HTMLElement {
+    const row = document.createElement('div');
+    row.className = styles.row;
+    row.style.borderLeftColor = IMPORTANCE_COLORS[signal.importance];
+
+    const meta = document.createElement('div');
+    const badge = document.createElement('div');
+    badge.className = styles.badge;
+    badge.style.color = IMPORTANCE_COLORS[signal.importance];
+    badge.textContent = IMPORTANCE_LABELS[signal.importance];
+    const bits = document.createElement('div');
+    bits.className = styles.bits;
+    bits.textContent = `${signal.entropyBits} bit${signal.entropyBits === 1 ? '' : 's'}`;
+
+    const stability = document.createElement('div');
+    stability.className = styles.stability;
+    stability.textContent = signal.stable ? 'in fingerprint ID' : 'varies per session';
+
+    meta.append(badge, bits, stability);
+
+    const body = document.createElement('div');
+    const label = document.createElement('div');
+    label.className = styles.rowLabel;
+    label.textContent = signal.label;
+
+    const value = document.createElement('div');
+    const missing = signal.value === UNAVAILABLE;
+    value.className = missing ? `${styles.rowValue} ${styles.rowValueMuted}` : styles.rowValue;
+    value.textContent = signal.value;
+
+    const note = document.createElement('p');
+    note.className = styles.rowNote;
+    note.textContent = signal.note;
+
+    body.append(label, value, note);
+
+    const advice = SIGNAL_ADVICE[signal.id];
+    if (advice) {
+      const adviceEl = document.createElement('p');
+      adviceEl.className = styles.rowAdvice;
+      adviceEl.textContent = `Defence: ${advice}`;
+      body.append(adviceEl);
+    }
+
+    row.append(meta, body);
+
+    if (signal.value.length > 220) {
+      const expand = document.createElement('button');
+      expand.type = 'button';
+      expand.className = styles.expand;
+      expand.textContent = 'Show full value';
+      expand.addEventListener('click', () => {
+        const open = value.classList.toggle(styles.rowValueOpen);
+        expand.textContent = open ? 'Show less' : 'Show full value';
+      });
+      body.insertBefore(expand, note);
+    }
+
+    return row;
+  }
+
+  function render() {
+    if (!resultsEl || !emptyEl) return;
+
+    const matched = filterSignals(signals, query, importance);
+    resultsEl.replaceChildren();
+    emptyEl.hidden = matched.length > 0;
+
+    if (view === 'group') {
+      for (const entry of groupSignals(matched)) {
+        const head = document.createElement('p');
+        head.className = styles.groupHead;
+        head.textContent = `${entry.group} · ${entry.signals.length}`;
+        resultsEl.append(head, ...entry.signals.map(buildRow));
+      }
+    } else {
+      resultsEl.append(...sortSignals(matched).map(buildRow));
+    }
+
+    importanceButtons.forEach(button => {
+      button.setAttribute('aria-pressed', button.dataset.importance === importance ? 'true' : 'false');
+    });
+    viewButtons.forEach(button => {
+      button.setAttribute('aria-pressed', button.dataset.view === view ? 'true' : 'false');
+    });
+  }
+
+  function renderSummary() {
+    const counts = countByImportance(signals);
+    document.querySelectorAll<HTMLElement>('[data-count]').forEach(element => {
+      const key = element.dataset.count as Importance | 'all' | undefined;
+      element.textContent = key ? ` ${counts[key]}` : '';
+    });
+
+    const effective = effectiveEntropyBits(signals);
+    const verdict = describeUniqueness(effective);
+
+    if (idEl) idEl.textContent = fingerprintId;
+    if (bitsEl) {
+      bitsEl.textContent = String(verdict.bits);
+      bitsEl.style.color = verdict.color;
+    }
+    if (gaugeEl) {
+      gaugeEl.style.width = `${Math.min(100, (effective / MAX_ENTROPY_BITS) * 100)}%`;
+      gaugeEl.style.background = verdict.color;
+    }
+    if (verdictEl) {
+      verdictEl.textContent = `${verdict.rating} identifiability. ${verdict.summary} Raw sum across ${signals.length} signals is ${totalEntropyBits(signals)} bits.`;
+    }
+  }
+
+  async function scan() {
+    if (idEl) idEl.textContent = 'Collecting signals…';
+    try {
+      signals = await collectSignals();
+      fingerprintId = await computeFingerprintId(signals);
+    } catch {
+      signals = [];
+      fingerprintId = 'Collection failed';
+    }
+    renderSummary();
+    render();
+    recordVisit();
+    renderVisits();
+    renderConsistency();
+    renderAutomationVerdict();
+    renderTorVerdict();
+    void renderPrivateVerdict();
+  }
+
+  async function copyText(button: HTMLElement, value: string) {
+    const original = button.textContent;
+    try {
+      await navigator.clipboard.writeText(value);
+      button.textContent = 'Copied';
+    } catch {
+      button.textContent = 'Copy failed';
+    }
+    setTimeout(() => {
+      button.textContent = original;
+    }, 1400);
+  }
+
+  searchEl?.addEventListener('input', () => {
+    query = searchEl.value;
+    render();
+  });
+
+  importanceButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      importance = (button.dataset.importance ?? 'all') as Importance | 'all';
+      render();
+    });
+  });
+
+  viewButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      view = button.dataset.view === 'group' ? 'group' : 'importance';
+      render();
+    });
+  });
+
+  copyIdBtn?.addEventListener('click', () => copyText(copyIdBtn, fingerprintId));
+  copyJsonBtn?.addEventListener('click', () =>
+    copyText(copyJsonBtn, signalsToJson(signals, fingerprintId))
+  );
+
+  downloadBtn?.addEventListener('click', () => {
+    const blob = new Blob([signalsToJson(signals, fingerprintId)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `browser-fingerprint-${fingerprintId.slice(0, 12)}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  });
+
+  rescanBtn?.addEventListener('click', () => {
+    void scan();
+  });
+
+  checkNetworkBtn?.addEventListener('click', () => {
+    void checkNetwork();
+  });
+
+  void scan();
+</script>
