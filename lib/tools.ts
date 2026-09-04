@@ -63,7 +63,7 @@ export const tools: Tool[] = [
 
   // Web & SEO
   { name: "Web Baseline Checker", desc: "Audit any website against core web standards and baseline hygiene: HTTPS, favicon, title, viewport, H1, header, footer, schema, robots.txt, sitemap.xml and security headers.", icon: "🛡️", url: "/web-baseline/", type: "open", tags: "baseline audit checklist website seo https favicon robots sitemap schema h1 header footer viewport security web standards", cats: ["Web & SEO", "Security", "AI & Agents"], aliases: "site audit lighthouse seo checkup web vitals hygiene", featured: true },
-  { name: "Link Radar", desc: "Scan web pages to detect broken links, 404 errors and redirect loops instantly in your browser with no server processing required.", icon: "🔗", url: "/linkradar/", type: "open", tags: "links 404 redirect scan broken crawl", cats: ["Web & SEO", "Network"], aliases: "dead link checker link rot broken url crawler" },
+  { name: "Link Radar", desc: "Scan web pages to detect broken links, 404 errors and redirect loops instantly in your browser with no server processing required.", icon: "🔗", url: "/linkradar/", type: "open", tags: "links 404 redirect scan broken crawl", cats: ["Web & SEO", "Network"], aliases: "dead link checker link rot broken url crawler", featured: true },
   { name: "Sitemap Generator", desc: "Generate XML sitemaps for website URLs and paths. Optimize SEO crawling and search engine indexing effortlessly.", icon: "🗺️", url: "/sitemap-generator/", type: "open", tags: "sitemap xml crawl seo url generator agent", cats: ["Web & SEO", "AI & Agents"], aliases: "sitemap.xml urlset indexing google search console" },
   { name: "robots.txt Generator & Validator", desc: "Create and validate robots.txt files for search engine crawlers and AI search bots with customized allow/disallow rules.", icon: "🤖", url: "/robots-generator/", type: "open", tags: "robots txt generator validator crawler useragent allow disallow", cats: ["Web & SEO", "AI & Agents"], aliases: "robots.txt crawl directives noindex gptbot block bots" },
   { name: "Meta Tag & Open Graph Previewer", desc: "Preview how your web page meta tags and Open Graph cards look on Google, Twitter/X, Facebook and LinkedIn.", icon: "👁️", url: "/og-preview/", type: "open", tags: "meta tag og opengraph preview twitter facebook card seo", cats: ["Web & SEO", "Design"], aliases: "og image social card twitter card link preview share" },
@@ -87,7 +87,7 @@ export const tools: Tool[] = [
   { name: "Base64 & URL Encoder", desc: "Encode and decode Base64 strings, URL parameters, JWT tokens and Data URIs instantly with client-side privacy.", icon: "⇄", url: "/encodelab/", type: "open", tags: "base64 url encode decode jwt data uri", cats: ["Text & Code", "Crypto & Hashing"], aliases: "b64 atob btoa percent encoding urlencode datauri" },
 
   // Generators
-  { name: "QR Forge", desc: "Generate custom QR codes instantly from URLs, plain text, Wi-Fi credentials and vCards with SVG or PNG export directly in your browser.", icon: "▦", url: "/qrforge/", type: "open", tags: "qr code svg png generate wifi vcard", cats: ["Generators", "Design"], aliases: "qrcode barcode scan contact card", featured: true },
+  { name: "QR Forge", desc: "Generate custom QR codes instantly from URLs, plain text, Wi-Fi credentials and vCards with SVG or PNG export directly in your browser.", icon: "▦", url: "/qrforge/", type: "open", tags: "qr code svg png generate wifi vcard", cats: ["Generators", "Design"], aliases: "qrcode barcode scan contact card" },
   { name: "Favicon Generator", desc: "Convert any image into browser favicons, Apple touch icons and web manifest.json files in all required sizes locally.", icon: "🏷️", url: "/favicongen/", type: "open", tags: "favicon icon manifest apple touch 16 32 180", cats: ["Generators", "Design"], aliases: "site icon ico pwa manifest touch icon" },
   { name: "Lorem Ipsum & Fake Data Generator", desc: "Generate realistic mock data including names, emails, addresses, numbers and JSON objects locally for development testing.", icon: "🎲", url: "/fake-data-generator/", type: "open", tags: "lorem ipsum fake mock data generate names json", cats: ["Generators"], aliases: "faker dummy placeholder seed test fixtures sample" },
   { name: "UUID / ULID Generator", desc: "Batch generate cryptographically secure UUID v4 identifiers and lexicographically sortable ULIDs with quick copy.", icon: "🆔", url: "/uuid-ulid-generator/", type: "open", tags: "uuid ulid guid generate random batch id", cats: ["Generators", "Crypto & Hashing"], aliases: "guid v4 nanoid identifier unique key" },
@@ -188,7 +188,13 @@ export function countByStatus(): Record<string, number> {
 }
 
 export function getFeaturedTools(): Tool[] {
-  return tools.filter(t => t.featured === true);
+  return tools.filter(t => t.featured === true).sort((a, b) => {
+    const aIsSaaS = a.cats.includes('SaaS');
+    const bIsSaaS = b.cats.includes('SaaS');
+
+    if (aIsSaaS !== bIsSaaS) return aIsSaaS ? 1 : -1;
+    return a.name.localeCompare(b.name);
+  });
 }
 
 export function groupByPrimaryCategory(): Array<{ category: Category; tools: Tool[] }> {

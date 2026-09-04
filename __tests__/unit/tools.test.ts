@@ -129,6 +129,25 @@ describe('lib/tools.ts - helpers', () => {
     featured.forEach(tool => expect(tool.featured).toBe(true));
   });
 
+  it('puts SaaS featured tools last and sorts each group alphabetically', () => {
+    const featured = getFeaturedTools();
+    const firstSaaS = featured.findIndex(tool => tool.cats.includes('SaaS'));
+
+    expect(firstSaaS).toBeGreaterThan(0);
+    expect(featured.slice(0, firstSaaS).every(tool => !tool.cats.includes('SaaS'))).toBe(true);
+    expect(featured.slice(firstSaaS).every(tool => tool.cats.includes('SaaS'))).toBe(true);
+
+    for (let index = 1; index < featured.length; index += 1) {
+      const previous = featured[index - 1];
+      const current = featured[index];
+      const sameSaaSGroup = previous.cats.includes('SaaS') === current.cats.includes('SaaS');
+
+      if (sameSaaSGroup) {
+        expect(previous.name.localeCompare(current.name)).toBeLessThanOrEqual(0);
+      }
+    }
+  });
+
   it('matches a tool on any of its categories, not just the primary', () => {
     const tool = stub({ cats: ['Security', 'Network'] });
     expect(matchesFilters(tool, 'Security', 'all')).toBe(true);
