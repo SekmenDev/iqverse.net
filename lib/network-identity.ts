@@ -1,4 +1,5 @@
 import { buildVerdict, type Clue, type Verdict } from './verdict';
+import { readPluginCount } from './utils';
 
 export interface EdgeNetworkInfo {
   ip: string;
@@ -520,7 +521,7 @@ export function readTorClientContext(webglRenderer: string): TorClientContext {
     innerWidth: hasWindow ? window.innerWidth : null,
     innerHeight: hasWindow ? window.innerHeight : null,
     screenWidth: typeof screen === 'undefined' ? null : screen.width,
-    pluginCount: hasNavigator ? navigator.plugins.length : 0,
+    pluginCount: readPluginCount(),
     webglRenderer,
     userAgent: hasNavigator ? navigator.userAgent : '',
   };

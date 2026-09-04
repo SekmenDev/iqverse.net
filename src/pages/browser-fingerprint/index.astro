@@ -224,6 +224,7 @@ import { IMPORTANCE_LABELS, IMPORTANCE_LEVELS } from '@/lib/fingerprint';
   } from '@/lib/network-identity';
   import type { Verdict } from '@/lib/verdict';
   import { detectAutomation, readAutomationContext } from '@/lib/automation';
+  import { readPluginCount } from '@/lib/utils';
   import {
     SEVERITY_COLORS,
     SEVERITY_LABELS,
@@ -390,7 +391,7 @@ import { IMPORTANCE_LABELS, IMPORTANCE_LEVELS } from '@/lib/fingerprint';
         mobileHint: mobileHint(),
         languages: [...navigator.languages],
         vendor: navigator.vendor,
-        pluginCount: navigator.plugins.length,
+        pluginCount: readPluginCount(),
         webdriver: navigator.webdriver === true,
         screenWidth: screen.width,
         innerWidth: window.innerWidth,

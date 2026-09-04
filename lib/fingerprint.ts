@@ -1,4 +1,5 @@
 import { arrayBufferToHex, computeDigest } from './hashing';
+import { readPluginNames } from './utils';
 
 export type Importance = 'critical' | 'high' | 'medium' | 'low';
 
@@ -917,11 +918,8 @@ async function speechVoiceReport(): Promise<string> {
 }
 
 function pluginList(): string {
-  const navigatorRef = readNavigator();
-  if (!navigatorRef?.plugins || navigatorRef.plugins.length === 0) return 'None';
-  return Array.from(navigatorRef.plugins)
-    .map(plugin => plugin.name)
-    .join(', ');
+  const names = readPluginNames();
+  return names.length === 0 ? 'None' : names.join(', ');
 }
 
 function intlSettings(): string {

@@ -56,6 +56,19 @@ export function getHeader(headers: Record<string, string>, name: string): string
   return key ? headers[key] : null;
 }
 
+type PluginEntry = { name: string };
+type NavigatorWithPlugins = { plugins?: ArrayLike<PluginEntry> };
+
+export function readPluginNames(): string[] {
+  if (typeof navigator === 'undefined') return [];
+  const plugins = (navigator as NavigatorWithPlugins).plugins;
+  return plugins ? Array.from(plugins, (plugin) => plugin.name) : [];
+}
+
+export function readPluginCount(): number {
+  return readPluginNames().length;
+}
+
 export function buildQRPayload(type: string, values: Record<string, string>): string {
   switch (type) {
     case 'email':
