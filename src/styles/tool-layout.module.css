@@ -32,13 +32,6 @@
   flex-shrink: 0;
 }
 
-.navLogoDot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--accent);
-}
-
 .navBreadcrumb {
   display: flex;
   align-items: center;

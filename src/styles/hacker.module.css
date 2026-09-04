@@ -153,11 +153,6 @@
   font-weight: 700;
 }
 
-.successTag {
-  color: var(--green-glow);
-  font-weight: 700;
-}
-
 .targetPath {
   color: var(--yellow-warn);
   background: rgba(255, 204, 0, 0.1);

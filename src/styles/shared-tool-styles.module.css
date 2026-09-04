@@ -189,28 +189,6 @@
   border-color: var(--accent);
 }
 
-.buttonGhost {
-  background: transparent;
-  border-color: transparent;
-  color: var(--text-muted);
-}
-
-.buttonGhost:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text);
-}
-
-.buttonDanger {
-  background: transparent;
-  color: var(--red);
-  border-color: rgba(248, 113, 113, 0.3);
-}
-
-.buttonDanger:hover {
-  background: rgba(248, 113, 113, 0.1);
-  border-color: var(--red);
-}
-
 .buttonSmall {
   padding: 0.45rem 0.85rem;
   font-size: 0.8rem;
@@ -260,28 +238,4 @@
     padding: 0.6rem 1rem;
     font-size: 0.84rem;
   }
-}
-
-.customScrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
-}
-
-.customScrollbar::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-.customScrollbar::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.15);
-  border-radius: 4px;
-}
-
-.customScrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.25);
-  border-radius: 4px;
-}
-
-.customScrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.45);
 }

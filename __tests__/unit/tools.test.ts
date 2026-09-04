@@ -76,6 +76,22 @@ describe('lib/tools.ts - helpers', () => {
     expect(primaryCategory(stub({ cats: ['Network', 'Security'] }))).toBe('Network');
   });
 
+  it('keys a tool by its url', () => {
+    expect(toolKey(stub({ url: '/stub/' }))).toBe('/stub/');
+    expect(new Set(tools.map(toolKey)).size).toBe(tools.length);
+  });
+
+  it('groups every tool under its primary category only', () => {
+    const groups = groupByPrimaryCategory();
+    const grouped = groups.flatMap(group => group.tools);
+
+    expect(grouped.length).toBe(tools.length);
+    groups.forEach(group => {
+      expect(group.tools.length).toBeGreaterThan(0);
+      group.tools.forEach(tool => expect(primaryCategory(tool)).toBe(group.category));
+    });
+  });
+
   it('lists every used category once, prefixed with all', () => {
     const categories = getUniqueCategories();
     expect(categories[0]).toBe('all');
@@ -105,18 +121,6 @@ describe('lib/tools.ts - helpers', () => {
   it('counts each tool under exactly one status', () => {
     const counts = countByStatus();
     expect(counts.open + counts.saas + counts.coming).toBe(tools.length);
-  });
-
-  it('places every tool in either the featured row or its primary category, exactly once', () => {
-    const groups = groupByPrimaryCategory();
-    const rendered = [...getFeaturedTools(), ...groups.flatMap(g => g.tools)];
-
-    expect(rendered).toHaveLength(tools.length);
-    expect(new Set(rendered.map(toolKey)).size).toBe(tools.length);
-
-    groups.forEach(group => {
-      group.tools.forEach(tool => expect(primaryCategory(tool)).toBe(group.category));
-    });
   });
 
   it('returns only flagged tools as featured', () => {

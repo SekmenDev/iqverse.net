@@ -14,6 +14,7 @@ export default tseslint.config(
       "test-results/**",
       "playwright-report/**",
       "vitest-report/**",
+      ".vitest/**",
       ".yarn/**",
       ".pnp.cjs",
       ".yarnrc.yml"

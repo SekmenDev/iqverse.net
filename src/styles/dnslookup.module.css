@@ -312,12 +312,6 @@
   border: 1px solid rgba(52, 211, 153, 0.3);
 }
 
-.badgeWarning {
-  color: var(--yellow);
-  background: rgba(251, 191, 36, 0.12);
-  border: 1px solid rgba(251, 191, 36, 0.3);
-}
-
 .badgeFail {
   color: var(--red);
   background: rgba(248, 113, 113, 0.12);
@@ -352,67 +346,10 @@
 }
 
 /* Toolbar & Filters */
-.resultsToolbar {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 16px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.filterBar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-}
-
-.filterLabel {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
 .filterPills {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-}
-
-.filterPill {
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: var(--card);
-  padding: 6px 12px;
-  color: var(--text);
-  cursor: pointer;
-  font-size: 0.78rem;
-  font-family: var(--font-mono);
-  font-weight: 500;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.filterPill:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: var(--card-hover);
-}
-
-.activeFilter,
-.filterPill.active {
-  border-color: var(--accent) !important;
-  background: var(--accent-dim) !important;
-  color: var(--accent) !important;
-  font-weight: 600;
 }
 
 .toolbarActions {

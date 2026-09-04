@@ -1,4 +1,5 @@
 import { buildVerdict, type Clue, type Verdict } from './verdict';
+import { readPluginCount } from './utils';
 
 export interface AutomationContext {
   userAgent: string;
@@ -133,7 +134,7 @@ export function readAutomationContext(webglRenderer: string): AutomationContext 
   return {
     userAgent,
     webdriver: hasNavigator && navigator.webdriver === true,
-    pluginCount: hasNavigator ? navigator.plugins.length : 0,
+    pluginCount: readPluginCount(),
     languageCount: hasNavigator ? navigator.languages.length : 0,
     webglRenderer,
     outerWidth: hasWindow ? window.outerWidth : null,
