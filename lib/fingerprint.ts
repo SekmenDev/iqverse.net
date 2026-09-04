@@ -54,6 +54,46 @@ export interface Signal {
 /** log2 of the current world population: no browser can be rarer than this. */
 export const MAX_ENTROPY_BITS = 33.2;
 
+/** What actually blunts a given signal, keyed by signal id. Absent means no practical defence. */
+export const SIGNAL_ADVICE: Record<string, string> = {
+  'canvas-hash':
+    'Tor Browser blocks canvas reads behind a prompt. Firefox with privacy.resistFingerprinting returns a uniform value to every site.',
+  'webgl-renderer':
+    'Firefox resistFingerprinting hides the real renderer. Disabling WebGL entirely works but breaks maps and games.',
+  'webgl-hash': 'Same defence as the renderer: resistFingerprinting or disabling WebGL.',
+  'webgpu-adapter':
+    'WebGPU can be turned off in browser flags. It is not yet needed by most sites, so the cost is low.',
+  'font-list':
+    'Tor Browser ships a fixed font set so every user reports the same list. Limiting locally installed fonts helps elsewhere.',
+  'audio-hash':
+    'Firefox resistFingerprinting adds noise to the audio output. Extensions that randomise it also work.',
+  'user-agent':
+    'Do not spoof it piecemeal. A mismatched user agent makes you rarer, not safer, as the consistency card shows.',
+  'ua-high-entropy':
+    'Client hints are sent automatically by Chromium. Firefox and Safari do not send them at all.',
+  'screen-resolution':
+    'Tor Browser letterboxes the window to rounded sizes so the reported dimensions land in a small set of buckets.',
+  timezone:
+    'Set the browser to UTC, or use Tor Browser which does it for you. A VPN alone leaves the real zone exposed.',
+  languages:
+    'Trim the list to one common locale. A long ordered list of languages is far more distinctive than a short one.',
+  'speech-voices': 'Firefox reports fewer voices than Chromium. There is no per-site control.',
+  'emoji-set': 'Nothing practical. The emoji font ships with the operating system.',
+  'keyboard-layout':
+    'Firefox and Safari do not implement the Keyboard Map API, so they leak nothing here.',
+  'webrtc-hosts':
+    'Disable WebRTC when you do not need calls, or use a browser that forces mDNS candidates. This is the usual VPN leak.',
+  'media-devices':
+    'Firefox hides device counts until permission is granted. Chromium exposes them to any page.',
+  'cpu-cores': 'Firefox resistFingerprinting reports 2 cores for everyone.',
+  'device-memory': 'Chromium only. Firefox and Safari never send it.',
+  'storage-quota':
+    'Nothing practical, though the value already changes between normal and private windows.',
+  plugins: 'Already normalised by modern browsers. Nothing worth changing.',
+  'do-not-track':
+    'Turning this on makes you more identifiable, not less, because so few people set it. Most sites ignore it.',
+};
+
 export function isAvailable(signal: Signal): boolean {
   return signal.value !== UNAVAILABLE && signal.value.trim().length > 0;
 }
@@ -464,6 +504,149 @@ export function detectFonts(candidates: string[] = FONT_PROBES): string[] {
   }
 }
 
+type GpuAdapterInfoLike = {
+  vendor?: string;
+  architecture?: string;
+  device?: string;
+  description?: string;
+};
+
+type GpuAdapterLike = {
+  info?: GpuAdapterInfoLike;
+  features?: Iterable<string>;
+  limits?: Record<string, number | undefined>;
+};
+
+type GpuLike = { requestAdapter: () => Promise<GpuAdapterLike | null> };
+
+export interface WebgpuReport {
+  adapter: string;
+  features: string[];
+  maxTextureDimension2D: number | null;
+}
+
+export async function readWebgpu(): Promise<WebgpuReport | null> {
+  const gpu = (navigator as Navigator & { gpu?: GpuLike }).gpu;
+  if (!gpu?.requestAdapter) return null;
+
+  try {
+    const adapter = await gpu.requestAdapter();
+    if (!adapter) return null;
+
+    const info = adapter.info ?? {};
+    const adapterName = [info.vendor, info.architecture, info.device, info.description]
+      .filter((part): part is string => typeof part === 'string' && part.length > 0)
+      .join(' · ');
+
+    return {
+      adapter: adapterName,
+      features: adapter.features ? [...adapter.features].sort((a, b) => a.localeCompare(b)) : [],
+      maxTextureDimension2D: adapter.limits?.maxTextureDimension2D ?? null,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export interface EmojiProbe {
+  emoji: string;
+  version: string;
+}
+
+/** One emoji per Unicode release, so the newest that renders reveals the font version. */
+export const EMOJI_PROBES: EmojiProbe[] = [
+  { emoji: '\u{1F600}', version: '6.1' },
+  { emoji: '\u{1F921}', version: '9.0' },
+  { emoji: '\u{1F970}', version: '11.0' },
+  { emoji: '\u{1F971}', version: '12.0' },
+  { emoji: '\u{1F978}', version: '13.0' },
+  { emoji: '\u{1FAE0}', version: '14.0' },
+  { emoji: '\u{1FAE8}', version: '15.0' },
+  { emoji: '\u{1FA75}', version: '15.1' },
+  { emoji: '\u{1FADF}', version: '16.0' },
+];
+
+export interface EmojiReport {
+  supported: string[];
+  highestVersion: string | null;
+  widths: string;
+}
+
+export function detectEmojiSupport(probes: EmojiProbe[] = EMOJI_PROBES): EmojiReport | null {
+  if (typeof document === 'undefined' || !document.body) return null;
+
+  const probe = document.createElement('span');
+  probe.style.position = 'absolute';
+  probe.style.left = '-9999px';
+  probe.style.top = '-9999px';
+  probe.style.fontSize = '64px';
+  probe.style.visibility = 'hidden';
+  document.body.appendChild(probe);
+
+  try {
+    // An unassigned code point always falls back to the notdef glyph.
+    probe.textContent = '\u{1FFFD}';
+    const missingWidth = probe.offsetWidth;
+    if (missingWidth === 0) return null;
+
+    const supported: string[] = [];
+    const widths: number[] = [];
+
+    for (const entry of probes) {
+      probe.textContent = entry.emoji;
+      widths.push(probe.offsetWidth);
+      if (probe.offsetWidth !== missingWidth) supported.push(entry.version);
+    }
+
+    return {
+      supported,
+      highestVersion: supported.length > 0 ? supported[supported.length - 1] : null,
+      widths: widths.join(','),
+    };
+  } finally {
+    probe.remove();
+  }
+}
+
+type KeyboardLayoutLike = { getLayoutMap: () => Promise<Map<string, string>> };
+
+export const LAYOUT_PROBE_KEYS = ['KeyQ', 'KeyW', 'KeyY', 'KeyZ', 'Semicolon'];
+
+export function inferKeyboardLayout(keys: Record<string, string>): string {
+  const q = keys.KeyQ?.toLowerCase();
+  const w = keys.KeyW?.toLowerCase();
+  const y = keys.KeyY?.toLowerCase();
+  const z = keys.KeyZ?.toLowerCase();
+
+  if (q === 'a' && w === 'z') return 'AZERTY';
+  if (y === 'z' && z === 'y') return 'QWERTZ';
+  if (q === 'q' && w === 'w' && y === 'y' && z === 'z') return 'QWERTY';
+  return 'Other';
+}
+
+export async function readKeyboardLayout(): Promise<string> {
+  const keyboard = (navigator as Navigator & { keyboard?: KeyboardLayoutLike }).keyboard;
+  if (!keyboard?.getLayoutMap) return UNAVAILABLE;
+
+  try {
+    const layout = await keyboard.getLayoutMap();
+    const keys: Record<string, string> = {};
+    for (const code of LAYOUT_PROBE_KEYS) {
+      const value = layout.get(code);
+      if (value) keys[code] = value;
+    }
+    if (Object.keys(keys).length === 0) return UNAVAILABLE;
+
+    const printed = LAYOUT_PROBE_KEYS.filter(code => keys[code])
+      .map(code => `${code.replace('Key', '')}=${keys[code]}`)
+      .join(' ');
+
+    return `${inferKeyboardLayout(keys)} (${printed})`;
+  } catch {
+    return UNAVAILABLE;
+  }
+}
+
 export function mathFingerprint(): string {
   const probes: Array<[string, number]> = [
     ['acos', Math.acos(0.123456789)],
@@ -695,14 +878,39 @@ async function readHighEntropyUserAgent(): Promise<string> {
   }
 }
 
-function speechVoices(): string {
+/** Chromium populates the voice list asynchronously, so an empty first read is normal. */
+function loadVoices(timeoutMs = 600): Promise<SpeechSynthesisVoice[]> {
   const scope = globalThis as typeof globalThis & { speechSynthesis?: SpeechSynthesis };
-  if (!scope.speechSynthesis?.getVoices) return UNAVAILABLE;
+  const synth = scope.speechSynthesis;
+  if (!synth?.getVoices) return Promise.resolve([]);
 
+  const immediate = synth.getVoices();
+  if (immediate.length > 0) return Promise.resolve(immediate);
+
+  return new Promise<SpeechSynthesisVoice[]>(resolve => {
+    let settled = false;
+
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      synth.removeEventListener('voiceschanged', finish);
+      resolve(synth.getVoices());
+    };
+
+    const timer = setTimeout(finish, timeoutMs);
+    synth.addEventListener('voiceschanged', finish);
+  });
+}
+
+async function speechVoiceReport(): Promise<string> {
   try {
-    const voices = scope.speechSynthesis.getVoices();
+    const voices = await loadVoices();
     if (voices.length === 0) return UNAVAILABLE;
-    return `${voices.length} voices (${voices[0].name})`;
+
+    const locales = new Set(voices.map(voice => voice.lang));
+    const hash = await hashText(voices.map(voice => `${voice.name}|${voice.lang}`).join(','), 12);
+    return `${voices.length} voices across ${locales.size} locales · list hash ${hash}`;
   } catch {
     return UNAVAILABLE;
   }
@@ -733,25 +941,44 @@ export async function collectSignals(): Promise<Signal[]> {
   const canvasSource = canvasFingerprintSource();
   const webgl = readWebgl();
   const fonts = detectFonts();
+  const emoji = detectEmojiSupport();
 
-  const [audio, canvasHash, webglHash, mathHash, webrtcHosts, mediaDevices, quota, battery, permissions, uaHighEntropy] =
-    await Promise.all([
-      audioFingerprint(),
-      canvasSource ? hashText(canvasSource, 16) : Promise.resolve(null),
-      webgl
-        ? hashText(
-            [webgl.version, webgl.shadingLanguageVersion, webgl.maxViewportDims, webgl.extensions.join(',')].join('|'),
-            16
-          )
-        : Promise.resolve(null),
-      hashText(mathFingerprint(), 16),
-      detectWebrtcHosts(),
-      readMediaDevices(),
-      readStorageQuota(),
-      readBattery(),
-      readPermissions(),
-      readHighEntropyUserAgent(),
-    ]);
+  const [
+    audio,
+    canvasHash,
+    webglHash,
+    mathHash,
+    emojiHash,
+    webrtcHosts,
+    mediaDevices,
+    quota,
+    battery,
+    permissions,
+    uaHighEntropy,
+    webgpu,
+    keyboardLayout,
+    voices,
+  ] = await Promise.all([
+    audioFingerprint(),
+    canvasSource ? hashText(canvasSource, 16) : Promise.resolve(null),
+    webgl
+      ? hashText(
+          [webgl.version, webgl.shadingLanguageVersion, webgl.maxViewportDims, webgl.extensions.join(',')].join('|'),
+          16
+        )
+      : Promise.resolve(null),
+    hashText(mathFingerprint(), 16),
+    emoji ? hashText(emoji.widths, 12) : Promise.resolve(null),
+    detectWebrtcHosts(),
+    readMediaDevices(),
+    readStorageQuota(),
+    readBattery(),
+    readPermissions(),
+    readHighEntropyUserAgent(),
+    readWebgpu(),
+    readKeyboardLayout(),
+    speechVoiceReport(),
+  ]);
 
   const signals: Signal[] = [
     {
@@ -853,13 +1080,45 @@ export async function collectSignals(): Promise<Signal[]> {
       stable: true,
     },
     {
+      id: 'webgpu-adapter',
+      label: 'WebGPU adapter',
+      group: 'Fingerprint Hashes',
+      importance: 'critical',
+      entropyBits: 6,
+      value: text(webgpu?.adapter),
+      note: 'WebGPU names the graphics vendor, architecture and device directly, without the masking WebGL now applies.',
+      stable: true,
+    },
+    {
       id: 'speech-voices',
       label: 'Speech synthesis voices',
       group: 'Capabilities',
       importance: 'high',
+      entropyBits: 5,
+      value: voices,
+      note: 'Voice packs are installed per OS and per language. Hashing the whole list is far sharper than the count alone.',
+      stable: true,
+    },
+    {
+      id: 'emoji-set',
+      label: 'Emoji font version',
+      group: 'Fingerprint Hashes',
+      importance: 'high',
       entropyBits: 4,
-      value: speechVoices(),
-      note: 'Voice packs are installed per OS and per language, so the count alone is revealing.',
+      value: emoji
+        ? `Renders up to Unicode ${emoji.highestVersion ?? 'none'} · width hash ${emojiHash ?? 'n/a'}`
+        : UNAVAILABLE,
+      note: 'Emoji glyph widths reveal the installed emoji font, which tracks the OS version closely.',
+      stable: true,
+    },
+    {
+      id: 'keyboard-layout',
+      label: 'Keyboard layout',
+      group: 'Hardware',
+      importance: 'high',
+      entropyBits: 3,
+      value: keyboardLayout,
+      note: 'The Keyboard Map API reports your physical layout with no prompt, which often gives away your country.',
       stable: true,
     },
     {
@@ -941,6 +1200,30 @@ export async function collectSignals(): Promise<Signal[]> {
       value: webgl ? `${webgl.extensions.length}: ${webgl.extensions.join(', ')}` : UNAVAILABLE,
       note: 'The exact extension set maps closely to a driver build.',
       stable: true,
+    },
+    {
+      id: 'webgpu-features',
+      label: 'WebGPU features',
+      group: 'Display & Graphics',
+      importance: 'medium',
+      entropyBits: 2,
+      value: webgpu
+        ? `${webgpu.features.length} features, max 2D texture ${webgpu.maxTextureDimension2D ?? 'unknown'}: ${webgpu.features.join(', ')}`
+        : UNAVAILABLE,
+      note: 'Optional feature support and driver limits differ between GPU generations.',
+      stable: true,
+    },
+    {
+      id: 'multi-monitor',
+      label: 'Extended display',
+      group: 'Display & Graphics',
+      importance: 'medium',
+      entropyBits: 1,
+      value: text(
+        (screenRef as (Screen & { isExtended?: boolean }) | null)?.isExtended ?? null
+      ),
+      note: 'The Window Management API reports whether more than one monitor is attached, no permission required.',
+      stable: false,
     },
     {
       id: 'color-depth',

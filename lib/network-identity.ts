@@ -1,26 +1,4 @@
-export type Confidence = 'confirmed' | 'likely' | 'possible' | 'unlikely';
-
-export const CONFIDENCE_COLORS: Record<Confidence, string> = {
-  confirmed: '#ff4d4f',
-  likely: '#ff9800',
-  possible: '#faad14',
-  unlikely: '#4caf50',
-};
-
-export interface Clue {
-  id: string;
-  label: string;
-  detail: string;
-  weight: number;
-}
-
-export interface Verdict {
-  confidence: Confidence;
-  score: number;
-  headline: string;
-  color: string;
-  clues: Clue[];
-}
+import { buildVerdict, type Clue, type Verdict } from './verdict';
 
 export interface EdgeNetworkInfo {
   ip: string;
@@ -196,13 +174,6 @@ export function parseEdgeNetworkInfo(payload: unknown): EdgeNetworkInfo | null {
   };
 }
 
-function scoreToConfidence(score: number): Confidence {
-  if (score >= 100) return 'confirmed';
-  if (score >= 60) return 'likely';
-  if (score >= 30) return 'possible';
-  return 'unlikely';
-}
-
 function isPrivateAddress(host: string): boolean {
   if (host.endsWith('.local')) return true;
   if (/^10\./.test(host)) return true;
@@ -281,23 +252,16 @@ export function detectVpn(edge: EdgeNetworkInfo, local: LocalNetworkContext): Ve
     });
   }
 
-  const score = clues.reduce((sum, clue) => sum + clue.weight, 0);
-  const confidence = scoreToConfidence(score);
-
-  const headlines: Record<Confidence, string> = {
-    confirmed: 'You are behind a commercial VPN',
-    likely: 'A VPN or proxy is very likely',
-    possible: 'Some proxy indicators found',
-    unlikely: 'No VPN or proxy indicators',
-  };
-
-  return {
-    confidence,
-    score,
-    headline: headlines[confidence],
-    color: CONFIDENCE_COLORS[confidence],
+  return buildVerdict(
     clues,
-  };
+    {
+      confirmed: 'You are behind a commercial VPN',
+      likely: 'A VPN or proxy is very likely',
+      possible: 'Some proxy indicators found',
+      unlikely: 'No VPN or proxy indicators',
+    },
+    { requireDefinitive: true }
+  );
 }
 
 export interface TorClientContext {
@@ -406,23 +370,16 @@ export function detectTor(torExit: boolean, client: TorClientContext): Verdict {
     });
   }
 
-  const score = clues.reduce((sum, clue) => sum + clue.weight, 0);
-  const confidence = scoreToConfidence(score);
-
-  const headlines: Record<Confidence, string> = {
-    confirmed: 'You are using Tor',
-    likely: 'Tor Browser or strong anti-fingerprinting is very likely',
-    possible: 'Some anti-fingerprinting defences detected',
-    unlikely: 'No Tor or anti-fingerprinting indicators',
-  };
-
-  return {
-    confidence,
-    score,
-    headline: headlines[confidence],
-    color: CONFIDENCE_COLORS[confidence],
+  return buildVerdict(
     clues,
-  };
+    {
+      confirmed: 'You are using Tor',
+      likely: 'Tor Browser or strong anti-fingerprinting is very likely',
+      possible: 'Some anti-fingerprinting defences detected',
+      unlikely: 'No Tor or anti-fingerprinting indicators',
+    },
+    { requireDefinitive: true }
+  );
 }
 
 export type BrowserEngine = 'chromium' | 'firefox' | 'webkit' | 'unknown';
@@ -500,23 +457,16 @@ export function detectPrivateMode(context: PrivateModeContext): Verdict {
     }
   }
 
-  const score = clues.reduce((sum, clue) => sum + clue.weight, 0);
-  const confidence = scoreToConfidence(Math.min(score, 99));
-
-  const headlines: Record<Confidence, string> = {
-    confirmed: 'Private browsing detected',
-    likely: 'Private or incognito window is very likely',
-    possible: 'Some private browsing indicators found',
-    unlikely: 'Looks like a normal browsing window',
-  };
-
-  return {
-    confidence,
-    score,
-    headline: headlines[confidence],
-    color: CONFIDENCE_COLORS[confidence],
+  return buildVerdict(
     clues,
-  };
+    {
+      confirmed: 'Private browsing detected',
+      likely: 'Private or incognito window is very likely',
+      possible: 'Some private browsing indicators found',
+      unlikely: 'Looks like a normal browsing window',
+    },
+    { maxScore: 99 }
+  );
 }
 
 export function summariseLocation(edge: EdgeNetworkInfo): string {

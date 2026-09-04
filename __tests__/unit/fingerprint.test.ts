@@ -1,9 +1,16 @@
 import { describe, it, expect } from 'vitest';
 import {
+  EMOJI_PROBES,
   MAX_ENTROPY_BITS,
+  SIGNAL_ADVICE,
   UNAVAILABLE,
   canvasFingerprintSource,
+  collectSignals,
   computeFingerprintId,
+  detectEmojiSupport,
+  inferKeyboardLayout,
+  readKeyboardLayout,
+  readWebgpu,
   countByImportance,
   describeUniqueness,
   detectFonts,
@@ -206,5 +213,57 @@ describe('Fingerprint browser probes (lib/fingerprint)', () => {
 
   it('detects no fonts when text measurement is unavailable', () => {
     expect(detectFonts(['Arial', 'Comic Sans MS'])).toEqual([]);
+  });
+
+  it('returns null for emoji support when text measurement is unavailable', () => {
+    expect(detectEmojiSupport()).toBeNull();
+  });
+
+  it('covers one emoji per Unicode release in ascending order', () => {
+    const versions = EMOJI_PROBES.map(probe => Number.parseFloat(probe.version));
+    expect(versions).toEqual([...versions].sort((a, b) => a - b));
+    expect(new Set(EMOJI_PROBES.map(probe => probe.emoji)).size).toBe(EMOJI_PROBES.length);
+  });
+
+  it('reports the Keyboard Map API as unavailable when absent', async () => {
+    await expect(readKeyboardLayout()).resolves.toBe(UNAVAILABLE);
+  });
+
+  it('returns null for WebGPU when navigator.gpu is absent', async () => {
+    await expect(readWebgpu()).resolves.toBeNull();
+  });
+});
+
+describe('Keyboard layout inference (lib/fingerprint)', () => {
+  it('names the common physical layouts', () => {
+    expect(inferKeyboardLayout({ KeyQ: 'q', KeyW: 'w', KeyY: 'y', KeyZ: 'z' })).toBe('QWERTY');
+    expect(inferKeyboardLayout({ KeyQ: 'q', KeyW: 'w', KeyY: 'z', KeyZ: 'y' })).toBe('QWERTZ');
+    expect(inferKeyboardLayout({ KeyQ: 'a', KeyW: 'z', KeyY: 'y', KeyZ: 'w' })).toBe('AZERTY');
+  });
+
+  it('falls back to Other for layouts it cannot name', () => {
+    expect(inferKeyboardLayout({ KeyQ: 'ф', KeyW: 'ц', KeyY: 'н', KeyZ: 'я' })).toBe('Other');
+    expect(inferKeyboardLayout({})).toBe('Other');
+  });
+
+  it('ignores case differences from the layout map', () => {
+    expect(inferKeyboardLayout({ KeyQ: 'Q', KeyW: 'W', KeyY: 'Y', KeyZ: 'Z' })).toBe('QWERTY');
+  });
+});
+
+describe('Mitigation advice (lib/fingerprint)', () => {
+  it('only maps advice onto signal ids that exist', async () => {
+    const signalIds = new Set((await collectSignals()).map(signal => signal.id));
+    for (const id of Object.keys(SIGNAL_ADVICE)) {
+      expect(signalIds.has(id)).toBe(true);
+    }
+  });
+
+  it('covers every critical signal', async () => {
+    const critical = (await collectSignals()).filter(signal => signal.importance === 'critical');
+    expect(critical.length).toBeGreaterThan(0);
+    for (const signal of critical) {
+      expect(SIGNAL_ADVICE[signal.id]).toBeTruthy();
+    }
   });
 });

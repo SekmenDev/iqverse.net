@@ -53,6 +53,11 @@ import { IMPORTANCE_LABELS, IMPORTANCE_LEVELS } from '@/lib/fingerprint';
           <p class={styles.verdictHeadline}>Checking…</p>
         </div>
 
+        <div class={styles.verdictCard} id="card-automation">
+          <span class={styles.verdictTitle}>Automation &amp; headless</span>
+          <p class={styles.verdictHeadline}>Checking…</p>
+        </div>
+
         <div class={styles.verdictCard} id="card-private">
           <span class={styles.verdictTitle}>Private browsing</span>
           <p class={styles.verdictHeadline}>Checking…</p>
@@ -123,6 +128,34 @@ import { IMPORTANCE_LABELS, IMPORTANCE_LEVELS } from '@/lib/fingerprint';
 
     <section class={sharedStyles.section}>
       <div class={sharedStyles.card}>
+        <h2 style="font-size: 1rem; margin-bottom: 10px;">Reducing your fingerprint</h2>
+        <p style="line-height: 1.65; margin-bottom: 10px;">
+          Individual rows carry a "Defence" line where one exists. Four strategies do most of the
+          work, in descending order of effectiveness:
+        </p>
+        <ol style="line-height: 1.7; padding-left: 20px;">
+          <li>
+            Use Tor Browser. It blocks canvas, normalises fonts, pins the time zone to UTC and
+            letterboxes the window so every user reports the same values.
+          </li>
+          <li>
+            Use Firefox with privacy.resistFingerprinting enabled. It covers canvas, audio, WebGL,
+            time zone and core count in one switch, at the cost of some site breakage.
+          </li>
+          <li>
+            Blend in rather than stand out. Skip Do Not Track, trim your language list to one
+            common locale and leave the user agent alone. Rare settings identify you.
+          </li>
+          <li>
+            Keep a VPN and the browser consistent. Match the browser time zone to the exit country
+            and disable WebRTC, or the mismatches on this page give the tunnel away.
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
         <h2 style="font-size: 1rem; margin-bottom: 10px;">How to read this</h2>
         <p style="line-height: 1.65; margin-bottom: 10px;">
           Entropy measures how much a signal narrows you down. Every bit halves the crowd you hide
@@ -173,6 +206,7 @@ import { IMPORTANCE_LABELS, IMPORTANCE_LEVELS } from '@/lib/fingerprint';
     signalsToJson,
     sortSignals,
     totalEntropyBits,
+    SIGNAL_ADVICE,
     type Importance,
     type Signal,
   } from '@/lib/fingerprint';
@@ -187,8 +221,9 @@ import { IMPORTANCE_LABELS, IMPORTANCE_LEVELS } from '@/lib/fingerprint';
     readTorClientContext,
     summariseLocation,
     type EdgeNetworkInfo,
-    type Verdict,
   } from '@/lib/network-identity';
+  import type { Verdict } from '@/lib/verdict';
+  import { detectAutomation, readAutomationContext } from '@/lib/automation';
   import {
     SEVERITY_COLORS,
     SEVERITY_LABELS,
@@ -227,6 +262,7 @@ import { IMPORTANCE_LABELS, IMPORTANCE_LEVELS } from '@/lib/fingerprint';
   const checkNetworkBtn = document.getElementById('btn-check-network') as HTMLButtonElement | null;
   const consistencyCard = document.getElementById('card-consistency');
   const visitsCard = document.getElementById('card-visits');
+  const automationCard = document.getElementById('card-automation');
 
   let signals: Signal[] = [];
   let fingerprintId = '';
@@ -458,6 +494,12 @@ import { IMPORTANCE_LABELS, IMPORTANCE_LEVELS } from '@/lib/fingerprint';
     saveVisitRecord(updateVisitRecord(loadVisitRecord(), fingerprintId, new Date()));
   }
 
+  function renderAutomationVerdict() {
+    if (!automationCard) return;
+    const verdict = detectAutomation(readAutomationContext(signalValue('webgl-renderer')));
+    paintVerdict(automationCard, 'Automation & headless', verdict);
+  }
+
   function renderTorVerdict() {
     if (!torCard) return;
     const verdict = detectTor(edge?.torExit ?? false, readTorClientContext(signalValue('webgl-renderer')));
@@ -531,6 +573,15 @@ import { IMPORTANCE_LABELS, IMPORTANCE_LEVELS } from '@/lib/fingerprint';
     note.textContent = signal.note;
 
     body.append(label, value, note);
+
+    const advice = SIGNAL_ADVICE[signal.id];
+    if (advice) {
+      const adviceEl = document.createElement('p');
+      adviceEl.className = styles.rowAdvice;
+      adviceEl.textContent = `Defence: ${advice}`;
+      body.append(adviceEl);
+    }
+
     row.append(meta, body);
 
     if (signal.value.length > 220) {
@@ -612,6 +663,7 @@ import { IMPORTANCE_LABELS, IMPORTANCE_LEVELS } from '@/lib/fingerprint';
     recordVisit();
     renderVisits();
     renderConsistency();
+    renderAutomationVerdict();
     renderTorVerdict();
     void renderPrivateVerdict();
   }

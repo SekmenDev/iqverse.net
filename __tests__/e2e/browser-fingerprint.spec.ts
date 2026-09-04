@@ -210,6 +210,43 @@ test.describe('Browser Fingerprint collection & filtering', () => {
     await expect(headers).toContainText('gzip, br');
   });
 
+  test('collects the newer graphics, emoji and keyboard probes', async ({ page }) => {
+    await page.goto('/browser-fingerprint/');
+    await expect(page.locator('#fp-id')).toHaveText(/^[0-9a-f]{32}$/, { timeout: 15000 });
+
+    const results = page.locator('#fp-results');
+    await expect(results).toContainText('WebGPU adapter');
+    await expect(results).toContainText('Emoji font version');
+    await expect(results).toContainText('Keyboard layout');
+    await expect(results).toContainText('Extended display');
+
+    // The voice signal reports a hash of the whole list, not just a count
+    await expect(results).toContainText('Speech synthesis voices');
+
+    const emojiRow = page.locator('#fp-results > div').filter({ hasText: 'Emoji font version' });
+    await expect(emojiRow).toContainText(/Renders up to Unicode|Not available/);
+  });
+
+  test('flags the automation running the test suite', async ({ page }) => {
+    await page.goto('/browser-fingerprint/');
+
+    const card = page.locator('#card-automation');
+    await expect(card).toContainText('under automation', { timeout: 15000 });
+    await expect(card).toContainText('navigator.webdriver is true');
+    await expect(card).toContainText('confirmed');
+  });
+
+  test('shows a defence line on the signals that have one', async ({ page }) => {
+    await page.goto('/browser-fingerprint/');
+    await expect(page.locator('#fp-id')).toHaveText(/^[0-9a-f]{32}$/, { timeout: 15000 });
+
+    const canvasRow = page.locator('#fp-results > div').filter({ hasText: 'Canvas rendering hash' });
+    await expect(canvasRow).toContainText('Defence: Tor Browser blocks canvas reads');
+
+    await expect(page.locator('main')).toContainText('Reducing your fingerprint');
+    await expect(page.locator('main')).toContainText('privacy.resistFingerprinting');
+  });
+
   test('is reachable from the featured row on the homepage', async ({ page }) => {
     await page.goto('/');
 

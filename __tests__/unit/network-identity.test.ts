@@ -191,7 +191,7 @@ describe('Tor detection (lib/network-identity)', () => {
     expect(verdict.clues[0].id).toBe('tor-exit');
   });
 
-  it('recognises a Tor Browser profile without the exit node tag', () => {
+  it('stops short of certainty for a Tor Browser profile without the exit node tag', () => {
     const verdict = detectTor(
       false,
       torClient({
@@ -207,9 +207,28 @@ describe('Tor detection (lib/network-identity)', () => {
         userAgent: 'Mozilla/5.0 (Windows NT 10.0; rv:128.0) Gecko/20100101 Firefox/128.0',
       })
     );
-    expect(verdict.confidence).toBe('confirmed');
+    expect(verdict.score).toBeGreaterThan(100);
+    expect(verdict.confidence).toBe('likely');
     expect(verdict.clues.map(clue => clue.id)).toContain('tor-letterbox');
     expect(verdict.clues.map(clue => clue.id)).toContain('tor-cores');
+  });
+
+  it('reserves certainty for a real exit node, since resistFingerprinting looks identical', () => {
+    const profile = torClient({
+      timezone: 'UTC',
+      languages: ['en-US', 'en'],
+      hardwareConcurrency: 2,
+      devicePixelRatio: 1,
+      innerWidth: 1000,
+      innerHeight: 900,
+      screenWidth: 1000,
+      pluginCount: 0,
+      webglRenderer: 'llvmpipe',
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; rv:128.0) Gecko/20100101 Firefox/128.0',
+    });
+
+    expect(detectTor(false, profile).confidence).toBe('likely');
+    expect(detectTor(true, profile).confidence).toBe('confirmed');
   });
 
   it('reports partial anti-fingerprinting without overclaiming', () => {
