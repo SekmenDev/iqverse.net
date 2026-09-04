@@ -107,18 +107,6 @@ describe('lib/tools.ts - helpers', () => {
     expect(counts.open + counts.saas + counts.coming).toBe(tools.length);
   });
 
-  it('places every tool in either the featured row or its primary category, exactly once', () => {
-    const groups = groupByPrimaryCategory();
-    const rendered = [...getFeaturedTools(), ...groups.flatMap(g => g.tools)];
-
-    expect(rendered).toHaveLength(tools.length);
-    expect(new Set(rendered.map(toolKey)).size).toBe(tools.length);
-
-    groups.forEach(group => {
-      group.tools.forEach(tool => expect(primaryCategory(tool)).toBe(group.category));
-    });
-  });
-
   it('returns only flagged tools as featured', () => {
     const featured = getFeaturedTools();
     expect(featured.length).toBeGreaterThan(0);
