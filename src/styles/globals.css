@@ -283,26 +283,6 @@ a:hover {
   height: 1rem;
 }
 
-.color-fields {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(120px, 1fr));
-  gap: 1rem;
-}
-
-.qr-preview {
-  display: grid;
-  gap: 1rem;
-  justify-items: center;
-  text-align: center;
-}
-
-.qr-preview canvas {
-  width: 280px;
-  height: 280px;
-  background: #fff;
-  border-radius: 1rem;
-}
-
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -317,11 +297,6 @@ a:hover {
 
 .btn-primary:hover {
   transform: translateY(-1px);
-}
-
-.helper-text {
-  color: var(--text-muted);
-  font-size: 0.95rem;
 }
 
 .match-summary {
@@ -347,10 +322,6 @@ a:hover {
 
 @media (max-width: 980px) {
   .tool-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .color-fields {
     grid-template-columns: 1fr;
   }
 }
@@ -396,72 +367,11 @@ textarea {
   resize: vertical;
 }
 
-/* Background effects */
-.bg-grid {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: 
-	linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-	linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 50px 50px;
-  pointer-events: none;
-  z-index: 0;
-}
-
-[data-theme='light'] .bg-grid {
-  background-image: 
-	linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px),
-	linear-gradient(90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
-}
-
-.bg-glow {
-  position: fixed;
-  border-radius: 50%;
-  opacity: 0.15;
-  mix-blend-mode: screen;
-  pointer-events: none;
-  z-index: 0;
-}
-
-[data-theme='light'] .bg-glow {
-  mix-blend-mode: multiply;
-  opacity: 0.04;
-}
-
-.bg-glow--1 {
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, var(--accent), transparent);
-  top: -200px;
-  right: -100px;
-}
-
-.bg-glow--2 {
-  width: 800px;
-  height: 800px;
-  background: radial-gradient(circle, #0066ff, transparent);
-  bottom: -300px;
-  left: -200px;
-}
-
 /* Layout Wrappers */
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 2rem;
-}
-
-.section-label {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 1.5rem;
 }
 
 .pill {
@@ -849,8 +759,7 @@ textarea {
 }
 
 /* Backward compatibility classes for JS manipulation */
-.sharedStyles_button,
-.button-secondary {
+.sharedStyles_button {
   border: none;
   border-radius: var(--radius-sm);
   padding: 0.75rem 1.25rem;
