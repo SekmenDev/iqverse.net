@@ -1,0 +1,229 @@
+.summary {
+  display: grid;
+  grid-template-columns: minmax(280px, 1.4fr) minmax(240px, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.summaryCard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+}
+
+.summaryLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.idValue {
+  font-family: var(--font-mono);
+  font-size: clamp(16px, 3.4vw, 26px);
+  font-weight: 700;
+  word-break: break-all;
+  line-height: 1.35;
+  margin: 8px 0 14px;
+  color: var(--text);
+}
+
+.idActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.gauge {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 8px 0 6px;
+}
+
+.gaugeValue {
+  font-family: var(--font-mono);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.gaugeUnit {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.gaugeTrack {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+  margin: 12px 0 10px;
+}
+
+.gaugeFill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.35s ease;
+}
+
+.gaugeNote {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.search {
+  flex: 1 1 220px;
+  min-width: 180px;
+}
+
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.chip:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.chip[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  color: var(--text);
+}
+
+.chipCount {
+  opacity: 0.6;
+  margin-left: 6px;
+}
+
+.groupHead {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 24px 0 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  border-radius: var(--radius-sm);
+  background: var(--card);
+}
+
+.badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.bits {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.rowLabel {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.rowValue {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.55;
+  word-break: break-word;
+  color: var(--text);
+  max-height: 4.7em;
+  overflow: hidden;
+}
+
+.rowValueOpen {
+  max-height: none;
+}
+
+.rowValueMuted {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.rowNote {
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-top: 6px;
+}
+
+.expand {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.empty {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--muted);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+}
+
+@media (max-width: 640px) {
+  .summary {
+    grid-template-columns: 1fr;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}

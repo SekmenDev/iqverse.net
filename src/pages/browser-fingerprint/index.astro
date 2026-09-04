@@ -1,0 +1,302 @@
+---
+import ToolLayout from '@/layouts/ToolLayout.astro';
+import sharedStyles from '@/styles/shared-tool-styles.module.css';
+import styles from '@/styles/fingerprint.module.css';
+import { IMPORTANCE_LABELS, IMPORTANCE_LEVELS } from '@/lib/fingerprint';
+---
+
+<ToolLayout
+  title="Browser Fingerprint & Privacy Inspector"
+  subtitle="Everything This Page Can Learn About You"
+  pill="PRIVACY"
+  toolSlug="browser-fingerprint"
+  description="See your browser fingerprint and every signal a website can read from your browser, ranked by how much each one identifies you. Runs entirely in your browser with nothing uploaded."
+>
+  <div style="max-width: 1100px;">
+    <section class={styles.summary}>
+      <div class={styles.summaryCard}>
+        <span class={styles.summaryLabel}>Fingerprint ID (SHA-256)</span>
+        <div class={styles.idValue} id="fp-id">Collecting signals…</div>
+        <div class={styles.idActions}>
+          <button type="button" id="btn-copy-id" class={sharedStyles.button}>Copy ID</button>
+          <button type="button" id="btn-copy-json" class={sharedStyles.button}>Copy JSON</button>
+          <button type="button" id="btn-download" class={sharedStyles.button}>Download JSON</button>
+          <button type="button" id="btn-rescan" class={sharedStyles.button}>Re-scan</button>
+        </div>
+      </div>
+
+      <div class={styles.summaryCard}>
+        <span class={styles.summaryLabel}>Identifiability</span>
+        <div class={styles.gauge}>
+          <span class={styles.gaugeValue} id="fp-bits">—</span>
+          <span class={styles.gaugeUnit}>bits of entropy</span>
+        </div>
+        <div class={styles.gaugeTrack}>
+          <div class={styles.gaugeFill} id="fp-gauge" style="width: 0%; background: var(--accent);"></div>
+        </div>
+        <p class={styles.gaugeNote} id="fp-verdict">
+          Measuring how far this browser stands out from the crowd.
+        </p>
+      </div>
+    </section>
+
+    <section class={sharedStyles.section}>
+      <div class={styles.toolbar}>
+        <input
+          type="search"
+          id="fp-search"
+          class={`${sharedStyles.input} ${styles.search}`}
+          placeholder="Filter signals…"
+          autocomplete="off"
+        />
+        <div class={styles.chipRow} id="fp-importance" role="group" aria-label="Filter by importance">
+          <button type="button" class={styles.chip} data-importance="all" aria-pressed="true">
+            All<span class={styles.chipCount} data-count="all"></span>
+          </button>
+          {IMPORTANCE_LEVELS.map(level => (
+            <button type="button" class={styles.chip} data-importance={level} aria-pressed="false">
+              {IMPORTANCE_LABELS[level]}<span class={styles.chipCount} data-count={level}></span>
+            </button>
+          ))}
+        </div>
+        <div class={styles.chipRow} id="fp-view" role="group" aria-label="Sort mode">
+          <button type="button" class={styles.chip} data-view="importance" aria-pressed="true">
+            By importance
+          </button>
+          <button type="button" class={styles.chip} data-view="group" aria-pressed="false">
+            By group
+          </button>
+        </div>
+      </div>
+
+      <div id="fp-results" class={styles.list}></div>
+
+      <div id="fp-empty" class={styles.empty} hidden>No signals match this filter.</div>
+    </section>
+
+    <section class={sharedStyles.section}>
+      <div class={sharedStyles.card}>
+        <h2 style="font-size: 1rem; margin-bottom: 10px;">How to read this</h2>
+        <p style="line-height: 1.65; margin-bottom: 10px;">
+          Entropy measures how much a signal narrows you down. Every bit halves the crowd you hide
+          in. Around 33 bits is enough to single out one person on Earth, so the total is capped
+          there. Real trackers reach a lower effective number because signals overlap, but the
+          ranking still shows which ones matter.
+        </p>
+        <p style="line-height: 1.65; margin-bottom: 10px;">
+          The fingerprint ID is a SHA-256 digest of the stable signals only. Values that shift
+          between page loads, like window size and network speed, are excluded so the ID stays the
+          same when you reload.
+        </p>
+        <p style="line-height: 1.65;">
+          Everything here is computed in your browser. No values are uploaded, logged or stored.
+        </p>
+      </div>
+    </section>
+  </div>
+</ToolLayout>
+
+<script>
+  import {
+    IMPORTANCE_COLORS,
+    IMPORTANCE_LABELS,
+    MAX_ENTROPY_BITS,
+    UNAVAILABLE,
+    collectSignals,
+    computeFingerprintId,
+    countByImportance,
+    describeUniqueness,
+    effectiveEntropyBits,
+    filterSignals,
+    groupSignals,
+    signalsToJson,
+    sortSignals,
+    totalEntropyBits,
+    type Importance,
+    type Signal,
+  } from '@/lib/fingerprint';
+  import styles from '@/styles/fingerprint.module.css';
+
+  const idEl = document.getElementById('fp-id');
+  const bitsEl = document.getElementById('fp-bits');
+  const gaugeEl = document.getElementById('fp-gauge');
+  const verdictEl = document.getElementById('fp-verdict');
+  const resultsEl = document.getElementById('fp-results');
+  const emptyEl = document.getElementById('fp-empty');
+  const searchEl = document.getElementById('fp-search') as HTMLInputElement | null;
+  const importanceButtons = document.querySelectorAll<HTMLButtonElement>('#fp-importance button[data-importance]');
+  const viewButtons = document.querySelectorAll<HTMLButtonElement>('#fp-view button[data-view]');
+  const copyIdBtn = document.getElementById('btn-copy-id');
+  const copyJsonBtn = document.getElementById('btn-copy-json');
+  const downloadBtn = document.getElementById('btn-download');
+  const rescanBtn = document.getElementById('btn-rescan');
+
+  let signals: Signal[] = [];
+  let fingerprintId = '';
+  let query = '';
+  let importance: Importance | 'all' = 'all';
+  let view: 'importance' | 'group' = 'importance';
+
+  function buildRow(signal: Signal): HTMLElement {
+    const row = document.createElement('div');
+    row.className = styles.row;
+    row.style.borderLeftColor = IMPORTANCE_COLORS[signal.importance];
+
+    const meta = document.createElement('div');
+    const badge = document.createElement('div');
+    badge.className = styles.badge;
+    badge.style.color = IMPORTANCE_COLORS[signal.importance];
+    badge.textContent = IMPORTANCE_LABELS[signal.importance];
+    const bits = document.createElement('div');
+    bits.className = styles.bits;
+    bits.textContent = `${signal.entropyBits} bits`;
+    meta.append(badge, bits);
+
+    const body = document.createElement('div');
+    const label = document.createElement('div');
+    label.className = styles.rowLabel;
+    label.textContent = signal.label;
+
+    const value = document.createElement('div');
+    const missing = signal.value === UNAVAILABLE;
+    value.className = missing ? `${styles.rowValue} ${styles.rowValueMuted}` : styles.rowValue;
+    value.textContent = signal.value;
+
+    const note = document.createElement('p');
+    note.className = styles.rowNote;
+    note.textContent = signal.note;
+
+    body.append(label, value, note);
+    row.append(meta, body);
+
+    if (signal.value.length > 220) {
+      const expand = document.createElement('button');
+      expand.type = 'button';
+      expand.className = styles.expand;
+      expand.textContent = 'Show full value';
+      expand.addEventListener('click', () => {
+        const open = value.classList.toggle(styles.rowValueOpen);
+        expand.textContent = open ? 'Show less' : 'Show full value';
+      });
+      body.insertBefore(expand, note);
+    }
+
+    return row;
+  }
+
+  function render() {
+    if (!resultsEl || !emptyEl) return;
+
+    const matched = filterSignals(signals, query, importance);
+    resultsEl.replaceChildren();
+    emptyEl.hidden = matched.length > 0;
+
+    if (view === 'group') {
+      for (const entry of groupSignals(matched)) {
+        const head = document.createElement('p');
+        head.className = styles.groupHead;
+        head.textContent = `${entry.group} · ${entry.signals.length}`;
+        resultsEl.append(head, ...entry.signals.map(buildRow));
+      }
+    } else {
+      resultsEl.append(...sortSignals(matched).map(buildRow));
+    }
+
+    importanceButtons.forEach(button => {
+      button.setAttribute('aria-pressed', button.dataset.importance === importance ? 'true' : 'false');
+    });
+    viewButtons.forEach(button => {
+      button.setAttribute('aria-pressed', button.dataset.view === view ? 'true' : 'false');
+    });
+  }
+
+  function renderSummary() {
+    const counts = countByImportance(signals);
+    document.querySelectorAll<HTMLElement>('[data-count]').forEach(element => {
+      const key = element.dataset.count as Importance | 'all' | undefined;
+      element.textContent = key ? ` ${counts[key]}` : '';
+    });
+
+    const effective = effectiveEntropyBits(signals);
+    const verdict = describeUniqueness(effective);
+
+    if (idEl) idEl.textContent = fingerprintId;
+    if (bitsEl) {
+      bitsEl.textContent = String(verdict.bits);
+      bitsEl.style.color = verdict.color;
+    }
+    if (gaugeEl) {
+      gaugeEl.style.width = `${Math.min(100, (effective / MAX_ENTROPY_BITS) * 100)}%`;
+      gaugeEl.style.background = verdict.color;
+    }
+    if (verdictEl) {
+      verdictEl.textContent = `${verdict.rating} identifiability. ${verdict.summary} Raw sum across ${signals.length} signals is ${totalEntropyBits(signals)} bits.`;
+    }
+  }
+
+  async function scan() {
+    if (idEl) idEl.textContent = 'Collecting signals…';
+    try {
+      signals = await collectSignals();
+      fingerprintId = await computeFingerprintId(signals);
+    } catch {
+      signals = [];
+      fingerprintId = 'Collection failed';
+    }
+    renderSummary();
+    render();
+  }
+
+  async function copyText(button: HTMLElement, value: string) {
+    const original = button.textContent;
+    try {
+      await navigator.clipboard.writeText(value);
+      button.textContent = 'Copied';
+    } catch {
+      button.textContent = 'Copy failed';
+    }
+    setTimeout(() => {
+      button.textContent = original;
+    }, 1400);
+  }
+
+  searchEl?.addEventListener('input', () => {
+    query = searchEl.value;
+    render();
+  });
+
+  importanceButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      importance = (button.dataset.importance ?? 'all') as Importance | 'all';
+      render();
+    });
+  });
+
+  viewButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      view = button.dataset.view === 'group' ? 'group' : 'importance';
+      render();
+    });
+  });
+
+  copyIdBtn?.addEventListener('click', () => copyText(copyIdBtn, fingerprintId));
+  copyJsonBtn?.addEventListener('click', () =>
+    copyText(copyJsonBtn, signalsToJson(signals, fingerprintId))
+  );
+
+  downloadBtn?.addEventListener('click', () => {
+    const blob = new Blob([signalsToJson(signals, fingerprintId)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `browser-fingerprint-${fingerprintId.slice(0, 12)}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  });
+
+  rescanBtn?.addEventListener('click', () => {
+    void scan();
+  });
+
+  void scan();
+</script>

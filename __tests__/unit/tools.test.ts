@@ -3,6 +3,7 @@ import {
   CATEGORIES,
   countByCategory,
   countByStatus,
+  getFeaturedTools,
   getUniqueCategories,
   getUniqueStatuses,
   groupByPrimaryCategory,
@@ -10,6 +11,7 @@ import {
   matchesFilters,
   primaryCategory,
   sortTools,
+  toolKey,
   tools,
   TOOL_TYPES,
   type Tool,
@@ -105,14 +107,22 @@ describe('lib/tools.ts - helpers', () => {
     expect(counts.open + counts.saas + counts.coming).toBe(tools.length);
   });
 
-  it('groups every tool under its primary category exactly once', () => {
+  it('places every tool in either the featured row or its primary category, exactly once', () => {
     const groups = groupByPrimaryCategory();
-    const grouped = groups.flatMap(g => g.tools);
-    expect(grouped).toHaveLength(tools.length);
+    const rendered = [...getFeaturedTools(), ...groups.flatMap(g => g.tools)];
+
+    expect(rendered).toHaveLength(tools.length);
+    expect(new Set(rendered.map(toolKey)).size).toBe(tools.length);
 
     groups.forEach(group => {
       group.tools.forEach(tool => expect(primaryCategory(tool)).toBe(group.category));
     });
+  });
+
+  it('returns only flagged tools as featured', () => {
+    const featured = getFeaturedTools();
+    expect(featured.length).toBeGreaterThan(0);
+    featured.forEach(tool => expect(tool.featured).toBe(true));
   });
 
   it('matches a tool on any of its categories, not just the primary', () => {
