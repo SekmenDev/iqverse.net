@@ -8,7 +8,7 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   subtitle="Offline Password Security & Crack Time Evaluator"
   pill="SECURITY"
   toolSlug="password-analyzer"
-  description="Evaluate password security strength, bit entropy score, pattern detection and estimated crack time entirely offline."
+  description="Score password strength with zxcvbn pattern matching against breached passwords, dictionary words, keyboard runs and dates, entirely offline."
 >
   <div style="max-width: 1000px;">
     <section class={sharedStyles.section}>
@@ -34,60 +34,99 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
             class={sharedStyles.input}
             style="font-family: monospace; font-size: 1.2rem;"
             placeholder="Enter a password to test..."
+            autocomplete="off"
+            spellcheck="false"
           />
         </div>
 
-        <!-- Score Indicator -->
         <div
           id="score-box"
-          style="padding: 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid #4caf50; margin-top: 20px; margin-bottom: 20px;"
+          style="padding: 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); margin-top: 20px; margin-bottom: 20px;"
         >
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
             <div>
-              <span style="font-size: 0.85rem; opacity: 0.8;">Bit Entropy:</span>
-              <span id="entropy-value" style="font-size: 1.8rem; font-weight: bold; margin-left: 12px; color: #4caf50; font-family: monospace;">
+              <span style="font-size: 0.85rem; opacity: 0.8;">Guess Entropy:</span>
+              <span
+                id="entropy-value"
+                style="font-size: 1.8rem; font-weight: bold; margin-left: 12px; font-family: monospace;"
+              >
                 0 <span style="font-size: 1rem;">bits</span>
               </span>
             </div>
             <span
               id="rating-badge"
-              style="padding: 6px 16px; border-radius: 16px; font-weight: bold; background: rgba(76, 175, 80, 0.15); color: #4caf50; border: 1px solid #4caf50;"
+              style="padding: 6px 16px; border-radius: 16px; font-weight: bold; border: 1px solid var(--border);"
             >
-              Strong
+              Analyzing...
             </span>
           </div>
 
-          <!-- Character pool check -->
+          <div
+            style="display: flex; gap: 4px; margin-bottom: 12px;"
+            aria-hidden="true"
+          >
+            <div class="strength-segment" data-index="0"></div>
+            <div class="strength-segment" data-index="1"></div>
+            <div class="strength-segment" data-index="2"></div>
+            <div class="strength-segment" data-index="3"></div>
+            <div class="strength-segment" data-index="4"></div>
+          </div>
+
           <div style="display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.85rem;">
-            <div id="check-lower" style="color: #4caf50;">✓ Lowercase (a-z)</div>
-            <div id="check-upper" style="color: #4caf50;">✓ Uppercase (A-Z)</div>
-            <div id="check-digit" style="color: #4caf50;">✓ Digits (0-9)</div>
-            <div id="check-symbol" style="color: #4caf50;">✓ Symbols (!@#$)</div>
+            <div id="check-lower">Lowercase (a-z)</div>
+            <div id="check-upper">Uppercase (A-Z)</div>
+            <div id="check-digit">Digits (0-9)</div>
+            <div id="check-symbol">Symbols (!@#$)</div>
           </div>
         </div>
 
-        <!-- Crack Time Estimates -->
+        <div id="feedback-box" hidden style="margin-bottom: 20px;">
+          <h4 style="margin-bottom: 8px;">Feedback</h4>
+          <div
+            id="feedback-warning"
+            hidden
+            style="padding: 10px 12px; border-radius: 6px; margin-bottom: 8px; font-weight: 600;"
+          >
+          </div>
+          <ul id="feedback-suggestions" style="margin: 0; padding-left: 20px; font-size: 0.9rem; opacity: 0.85;"></ul>
+        </div>
+
+        <div id="patterns-box" hidden style="margin-bottom: 20px;">
+          <h4 style="margin-bottom: 8px;">Detected Patterns</h4>
+          <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 0; margin-bottom: 10px;">
+            Cracking tools try these before brute force, so each match cuts the real search space.
+          </p>
+          <div id="patterns-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
+        </div>
+
         <div>
-          <h4 style="margin-bottom: 12px;">Estimated Time to Crack (Brute Force)</h4>
+          <h4 style="margin-bottom: 12px;">Estimated Time to Crack</h4>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
             <div style="padding: 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
-              <div style="font-size: 0.75rem; opacity: 0.7;">Offline Fast GPU Hash (100B/sec)</div>
-              <div id="offline-time" style="font-size: 1.1rem; font-weight: bold; margin-top: 4px; color: #4caf50;">
-                Instant
+              <div style="font-size: 0.75rem; opacity: 0.7;">Offline fast hash, MD5 or SHA-1 (10B/sec)</div>
+              <div id="offline-fast-time" style="font-size: 1.1rem; font-weight: bold; margin-top: 4px;">
+                &mdash;
               </div>
             </div>
 
             <div style="padding: 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
-              <div style="font-size: 0.75rem; opacity: 0.7;">Online Fast API (1,000 req/sec)</div>
-              <div id="online-fast-time" style="font-size: 1.1rem; font-weight: bold; margin-top: 4px;">
-                Instant
+              <div style="font-size: 0.75rem; opacity: 0.7;">Offline slow hash, bcrypt (10K/sec)</div>
+              <div id="offline-slow-time" style="font-size: 1.1rem; font-weight: bold; margin-top: 4px;">
+                &mdash;
               </div>
             </div>
 
             <div style="padding: 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
-              <div style="font-size: 0.75rem; opacity: 0.7;">Online Throttled API (10 req/sec)</div>
-              <div id="online-slow-time" style="font-size: 1.1rem; font-weight: bold; margin-top: 4px;">
-                Instant
+              <div style="font-size: 0.75rem; opacity: 0.7;">Online, no throttling (10/sec)</div>
+              <div id="online-time" style="font-size: 1.1rem; font-weight: bold; margin-top: 4px;">
+                &mdash;
+              </div>
+            </div>
+
+            <div style="padding: 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);">
+              <div style="font-size: 0.75rem; opacity: 0.7;">Online, throttled (100/hour)</div>
+              <div id="online-throttled-time" style="font-size: 1.1rem; font-weight: bold; margin-top: 4px;">
+                &mdash;
               </div>
             </div>
           </div>
@@ -97,8 +136,18 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   </div>
 </ToolLayout>
 
+<style>
+  .strength-segment {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(128, 128, 128, 0.25);
+    transition: background 0.15s ease;
+  }
+</style>
+
 <script>
-  import { analyzePasswordStrength } from '@/lib/password-analyzer';
+  import type { PasswordAnalysis } from '@/lib/password-analyzer';
 
   const pwdInput = document.getElementById('pwdInput') as HTMLInputElement;
   const pwdInputLabel = document.getElementById('pwdInputLabel');
@@ -106,29 +155,35 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
   const scoreBox = document.getElementById('score-box');
   const entropyVal = document.getElementById('entropy-value');
   const ratingBadge = document.getElementById('rating-badge');
+  const segments = document.querySelectorAll<HTMLElement>('.strength-segment');
   const checkLower = document.getElementById('check-lower');
   const checkUpper = document.getElementById('check-upper');
   const checkDigit = document.getElementById('check-digit');
   const checkSymbol = document.getElementById('check-symbol');
-  const offlineTime = document.getElementById('offline-time');
-  const onlineFastTime = document.getElementById('online-fast-time');
-  const onlineSlowTime = document.getElementById('online-slow-time');
+  const feedbackBox = document.getElementById('feedback-box');
+  const feedbackWarning = document.getElementById('feedback-warning');
+  const feedbackSuggestions = document.getElementById('feedback-suggestions');
+  const patternsBox = document.getElementById('patterns-box');
+  const patternsList = document.getElementById('patterns-list');
+  const offlineFastTime = document.getElementById('offline-fast-time');
+  const offlineSlowTime = document.getElementById('offline-slow-time');
+  const onlineTime = document.getElementById('online-time');
+  const onlineThrottledTime = document.getElementById('online-throttled-time');
 
   let showPwd = true;
-  if (btnToggle && pwdInput) {
-    btnToggle.addEventListener('click', () => {
-      showPwd = !showPwd;
-      pwdInput.type = showPwd ? 'text' : 'password';
-      btnToggle.textContent = showPwd ? 'Hide Password' : 'Show Password';
-    });
+  btnToggle?.addEventListener('click', () => {
+    showPwd = !showPwd;
+    pwdInput.type = showPwd ? 'text' : 'password';
+    btnToggle.textContent = showPwd ? 'Hide Password' : 'Show Password';
+  });
+
+  function setCheck(element: HTMLElement | null, active: boolean, label: string) {
+    if (!element) return;
+    element.textContent = `${active ? '✓' : '✕'} ${label}`;
+    element.style.color = active ? '#4caf50' : '#888';
   }
 
-  function analyze() {
-    const password = pwdInput?.value || '';
-    if (pwdInputLabel) pwdInputLabel.textContent = `Password Input (${password.length} characters)`;
-
-    const res = analyzePasswordStrength(password);
-
+  function render(res: PasswordAnalysis) {
     if (scoreBox) scoreBox.style.borderColor = res.color;
     if (entropyVal) {
       entropyVal.innerHTML = `${res.entropy} <span style="font-size: 1rem;">bits</span>`;
@@ -141,29 +196,78 @@ import sharedStyles from '@/styles/shared-tool-styles.module.css';
       ratingBadge.style.background = `${res.color}22`;
     }
 
-    if (checkLower) {
-      checkLower.textContent = `${res.hasLower ? '✓' : '✕'} Lowercase (a-z)`;
-      checkLower.style.color = res.hasLower ? '#4caf50' : '#888';
-    }
-    if (checkUpper) {
-      checkUpper.textContent = `${res.hasUpper ? '✓' : '✕'} Uppercase (A-Z)`;
-      checkUpper.style.color = res.hasUpper ? '#4caf50' : '#888';
-    }
-    if (checkDigit) {
-      checkDigit.textContent = `${res.hasDigit ? '✓' : '✕'} Digits (0-9)`;
-      checkDigit.style.color = res.hasDigit ? '#4caf50' : '#888';
-    }
-    if (checkSymbol) {
-      checkSymbol.textContent = `${res.hasSymbol ? '✓' : '✕'} Symbols (!@#$)`;
-      checkSymbol.style.color = res.hasSymbol ? '#4caf50' : '#888';
-    }
+    segments.forEach((segment, index) => {
+      const filled = res.length > 0 && index <= res.score;
+      segment.style.background = filled ? res.color : 'rgba(128, 128, 128, 0.25)';
+    });
 
-    if (offlineTime) {
-      offlineTime.textContent = res.crackTimeOffline;
-      offlineTime.style.color = res.color;
+    setCheck(checkLower, res.hasLower, 'Lowercase (a-z)');
+    setCheck(checkUpper, res.hasUpper, 'Uppercase (A-Z)');
+    setCheck(checkDigit, res.hasDigit, 'Digits (0-9)');
+    setCheck(checkSymbol, res.hasSymbol, 'Symbols (!@#$)');
+
+    if (feedbackWarning) {
+      feedbackWarning.hidden = res.warning === '';
+      feedbackWarning.textContent = res.warning;
+      feedbackWarning.style.color = res.color;
+      feedbackWarning.style.background = `${res.color}18`;
+      feedbackWarning.style.border = `1px solid ${res.color}`;
     }
-    if (onlineFastTime) onlineFastTime.textContent = res.crackTimeOnlineFast;
-    if (onlineSlowTime) onlineSlowTime.textContent = res.crackTimeOnlineSlow;
+    if (feedbackSuggestions) {
+      feedbackSuggestions.replaceChildren(
+        ...res.suggestions.map((text) => {
+          const item = document.createElement('li');
+          item.textContent = text;
+          return item;
+        })
+      );
+    }
+    if (feedbackBox) feedbackBox.hidden = res.warning === '' && res.suggestions.length === 0;
+
+    if (patternsList) {
+      patternsList.replaceChildren(
+        ...res.patterns.map((pattern) => {
+          const row = document.createElement('div');
+          row.style.cssText =
+            'padding: 8px 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); font-size: 0.85rem; display: flex; gap: 10px; flex-wrap: wrap; align-items: baseline;';
+
+          const token = document.createElement('code');
+          token.textContent = pattern.token;
+          token.style.cssText = 'font-family: monospace; font-weight: bold;';
+
+          const label = document.createElement('span');
+          label.textContent = pattern.label;
+          label.style.cssText = 'font-weight: 600;';
+
+          const detail = document.createElement('span');
+          detail.textContent = pattern.detail;
+          detail.style.cssText = 'opacity: 0.7;';
+
+          row.append(token, label, detail);
+          return row;
+        })
+      );
+    }
+    if (patternsBox) patternsBox.hidden = res.patterns.length === 0;
+
+    if (offlineFastTime) {
+      offlineFastTime.textContent = res.crackTimeOfflineFast;
+      offlineFastTime.style.color = res.color;
+    }
+    if (offlineSlowTime) offlineSlowTime.textContent = res.crackTimeOfflineSlow;
+    if (onlineTime) onlineTime.textContent = res.crackTimeOnline;
+    if (onlineThrottledTime) onlineThrottledTime.textContent = res.crackTimeOnlineThrottled;
+  }
+
+  const analyzerModule = import('@/lib/password-analyzer');
+
+  async function analyze() {
+    const password = pwdInput?.value ?? '';
+    if (pwdInputLabel) pwdInputLabel.textContent = `Password Input (${password.length} characters)`;
+
+    const { analyzePassword } = await analyzerModule;
+    if (pwdInput.value !== password) return;
+    render(analyzePassword(password));
   }
 
   pwdInput?.addEventListener('input', analyze);

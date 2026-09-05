@@ -1,131 +1,205 @@
-export interface PasswordStats {
-  entropy: number;
-  charsetSize: number;
+import { ZxcvbnFactory } from '@zxcvbn-ts/core';
+import type {
+  DateMatch,
+  DictionaryMatch,
+  MatchExtended,
+  OptionsGraph,
+  RegexMatch,
+  RepeatMatch,
+  SequenceMatch,
+  SpatialMatch,
+  WordSequenceMatch,
+} from '@zxcvbn-ts/core';
+import { adjacencyGraphs, dictionary as commonDictionary } from '@zxcvbn-ts/language-common';
+import { dictionary as englishDictionary, translations } from '@zxcvbn-ts/language-en';
+
+export type PasswordRating = 'Very Weak' | 'Weak' | 'Medium' | 'Strong' | 'Very Strong';
+
+export interface CharacterSets {
   hasLower: boolean;
   hasUpper: boolean;
   hasDigit: boolean;
   hasSymbol: boolean;
-  rating: 'Very Weak' | 'Weak' | 'Medium' | 'Strong' | 'Very Strong';
-  color: string;
-  offlineCrackTime: string;
-  onlineFastCrackTime: string;
-  onlineSlowCrackTime: string;
+  charsetSize: number;
 }
 
-export function calculatePasswordEntropy(pwd: string): {
-  entropy: number;
-  charsetSize: number;
-  hasLower: boolean;
-  hasUpper: boolean;
-  hasDigit: boolean;
-  hasSymbol: boolean;
-} {
-  let charsetSize = 0;
-  const hasLower = /[a-z]/.test(pwd);
-  const hasUpper = /[A-Z]/.test(pwd);
-  const hasDigit = /[0-9]/.test(pwd);
-  const hasSymbol = /[^a-zA-Z0-9]/.test(pwd);
+export interface DetectedPattern {
+  token: string;
+  label: string;
+  detail: string;
+}
 
+export interface PasswordAnalysis extends CharacterSets {
+  length: number;
+  score: 0 | 1 | 2 | 3 | 4;
+  rating: PasswordRating;
+  color: string;
+  entropy: number;
+  guesses: number;
+  crackTimeOfflineFast: string;
+  crackTimeOfflineSlow: string;
+  crackTimeOnline: string;
+  crackTimeOnlineThrottled: string;
+  warning: string;
+  suggestions: string[];
+  patterns: DetectedPattern[];
+}
+
+const RATINGS: Record<number, { rating: PasswordRating; color: string }> = {
+  0: { rating: 'Very Weak', color: '#ff4d4f' },
+  1: { rating: 'Weak', color: '#ff9800' },
+  2: { rating: 'Medium', color: '#faad14' },
+  3: { rating: 'Strong', color: '#8bc34a' },
+  4: { rating: 'Very Strong', color: '#4caf50' },
+};
+
+const DICTIONARY_LABELS: Record<string, string> = {
+  passwords: 'Breached password',
+  commonWords: 'Common English word',
+  firstnames: 'Common first name',
+  lastnames: 'Common last name',
+  wikipedia: 'Wikipedia term',
+  diceware: 'Diceware word',
+  userInputs: 'Site or personal term',
+};
+
+const zxcvbn = new ZxcvbnFactory({
+  translations,
+  graphs: adjacencyGraphs as unknown as OptionsGraph,
+  dictionary: { ...commonDictionary, ...englishDictionary },
+  useLevenshteinDistance: true,
+});
+
+export function getCharacterSets(password: string): CharacterSets {
+  const hasLower = /[a-z]/.test(password);
+  const hasUpper = /[A-Z]/.test(password);
+  const hasDigit = /[0-9]/.test(password);
+  const hasSymbol = /[^a-zA-Z0-9]/.test(password);
+
+  let charsetSize = 0;
   if (hasLower) charsetSize += 26;
   if (hasUpper) charsetSize += 26;
   if (hasDigit) charsetSize += 10;
-  if (hasSymbol) charsetSize += 32;
+  if (hasSymbol) charsetSize += 33;
 
-  if (pwd.length === 0 || charsetSize === 0) {
-    return { entropy: 0, charsetSize: 0, hasLower, hasUpper, hasDigit, hasSymbol };
+  return { hasLower, hasUpper, hasDigit, hasSymbol, charsetSize };
+}
+
+function labelDictionary(name: string): string {
+  const base = name.replace(/-(common|en)$/, '');
+  return DICTIONARY_LABELS[base] ?? 'Dictionary word';
+}
+
+function describeMatch(match: MatchExtended): DetectedPattern | null {
+  switch (match.pattern) {
+    case 'dictionary': {
+      const entry = match as DictionaryMatch;
+      const notes = [`ranked #${entry.rank}`];
+      if (entry.l33t) notes.push('leetspeak substitutions do not help');
+      if (entry.reversed) notes.push('reversed spelling does not help');
+      return {
+        token: entry.token,
+        label: labelDictionary(entry.dictionaryName),
+        detail: notes.join(', '),
+      };
+    }
+    case 'spatial': {
+      const entry = match as SpatialMatch;
+      const turns = entry.turns === 1 ? 'straight run' : `${entry.turns} turns`;
+      return {
+        token: entry.token,
+        label: 'Keyboard pattern',
+        detail: `${entry.graph} layout, ${turns}`,
+      };
+    }
+    case 'repeat': {
+      const entry = match as RepeatMatch;
+      const base = Array.isArray(entry.baseToken) ? entry.baseToken.join('') : entry.baseToken;
+      return {
+        token: entry.token,
+        label: 'Repeated characters',
+        detail: `"${base}" repeated ${entry.repeatCount} times`,
+      };
+    }
+    case 'sequence': {
+      const entry = match as SequenceMatch;
+      return {
+        token: entry.token,
+        label: 'Predictable sequence',
+        detail: `${entry.sequenceName}, ${entry.ascending ? 'ascending' : 'descending'}`,
+      };
+    }
+    case 'wordSequence': {
+      const entry = match as WordSequenceMatch;
+      return {
+        token: entry.token,
+        label: 'Word sequence',
+        detail: `${entry.wordCount} related words in order`,
+      };
+    }
+    case 'date': {
+      const entry = match as DateMatch;
+      return { token: entry.token, label: 'Date', detail: `looks like the year ${entry.year}` };
+    }
+    case 'regex': {
+      const entry = match as RegexMatch;
+      return {
+        token: entry.token,
+        label: entry.regexName === 'recentYear' ? 'Recent year' : 'Predictable format',
+        detail: 'guessed early by cracking tools',
+      };
+    }
+    default:
+      return null;
+  }
+}
+
+export function analyzePassword(password: string, userInputs: string[] = []): PasswordAnalysis {
+  const sets = getCharacterSets(password);
+
+  if (password.length === 0) {
+    return {
+      ...sets,
+      length: 0,
+      score: 0,
+      rating: 'Very Weak',
+      color: RATINGS[0].color,
+      entropy: 0,
+      guesses: 0,
+      crackTimeOfflineFast: 'less than a second',
+      crackTimeOfflineSlow: 'less than a second',
+      crackTimeOnline: 'less than a second',
+      crackTimeOnlineThrottled: 'less than a second',
+      warning: '',
+      suggestions: ['Enter a password to analyze it.'],
+      patterns: [],
+    };
   }
 
-  const entropy = Math.round(pwd.length * Math.log2(charsetSize) * 10) / 10;
-  return { entropy, charsetSize, hasLower, hasUpper, hasDigit, hasSymbol };
-}
+  const result = zxcvbn.check(password, userInputs);
+  const { rating, color } = RATINGS[result.score];
 
-export function formatCrackTime(seconds: number): string {
-  if (seconds < 1) return 'Instant';
-  if (seconds < 60) return `${Math.round(seconds)} seconds`;
-  const mins = Math.round(seconds / 60);
-  if (mins < 60) return `${mins} minutes`;
-  const hours = Math.round(mins / 60);
-  if (hours < 24) return `${hours} hours`;
-  const days = Math.round(hours / 24);
-  if (days < 365) return `${days} days`;
-  const years = Math.round(days / 365);
-  if (years < 1000) return `${years} years`;
-  if (years < 1000000) return `${Math.round(years / 1000)} thousand years`;
-  return `${Math.round(years / 1000000)} million years`;
-}
-
-export function analyzePassword(password: string): PasswordStats {
-  const stats = calculatePasswordEntropy(password);
-  const combinations = Math.pow(stats.charsetSize, password.length);
-
-  const offlineSec = combinations / 1e11;
-  const onlineFastSec = combinations / 1000;
-  const onlineSlowSec = combinations / 10;
-
-  let rating: PasswordStats['rating'] = 'Weak';
-  let color = '#ff4d4f';
-
-  if (stats.entropy >= 80) {
-    rating = 'Very Strong';
-    color = '#4caf50';
-  } else if (stats.entropy >= 60) {
-    rating = 'Strong';
-    color = '#8bc34a';
-  } else if (stats.entropy >= 40) {
-    rating = 'Medium';
-    color = '#faad14';
-  } else if (stats.entropy >= 20) {
-    rating = 'Weak';
-    color = '#ff9800';
-  } else {
-    rating = 'Very Weak';
-    color = '#ff4d4f';
+  const suggestions = [...result.feedback.suggestions];
+  if (password.length < 12) {
+    suggestions.unshift('Use at least 12 characters. Length beats complexity.');
   }
 
   return {
-    ...stats,
+    ...sets,
+    length: password.length,
+    score: result.score,
     rating,
     color,
-    offlineCrackTime: formatCrackTime(offlineSec),
-    onlineFastCrackTime: formatCrackTime(onlineFastSec),
-    onlineSlowCrackTime: formatCrackTime(onlineSlowSec),
-  };
-}
-
-export function analyzePasswordStrength(password: string): PasswordStats & {
-  strength: 'very_weak' | 'weak' | 'medium' | 'strong' | 'very_strong';
-  score: number;
-  entropy: number;
-  crackTime: string;
-  crackTimeOffline: string;
-  crackTimeOnlineFast: string;
-  crackTimeOnlineSlow: string;
-  feedback: string[];
-} {
-  const stats = analyzePassword(password);
-  let strength: 'very_weak' | 'weak' | 'medium' | 'strong' | 'very_strong' = 'weak';
-  const score = Math.min(100, Math.round(stats.entropy));
-
-  if (stats.rating === 'Very Strong') strength = 'very_strong';
-  else if (stats.rating === 'Strong') strength = 'strong';
-  else if (stats.rating === 'Medium') strength = 'medium';
-  else if (stats.rating === 'Weak') strength = 'weak';
-  else strength = 'very_weak';
-
-  const feedback: string[] = [];
-  if (password.length < 8) feedback.push('Length should be at least 8 characters');
-  if (!stats.hasUpper) feedback.push('Add uppercase letters');
-  if (!stats.hasSymbol) feedback.push('Add special symbols');
-
-  return {
-    ...stats,
-    strength,
-    score,
-    entropy: stats.entropy,
-    crackTime: stats.offlineCrackTime,
-    crackTimeOffline: stats.offlineCrackTime,
-    crackTimeOnlineFast: stats.onlineFastCrackTime,
-    crackTimeOnlineSlow: stats.onlineSlowCrackTime,
-    feedback,
+    entropy: Math.round(result.guessesLog10 * Math.log2(10) * 10) / 10,
+    guesses: result.guesses,
+    crackTimeOfflineFast: result.crackTimes.offlineFastHashingXPerSecond.display,
+    crackTimeOfflineSlow: result.crackTimes.offlineSlowHashingXPerSecond.display,
+    crackTimeOnline: result.crackTimes.onlineNoThrottlingXPerSecond.display,
+    crackTimeOnlineThrottled: result.crackTimes.onlineThrottlingXPerHour.display,
+    warning: result.feedback.warning ?? '',
+    suggestions,
+    patterns: result.sequence
+      .map(describeMatch)
+      .filter((pattern): pattern is DetectedPattern => pattern !== null),
   };
 }

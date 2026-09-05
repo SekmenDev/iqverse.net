@@ -128,7 +128,7 @@ IQVerse organizes tools into intuitive categories. Below is the full directory o
 | Tool Name | Route / Link | Status | Description |
 | :--- | :--- | :--- | :--- |
 | **Password Generator** | [`/password/`](https://iqverse.net/password/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Cryptographically secure password & secret generator (WebCrypto API) |
-| **Password Analyzer** | [`/password-analyzer/`](https://iqverse.net/password-analyzer/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Evaluate password strength, bit entropy and crack time offline |
+| **Password Analyzer** | [`/password-analyzer/`](https://iqverse.net/password-analyzer/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Score passwords with zxcvbn pattern matching, entropy and crack time offline |
 | **Hashing** | [`/hashing/`](https://iqverse.net/hashing/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Compute SHA digests and HMAC values locally in hex or Base64 |
 | **File Hash Verifier** | [`/file-hash/`](https://iqverse.net/file-hash/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Calculate and compare MD5, SHA-1, SHA-256 and SHA-512 file hashes |
 | **SRI Hash Generator** | [`/sri-generator/`](https://iqverse.net/sri-generator/) | ![Live](https://img.shields.io/badge/✦_Live-10B981?style=flat-square) | Generate and verify Subresource Integrity hashes for CDN scripts and styles |
