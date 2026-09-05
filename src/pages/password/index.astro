@@ -64,69 +64,81 @@ const AMBIGUOUS = '{}[]()/\\\'"`~,;:.<>?';
             id="customSymbols"
             type="text"
             placeholder="Leave blank for default symbols"
-            class={sharedStyles.textarea}
+            class={sharedStyles.input}
           />
         </div>
 
         <div class={sharedStyles.field}>
           <div class={sharedStyles.fieldLabel}>Prefix / Suffix</div>
-          <div style="display: grid; gap: 0.75rem;">
-            <label for="pwdPrefix" class={sharedStyles.fieldLabel}>Prefix</label>
-            <input
-              id="pwdPrefix"
-              type="text"
-              placeholder="Prefix"
-              class={sharedStyles.textarea}
-            />
-            <label for="pwdSuffix" class={sharedStyles.fieldLabel}>Suffix</label>
-            <input
-              id="pwdSuffix"
-              type="text"
-              placeholder="Suffix"
-              class={sharedStyles.textarea}
-            />
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem;">
+            <div>
+              <label for="pwdPrefix" class={sharedStyles.fieldLabel}>Prefix</label>
+              <input
+                id="pwdPrefix"
+                type="text"
+                placeholder="Prefix"
+                class={sharedStyles.input}
+              />
+            </div>
+            <div>
+              <label for="pwdSuffix" class={sharedStyles.fieldLabel}>Suffix</label>
+              <input
+                id="pwdSuffix"
+                type="text"
+                placeholder="Suffix"
+                class={sharedStyles.input}
+              />
+            </div>
           </div>
         </div>
 
         <div class={sharedStyles.field}>
           <div class={sharedStyles.fieldLabel}>Minimum counts</div>
-          <div style="display: grid; gap: 0.75rem;">
-            <label for="minUpper" class={sharedStyles.fieldLabel}>Uppercase min</label>
-            <input
-              id="minUpper"
-              type="number"
-              min="0"
-              max="128"
-              value="1"
-              class={sharedStyles.textarea}
-            />
-            <label for="minLower" class={sharedStyles.fieldLabel}>Lowercase min</label>
-            <input
-              id="minLower"
-              type="number"
-              min="0"
-              max="128"
-              value="1"
-              class={sharedStyles.textarea}
-            />
-            <label for="minDigits" class={sharedStyles.fieldLabel}>Digits min</label>
-            <input
-              id="minDigits"
-              type="number"
-              min="0"
-              max="128"
-              value="1"
-              class={sharedStyles.textarea}
-            />
-            <label for="minSymbols" class={sharedStyles.fieldLabel}>Symbols min</label>
-            <input
-              id="minSymbols"
-              type="number"
-              min="0"
-              max="128"
-              value="1"
-              class={sharedStyles.textarea}
-            />
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;">
+            <div>
+              <label for="minUpper" class={sharedStyles.fieldLabel}>Uppercase min</label>
+              <input
+                id="minUpper"
+                type="number"
+                min="0"
+                max="128"
+                value="1"
+                class={sharedStyles.input}
+              />
+            </div>
+            <div>
+              <label for="minLower" class={sharedStyles.fieldLabel}>Lowercase min</label>
+              <input
+                id="minLower"
+                type="number"
+                min="0"
+                max="128"
+                value="1"
+                class={sharedStyles.input}
+              />
+            </div>
+            <div>
+              <label for="minDigits" class={sharedStyles.fieldLabel}>Digits min</label>
+              <input
+                id="minDigits"
+                type="number"
+                min="0"
+                max="128"
+                value="1"
+                class={sharedStyles.input}
+              />
+            </div>
+            <div>
+              <label for="minSymbols" class={sharedStyles.fieldLabel}>Symbols min</label>
+              <input
+                id="minSymbols"
+                type="number"
+                min="0"
+                max="128"
+                value="1"
+                class={sharedStyles.input}
+              />
+            </div>
           </div>
         </div>
 
