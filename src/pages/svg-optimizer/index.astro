@@ -60,15 +60,35 @@ const SAMPLE_SVG = `<?xml version="1.0" encoding="utf-8"?>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
           <div class={sharedStyles.field}>
-            <label class={sharedStyles.fieldLabel} for="svgInput">
-              Raw SVG Code Input
-            </label>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+              <label class={sharedStyles.fieldLabel} for="svgInput" style="margin-bottom: 0;">
+                Raw SVG Code Input
+              </label>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <input
+                  type="file"
+                  id="svgFileInput"
+                  accept=".svg,image/svg+xml"
+                  style="display: none;"
+                />
+                <button type="button" id="btn-upload-svg" class={sharedStyles.button}>
+                  Upload File
+                </button>
+                <button type="button" id="btn-clear-svg" class={sharedStyles.button}>
+                  Clear
+                </button>
+              </div>
+            </div>
             <textarea
               id="svgInput"
               class={sharedStyles.textarea}
               rows="12"
+              placeholder="Paste SVG code or drop an SVG file here..."
               style="font-family: monospace; font-size: 0.85rem;"
             >{SAMPLE_SVG}</textarea>
+            <div id="file-name-display" style="margin-top: 6px; font-size: 0.8rem; color: var(--text-muted); display: none;">
+              Loaded: <span id="file-name-text"></span>
+            </div>
           </div>
 
           <div class={sharedStyles.field}>
@@ -111,12 +131,18 @@ const SAMPLE_SVG = `<?xml version="1.0" encoding="utf-8"?>
 <script>
   import { optimizeSvgCode, calculateSvgSavings } from '@/lib/svg';
 
-  const svgInput = document.getElementById('svgInput') as HTMLTextAreaElement;
-  const svgOptOutput = document.getElementById('svgOptOutput') as HTMLTextAreaElement;
-  const cbComments = document.getElementById('cb-remove-comments') as HTMLInputElement;
-  const cbMetadata = document.getElementById('cb-remove-metadata') as HTMLInputElement;
-  const cbDoctype = document.getElementById('cb-remove-doctype') as HTMLInputElement;
-  const cbWhitespace = document.getElementById('cb-minify-whitespace') as HTMLInputElement;
+  const svgInput = document.getElementById('svgInput') as HTMLTextAreaElement | null;
+  const svgOptOutput = document.getElementById('svgOptOutput') as HTMLTextAreaElement | null;
+  const fileInput = document.getElementById('svgFileInput') as HTMLInputElement | null;
+  const btnUpload = document.getElementById('btn-upload-svg');
+  const btnClear = document.getElementById('btn-clear-svg');
+  const fileNameDisplay = document.getElementById('file-name-display');
+  const fileNameText = document.getElementById('file-name-text');
+
+  const cbComments = document.getElementById('cb-remove-comments') as HTMLInputElement | null;
+  const cbMetadata = document.getElementById('cb-remove-metadata') as HTMLInputElement | null;
+  const cbDoctype = document.getElementById('cb-remove-doctype') as HTMLInputElement | null;
+  const cbWhitespace = document.getElementById('cb-minify-whitespace') as HTMLInputElement | null;
 
   const statOrig = document.getElementById('svg-stat-orig');
   const statOpt = document.getElementById('svg-stat-opt');
@@ -124,6 +150,24 @@ const SAMPLE_SVG = `<?xml version="1.0" encoding="utf-8"?>
   const previewBox = document.getElementById('svg-visual-preview');
   const btnCopy = document.getElementById('btn-copy-svg');
   const btnDownload = document.getElementById('btn-download-svg');
+
+  let downloadFileName = 'optimized.svg';
+
+  function setLoadedFile(name: string) {
+    downloadFileName = name.replace(/\.svg$/i, '.min.svg') || 'optimized.svg';
+    if (fileNameDisplay && fileNameText) {
+      fileNameText.textContent = name;
+      fileNameDisplay.style.display = 'block';
+    }
+  }
+
+  function clearLoadedFile() {
+    downloadFileName = 'optimized.svg';
+    if (fileNameDisplay && fileNameText) {
+      fileNameText.textContent = '';
+      fileNameDisplay.style.display = 'none';
+    }
+  }
 
   function update() {
     const raw = svgInput?.value || '';
@@ -144,7 +188,82 @@ const SAMPLE_SVG = `<?xml version="1.0" encoding="utf-8"?>
     if (statSaved) statSaved.textContent = `${savedBytes} bytes (${savedPercent}%)`;
   }
 
-  [svgInput, cbComments, cbMetadata, cbDoctype, cbWhitespace].forEach((el) => {
+  async function handleFile(file: File) {
+    if (!file.name.toLowerCase().endsWith('.svg') && file.type !== 'image/svg+xml') {
+      alert('Please select a valid .svg file.');
+      return;
+    }
+    const content = await file.text();
+    if (svgInput) {
+      svgInput.value = content;
+      setLoadedFile(file.name);
+      update();
+    }
+  }
+
+  btnUpload?.addEventListener('click', () => {
+    fileInput?.click();
+  });
+
+  fileInput?.addEventListener('change', async () => {
+    const file = fileInput.files?.[0];
+    if (file) {
+      await handleFile(file);
+      fileInput.value = '';
+    }
+  });
+
+  btnClear?.addEventListener('click', () => {
+    if (svgInput) {
+      svgInput.value = '';
+      clearLoadedFile();
+      update();
+      svgInput.focus();
+    }
+  });
+
+  const resetDragState = () => {
+    if (svgInput) {
+      svgInput.style.borderColor = '';
+      svgInput.style.boxShadow = '';
+    }
+  };
+
+  svgInput?.addEventListener('dragover', (event: DragEvent) => {
+    event.preventDefault();
+    if (svgInput) {
+      svgInput.style.borderColor = 'var(--accent)';
+      svgInput.style.boxShadow = '0 0 0 3px var(--accent-dim)';
+    }
+  });
+
+  svgInput?.addEventListener('dragleave', resetDragState);
+  svgInput?.addEventListener('dragend', resetDragState);
+
+  svgInput?.addEventListener('drop', async (event: DragEvent) => {
+    event.preventDefault();
+    resetDragState();
+    const file = event.dataTransfer?.files?.[0];
+    if (file) {
+      await handleFile(file);
+      return;
+    }
+    const text = event.dataTransfer?.getData('text');
+    if (text && svgInput) {
+      svgInput.value = text;
+      clearLoadedFile();
+      update();
+    }
+  });
+
+  svgInput?.addEventListener('input', () => {
+    if (!svgInput?.value) {
+      clearLoadedFile();
+    }
+    update();
+  });
+
+  [cbComments, cbMetadata, cbDoctype, cbWhitespace].forEach((el) => {
     el?.addEventListener('input', update);
   });
 
@@ -163,7 +282,7 @@ const SAMPLE_SVG = `<?xml version="1.0" encoding="utf-8"?>
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'optimized.svg';
+    a.download = downloadFileName;
     a.click();
     URL.revokeObjectURL(url);
   });

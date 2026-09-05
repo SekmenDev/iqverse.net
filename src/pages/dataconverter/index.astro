@@ -25,7 +25,7 @@ const formats = [
           <label class={sharedStyles.fieldLabel} for="inputFormat">
             Input Format
           </label>
-          <select id="inputFormat">
+          <select id="inputFormat" class={sharedStyles.select}>
             {formats.map((option) => (
               <option value={option.value} selected={option.value === 'json'}>
                 {option.label}
@@ -38,7 +38,7 @@ const formats = [
           <label class={sharedStyles.fieldLabel} for="outputFormat">
             Output Format
           </label>
-          <select id="outputFormat">
+          <select id="outputFormat" class={sharedStyles.select}>
             {formats.map((option) => (
               <option value={option.value} selected={option.value === 'csv'}>
                 {option.label}
@@ -48,15 +48,34 @@ const formats = [
         </div>
 
         <div class={sharedStyles.field}>
-          <label class={sharedStyles.fieldLabel} for="converterInput">
-            Input
-          </label>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+            <label class={sharedStyles.fieldLabel} for="converterInput" style="margin-bottom: 0;">
+              Input
+            </label>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <input
+                type="file"
+                id="converterFileInput"
+                accept=".json,.csv,.txt,.hex,.b64,text/plain,application/json,text/csv"
+                style="display: none;"
+              />
+              <button type="button" id="btn-upload-file" class={sharedStyles.button}>
+                Upload File
+              </button>
+              <button type="button" id="btn-clear-input" class={sharedStyles.button}>
+                Clear
+              </button>
+            </div>
+          </div>
           <textarea
             id="converterInput"
             class={sharedStyles.textarea}
             rows="8"
-            placeholder='[{"id": 1, "name": "Alice"}, {"id": 2, "name": "Bob"}]'
+            placeholder="Paste data here or drop a file (.json, .csv, .txt)..."
           ></textarea>
+          <div id="file-name-display" style="margin-top: 6px; font-size: 0.8rem; color: var(--text-muted); display: none;">
+            Loaded: <span id="file-name-text"></span>
+          </div>
         </div>
 
         <div class={sharedStyles.buttonGroup}>
@@ -65,8 +84,18 @@ const formats = [
           </button>
         </div>
 
-        <div class={sharedStyles.sectionLabel} style="margin-top: 18px;">
-          Output
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 18px; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+          <div class={sharedStyles.sectionLabel} style="margin-bottom: 0;">
+            Output
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button type="button" id="btn-copy-output" class={sharedStyles.button}>
+              Copy
+            </button>
+            <button type="button" id="btn-download-output" class={sharedStyles.button}>
+              Download
+            </button>
+          </div>
         </div>
 
         <div class={sharedStyles.field}>
@@ -82,15 +111,142 @@ const formats = [
 </ToolLayout>
 
 <script>
-  import { hexDecode, hexEncode } from '@/lib/encoding';
+  import { b64Decode, b64Encode, hexDecode, hexEncode } from '@/lib/encoding';
 
-  const inFmtSelect = document.getElementById('inputFormat') as HTMLSelectElement;
-  const outFmtSelect = document.getElementById('outputFormat') as HTMLSelectElement;
-  const inputEl = document.getElementById('converterInput') as HTMLTextAreaElement;
-  const outputEl = document.getElementById('converterOutput') as HTMLTextAreaElement;
+  const inFmtSelect = document.getElementById('inputFormat') as HTMLSelectElement | null;
+  const outFmtSelect = document.getElementById('outputFormat') as HTMLSelectElement | null;
+  const inputEl = document.getElementById('converterInput') as HTMLTextAreaElement | null;
+  const outputEl = document.getElementById('converterOutput') as HTMLTextAreaElement | null;
+  const fileInput = document.getElementById('converterFileInput') as HTMLInputElement | null;
+  const btnUpload = document.getElementById('btn-upload-file');
+  const btnClear = document.getElementById('btn-clear-input');
   const btnConvert = document.getElementById('btn-convert');
+  const btnCopy = document.getElementById('btn-copy-output');
+  const btnDownload = document.getElementById('btn-download-output');
+  const fileNameDisplay = document.getElementById('file-name-display');
+  const fileNameText = document.getElementById('file-name-text');
   const errorBox = document.getElementById('converter-error-box');
   const errorMsg = document.getElementById('converter-error-msg');
+
+  let loadedFileName = '';
+
+  function formatFileSize(bytes: number): string {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
+  function setLoadedFile(name: string, size?: number) {
+    loadedFileName = name;
+    if (fileNameDisplay && fileNameText) {
+      const sizeInfo = size !== undefined ? ` (${formatFileSize(size)})` : '';
+      fileNameText.textContent = `${name}${sizeInfo}`;
+      fileNameDisplay.style.display = 'block';
+    }
+  }
+
+  function clearLoadedFile() {
+    loadedFileName = '';
+    if (fileNameDisplay && fileNameText) {
+      fileNameText.textContent = '';
+      fileNameDisplay.style.display = 'none';
+    }
+  }
+
+  function detectFormatFromFileName(name: string): string | null {
+    const lower = name.toLowerCase();
+    if (lower.endsWith('.json')) return 'json';
+    if (lower.endsWith('.csv')) return 'csv';
+    if (lower.endsWith('.hex')) return 'hex';
+    if (lower.endsWith('.b64') || lower.endsWith('.base64')) return 'base64';
+    return null;
+  }
+
+  async function handleFile(file: File) {
+    try {
+      const content = await file.text();
+      if (inputEl) {
+        inputEl.value = content;
+      }
+      setLoadedFile(file.name, file.size);
+      const detected = detectFormatFromFileName(file.name);
+      if (detected && inFmtSelect) {
+        inFmtSelect.value = detected;
+        if (outFmtSelect && outFmtSelect.value === detected) {
+          outFmtSelect.value = detected === 'json' ? 'csv' : 'json';
+        }
+      }
+      if (errorBox) {
+        errorBox.style.display = 'none';
+      }
+    } catch {
+      if (errorBox && errorMsg) {
+        errorBox.style.display = 'block';
+        errorMsg.textContent = 'Could not read file content.';
+      }
+    }
+  }
+
+  btnUpload?.addEventListener('click', () => {
+    fileInput?.click();
+  });
+
+  fileInput?.addEventListener('change', async () => {
+    const file = fileInput.files?.[0];
+    if (file) {
+      await handleFile(file);
+      fileInput.value = '';
+    }
+  });
+
+  btnClear?.addEventListener('click', () => {
+    if (inputEl) inputEl.value = '';
+    if (outputEl) outputEl.value = '';
+    clearLoadedFile();
+    if (errorBox) {
+      errorBox.style.display = 'none';
+    }
+    inputEl?.focus();
+  });
+
+  const resetDragState = () => {
+    if (inputEl) {
+      inputEl.style.borderColor = '';
+      inputEl.style.boxShadow = '';
+    }
+  };
+
+  inputEl?.addEventListener('dragover', (event: DragEvent) => {
+    event.preventDefault();
+    if (inputEl) {
+      inputEl.style.borderColor = 'var(--accent)';
+      inputEl.style.boxShadow = '0 0 0 3px var(--accent-dim)';
+    }
+  });
+
+  inputEl?.addEventListener('dragleave', resetDragState);
+  inputEl?.addEventListener('dragend', resetDragState);
+
+  inputEl?.addEventListener('drop', async (event: DragEvent) => {
+    event.preventDefault();
+    resetDragState();
+    const file = event.dataTransfer?.files?.[0];
+    if (file) {
+      await handleFile(file);
+      return;
+    }
+    const text = event.dataTransfer?.getData('text');
+    if (text && inputEl) {
+      inputEl.value = text;
+      clearLoadedFile();
+    }
+  });
+
+  inputEl?.addEventListener('input', () => {
+    if (!inputEl?.value) {
+      clearLoadedFile();
+    }
+  });
 
   function convert() {
     if (errorBox) errorBox.style.display = 'none';
@@ -98,29 +254,43 @@ const formats = [
 
     try {
       const input = inputEl?.value || '';
+      if (!input.trim()) {
+        throw new Error('Please enter or upload data to convert.');
+      }
       const inFmt = inFmtSelect?.value || 'json';
       const outFmt = outFmtSelect?.value || 'csv';
 
-      let parsed: any = input;
+      let parsed: unknown = input;
 
       if (inFmt === 'json') {
         parsed = JSON.parse(input);
       } else if (inFmt === 'csv') {
         const lines = input.split(/\r?\n/).filter(Boolean);
         const [header, ...rows] = lines;
+        if (!header) {
+          throw new Error('CSV input is empty or invalid.');
+        }
         const columns = header.split(',').map((v) => v.trim());
         parsed = rows.map((row) => {
           const values = row.split(',').map((v) => v.trim());
-          return columns.reduce((obj: any, col, idx) => ({ ...obj, [col]: values[idx] ?? '' }), {});
+          return columns.reduce<Record<string, string>>((obj, col, idx) => ({ ...obj, [col]: values[idx] ?? '' }), {});
         });
       } else if (inFmt === 'hex') {
-        parsed = hexDecode(input);
+        const decoded = hexDecode(input);
+        if (decoded === 'Decoding error') {
+          throw new Error('Invalid Hex data.');
+        }
+        parsed = decoded;
       } else if (inFmt === 'base64') {
-        parsed = atob(input);
+        const decoded = b64Decode(input.trim());
+        if (decoded === 'Decoding error') {
+          throw new Error('Invalid Base64 data.');
+        }
+        parsed = decoded;
       }
 
       if (outFmt === 'json') {
-        outputEl.value = JSON.stringify(parsed, null, 2);
+        outputEl!.value = JSON.stringify(parsed, null, 2);
       } else if (outFmt === 'csv') {
         if (!Array.isArray(parsed) || parsed.length === 0 || typeof parsed[0] !== 'object' || parsed[0] === null) {
           throw new TypeError('CSV output requires an array of objects.');
@@ -131,21 +301,64 @@ const formats = [
         rows.forEach((row) => {
           csv.push(headers.map((h) => String(row[h] ?? '')).join(','));
         });
-        outputEl.value = csv.join('\n');
+        outputEl!.value = csv.join('\n');
       } else if (outFmt === 'hex') {
         const text = typeof parsed === 'string' ? parsed : JSON.stringify(parsed);
-        outputEl.value = hexEncode(text);
+        outputEl!.value = hexEncode(text);
       } else if (outFmt === 'base64') {
         const text = typeof parsed === 'string' ? parsed : JSON.stringify(parsed);
-        outputEl.value = btoa(text);
+        outputEl!.value = b64Encode(text);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (errorBox && errorMsg) {
         errorBox.style.display = 'block';
-        errorMsg.textContent = err.message || 'Conversion failed.';
+        errorMsg.textContent = err instanceof Error ? err.message : 'Conversion failed.';
       }
     }
   }
 
   btnConvert?.addEventListener('click', convert);
+
+  btnCopy?.addEventListener('click', async () => {
+    if (!outputEl?.value) return;
+    try {
+      await navigator.clipboard.writeText(outputEl.value);
+      const originalText = btnCopy.textContent;
+      btnCopy.textContent = 'Copied!';
+      setTimeout(() => {
+        btnCopy.textContent = originalText;
+      }, 1500);
+    } catch {
+      // clipboard access denied
+    }
+  });
+
+  function getDownloadExtension(fmt: string): string {
+    if (fmt === 'json') return 'json';
+    if (fmt === 'csv') return 'csv';
+    if (fmt === 'hex') return 'hex.txt';
+    if (fmt === 'base64') return 'b64.txt';
+    return 'txt';
+  }
+
+  btnDownload?.addEventListener('click', () => {
+    if (!outputEl?.value) return;
+    const outFmt = outFmtSelect?.value || 'txt';
+    const ext = getDownloadExtension(outFmt);
+
+    let baseName = 'converted';
+    if (loadedFileName) {
+      const dotIdx = loadedFileName.lastIndexOf('.');
+      baseName = dotIdx > 0 ? loadedFileName.slice(0, dotIdx) : loadedFileName;
+    }
+
+    const fileName = `${baseName}.${ext}`;
+    const blob = new Blob([outputEl.value], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
 </script>
