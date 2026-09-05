@@ -7,15 +7,24 @@ const DEFAULT_COOKIES = `Set-Cookie: session_id=xyz12345; Path=/; Domain=iqverse
 
 <ToolLayout
   title="Cookie & Set-Cookie Header Inspector"
-  subtitle="Inspect Flags, SameSite, Secure & HttpOnly Directives"
+  subtitle="Inspect Set-Cookie Flags Or View Cookies In Your Browser"
   pill="BROWSER TOOLS"
   toolSlug="cookie-inspector"
-  description="Inspect and parse HTTP Set-Cookie headers to verify security attributes like Secure, HttpOnly, SameSite and Partitioned flags."
+  description="Parse HTTP Set-Cookie headers to verify Secure, HttpOnly, SameSite and Partitioned flags, or list the cookies your browser exposes on this site."
 >
   <div style="max-width: 1050px;">
     <section class={sharedStyles.section}>
       <div class={sharedStyles.card}>
-        <div class={sharedStyles.field}>
+        <div class="tool-filter-group" id="cookie-mode-pills" style="margin-bottom: 20px;">
+          <button type="button" class="filter-pill active cookie-mode-btn" data-mode="header">
+            📋 Paste Set-Cookie Header
+          </button>
+          <button type="button" class="filter-pill cookie-mode-btn" data-mode="browser">
+            🌐 Cookies In This Browser
+          </button>
+        </div>
+
+        <div class={sharedStyles.field} id="cookie-header-panel">
           <label class={sharedStyles.fieldLabel} for="cookieInput">
             Paste Raw Set-Cookie Header(s)
           </label>
@@ -25,6 +34,22 @@ const DEFAULT_COOKIES = `Set-Cookie: session_id=xyz12345; Path=/; Domain=iqverse
             rows="4"
             placeholder="Set-Cookie: name=value; Path=/; Secure; HttpOnly..."
           >{DEFAULT_COOKIES}</textarea>
+        </div>
+
+        <div id="cookie-browser-panel" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div style="font-size: 0.9rem;">
+              Cookies readable on <strong id="cookie-host">this page</strong>:
+              <strong id="cookie-browser-total">0</strong> cookie(s), <strong id="cookie-browser-bytes">0</strong> bytes.
+            </div>
+            <button type="button" id="btn-refresh-cookies" class={`${sharedStyles.button} ${sharedStyles.buttonSmall}`}>
+              ↻ Refresh
+            </button>
+          </div>
+          <div style="margin-top: 12px; padding: 10px 14px; border-radius: 6px; background: rgba(33, 150, 243, 0.08); border: 1px solid rgba(33, 150, 243, 0.3); font-size: 0.85rem;">
+            This reads <code>document.cookie</code> for the current site only. HttpOnly cookies are invisible to
+            JavaScript by design, so they never appear here. Nothing is uploaded or stored.
+          </div>
         </div>
 
         <div style="margin-top: 24px;">
@@ -37,10 +62,10 @@ const DEFAULT_COOKIES = `Set-Cookie: session_id=xyz12345; Path=/; Domain=iqverse
               <button type="button" class="filter-pill active cookie-filter-btn" data-filter="all">
                 All Cookies <span class="filter-badge" id="cookie-count-all">0</span>
               </button>
-              <button type="button" class="filter-pill cookie-filter-btn" data-filter="secure">
+              <button type="button" class="filter-pill cookie-filter-btn" data-filter="secure" id="cookie-pill-secure">
                 🔒 Secure <span class="filter-badge" id="cookie-count-sec">0</span>
               </button>
-              <button type="button" class="filter-pill cookie-filter-btn" data-filter="httponly">
+              <button type="button" class="filter-pill cookie-filter-btn" data-filter="httponly" id="cookie-pill-httponly">
                 🛡️ HttpOnly <span class="filter-badge" id="cookie-count-http">0</span>
               </button>
               <button type="button" class="filter-pill filter-pill-danger cookie-filter-btn" data-filter="warnings">
@@ -71,8 +96,10 @@ const DEFAULT_COOKIES = `Set-Cookie: session_id=xyz12345; Path=/; Domain=iqverse
 
           <div id="cookie-empty-state" class="tool-empty-state" style="display: none;">
             <div class="tool-empty-state-icon">🔍</div>
-            <div class="tool-empty-state-title">No matching cookies</div>
-            <div class="tool-empty-state-text">Try adjusting your search query or switching the active filter.</div>
+            <div class="tool-empty-state-title" id="cookie-empty-title">No matching cookies</div>
+            <div class="tool-empty-state-text" id="cookie-empty-text">
+              Try adjusting your search query or switching the active filter.
+            </div>
           </div>
         </div>
       </div>
@@ -81,9 +108,19 @@ const DEFAULT_COOKIES = `Set-Cookie: session_id=xyz12345; Path=/; Domain=iqverse
 </ToolLayout>
 
 <script>
-  import { parseSetCookieHeader } from '@/lib/cookies';
+  import { parseSetCookieHeader, readBrowserCookies, type ParsedCookie } from '@/lib/cookies';
 
   const cookieInput = document.getElementById('cookieInput') as HTMLTextAreaElement;
+  const headerPanel = document.getElementById('cookie-header-panel');
+  const browserPanel = document.getElementById('cookie-browser-panel');
+  const hostEl = document.getElementById('cookie-host');
+  const browserTotalEl = document.getElementById('cookie-browser-total');
+  const browserBytesEl = document.getElementById('cookie-browser-bytes');
+  const btnRefresh = document.getElementById('btn-refresh-cookies');
+  const pillSecure = document.getElementById('cookie-pill-secure');
+  const pillHttpOnly = document.getElementById('cookie-pill-httponly');
+  const emptyTitleEl = document.getElementById('cookie-empty-title');
+  const emptyTextEl = document.getElementById('cookie-empty-text');
   const cookiesList = document.getElementById('cookies-list');
   const searchInput = document.getElementById('cookie-search-input') as HTMLInputElement;
   const btnClearSearch = document.getElementById('btn-clear-cookie-search');
@@ -97,7 +134,46 @@ const DEFAULT_COOKIES = `Set-Cookie: session_id=xyz12345; Path=/; Domain=iqverse
   const countWarnEl = document.getElementById('cookie-count-warn');
 
   const filterBtns = document.querySelectorAll('.cookie-filter-btn');
+  const modeBtns = document.querySelectorAll('.cookie-mode-btn');
   let activeFilter = 'all';
+  let activeMode: 'header' | 'browser' = 'header';
+
+  function escapeHtml(value: string): string {
+    return value
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
+  }
+
+  function resetFilter() {
+    activeFilter = 'all';
+    filterBtns.forEach((b) => b.classList.toggle('active', (b as HTMLElement).dataset.filter === 'all'));
+  }
+
+  modeBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const mode = (btn as HTMLElement).dataset.mode === 'browser' ? 'browser' : 'header';
+      if (mode === activeMode) return;
+
+      activeMode = mode;
+      modeBtns.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const browserMode = activeMode === 'browser';
+      if (headerPanel) headerPanel.style.display = browserMode ? 'none' : '';
+      if (browserPanel) browserPanel.style.display = browserMode ? 'block' : 'none';
+      if (pillSecure) pillSecure.style.display = browserMode ? 'none' : '';
+      if (pillHttpOnly) pillHttpOnly.style.display = browserMode ? 'none' : '';
+      if (hostEl) hostEl.textContent = window.location.hostname;
+
+      resetFilter();
+      render();
+    });
+  });
+
+  btnRefresh?.addEventListener('click', render);
 
   filterBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -123,9 +199,17 @@ const DEFAULT_COOKIES = `Set-Cookie: session_id=xyz12345; Path=/; Domain=iqverse
   });
 
   function render() {
-    if (!cookieInput || !cookiesList) return;
-    const allCookies = parseSetCookieHeader(cookieInput.value) || [];
+    if (!cookiesList) return;
+
+    const allCookies: ParsedCookie[] =
+      activeMode === 'browser' ? readBrowserCookies() : parseSetCookieHeader(cookieInput?.value || '') || [];
     const query = (searchInput?.value || '').toLowerCase().trim();
+
+    if (activeMode === 'browser') {
+      const totalBytes = allCookies.reduce((sum, c) => sum + c.size, 0);
+      if (browserTotalEl) browserTotalEl.textContent = String(allCookies.length);
+      if (browserBytesEl) browserBytesEl.textContent = String(totalBytes);
+    }
 
     const secCount = allCookies.filter((c) => c.secure).length;
     const httpCount = allCookies.filter((c) => c.httpOnly).length;
@@ -159,6 +243,17 @@ const DEFAULT_COOKIES = `Set-Cookie: session_id=xyz12345; Path=/; Domain=iqverse
 
     if (filtered.length === 0) {
       cookiesList.innerHTML = '';
+      const noneAtAll = allCookies.length === 0;
+      if (emptyTitleEl) {
+        emptyTitleEl.textContent =
+          noneAtAll && activeMode === 'browser' ? 'No readable cookies on this site' : 'No matching cookies';
+      }
+      if (emptyTextEl) {
+        emptyTextEl.textContent =
+          noneAtAll && activeMode === 'browser'
+            ? 'This page has no cookies that JavaScript can read. HttpOnly cookies stay hidden from this view.'
+            : 'Try adjusting your search query or switching the active filter.';
+      }
       if (emptyState) emptyState.style.display = 'flex';
       return;
     }
@@ -166,20 +261,13 @@ const DEFAULT_COOKIES = `Set-Cookie: session_id=xyz12345; Path=/; Domain=iqverse
     if (emptyState) emptyState.style.display = 'none';
 
     cookiesList.innerHTML = filtered
-      .map(
-        (cookie) => `
-      <div
-        style="padding: 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid ${
-          cookie.warnings.length === 0 ? 'var(--border)' : '#faad14'
-        };"
-      >
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-          <div>
-            <strong style="font-size: 1.1rem; color: #2196f3;">${cookie.name}</strong> ={' '}
-            <code style="font-family: monospace;">${cookie.value}</code>
-          </div>
-          <div style="display: flex; gap: 8px;">
-            <span
+      .map((cookie) => {
+        const fromBrowser = cookie.source === 'browser';
+        const flags = fromBrowser
+          ? `<span style="padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; background: rgba(255, 255, 255, 0.1); color: #888;">
+               Readable by JavaScript
+             </span>`
+          : `<span
               style="padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; background: ${
                 cookie.httpOnly ? 'rgba(76, 175, 80, 0.2)' : 'rgba(255, 255, 255, 0.1)'
               }; color: ${cookie.httpOnly ? '#4caf50' : '#888'};"
@@ -192,15 +280,36 @@ const DEFAULT_COOKIES = `Set-Cookie: session_id=xyz12345; Path=/; Domain=iqverse
               }; color: ${cookie.secure ? '#4caf50' : '#888'};"
             >
               Secure: ${cookie.secure ? 'Yes' : 'No'}
-            </span>
+            </span>`;
+
+        const details = fromBrowser
+          ? `<div>Domain: <strong>${escapeHtml(cookie.domain || 'Unspecified')}</strong></div>
+             <div>Size: <strong>${cookie.size} bytes</strong></div>
+             <div>HttpOnly: <strong>No</strong></div>
+             <div>Secure: <strong>Not exposed to JavaScript</strong></div>`
+          : `<div>Domain: <strong>${escapeHtml(cookie.domain || 'Unspecified')}</strong></div>
+             <div>Path: <strong>${escapeHtml(cookie.path || '/')}</strong></div>
+             <div>SameSite: <strong>${escapeHtml(cookie.sameSite || 'Default (Lax)')}</strong></div>
+             <div>Max-Age: <strong>${escapeHtml(String(cookie.maxAge ?? 'Session'))}</strong></div>`;
+
+        return `
+      <div
+        style="padding: 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.02); border: 1px solid ${
+          cookie.warnings.length === 0 ? 'var(--border)' : '#faad14'
+        };"
+      >
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <div style="min-width: 0; word-break: break-all;">
+            <strong style="font-size: 1.1rem; color: #2196f3;">${escapeHtml(cookie.name)}</strong> =
+            <code style="font-family: monospace;">${escapeHtml(cookie.value)}</code>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            ${flags}
           </div>
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; font-size: 0.85rem;">
-          <div>Domain: <strong>${cookie.domain || 'Unspecified'}</strong></div>
-          <div>Path: <strong>${cookie.path || '/'}</strong></div>
-          <div>SameSite: <strong>${cookie.sameSite || 'Default (Lax)'}</strong></div>
-          <div>Max-Age: <strong>${cookie.maxAge || 'Session'}</strong></div>
+          ${details}
         </div>
 
         ${
@@ -209,15 +318,15 @@ const DEFAULT_COOKIES = `Set-Cookie: session_id=xyz12345; Path=/; Domain=iqverse
           <div style="margin-top: 12px; padding: 8px 12px; border-radius: 4px; background: rgba(250, 173, 20, 0.1); border: 1px solid rgba(250, 173, 20, 0.3); color: #faad14; font-size: 0.85rem;">
             <strong>Security Warnings:</strong>
             <ul style="margin: 4px 0 0 16px; padding: 0;">
-              ${cookie.warnings.map((w) => `<li>${w}</li>`).join('')}
+              ${cookie.warnings.map((w) => `<li>${escapeHtml(w)}</li>`).join('')}
             </ul>
           </div>
         `
             : ''
         }
       </div>
-    `
-      )
+    `;
+      })
       .join('');
   }
 

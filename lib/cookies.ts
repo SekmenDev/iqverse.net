@@ -1,15 +1,31 @@
+export type CookieSource = 'header' | 'browser';
+
 export interface ParsedCookie {
   name: string;
   value: string;
   domain?: string;
   path?: string;
   expires?: string;
-  maxAge?: string;
+  maxAge?: string | number;
   sameSite?: string;
   secure: boolean;
   httpOnly: boolean;
   partitioned: boolean;
   warnings: string[];
+  source: CookieSource;
+  size: number;
+}
+
+export interface BrowserCookieContext {
+  host: string;
+  secureContext: boolean;
+}
+
+const SENSITIVE_NAME_PATTERN = /session|token|auth|jwt|login|credential/i;
+const MAX_COOKIE_BYTES = 4096;
+
+export function cookieByteSize(name: string, value: string): number {
+  return new TextEncoder().encode(`${name}=${value}`).length;
 }
 
 export function parseSetCookieHeader(input: string): (ParsedCookie[] & ParsedCookie) | null {
@@ -60,19 +76,15 @@ export function parseSetCookieHeader(input: string): (ParsedCookie[] & ParsedCoo
     if (!sameSite) {
       warnings.push('Cookie missing SameSite attribute (vulnerable to CSRF on legacy browsers).');
     }
-    if (
-      !httpOnly &&
-      (name.toLowerCase().includes('session') ||
-        name.toLowerCase().includes('token') ||
-        name.toLowerCase().includes('auth'))
-    ) {
+    if (!httpOnly && SENSITIVE_NAME_PATTERN.test(name)) {
       warnings.push('Sensitive session token missing HttpOnly flag (vulnerable to XSS theft).');
     }
     if (!secure) {
       warnings.push('Cookie missing Secure flag (transmitted over insecure HTTP connection).');
     }
 
-    const parsedMaxAge: any = maxAge !== undefined && !Number.isNaN(Number(maxAge)) ? Number(maxAge) : maxAge;
+    const parsedMaxAge =
+      maxAge !== undefined && maxAge !== '' && !Number.isNaN(Number(maxAge)) ? Number(maxAge) : maxAge;
 
     cookies.push({
       name,
@@ -86,11 +98,65 @@ export function parseSetCookieHeader(input: string): (ParsedCookie[] & ParsedCoo
       httpOnly,
       partitioned,
       warnings,
+      source: 'header',
+      size: cookieByteSize(name, value),
     });
   });
 
   if (cookies.length === 0) return null;
   return Object.assign(cookies, cookies[0]);
+}
+
+export function parseDocumentCookies(cookieString: string, context: BrowserCookieContext): ParsedCookie[] {
+  if (!cookieString || !cookieString.trim()) return [];
+
+  const cookies: ParsedCookie[] = [];
+
+  cookieString.split(';').forEach((pair) => {
+    const clean = pair.trim();
+    if (!clean.includes('=')) return;
+
+    const firstEq = clean.indexOf('=');
+    const name = clean.slice(0, firstEq).trim();
+    const value = clean.slice(firstEq + 1).trim();
+    if (!name) return;
+
+    const size = cookieByteSize(name, value);
+    const warnings: string[] = [];
+
+    if (SENSITIVE_NAME_PATTERN.test(name)) {
+      warnings.push('Sensitive cookie is readable by JavaScript, so it is not protected by HttpOnly.');
+    }
+    if (!context.secureContext) {
+      warnings.push('Page is not a secure context, so this cookie can travel over plain HTTP.');
+    }
+    if (size > MAX_COOKIE_BYTES) {
+      warnings.push(`Cookie is ${size} bytes and exceeds the ${MAX_COOKIE_BYTES} byte limit most browsers enforce.`);
+    }
+
+    cookies.push({
+      name,
+      value,
+      domain: context.host,
+      secure: false,
+      httpOnly: false,
+      partitioned: false,
+      warnings,
+      source: 'browser',
+      size,
+    });
+  });
+
+  return cookies;
+}
+
+export function readBrowserCookies(): ParsedCookie[] {
+  if (typeof document === 'undefined') return [];
+
+  return parseDocumentCookies(document.cookie, {
+    host: window.location.hostname,
+    secureContext: window.isSecureContext,
+  });
 }
 
 export function filterCookies(
