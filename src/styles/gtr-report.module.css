@@ -1,0 +1,165 @@
+/* GTR report preview (hero mockup) */
+
+.report {
+  --gtr-fail-bg: rgba(248, 113, 113, 0.16);
+  --gtr-fail-text: #fca5a5;
+  --gtr-track: rgba(255, 255, 255, 0.08);
+  --gtr-divider: rgba(255, 255, 255, 0.08);
+
+  display: grid;
+  gap: 0.85rem;
+}
+
+:global([data-theme='light']) .report {
+  --gtr-fail-bg: rgba(220, 38, 38, 0.1);
+  --gtr-fail-text: #b91c1c;
+  --gtr-track: rgba(15, 23, 42, 0.08);
+  --gtr-divider: rgba(15, 23, 42, 0.08);
+}
+
+.scoreRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.scoreValue {
+  display: flex;
+  align-items: baseline;
+  gap: 0.15rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--saas-text);
+}
+
+.scoreNumber {
+  font-size: 2.5rem;
+  letter-spacing: -0.02em;
+}
+
+.scoreMax {
+  font-size: 1rem;
+  color: var(--saas-text-dim);
+}
+
+.scoreLabel {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--saas-text-muted);
+}
+
+.trend {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3rem;
+}
+
+.spark {
+  display: block;
+  width: 120px;
+  height: 32px;
+  color: var(--saas-stat-green-text);
+}
+
+.delta {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--saas-stat-green-text);
+}
+
+.meter {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--gtr-track);
+  overflow: hidden;
+}
+
+.meterFill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #818cf8, #4f46e5);
+}
+
+.checks {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.check {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 12px;
+  background: var(--saas-preview-row-bg);
+  border: 1px solid var(--saas-border);
+}
+
+.checkIcon {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.checkName {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--saas-text);
+}
+
+.checkDetail {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.78rem;
+  color: var(--saas-text-muted);
+}
+
+.pill {
+  padding: 0.22rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.pass {
+  background: var(--saas-stat-green-bg);
+  color: var(--saas-stat-green-text);
+}
+
+.warn {
+  background: var(--saas-stat-amber-bg);
+  color: var(--saas-stat-amber-text);
+}
+
+.fail {
+  background: var(--gtr-fail-bg);
+  color: var(--gtr-fail-text);
+}
+
+.reportFoot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--gtr-divider);
+  font-size: 0.78rem;
+  color: var(--saas-text-dim);
+}
+
+@media (max-width: 480px) {
+  .scoreRow {
+    flex-direction: column;
+  }
+
+  .trend {
+    align-items: flex-start;
+  }
+}

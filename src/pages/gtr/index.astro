@@ -3,6 +3,45 @@ import Layout from '@/layouts/Layout.astro';
 import ThemeToggle from '@/components/ThemeToggle.astro';
 import CapCaptcha from '@/components/CapCaptcha.astro';
 import styles from '@/styles/saas-landing.module.css';
+import report from '@/styles/gtr-report.module.css';
+
+const checks = [
+  {
+    icon: '🛡️',
+    name: 'Security headers',
+    detail: '241 of 248 pages pass · CSP missing on /blog/*',
+    status: 'warn',
+    label: '7 issues',
+  },
+  {
+    icon: '📜',
+    name: 'SSL/TLS certificate',
+    detail: 'Valid to 12 Dec 2026 · renews in 46 days',
+    status: 'pass',
+    label: 'OK',
+  },
+  {
+    icon: '🔗',
+    name: 'Broken links',
+    detail: '3 dead of 1,842 links · 2 new since last scan',
+    status: 'fail',
+    label: '3 broken',
+  },
+  {
+    icon: '🤖',
+    name: 'AI crawler access',
+    detail: 'llms.txt found · 12 pages blocked by robots.txt',
+    status: 'warn',
+    label: 'Partial',
+  },
+  {
+    icon: '↩️',
+    name: 'Redirects',
+    detail: 'No loops · 4 chains longer than 2 hops',
+    status: 'pass',
+    label: 'OK',
+  },
+] as const;
 ---
 
 <Layout
@@ -58,30 +97,54 @@ import styles from '@/styles/saas-landing.module.css';
 
         <div class={styles.heroPreview}>
           <div class={styles.previewBar}>
-            <span>GTR Report Preview</span>
+            <span>GTR Report · example.com</span>
             <span>Coming Soon</span>
           </div>
           <div class={styles.previewBody}>
-            <div class={styles.previewList}>
-              <div class={styles.previewRow}>
-                <span>🤖</span>
-                <span>AI crawler access &amp; llms.txt coverage, site-wide</span>
+            <div class={report.report}>
+              <div class={report.scoreRow}>
+                <div>
+                  <div class={report.scoreValue}>
+                    <span class={report.scoreNumber}>87</span>
+                    <span class={report.scoreMax}>/100</span>
+                  </div>
+                  <span class={report.scoreLabel}>Site health · 248 pages crawled 2h ago</span>
+                </div>
+                <div class={report.trend}>
+                  <svg class={report.spark} viewBox="0 0 120 32" fill="none" aria-hidden="true">
+                    <polyline
+                      points="0,25.3 20,21.6 40,22.8 60,15.4 80,11.7 100,12.9 120,5.5"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <circle cx="120" cy="5.5" r="2.5" fill="currentColor" />
+                  </svg>
+                  <span class={report.delta}>▲ 4 vs last scan</span>
+                </div>
               </div>
-              <div class={styles.previewRow}>
-                <span>🛡️</span>
-                <span>Security headers on every page, checked daily</span>
+
+              <div class={report.meter}>
+                <div class={report.meterFill} style="width: 87%"></div>
               </div>
-              <div class={styles.previewRow}>
-                <span>📜</span>
-                <span>SSL/TLS certificate expiry, monitored per domain</span>
+
+              <div class={report.checks}>
+                {checks.map((check) => (
+                  <div class={report.check}>
+                    <span class={report.checkIcon}>{check.icon}</span>
+                    <span>
+                      <span class={report.checkName}>{check.name}</span>
+                      <span class={report.checkDetail}>{check.detail}</span>
+                    </span>
+                    <span class={`${report.pill} ${report[check.status]}`}>{check.label}</span>
+                  </div>
+                ))}
               </div>
-              <div class={styles.previewRow}>
-                <span>🔗</span>
-                <span>Broken links and redirect loops, whole site</span>
-              </div>
-              <div class={styles.previewRow}>
-                <span>📈</span>
-                <span>One score, tracked and diffed against the last scan</span>
+
+              <div class={report.reportFoot}>
+                <span>Daily crawl · next run in 22h</span>
+                <span>2 alerts sent this week</span>
               </div>
             </div>
           </div>
